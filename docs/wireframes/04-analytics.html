@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartMoney - 分析</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Noto Sans JP', 'sans-serif'], numbers: ['Inter', 'sans-serif'] },
+          colors: { primary: { 500: '#4CAF50' } }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50 font-sans">
+
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+          </svg>
+          <h1 class="text-xl font-bold">SmartMoney</h1>
+        </div>
+        <nav class="hidden md:flex items-center gap-6">
+          <a href="01-dashboard.html" class="text-gray-600 hover:text-gray-900">ダッシュボード</a>
+          <a href="02-upload.html" class="text-gray-600 hover:text-gray-900">アップロード</a>
+          <a href="03-transactions.html" class="text-gray-600 hover:text-gray-900">取引履歴</a>
+          <a href="#" class="text-primary-600 font-medium border-b-2 border-primary-600 pb-1">分析</a>
+          <a href="05-goals.html" class="text-gray-600 hover:text-gray-900">目標</a>
+          <a href="06-settings.html" class="text-gray-600 hover:text-gray-900">設定</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <div class="mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">分析</h2>
+      <p class="text-gray-600">収支の詳細な分析とトレンド</p>
+    </div>
+
+    <!-- Date Range Selector -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mb-6">
+      <div class="flex flex-wrap items-center gap-4">
+        <div class="flex gap-2">
+          <button class="px-4 py-2 bg-primary-500 text-white font-medium rounded-lg">今月</button>
+          <button class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">3ヶ月</button>
+          <button class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">6ヶ月</button>
+          <button class="px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50">1年</button>
+        </div>
+        <div class="flex gap-2">
+          <input type="date" class="px-4 py-2 border border-gray-300 rounded-lg" value="2025-11-01">
+          <span class="py-2">〜</span>
+          <input type="date" class="px-4 py-2 border border-gray-300 rounded-lg" value="2025-11-30">
+        </div>
+      </div>
+    </div>
+
+    <!-- Income vs Expense Chart -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm mb-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-6">収入 vs 支出</h3>
+      <div class="h-80 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center" role="img" aria-label="収入と支出の比較チャート">
+        <div class="text-center">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          <p class="text-gray-500 text-sm">Bar Chart: Income vs Expense by Month</p>
+          <p class="text-gray-400 text-xs mt-1">(Recharts implementation)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      
+      <!-- Category Breakdown Pie Chart -->
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">カテゴリー別内訳</h3>
+        <div class="h-80 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center" role="img" aria-label="カテゴリー別支出の円グラフ">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" stroke-width="2"></circle>
+              <path d="M12 2 A10 10 0 0 1 22 12 L12 12 Z" fill="currentColor" opacity="0.3"></path>
+            </svg>
+            <p class="text-gray-500 text-sm">Pie Chart: Category Breakdown</p>
+            <p class="text-gray-400 text-xs mt-1">(Recharts Pie Chart)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cashflow Waterfall Chart -->
+      <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+        <h3 class="text-lg font-semibold text-gray-900 mb-6">キャッシュフロー</h3>
+        <div class="h-80 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center" role="img" aria-label="キャッシュフローのウォーターフォールチャート">
+          <div class="text-center">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+            </svg>
+            <p class="text-gray-500 text-sm">Waterfall Chart: Monthly Cashflow</p>
+            <p class="text-gray-400 text-xs mt-1">(Custom Recharts)</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Top Categories Table -->
+    <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+      <h3 class="text-lg font-semibold text-gray-900 mb-6">カテゴリー別ランキング</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl font-bold text-gray-400">1</span>
+            <div>
+              <p class="font-semibold text-gray-900">住宅</p>
+              <p class="text-sm text-gray-600">42.1% of total expenses</p>
+            </div>
+          </div>
+          <p class="text-xl font-bold font-numbers text-gray-900">¥120,000</p>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl font-bold text-gray-400">2</span>
+            <div>
+              <p class="font-semibold text-gray-900">食費</p>
+              <p class="text-sm text-gray-600">29.8% of total expenses</p>
+            </div>
+          </div>
+          <p class="text-xl font-bold font-numbers text-gray-900">¥85,000</p>
+        </div>
+        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl font-bold text-gray-400">3</span>
+            <div>
+              <p class="font-semibold text-gray-900">こども・教育</p>
+              <p class="text-sm text-gray-600">15.8% of total expenses</p>
+            </div>
+          </div>
+          <p class="text-xl font-bold font-numbers text-gray-900">¥45,000</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-gray-200 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-sm text-gray-500">
+      <p>&copy; 2025 SmartMoney. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

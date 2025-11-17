@@ -1,0 +1,67 @@
+"""Analytics API routes."""
+from datetime import date
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from ..database import get_db
+from ..schemas.analytics import (
+    CategoryBreakdownResponse,
+    MonthlyCashflowResponse,
+    SourceBreakdownResponse,
+)
+from ..services.analytics_service import AnalyticsService
+
+router = APIRouter(prefix="/api/analytics", tags=["analytics"])
+
+
+@router.get("/monthly", response_model=list[MonthlyCashflowResponse])
+async def get_monthly_cashflow(
+    start_date: Optional[date] = Query(None, description="Filter by start date"),
+    end_date: Optional[date] = Query(None, description="Filter by end date"),
+    db: Session = Depends(get_db),
+):
+    """Get monthly cashflow data."""
+    return AnalyticsService.get_monthly_cashflow(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+
+@router.get("/categories", response_model=list[CategoryBreakdownResponse])
+async def get_category_breakdown(
+    start_date: Optional[date] = Query(None, description="Filter by start date"),
+    end_date: Optional[date] = Query(None, description="Filter by end date"),
+    db: Session = Depends(get_db),
+):
+    """Get category breakdown for expenses."""
+    return AnalyticsService.get_category_breakdown(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+
+@router.get("/trend", response_model=list[MonthlyCashflowResponse])
+async def get_monthly_trend(
+    months: int = Query(12, ge=1, le=60, description="Number of months to include"),
+    db: Session = Depends(get_db),
+):
+    """Get monthly trend for last N months."""
+    return AnalyticsService.get_monthly_trend(db=db, months=months)
+
+
+@router.get("/sources", response_model=list[SourceBreakdownResponse])
+async def get_sources_breakdown(
+    start_date: Optional[date] = Query(None, description="Filter by start date"),
+    end_date: Optional[date] = Query(None, description="Filter by end date"),
+    db: Session = Depends(get_db),
+):
+    """Get transaction breakdown by source."""
+    return AnalyticsService.get_sources_breakdown(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+    )
