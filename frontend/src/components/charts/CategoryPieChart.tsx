@@ -19,6 +19,15 @@ const COLORS = [
 ]
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
+  // Calculate total for percentage calculation
+  const total = data.reduce((sum, item) => sum + item.amount, 0)
+
+  // Custom label function that calculates percentage
+  const renderLabel = (entry: any) => {
+    const percentage = total > 0 ? ((entry.value / total) * 100).toFixed(1) : '0.0'
+    return `${entry.category} (${percentage}%)`
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
@@ -27,10 +36,11 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={(entry) => `${entry.category} (${entry.percentage}%)`}
+          label={renderLabel}
           outerRadius={100}
           fill="#8884d8"
           dataKey="amount"
+          nameKey="category"
         >
           {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
