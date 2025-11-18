@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
 import { CategoryPieChart } from '@/components/charts/CategoryPieChart'
+import { TrendLineChart } from '@/components/charts/TrendLineChart'
 import { fetchAnalytics } from '@/services/analytics-service'
 import { getCurrentMonthRange } from '@/utils/formatDate'
 import { format, subMonths } from 'date-fns'
@@ -146,8 +147,14 @@ export function Analytics() {
 
             <Card>
               <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('analytics.monthlyCashFlow')}</h3>
-              <div className="h-80 flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg">
-                <p className="text-gray-400">{t('analytics.comingSoon')}</p>
+              <div className="h-80">
+                {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
+                  <TrendLineChart data={analytics.monthly_trends} dataKey="net" />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400">
+                    {t('analytics.noData')}
+                  </div>
+                )}
               </div>
             </Card>
           </div>
