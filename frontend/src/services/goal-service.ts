@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { Goal } from '@/types'
+import type { Goal, GoalProgress } from '@/types'
 
 /**
  * Fetch all goals
@@ -40,4 +40,22 @@ export async function updateGoal(id: number, data: Partial<Goal>): Promise<Goal>
  */
 export async function deleteGoal(id: number): Promise<void> {
   await apiClient.delete(`/api/goals/${id}`)
+}
+
+/**
+ * Fetch goal progress with optional achievability metrics
+ */
+export async function fetchGoalProgress(
+  goalId: number,
+  includeAchievability: boolean = true
+): Promise<GoalProgress> {
+  const params = new URLSearchParams()
+  if (includeAchievability) {
+    params.append('include_achievability', 'true')
+  }
+
+  const response = await apiClient.get<GoalProgress>(
+    `/api/goals/${goalId}/progress?${params.toString()}`
+  )
+  return response.data
 }

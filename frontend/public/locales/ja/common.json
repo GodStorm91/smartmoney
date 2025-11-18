@@ -1,0 +1,159 @@
+{
+  "header": {
+    "dashboard": "ダッシュボード",
+    "upload": "アップロード",
+    "transactions": "取引履歴",
+    "analytics": "分析",
+    "goals": "目標",
+    "settings": "設定"
+  },
+  "button": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "update": "更新",
+    "close": "閉じる",
+    "apply": "フィルター適用",
+    "reset": "リセット",
+    "selectFile": "ファイルを選択"
+  },
+  "language": {
+    "selectLanguage": "言語を選択",
+    "japanese": "日本語",
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  },
+  "aria": {
+    "mainNavigation": "メインナビゲーション",
+    "mobileNavigation": "モバイルナビゲーション",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "uploadDropzone": "CSVファイルをドラッグ&ドロップ、またはクリックしてアップロード"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "subtitle": "{{month}}の財務状況",
+    "categoryBreakdown": "カテゴリー別支出",
+    "goalAchievability": "目標達成可能性",
+    "viewAllCategories": "すべてのカテゴリーを表示 →",
+    "viewDetails": "詳細 →",
+    "noData": "データがありません",
+    "noGoals": "目標が設定されていません",
+    "yearGoal": "{{years}}年目標",
+    "quickActions": "クイックアクション",
+    "quickActionUpload": "CSVアップロード",
+    "quickActionGoals": "目標を設定",
+    "quickActionAnalytics": "分析を表示"
+  },
+  "transactions": {
+    "title": "取引履歴",
+    "subtitle": "すべての取引を表示・フィルタリング",
+    "startDate": "開始日",
+    "endDate": "終了日",
+    "category": "カテゴリー",
+    "source": "支払元",
+    "all": "すべて",
+    "income": "収入",
+    "expense": "支出",
+    "difference": "差額",
+    "date": "日付",
+    "description": "内容",
+    "amount": "金額",
+    "noData": "取引データがありません",
+    "categoryFood": "食費",
+    "categoryHousing": "住宅",
+    "sourceRakuten": "楽天カード"
+  },
+  "upload": {
+    "title": "CSVアップロード",
+    "subtitle": "銀行またはアプリからエクスポートしたCSVファイルをアップロード",
+    "history": "アップロード履歴",
+    "faq": "よくある質問",
+    "uploading": "アップロード中...",
+    "pleaseWait": "しばらくお待ちください",
+    "dropOrClick": "ファイルをドロップまたはクリック",
+    "dropDescription": "CSVファイルをここにドラッグ&ドロップ、またはクリックして選択",
+    "supportedFormats": "対応形式: .csv (最大 10MB)",
+    "requirements": "CSVファイルの要件",
+    "requiredColumns": "必須列: 日付、金額、カテゴリー",
+    "supportedApps": "対応アプリ: Zaim、MoneyForward、楽天カード",
+    "encoding": "文字コード: UTF-8、Shift-JIS",
+    "noHistory": "アップロード履歴なし",
+    "uploadFirst": "最初のCSVファイルをアップロードしましょう",
+    "success": "成功",
+    "warning": "警告あり",
+    "completed": "完了",
+    "imported": "インポート済み",
+    "duplicates": "重複スキップ",
+    "errors": "エラー",
+    "errorDetails": "エラーの詳細:",
+    "row": "行",
+    "count": "件",
+    "alertSelectCSV": "CSVファイルを選択してください",
+    "alertMaxSize": "ファイルサイズは10MB以下にしてください",
+    "alertUploadFailed": "アップロードに失敗しました",
+    "faqQuestion1": "どのアプリのCSVに対応していますか？",
+    "faqAnswer1": "現在、Zaim、MoneyForward、楽天カード、三井住友カードのCSVエクスポート形式に対応しています。その他のフォーマットは設定ページでマッピングを調整できます。",
+    "faqQuestion2": "重複したデータはどう処理されますか？",
+    "faqAnswer2": "日付、金額、説明が完全に一致する取引は自動的にスキップされます。アップロード結果で重複スキップされた件数を確認できます。",
+    "faqQuestion3": "エラーが発生した場合は？",
+    "faqAnswer3": "エラーが発生した行は詳細とともに表示されます。エラーデータは修正後に再アップロードできます。正常な行は問題なくインポートされます。"
+  },
+  "analytics": {
+    "title": "分析",
+    "subtitle": "収支の詳細な分析とトレンド",
+    "currentMonth": "今月",
+    "3months": "3ヶ月",
+    "6months": "6ヶ月",
+    "1year": "1年",
+    "incomeVsExpense": "収入 vs 支出",
+    "categoryBreakdown": "カテゴリー別内訳",
+    "monthlyCashFlow": "月次キャッシュフロー",
+    "noData": "データがありません",
+    "comingSoon": "月次詳細チャート (実装予定)"
+  },
+  "goals": {
+    "title": "長期目標",
+    "subtitle": "1年、3年、5年、10年の貯蓄目標を設定・追跡",
+    "createGoal": "目標を作成",
+    "selectPeriod": "期間を選択して貯蓄目標を設定しましょう",
+    "remainingSlots": "残り{{count}}枠",
+    "maxGoalsReached": "最大{{max}}個の目標を設定できます。新しい目標を追加するには、既存の目標を削除してください。",
+    "yearGoal": "{{years}}年目標"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "noData": "データがありません"
+  },
+  "chart": {
+    "trend12months": "12ヶ月のトレンド",
+    "trendChart": "過去12ヶ月のトレンドチャート",
+    "income": "収入",
+    "expense": "支出",
+    "net": "差額"
+  },
+  "kpi": {
+    "thisMonthIncome": "今月の収入",
+    "thisMonthExpense": "今月の支出",
+    "thisMonthNet": "今月の差額"
+  },
+  "goal": {
+    "status": {
+      "onTrack": "順調",
+      "achievable": "達成可能",
+      "challenging": "挑戦的",
+      "severe": "厳しい"
+    },
+    "insight": {
+      "onPace": "このペースで達成できます！",
+      "smallGap": "あと{{gap}}/月で達成可能",
+      "mediumGap": "月{{gap}}増やす必要があります",
+      "largeGap": "月{{gap}}の追加貯蓄が必要です"
+    },
+    "monthlySavings": "月次貯蓄状況",
+    "monthsRemaining": "残り {{months}} ヶ月",
+    "editGoal": "目標を編集"
+  }
+}

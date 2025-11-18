@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
 import type { MonthlyData } from '@/types'
@@ -8,12 +9,13 @@ interface TrendChartCardProps {
 }
 
 export function TrendChartCard({ data }: TrendChartCardProps) {
+  const { t } = useTranslation('common')
   const [selectedMetric, setSelectedMetric] = useState<'net' | 'income' | 'expense'>('net')
 
   return (
     <Card className="lg:col-span-2">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">12ヶ月のトレンド</h3>
+        <h3 className="text-lg font-semibold text-gray-900">{t('chart.trend12months')}</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setSelectedMetric('net')}
@@ -23,7 +25,7 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            差額
+            {t('chart.net')}
           </button>
           <button
             onClick={() => setSelectedMetric('income')}
@@ -33,7 +35,7 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            収入
+            {t('chart.income')}
           </button>
           <button
             onClick={() => setSelectedMetric('expense')}
@@ -43,17 +45,17 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            支出
+            {t('chart.expense')}
           </button>
         </div>
       </div>
 
-      <div className="h-80" role="img" aria-label="過去12ヶ月のトレンドチャート">
+      <div className="h-80" role="img" aria-label={t('chart.trendChart')}>
         {data && data.length > 0 ? (
           <TrendLineChart data={data} dataKey={selectedMetric} />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400">
-            データがありません
+            {t('common.noData')}
           </div>
         )}
       </div>

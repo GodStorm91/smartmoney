@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
@@ -19,6 +20,7 @@ export function UploadDropZone({
   onDragLeave,
   onFileSelect,
 }: UploadDropZoneProps) {
+  const { t } = useTranslation('common')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   return (
@@ -26,7 +28,7 @@ export function UploadDropZone({
       <div
         role="button"
         tabIndex={0}
-        aria-label="CSVファイルをドラッグ&ドロップ、またはクリックしてアップロード"
+        aria-label={t('aria.uploadDropzone')}
         className={`border-2 border-dashed rounded-xl p-12 text-center transition-all cursor-pointer ${
           isDragOver
             ? 'border-primary-500 bg-primary-50/50'
@@ -56,8 +58,8 @@ export function UploadDropZone({
         {uploading ? (
           <>
             <LoadingSpinner size="lg" className="mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">アップロード中...</h3>
-            <p className="text-sm text-gray-600">しばらくお待ちください</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('upload.uploading')}</h3>
+            <p className="text-sm text-gray-600">{t('upload.pleaseWait')}</p>
           </>
         ) : (
           <>
@@ -65,17 +67,17 @@ export function UploadDropZone({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">ファイルをドロップまたはクリック</h3>
-            <p className="text-sm text-gray-600 mb-4">CSVファイルをここにドラッグ&ドロップ、またはクリックして選択</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('upload.dropOrClick')}</h3>
+            <p className="text-sm text-gray-600 mb-4">{t('upload.dropDescription')}</p>
 
             <Button variant="primary">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              ファイルを選択
+              {t('button.selectFile')}
             </Button>
 
-            <p className="text-xs text-gray-500 mt-4">対応形式: .csv (最大 10MB)</p>
+            <p className="text-xs text-gray-500 mt-4">{t('upload.supportedFormats')}</p>
           </>
         )}
       </div>
@@ -87,11 +89,11 @@ export function UploadDropZone({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <h4 className="text-sm font-semibold text-blue-900 mb-1">CSVファイルの要件</h4>
+            <h4 className="text-sm font-semibold text-blue-900 mb-1">{t('upload.requirements')}</h4>
             <ul className="text-sm text-blue-800 space-y-1">
-              <li>• 必須列: 日付、金額、カテゴリー</li>
-              <li>• 対応アプリ: Zaim、MoneyForward、楽天カード</li>
-              <li>• 文字コード: UTF-8、Shift-JIS</li>
+              <li>• {t('upload.requiredColumns')}</li>
+              <li>• {t('upload.supportedApps')}</li>
+              <li>• {t('upload.encoding')}</li>
             </ul>
           </div>
         </div>

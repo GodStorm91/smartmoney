@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/formatCurrency'
 import type { MonthlyData } from '@/types'
 
@@ -22,13 +23,15 @@ const colorMap = {
   net: '#2196F3',
 }
 
-const labelMap = {
-  income: '収入',
-  expense: '支出',
-  net: '差額',
-}
-
 export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
+  const { t } = useTranslation('common')
+
+  const labelMap = {
+    income: t('chart.income'),
+    expense: t('chart.expense'),
+    net: t('chart.net'),
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>

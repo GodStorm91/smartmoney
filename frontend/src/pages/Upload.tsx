@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { UploadDropZone } from '@/components/upload/UploadDropZone'
 import { UploadHistoryList } from '@/components/upload/UploadHistoryList'
@@ -7,6 +8,7 @@ import { UploadFAQ } from '@/components/upload/UploadFAQ'
 import { uploadCSV, fetchUploadHistory } from '@/services/upload-service'
 
 export function Upload() {
+  const { t } = useTranslation('common')
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const queryClient = useQueryClient()
@@ -29,12 +31,12 @@ export function Upload() {
     if (!file) return
 
     if (!file.name.endsWith('.csv')) {
-      alert('CSVファイルを選択してください')
+      alert(t('upload.alertSelectCSV'))
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('ファイルサイズは10MB以下にしてください')
+      alert(t('upload.alertMaxSize'))
       return
     }
 
@@ -43,7 +45,7 @@ export function Upload() {
       await uploadMutation.mutateAsync(file)
     } catch (error) {
       console.error('Upload failed:', error)
-      alert('アップロードに失敗しました')
+      alert(t('upload.alertUploadFailed'))
     } finally {
       setUploading(false)
     }
@@ -72,8 +74,8 @@ export function Upload() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Title */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">CSVアップロード</h2>
-        <p className="text-gray-600">銀行またはアプリからエクスポートしたCSVファイルをアップロード</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('upload.title')}</h2>
+        <p className="text-gray-600">{t('upload.subtitle')}</p>
       </div>
 
       {/* Upload Zone */}
@@ -90,13 +92,13 @@ export function Upload() {
 
       {/* Upload History */}
       <Card>
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">アップロード履歴</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('upload.history')}</h3>
         <UploadHistoryList history={history} isLoading={isLoading} />
       </Card>
 
       {/* FAQ Section */}
       <Card className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">よくある質問</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('upload.faq')}</h3>
         <UploadFAQ />
       </Card>
     </div>

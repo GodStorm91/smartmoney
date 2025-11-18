@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import './index.css'
+import './i18n/config' // Import i18n configuration
 
 // Configure React Query client
 const queryClient = new QueryClient({

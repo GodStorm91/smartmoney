@@ -35,6 +35,20 @@ class GoalResponse(GoalBase):
         from_attributes = True
 
 
+class GoalAchievabilityResponse(BaseModel):
+    """Schema for goal achievability metrics."""
+
+    current_monthly_net: int
+    achievable_amount: int
+    achievable_percentage: float
+    required_monthly: int
+    monthly_gap: int
+    status_tier: str  # on_track, achievable, challenging, deficit, severe_deficit
+    recommendation: str
+    data_source: str  # e.g., "2025-10"
+    months_remaining: int
+
+
 class GoalProgressResponse(BaseModel):
     """Schema for goal progress data."""
 
@@ -54,3 +68,4 @@ class GoalProgressResponse(BaseModel):
     needed_remaining: int
     projected_total: int
     status: str
+    achievability: Optional[GoalAchievabilityResponse] = None

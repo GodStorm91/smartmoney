@@ -215,3 +215,168 @@ class GoalService:
         expenses = result.expenses or 0
 
         return income - abs(expenses)
+
+    @staticmethod
+    def calculate_achievability(db: Session, goal: Goal) -> dict:
+        """Calculate goal achievability based on last complete month's cashflow.
+
+        Args:
+            db: Database session
+            goal: Goal object
+
+        Returns:
+            Dictionary with achievability metrics
+        """
+        # Determine start date
+        if goal.start_date:
+            start_date = goal.start_date
+        else:
+            # Use earliest transaction date
+            first_tx = (
+                db.query(func.min(Transaction.date))
+                .filter(~Transaction.is_transfer)
+                .scalar()
+            )
+            start_date = first_tx or date.today()
+
+        # Calculate months remaining
+        now = date.today()
+        target_date = start_date + relativedelta(years=goal.years)
+        months_total = goal.years * 12
+        months_elapsed = (
+            (now.year - start_date.year) * 12 + (now.month - start_date.month)
+        )
+        months_remaining = max(months_total - months_elapsed, 1)
+
+        # Get last complete month's cashflow
+        # Use previous month to ensure we have complete data
+        last_complete_month = (now.replace(day=1) - relativedelta(days=1))
+        last_month_key = last_complete_month.strftime("%Y-%m")
+
+        # Query last month's net cashflow
+        result = db.query(
+            func.sum(
+                case(
+                    (Transaction.is_income, Transaction.amount), else_=0
+                )
+            ).label("income"),
+            func.sum(
+                case(
+                    (~Transaction.is_income, Transaction.amount), else_=0
+                )
+            ).label("expenses"),
+        ).filter(
+            ~Transaction.is_transfer,
+            Transaction.month_key == last_month_key
+        ).first()
+
+        income = result.income or 0
+        expenses = result.expenses or 0
+        current_monthly_net = income - abs(expenses)
+
+        # Calculate achievable amount (linear projection)
+        achievable_amount = current_monthly_net * months_remaining
+
+        # Calculate achievable percentage
+        achievable_percentage = (
+            (achievable_amount / goal.target_amount * 100)
+            if goal.target_amount > 0
+            else 0
+        )
+
+        # Calculate required monthly savings
+        total_saved = GoalService._calculate_net_savings(db, start_date)
+        needed_remaining = goal.target_amount - total_saved
+        required_monthly = needed_remaining / months_remaining
+
+        # Calculate monthly gap
+        monthly_gap = required_monthly - current_monthly_net
+
+        # Determine status tier based on achievable percentage
+        if achievable_percentage >= 100:
+            status_tier = "on_track"
+        elif achievable_percentage >= 80:
+            status_tier = "achievable"
+        elif achievable_percentage >= 50:
+            status_tier = "challenging"
+        elif achievable_percentage >= 0:
+            status_tier = "deficit"
+        else:
+            status_tier = "severe_deficit"
+
+        # Generate recommendation
+        recommendation = GoalService._generate_recommendation(
+            status_tier=status_tier,
+            monthly_gap=monthly_gap,
+            current_monthly_net=current_monthly_net,
+            required_monthly=required_monthly,
+            achievable_percentage=achievable_percentage,
+        )
+
+        return {
+            "current_monthly_net": round(current_monthly_net, 0),
+            "achievable_amount": round(achievable_amount, 0),
+            "achievable_percentage": round(achievable_percentage, 2),
+            "required_monthly": round(required_monthly, 0),
+            "monthly_gap": round(monthly_gap, 0),
+            "status_tier": status_tier,
+            "recommendation": recommendation,
+            "data_source": last_month_key,
+            "months_remaining": months_remaining,
+        }
+
+    @staticmethod
+    def _generate_recommendation(
+        status_tier: str,
+        monthly_gap: int,
+        current_monthly_net: int,
+        required_monthly: int,
+        achievable_percentage: float,
+    ) -> str:
+        """Generate actionable recommendation based on achievability metrics.
+
+        Args:
+            status_tier: Status tier (on_track, achievable, challenging, deficit, severe_deficit)
+            monthly_gap: Gap between required and current monthly net
+            current_monthly_net: Current monthly net cashflow
+            required_monthly: Required monthly savings
+            achievable_percentage: Achievable percentage
+
+        Returns:
+            Recommendation text
+        """
+        if status_tier == "on_track":
+            return (
+                f"Great job! You're on track to exceed your goal. "
+                f"Consider increasing your target or maintaining this pace."
+            )
+        elif status_tier == "achievable":
+            return (
+                f"You're close! Increase monthly savings by ¥{abs(monthly_gap):,} "
+                f"to stay on track. Small adjustments to spending can help."
+            )
+        elif status_tier == "challenging":
+            return (
+                f"Challenging but possible. You need ¥{abs(monthly_gap):,}/month more. "
+                f"Review discretionary spending or consider adjusting your goal timeline."
+            )
+        elif status_tier == "deficit":
+            return (
+                f"Your goal is at risk. Current monthly net (¥{current_monthly_net:,}) "
+                f"needs to increase by ¥{abs(monthly_gap):,}. "
+                f"Consider: (1) Cut expenses significantly, or (2) Lower target amount."
+            )
+        else:  # severe_deficit
+            if current_monthly_net < 0:
+                return (
+                    f"Critical: You're losing ¥{abs(current_monthly_net):,}/month. "
+                    f"Immediate action required: (1) Cut expenses by ¥{abs(monthly_gap):,}/month, "
+                    f"or (2) Revise goal to realistic level. Current pace: {achievable_percentage:.1f}%."
+                )
+            else:
+                return (
+                    f"Your savings rate (¥{current_monthly_net:,}/month) is far below "
+                    f"required (¥{required_monthly:,}/month). "
+                    f"Consider: (1) Increase income, (2) Reduce expenses by ¥{abs(monthly_gap):,}, "
+                    f"or (3) Adjust goal amount."
+                )

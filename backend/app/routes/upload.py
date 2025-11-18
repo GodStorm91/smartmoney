@@ -76,3 +76,18 @@ async def upload_csv(
             status_code=500,
             detail=f"Failed to process CSV: {str(e)}"
         )
+
+
+@router.get("/history")
+async def get_upload_history(db: Session = Depends(get_db)):
+    """
+    Get upload history (stub for now - returns empty list).
+
+    TODO: Implement actual upload history tracking with:
+    - upload_id, filename, upload_date
+    - total_rows, created_count, skipped_count
+    - status (success/failed), error_message
+    """
+    # Return empty list for now - this prevents 404 errors
+    # In future, create an UploadHistory model to track uploads
+    return []

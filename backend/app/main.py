@@ -4,22 +4,22 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from .config import settings
+from .config import settings as app_settings
 from .database import init_db
-from .routes import analytics, goals, transactions, upload
+from .routes import analytics, dashboard, goals, settings, transactions, upload
 
 # Initialize FastAPI app
 app = FastAPI(
-    title=settings.app_name,
+    title=app_settings.app_name,
     description="Personal finance cashflow tracker API",
     version="0.1.0",
-    debug=settings.debug,
+    debug=app_settings.debug,
 )
 
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins,
+    allow_origins=app_settings.allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -55,7 +55,9 @@ async def startup_event():
 # Include routers
 app.include_router(transactions.router)
 app.include_router(analytics.router)
+app.include_router(dashboard.router)
 app.include_router(goals.router)
+app.include_router(settings.router)
 app.include_router(upload.router)
 
 
@@ -64,7 +66,7 @@ app.include_router(upload.router)
 async def root():
     """Health check endpoint."""
     return {
-        "message": f"Welcome to {settings.app_name} API",
+        "message": f"Welcome to {app_settings.app_name} API",
         "status": "healthy",
         "version": "0.1.0"
     }

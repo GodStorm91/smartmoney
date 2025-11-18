@@ -140,14 +140,24 @@ class TestGoalModel:
         assert goal.target_amount == 10000000
 
     def test_goal_years_constraint(self, db_session: Session):
-        """Test that years must be in (1, 3, 5, 10)."""
-        goal = Goal(
-            years=7,  # Invalid: must be 1, 3, 5, or 10
+        """Test that years must be between 1 and 10 (inclusive)."""
+        # Test year below minimum (0)
+        goal_zero = Goal(
+            years=0,  # Invalid: must be >= 1
             target_amount=5000000,
         )
+        db_session.add(goal_zero)
+        with pytest.raises(IntegrityError):
+            db_session.commit()
 
-        db_session.add(goal)
+        db_session.rollback()
 
+        # Test year above maximum (11)
+        goal_eleven = Goal(
+            years=11,  # Invalid: must be <= 10
+            target_amount=5000000,
+        )
+        db_session.add(goal_eleven)
         with pytest.raises(IntegrityError):
             db_session.commit()
 
@@ -178,17 +188,23 @@ class TestGoalModel:
             db_session.commit()
 
     def test_goal_all_valid_years(self, db_session: Session):
-        """Test creating goals for all valid year horizons."""
-        valid_years = [1, 3, 5, 10]
+        """Test creating goals for all valid year horizons (1-10 range including custom)."""
+        # Test preset years
+        preset_years = [1, 3, 5, 10]
+        for years in preset_years:
+            goal = Goal(years=years, target_amount=years * 1000000)
+            db_session.add(goal)
 
-        for years in valid_years:
+        # Test custom years within valid range
+        custom_years = [2, 7]
+        for years in custom_years:
             goal = Goal(years=years, target_amount=years * 1000000)
             db_session.add(goal)
 
         db_session.commit()
 
         all_goals = db_session.query(Goal).all()
-        assert len(all_goals) == 4
+        assert len(all_goals) == 6  # 4 preset + 2 custom
 
 
 class TestAppSettingsModel:

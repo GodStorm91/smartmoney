@@ -1,5 +1,5 @@
 """Goal API routes."""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -21,12 +21,7 @@ async def create_goal(
 ):
     """Create a new financial goal."""
     try:
-        # Validate years is one of 1, 3, 5, 10
-        if goal.years not in [1, 3, 5, 10]:
-            raise HTTPException(
-                status_code=400,
-                detail="Years must be one of: 1, 3, 5, 10"
-            )
+        # Pydantic schema already validates 1-10 years range
 
         # Check if goal for this year horizon already exists
         existing = GoalService.get_goal_by_years(db, goal.years)
@@ -95,12 +90,17 @@ async def delete_goal(
 @router.get("/{goal_id}/progress", response_model=GoalProgressResponse)
 async def get_goal_progress(
     goal_id: int,
+    include_achievability: bool = Query(True, description="Include achievability metrics"),
     db: Session = Depends(get_db),
 ):
-    """Get progress for a specific goal."""
+    """Get progress for a specific goal with optional achievability metrics."""
     goal = GoalService.get_goal(db, goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found")
 
     progress = GoalService.calculate_goal_progress(db, goal)
+
+    if include_achievability:
+        progress["achievability"] = GoalService.calculate_achievability(db, goal)
+
     return progress

@@ -1,0 +1,159 @@
+{
+  "header": {
+    "dashboard": "Bảng điều khiển",
+    "upload": "Tải lên",
+    "transactions": "Giao dịch",
+    "analytics": "Phân tích",
+    "goals": "Mục tiêu",
+    "settings": "Cài đặt"
+  },
+  "button": {
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "close": "Đóng",
+    "apply": "Áp dụng bộ lọc",
+    "reset": "Đặt lại",
+    "selectFile": "Chọn tệp"
+  },
+  "language": {
+    "selectLanguage": "Chọn ngôn ngữ",
+    "japanese": "日本語",
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  },
+  "aria": {
+    "mainNavigation": "Điều hướng chính",
+    "mobileNavigation": "Điều hướng di động",
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "uploadDropzone": "Kéo và thả tệp CSV hoặc nhấp để tải lên"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "subtitle": "Tình hình tài chính của {{month}}",
+    "categoryBreakdown": "Chi tiêu theo danh mục",
+    "goalAchievability": "Khả năng đạt mục tiêu",
+    "viewAllCategories": "Xem tất cả danh mục →",
+    "viewDetails": "Xem chi tiết →",
+    "noData": "Không có dữ liệu",
+    "noGoals": "Chưa đặt mục tiêu",
+    "yearGoal": "Mục tiêu {{years}} năm",
+    "quickActions": "Hành động nhanh",
+    "quickActionUpload": "Tải lên CSV",
+    "quickActionGoals": "Đặt mục tiêu",
+    "quickActionAnalytics": "Xem phân tích"
+  },
+  "transactions": {
+    "title": "Giao dịch",
+    "subtitle": "Xem và lọc tất cả giao dịch",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc",
+    "category": "Danh mục",
+    "source": "Nguồn",
+    "all": "Tất cả",
+    "income": "Thu nhập",
+    "expense": "Chi tiêu",
+    "difference": "Chênh lệch",
+    "date": "Ngày",
+    "description": "Mô tả",
+    "amount": "Số tiền",
+    "noData": "Không có dữ liệu giao dịch",
+    "categoryFood": "Thực phẩm",
+    "categoryHousing": "Nhà ở",
+    "sourceRakuten": "Thẻ Rakuten"
+  },
+  "upload": {
+    "title": "Tải lên CSV",
+    "subtitle": "Tải lên tệp CSV được xuất từ ngân hàng hoặc ứng dụng",
+    "history": "Lịch sử tải lên",
+    "faq": "Câu hỏi thường gặp",
+    "uploading": "Đang tải lên...",
+    "pleaseWait": "Vui lòng đợi",
+    "dropOrClick": "Thả tệp hoặc nhấp",
+    "dropDescription": "Kéo và thả tệp CSV vào đây hoặc nhấp để chọn",
+    "supportedFormats": "Định dạng hỗ trợ: .csv (tối đa 10MB)",
+    "requirements": "Yêu cầu tệp CSV",
+    "requiredColumns": "Cột bắt buộc: Ngày, Số tiền, Danh mục",
+    "supportedApps": "Ứng dụng hỗ trợ: Zaim, MoneyForward, Thẻ Rakuten",
+    "encoding": "Mã hóa ký tự: UTF-8, Shift-JIS",
+    "noHistory": "Không có lịch sử tải lên",
+    "uploadFirst": "Hãy tải lên tệp CSV đầu tiên của bạn",
+    "success": "Thành công",
+    "warning": "Cảnh báo",
+    "completed": "Hoàn thành",
+    "imported": "Đã nhập",
+    "duplicates": "Bỏ qua trùng lặp",
+    "errors": "Lỗi",
+    "errorDetails": "Chi tiết lỗi:",
+    "row": "Dòng",
+    "count": "mục",
+    "alertSelectCSV": "Vui lòng chọn tệp CSV",
+    "alertMaxSize": "Kích thước tệp phải nhỏ hơn hoặc bằng 10MB",
+    "alertUploadFailed": "Tải lên thất bại",
+    "faqQuestion1": "Hỗ trợ định dạng CSV của ứng dụng nào?",
+    "faqAnswer1": "Hiện tại hỗ trợ định dạng xuất CSV từ Zaim, MoneyForward, Thẻ Rakuten và Thẻ Sumitomo Mitsui. Các định dạng khác có thể điều chỉnh ánh xạ cột trong cài đặt.",
+    "faqQuestion2": "Xử lý dữ liệu trùng lặp như thế nào?",
+    "faqAnswer2": "Các giao dịch có ngày, số tiền và mô tả giống hệt nhau sẽ tự động bị bỏ qua. Bạn có thể xem số lượng bản sao bị bỏ qua trong kết quả tải lên.",
+    "faqQuestion3": "Điều gì xảy ra nếu có lỗi?",
+    "faqAnswer3": "Các dòng có lỗi sẽ hiển thị cùng với chi tiết. Bạn có thể sửa và tải lên lại dữ liệu lỗi. Các dòng hợp lệ được nhập thành công."
+  },
+  "analytics": {
+    "title": "Phân tích",
+    "subtitle": "Phân tích chi tiết thu nhập và chi tiêu",
+    "currentMonth": "Tháng này",
+    "3months": "3 tháng",
+    "6months": "6 tháng",
+    "1year": "1 năm",
+    "incomeVsExpense": "Thu nhập vs Chi tiêu",
+    "categoryBreakdown": "Phân tích theo danh mục",
+    "monthlyCashFlow": "Dòng tiền hàng tháng",
+    "noData": "Không có dữ liệu",
+    "comingSoon": "Biểu đồ chi tiết hàng tháng (sắp ra mắt)"
+  },
+  "goals": {
+    "title": "Mục tiêu dài hạn",
+    "subtitle": "Đặt và theo dõi mục tiêu tiết kiệm cho 1, 3, 5 và 10 năm",
+    "createGoal": "Tạo mục tiêu",
+    "selectPeriod": "Chọn khoảng thời gian để đặt mục tiêu tiết kiệm của bạn",
+    "remainingSlots": "Còn lại {{count}} vị trí",
+    "maxGoalsReached": "Bạn có thể đặt tối đa {{max}} mục tiêu. Để thêm mục tiêu mới, vui lòng xóa mục tiêu hiện có.",
+    "yearGoal": "Mục tiêu {{years}} năm"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "noData": "Không có dữ liệu"
+  },
+  "chart": {
+    "trend12months": "Xu hướng 12 tháng",
+    "trendChart": "Biểu đồ xu hướng 12 tháng qua",
+    "income": "Thu nhập",
+    "expense": "Chi tiêu",
+    "net": "Chênh lệch"
+  },
+  "kpi": {
+    "thisMonthIncome": "Thu nhập tháng này",
+    "thisMonthExpense": "Chi tiêu tháng này",
+    "thisMonthNet": "Chênh lệch tháng này"
+  },
+  "goal": {
+    "status": {
+      "onTrack": "Đúng hướng",
+      "achievable": "Có thể đạt được",
+      "challenging": "Thử thách",
+      "severe": "Khó khăn"
+    },
+    "insight": {
+      "onPace": "Bạn đang đi đúng hướng để đạt được mục tiêu!",
+      "smallGap": "Chỉ cần thêm {{gap}}/tháng để đạt mục tiêu",
+      "mediumGap": "Cần tăng {{gap}}/tháng",
+      "largeGap": "Cần tiết kiệm thêm {{gap}}/tháng"
+    },
+    "monthlySavings": "Tình trạng tiết kiệm hàng tháng",
+    "monthsRemaining": "Còn lại {{months}} tháng",
+    "editGoal": "Chỉnh sửa mục tiêu"
+  }
+}

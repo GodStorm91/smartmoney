@@ -203,3 +203,40 @@ class AnalyticsService:
             )
 
         return sources
+
+    @staticmethod
+    def get_comprehensive_analytics(
+        db: Session, start_date: Optional[date] = None, end_date: Optional[date] = None
+    ) -> dict:
+        """Get comprehensive analytics with all data.
+
+        Args:
+            db: Database session
+            start_date: Filter by start date
+            end_date: Filter by end date
+
+        Returns:
+            Dictionary with monthly trends, category breakdown, and totals
+        """
+        # Get monthly trends
+        monthly_trends = AnalyticsService.get_monthly_cashflow(
+            db=db, start_date=start_date, end_date=end_date
+        )
+
+        # Get category breakdown
+        category_breakdown = AnalyticsService.get_category_breakdown(
+            db=db, start_date=start_date, end_date=end_date
+        )
+
+        # Calculate totals from monthly trends
+        total_income = sum(month["income"] for month in monthly_trends)
+        total_expense = sum(month["expenses"] for month in monthly_trends)
+        net_cashflow = total_income - total_expense
+
+        return {
+            "monthly_trends": monthly_trends,
+            "category_breakdown": category_breakdown,
+            "total_income": total_income,
+            "total_expense": total_expense,
+            "net_cashflow": net_cashflow,
+        }

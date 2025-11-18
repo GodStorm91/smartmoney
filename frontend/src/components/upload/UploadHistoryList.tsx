@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { formatDateTime } from '@/utils/formatDate'
 import type { UploadResult } from '@/types'
@@ -8,6 +9,7 @@ interface UploadHistoryListProps {
 }
 
 export function UploadHistoryList({ history, isLoading }: UploadHistoryListProps) {
+  const { t } = useTranslation('common')
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -22,8 +24,8 @@ export function UploadHistoryList({ history, isLoading }: UploadHistoryListProps
         <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">アップロード履歴なし</h3>
-        <p className="text-gray-600">最初のCSVファイルをアップロードしましょう</p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('upload.noHistory')}</h3>
+        <p className="text-gray-600">{t('upload.uploadFirst')}</p>
       </div>
     )
   }
@@ -38,10 +40,11 @@ export function UploadHistoryList({ history, isLoading }: UploadHistoryListProps
 }
 
 function UploadResultCard({ result }: { result: UploadResult }) {
+  const { t } = useTranslation('common')
   const bgColor = result.status === 'success' ? 'bg-green-50 border-green-200' : result.status === 'warning' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'
   const iconColor = result.status === 'success' ? 'bg-green-100 text-green-600' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-200 text-gray-600'
   const badgeColor = result.status === 'success' ? 'bg-green-100 text-green-800' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-200 text-gray-700'
-  const badgeLabel = result.status === 'success' ? '成功' : result.status === 'warning' ? '警告あり' : '完了'
+  const badgeLabel = result.status === 'success' ? t('upload.success') : result.status === 'warning' ? t('upload.warning') : t('upload.completed')
 
   return (
     <div className={`flex items-start gap-4 p-4 border rounded-lg ${bgColor}`}>
@@ -64,24 +67,24 @@ function UploadResultCard({ result }: { result: UploadResult }) {
         </div>
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="text-gray-600">インポート済み</p>
-            <p className="font-semibold font-numbers text-gray-900">{result.imported_count}件</p>
+            <p className="text-gray-600">{t('upload.imported')}</p>
+            <p className="font-semibold font-numbers text-gray-900">{result.imported_count}{t('upload.count')}</p>
           </div>
           <div>
-            <p className="text-gray-600">重複スキップ</p>
-            <p className="font-semibold font-numbers text-gray-900">{result.duplicate_count}件</p>
+            <p className="text-gray-600">{t('upload.duplicates')}</p>
+            <p className="font-semibold font-numbers text-gray-900">{result.duplicate_count}{t('upload.count')}</p>
           </div>
           <div>
-            <p className="text-gray-600">エラー</p>
-            <p className={`font-semibold font-numbers ${result.error_count > 0 ? 'text-yellow-700' : 'text-gray-900'}`}>{result.error_count}件</p>
+            <p className="text-gray-600">{t('upload.errors')}</p>
+            <p className={`font-semibold font-numbers ${result.error_count > 0 ? 'text-yellow-700' : 'text-gray-900'}`}>{result.error_count}{t('upload.count')}</p>
           </div>
         </div>
         {result.errors && result.errors.length > 0 && (
           <div className="mt-3 text-sm text-yellow-800 bg-yellow-100 p-3 rounded">
-            <p className="font-medium mb-1">エラーの詳細:</p>
+            <p className="font-medium mb-1">{t('upload.errorDetails')}</p>
             <ul className="space-y-1 text-xs">
               {result.errors.map((error, idx) => (
-                <li key={idx}>• 行{error.row}: {error.message}</li>
+                <li key={idx}>• {t('upload.row')}{error.row}: {error.message}</li>
               ))}
             </ul>
           </div>

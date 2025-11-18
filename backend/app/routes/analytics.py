@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..schemas.analytics import (
+    AnalyticsResponse,
     CategoryBreakdownResponse,
     MonthlyCashflowResponse,
     SourceBreakdownResponse,
@@ -14,6 +15,24 @@ from ..schemas.analytics import (
 from ..services.analytics_service import AnalyticsService
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
+
+
+@router.get("", response_model=AnalyticsResponse)
+async def get_analytics(
+    start_date: Optional[date] = Query(None, description="Filter by start date"),
+    end_date: Optional[date] = Query(None, description="Filter by end date"),
+    db: Session = Depends(get_db),
+):
+    """Get comprehensive analytics data.
+
+    Returns:
+        Complete analytics with monthly trends, category breakdown, and totals
+    """
+    return AnalyticsService.get_comprehensive_analytics(
+        db=db,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
 
 @router.get("/monthly", response_model=list[MonthlyCashflowResponse])

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { GoalProgressCard } from '@/components/financial/GoalProgressCard'
+import { useTranslation } from 'react-i18next'
+import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { CategoryBreakdownList } from '@/components/financial/CategoryBreakdownList'
 import { DashboardKPIs } from '@/components/dashboard/DashboardKPIs'
 import { TrendChartCard } from '@/components/dashboard/TrendChartCard'
@@ -9,9 +10,11 @@ import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { formatMonth } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
-import { fetchGoals } from '@/services/goal-service'
+import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
 
 export function Dashboard() {
+  const { t } = useTranslation('common')
+
   // Fetch dashboard data
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard-summary'],
@@ -33,6 +36,18 @@ export function Dashboard() {
     queryFn: fetchGoals,
   })
 
+  // Fetch goal progress with achievability for each goal
+  const { data: goalsProgress, isLoading: goalsProgressLoading } = useQuery({
+    queryKey: ['goals-progress', goals?.map(g => g.id)],
+    queryFn: async () => {
+      if (!goals || goals.length === 0) return []
+      return Promise.all(
+        goals.map(goal => fetchGoalProgress(goal.id, true))
+      )
+    },
+    enabled: !!goals && goals.length > 0,
+  })
+
   const isLoading = summaryLoading || trendsLoading || categoriesLoading || goalsLoading
 
   if (isLoading) {
@@ -47,8 +62,8 @@ export function Dashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Title */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">ダッシュボード</h2>
-        <p className="text-gray-600">{formatMonth(new Date())}の財務状況</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('dashboard.title')}</h2>
+        <p className="text-gray-600">{t('dashboard.subtitle', { month: formatMonth(new Date()) })}</p>
       </div>
 
       {/* KPI Summary Cards */}
@@ -64,7 +79,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Breakdown */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">カテゴリー別支出</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('dashboard.categoryBreakdown')}</h3>
           {categories && categories.length > 0 ? (
             <>
               <CategoryBreakdownList categories={categories} maxItems={4} />
@@ -72,34 +87,47 @@ export function Dashboard() {
                 to="/analytics"
                 className="mt-6 block text-center text-sm font-medium text-primary-600 hover:text-primary-700"
               >
-                すべてのカテゴリーを表示 →
+                {t('dashboard.viewAllCategories')}
               </Link>
             </>
           ) : (
-            <p className="text-center text-gray-400 py-8">データがありません</p>
+            <p className="text-center text-gray-400 py-8">{t('dashboard.noData')}</p>
           )}
         </Card>
 
-        {/* Goals Progress */}
+        {/* Goals Achievability */}
         <Card>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">目標の進捗</h3>
+            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.goalAchievability')}</h3>
             <Link
               to="/goals"
               className="text-sm font-medium text-primary-600 hover:text-primary-700"
             >
-              詳細 →
+              {t('dashboard.viewDetails')}
             </Link>
           </div>
 
-          {goals && goals.length > 0 ? (
+          {goalsProgress && goalsProgress.length > 0 && !goalsProgressLoading ? (
             <div className="space-y-6">
-              {goals.slice(0, 3).map((goal) => (
-                <GoalProgressCard key={goal.id} goal={goal} compact />
+              {goalsProgress.slice(0, 3).map((progress) => (
+                progress.achievability && (
+                  <GoalAchievabilityCard
+                    key={progress.goal_id}
+                    goalId={progress.goal_id}
+                    goalName={t('dashboard.yearGoal', { years: progress.years })}
+                    achievability={progress.achievability}
+                    targetAmount={progress.target_amount}
+                    currentAmount={progress.total_saved}
+                  />
+                )
               ))}
             </div>
+          ) : goals && goals.length > 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <LoadingSpinner size="md" />
+            </div>
           ) : (
-            <p className="text-center text-gray-400 py-8">目標が設定されていません</p>
+            <p className="text-center text-gray-400 py-8">{t('dashboard.noGoals')}</p>
           )}
         </Card>
       </div>

@@ -1,8 +1,11 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 export function Header() {
+  const { t } = useTranslation('common')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
@@ -32,22 +35,27 @@ export function Header() {
           <nav
             className="hidden md:flex items-center gap-6"
             role="navigation"
-            aria-label="メインナビゲーション"
+            aria-label={t('aria.mainNavigation')}
           >
-            <NavLink to="/">ダッシュボード</NavLink>
-            <NavLink to="/upload">アップロード</NavLink>
-            <NavLink to="/transactions">取引履歴</NavLink>
-            <NavLink to="/analytics">分析</NavLink>
-            <NavLink to="/goals">目標</NavLink>
-            <NavLink to="/settings">設定</NavLink>
+            <NavLink to="/">{t('header.dashboard')}</NavLink>
+            <NavLink to="/upload">{t('header.upload')}</NavLink>
+            <NavLink to="/transactions">{t('header.transactions')}</NavLink>
+            <NavLink to="/analytics">{t('header.analytics')}</NavLink>
+            <NavLink to="/goals">{t('header.goals')}</NavLink>
+            <NavLink to="/settings">{t('header.settings')}</NavLink>
+
+            {/* Language Switcher - Desktop */}
+            <LanguageSwitcher />
           </nav>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 focus-ring"
-            aria-label={isMobileMenuOpen ? 'メニューを閉じる' : 'メニューを開く'}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
+          {/* Mobile: Language Switcher + Menu Button */}
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <button
+              className="p-2 rounded-lg hover:bg-gray-100 focus-ring"
+              aria-label={isMobileMenuOpen ? t('aria.closeMenu') : t('aria.openMenu')}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
             <svg
               className="w-6 h-6"
               fill="none"
@@ -71,7 +79,8 @@ export function Header() {
                 />
               )}
             </svg>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -79,26 +88,26 @@ export function Header() {
           <nav
             className="md:hidden py-4 border-t border-gray-200"
             role="navigation"
-            aria-label="モバイルナビゲーション"
+            aria-label={t('aria.mobileNavigation')}
           >
             <div className="flex flex-col gap-2">
               <MobileNavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                ダッシュボード
+                {t('header.dashboard')}
               </MobileNavLink>
               <MobileNavLink to="/upload" onClick={() => setIsMobileMenuOpen(false)}>
-                アップロード
+                {t('header.upload')}
               </MobileNavLink>
               <MobileNavLink to="/transactions" onClick={() => setIsMobileMenuOpen(false)}>
-                取引履歴
+                {t('header.transactions')}
               </MobileNavLink>
               <MobileNavLink to="/analytics" onClick={() => setIsMobileMenuOpen(false)}>
-                分析
+                {t('header.analytics')}
               </MobileNavLink>
               <MobileNavLink to="/goals" onClick={() => setIsMobileMenuOpen(false)}>
-                目標
+                {t('header.goals')}
               </MobileNavLink>
               <MobileNavLink to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
-                設定
+                {t('header.settings')}
               </MobileNavLink>
             </div>
           </nav>

@@ -8,6 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts'
+import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/formatCurrency'
 import type { MonthlyData } from '@/types'
 
@@ -16,6 +17,8 @@ interface IncomeExpenseBarChartProps {
 }
 
 export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
+  const { t } = useTranslation('common')
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -42,8 +45,8 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
         <Legend
           wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}
         />
-        <Bar dataKey="income" fill="#4CAF50" name="収入" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="expense" fill="#F44336" name="支出" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="income" fill="#4CAF50" name={t('chart.income')} radius={[4, 4, 0, 0]} />
+        <Bar dataKey="expense" fill="#F44336" name={t('chart.expense')} radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )

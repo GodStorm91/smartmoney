@@ -20,7 +20,7 @@ class Goal(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     __table_args__ = (
-        CheckConstraint("years IN (1, 3, 5, 10)", name="valid_years"),
+        CheckConstraint("years >= 1 AND years <= 10", name="valid_years"),
         CheckConstraint("target_amount > 0", name="positive_target"),
         Index("ix_years_unique", "years", unique=True),
     )

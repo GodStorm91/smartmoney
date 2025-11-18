@@ -25,3 +25,13 @@ class SourceBreakdownResponse(BaseModel):
     source: str
     total: int
     count: int
+
+
+class AnalyticsResponse(BaseModel):
+    """Comprehensive analytics response with all data."""
+
+    monthly_trends: list[MonthlyCashflowResponse]
+    category_breakdown: list[CategoryBreakdownResponse]
+    total_income: int
+    total_expense: int
+    net_cashflow: int

@@ -9,6 +9,7 @@ Personal finance webapp for tracking income, expenses, and long-term financial g
 - 📊 **CSV Import** - MoneyForward, Zaim (Shift-JIS/UTF-8 auto-detect)
 - 💰 **Cashflow Analytics** - Monthly income/expense/net with category breakdown
 - 🎯 **Goal Tracking** - Multi-horizon (1/3/5/10 years) with progress projections
+- 🎲 **Goal Achievability** - Real-time feasibility analysis based on current cashflow (NEW ✨)
 - 📈 **Interactive Charts** - Recharts visualizations (trends, pie charts, bars)
 - 🗾 **Japanese Support** - Full Japanese text handling (encoding, currency, categories)
 - 🔒 **Self-Hosted** - Privacy-first, no cloud data sharing
@@ -95,9 +96,10 @@ smartmoney/
 
 **✅ Completed:**
 - Backend API (4 route modules, 3 services)
-- Frontend UI (24 components, 6 pages)
+- Frontend UI (25 components, 6 pages)
 - CSV Parser (Shift-JIS/UTF-8 auto-detect)
 - Goal Progress Algorithm (linear projection)
+- Goal Achievability Feature (Phase 1) - 5-tier status system with actionable recommendations
 - Testing (89/89 passing, 95%+ coverage)
 - Documentation (15+ docs)
 

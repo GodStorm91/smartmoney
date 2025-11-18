@@ -1,0 +1,159 @@
+{
+  "header": {
+    "dashboard": "Dashboard",
+    "upload": "Upload",
+    "transactions": "Transactions",
+    "analytics": "Analytics",
+    "goals": "Goals",
+    "settings": "Settings"
+  },
+  "button": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "apply": "Apply Filters",
+    "reset": "Reset",
+    "selectFile": "Select File"
+  },
+  "language": {
+    "selectLanguage": "Select Language",
+    "japanese": "日本語",
+    "english": "English",
+    "vietnamese": "Tiếng Việt"
+  },
+  "aria": {
+    "mainNavigation": "Main Navigation",
+    "mobileNavigation": "Mobile Navigation",
+    "openMenu": "Open Menu",
+    "closeMenu": "Close Menu",
+    "uploadDropzone": "Drag and drop CSV file, or click to upload"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Financial overview for {{month}}",
+    "categoryBreakdown": "Spending by Category",
+    "goalAchievability": "Goal Achievability",
+    "viewAllCategories": "View all categories →",
+    "viewDetails": "View details →",
+    "noData": "No data available",
+    "noGoals": "No goals set",
+    "yearGoal": "{{years}}-year goal",
+    "quickActions": "Quick Actions",
+    "quickActionUpload": "Upload CSV",
+    "quickActionGoals": "Set Goals",
+    "quickActionAnalytics": "View Analytics"
+  },
+  "transactions": {
+    "title": "Transactions",
+    "subtitle": "View and filter all transactions",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "category": "Category",
+    "source": "Source",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expense",
+    "difference": "Difference",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "noData": "No transaction data",
+    "categoryFood": "Food",
+    "categoryHousing": "Housing",
+    "sourceRakuten": "Rakuten Card"
+  },
+  "upload": {
+    "title": "CSV Upload",
+    "subtitle": "Upload CSV file exported from your bank or app",
+    "history": "Upload History",
+    "faq": "FAQ",
+    "uploading": "Uploading...",
+    "pleaseWait": "Please wait",
+    "dropOrClick": "Drop file or click",
+    "dropDescription": "Drag and drop CSV file here, or click to select",
+    "supportedFormats": "Supported formats: .csv (max 10MB)",
+    "requirements": "CSV File Requirements",
+    "requiredColumns": "Required columns: Date, Amount, Category",
+    "supportedApps": "Supported apps: Zaim, MoneyForward, Rakuten Card",
+    "encoding": "Character encoding: UTF-8, Shift-JIS",
+    "noHistory": "No upload history",
+    "uploadFirst": "Upload your first CSV file",
+    "success": "Success",
+    "warning": "Warning",
+    "completed": "Completed",
+    "imported": "Imported",
+    "duplicates": "Duplicates Skipped",
+    "errors": "Errors",
+    "errorDetails": "Error details:",
+    "row": "Row",
+    "count": "items",
+    "alertSelectCSV": "Please select a CSV file",
+    "alertMaxSize": "File size must be 10MB or less",
+    "alertUploadFailed": "Upload failed",
+    "faqQuestion1": "Which apps' CSV formats are supported?",
+    "faqAnswer1": "Currently supports CSV export formats from Zaim, MoneyForward, Rakuten Card, and Sumitomo Mitsui Card. Other formats can be adjusted via column mapping in settings.",
+    "faqQuestion2": "How are duplicate records handled?",
+    "faqAnswer2": "Transactions with identical date, amount, and description are automatically skipped. You can see the count of skipped duplicates in the upload results.",
+    "faqQuestion3": "What happens if there are errors?",
+    "faqAnswer3": "Rows with errors are displayed with details. You can fix and re-upload the error data. Valid rows are imported successfully."
+  },
+  "analytics": {
+    "title": "Analytics",
+    "subtitle": "Detailed analysis of income and expenses",
+    "currentMonth": "This Month",
+    "3months": "3 Months",
+    "6months": "6 Months",
+    "1year": "1 Year",
+    "incomeVsExpense": "Income vs Expense",
+    "categoryBreakdown": "Category Breakdown",
+    "monthlyCashFlow": "Monthly Cash Flow",
+    "noData": "No data available",
+    "comingSoon": "Monthly detail chart (coming soon)"
+  },
+  "goals": {
+    "title": "Long-term Goals",
+    "subtitle": "Set and track savings goals for 1, 3, 5, and 10 years",
+    "createGoal": "Create Goal",
+    "selectPeriod": "Select a period to set your savings goal",
+    "remainingSlots": "{{count}} remaining",
+    "maxGoalsReached": "You can set up to {{max}} goals. To add a new goal, please delete an existing one.",
+    "yearGoal": "{{years}}-year goal"
+  },
+  "common": {
+    "loading": "Loading...",
+    "noData": "No data available"
+  },
+  "chart": {
+    "trend12months": "12-Month Trend",
+    "trendChart": "Trend chart for the past 12 months",
+    "income": "Income",
+    "expense": "Expense",
+    "net": "Difference"
+  },
+  "kpi": {
+    "thisMonthIncome": "Income this month",
+    "thisMonthExpense": "Expense this month",
+    "thisMonthNet": "Difference this month"
+  },
+  "goal": {
+    "status": {
+      "onTrack": "On Track",
+      "achievable": "Achievable",
+      "challenging": "Challenging",
+      "severe": "Severe"
+    },
+    "insight": {
+      "onPace": "You're on pace to achieve this!",
+      "smallGap": "Just {{gap}}/month more to achieve",
+      "mediumGap": "Need to increase by {{gap}}/month",
+      "largeGap": "Need additional savings of {{gap}}/month"
+    },
+    "monthlySavings": "Monthly Savings Status",
+    "monthsRemaining": "{{months}} months remaining",
+    "editGoal": "Edit goal"
+  }
+}

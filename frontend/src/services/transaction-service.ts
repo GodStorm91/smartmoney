@@ -1,6 +1,42 @@
 import { apiClient } from './api-client'
 import type { Transaction, TransactionFilters } from '@/types'
 
+interface BackendTransaction {
+  id: number
+  date: string
+  description: string
+  amount: number
+  category: string
+  source: string
+  is_income: boolean
+  is_transfer: boolean
+  month_key: string
+  tx_hash: string
+}
+
+interface TransactionListResponse {
+  transactions: BackendTransaction[]
+  total: number
+  limit: number
+  offset: number
+}
+
+/**
+ * Transform backend transaction to frontend format
+ */
+function transformTransaction(tx: BackendTransaction): Transaction {
+  return {
+    id: tx.id,
+    date: tx.date,
+    description: tx.description,
+    amount: tx.amount,
+    category: tx.category,
+    source: tx.source,
+    type: tx.is_income ? 'income' : 'expense',
+    created_at: tx.date, // Use date as created_at fallback
+  }
+}
+
 /**
  * Fetch all transactions with optional filters
  */
@@ -13,10 +49,13 @@ export async function fetchTransactions(
   if (filters?.end_date) params.append('end_date', filters.end_date)
   if (filters?.category) params.append('category', filters.category)
   if (filters?.source) params.append('source', filters.source)
-  if (filters?.type && filters.type !== 'all') params.append('type', filters.type)
+  if (filters?.type && filters.type !== 'all') {
+    // Map 'income'/'expense' to is_income boolean
+    params.append('is_income', filters.type === 'income' ? 'true' : 'false')
+  }
 
-  const response = await apiClient.get<Transaction[]>(`/api/transactions?${params.toString()}`)
-  return response.data
+  const response = await apiClient.get<TransactionListResponse>(`/api/transactions?${params.toString()}`)
+  return response.data.transactions.map(transformTransaction)
 }
 
 /**
