@@ -9,7 +9,8 @@ interface UploadDropZoneProps {
   onDrop: (e: React.DragEvent) => void
   onDragOver: (e: React.DragEvent) => void
   onDragLeave: () => void
-  onFileSelect: (file: File) => void
+  onFileSelect: (files: FileList) => void
+  hasFiles?: boolean
 }
 
 export function UploadDropZone({
@@ -19,6 +20,7 @@ export function UploadDropZone({
   onDragOver,
   onDragLeave,
   onFileSelect,
+  hasFiles = false,
 }: UploadDropZoneProps) {
   const { t } = useTranslation('common')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -48,10 +50,15 @@ export function UploadDropZone({
           ref={fileInputRef}
           type="file"
           accept=".csv"
+          multiple
           className="hidden"
           onChange={(e) => {
-            const file = e.target.files?.[0]
-            if (file) onFileSelect(file)
+            const files = e.target.files
+            if (files && files.length > 0) {
+              onFileSelect(files)
+              // Reset input to allow selecting same files again
+              e.target.value = ''
+            }
           }}
         />
 
@@ -67,14 +74,18 @@ export function UploadDropZone({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('upload.dropOrClick')}</h3>
-            <p className="text-sm text-gray-600 mb-4">{t('upload.dropDescription')}</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              {hasFiles ? t('upload.addMoreFiles') : t('upload.dropOrClick')}
+            </h3>
+            <p className="text-sm text-gray-600 mb-4">
+              {hasFiles ? t('upload.addMoreDescription') : t('upload.dropDescription')}
+            </p>
 
             <Button variant="primary">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
-              {t('button.selectFile')}
+              {hasFiles ? t('button.addMore') : t('button.selectFile')}
             </Button>
 
             <p className="text-xs text-gray-500 mt-4">{t('upload.supportedFormats')}</p>

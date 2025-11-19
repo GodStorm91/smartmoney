@@ -1,16 +1,55 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { fetchSettings } from '@/services/settings-service'
+import { fetchSettings, updateSettings } from '@/services/settings-service'
 
 export function Settings() {
+  const { t } = useTranslation('common')
+  const queryClient = useQueryClient()
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: fetchSettings,
   })
+
+  // Local state for form inputs
+  const [currency, setCurrency] = useState<string>('JPY')
+  const [baseDate, setBaseDate] = useState<number>(25)
+
+  // Sync state with fetched settings
+  useEffect(() => {
+    if (settings) {
+      setCurrency(settings.currency)
+      setBaseDate(settings.base_date)
+    }
+  }, [settings])
+
+  // Mutation for saving settings
+  const updateMutation = useMutation({
+    mutationFn: updateSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      alert(t('settings.saveSuccess'))
+    },
+    onError: (error) => {
+      console.error('Failed to save settings:', error)
+      alert(t('settings.saveFailed'))
+    },
+  })
+
+  const handleSave = () => {
+    updateMutation.mutate({
+      currency,
+      base_date: baseDate,
+    })
+  }
 
   if (isLoading) {
     return (
@@ -21,62 +60,70 @@ export function Settings() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">設定</h2>
-        <p className="text-gray-600">アプリケーション設定の管理</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('settings.title')}</h2>
+        <p className="text-gray-600">{t('settings.subtitle')}</p>
       </div>
 
       <div className="space-y-6">
         {/* General Settings */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">一般設定</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.general')}</h3>
           <div className="space-y-4">
             <Select
-              label="通貨"
-              value={settings?.currency || 'JPY'}
-              options={[{ value: 'JPY', label: '日本円 (¥)' }, { value: 'USD', label: '米ドル ($)' }]}
+              label={t('settings.currency')}
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              options={[
+                { value: 'JPY', label: t('settings.currencyJPY') },
+                { value: 'USD', label: t('settings.currencyUSD') },
+                { value: 'VND', label: t('settings.currencyVND') }
+              ]}
             />
             <Input
               type="number"
-              label="給料日 (毎月)"
-              value={settings?.base_date || 25}
+              label={t('settings.payday')}
+              value={baseDate}
+              onChange={(e) => setBaseDate(parseInt(e.target.value, 10))}
               min={1}
               max={31}
             />
           </div>
           <div className="mt-6">
-            <Button>設定を保存</Button>
+            <Button onClick={handleSave} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? t('common.loading') : t('settings.saveSettings')}
+            </Button>
           </div>
         </Card>
 
         {/* Categories */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">カテゴリー管理</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.categoryManagement')}</h3>
           <div className="space-y-2">
             {settings?.categories?.map((cat, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span>{cat}</span>
-                <button className="text-red-600 hover:text-red-700 text-sm">削除</button>
+                <button className="text-red-600 hover:text-red-700 text-sm">{t('settings.delete')}</button>
               </div>
-            )) || <p className="text-gray-400 text-center py-4">カテゴリーがありません</p>}
+            )) || <p className="text-gray-400 text-center py-4">{t('settings.noCategories')}</p>}
           </div>
           <div className="mt-4">
-            <Button variant="outline">カテゴリーを追加</Button>
+            <Button variant="outline">{t('settings.addCategory')}</Button>
           </div>
         </Card>
 
         {/* Payment Sources */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">支払元管理</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.paymentSourceManagement')}</h3>
           <div className="space-y-2">
             {settings?.sources?.map((source, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span>{source}</span>
-                <button className="text-red-600 hover:text-red-700 text-sm">削除</button>
+                <button className="text-red-600 hover:text-red-700 text-sm">{t('settings.delete')}</button>
               </div>
-            )) || <p className="text-gray-400 text-center py-4">支払元がありません</p>}
+            )) || <p className="text-gray-400 text-center py-4">{t('settings.noSources')}</p>}
           </div>
           <div className="mt-4">
-            <Button variant="outline">支払元を追加</Button>
+            <Button variant="outline">{t('settings.addSource')}</Button>
           </div>
         </Card>
       </div>

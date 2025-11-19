@@ -10,6 +10,8 @@ import {
 } from 'recharts'
 import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import type { MonthlyData } from '@/types'
 
 interface IncomeExpenseBarChartProps {
@@ -17,6 +19,8 @@ interface IncomeExpenseBarChartProps {
 }
 
 export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
+  const { currency } = useSettings()
+  const { data: exchangeRates } = useExchangeRates()
   const { t } = useTranslation('common')
 
   return (
@@ -31,7 +35,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
         <YAxis
           stroke="#6B7280"
           style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
-          tickFormatter={(value) => formatCurrency(value)}
+          tickFormatter={(value) => formatCurrency(value, currency, exchangeRates?.rates || {}, false)}
         />
         <Tooltip
           contentStyle={{
@@ -40,7 +44,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
             borderRadius: '8px',
             fontSize: '14px',
           }}
-          formatter={(value: number) => formatCurrency(value)}
+          formatter={(value: number) => formatCurrency(value, currency, exchangeRates?.rates || {}, false)}
         />
         <Legend
           wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}

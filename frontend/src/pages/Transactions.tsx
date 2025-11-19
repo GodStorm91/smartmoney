@@ -10,10 +10,14 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { formatCurrency, formatCurrencySigned } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange } from '@/utils/formatDate'
 import { fetchTransactions } from '@/services/transaction-service'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useRatesMap } from '@/hooks/useExchangeRates'
 import type { TransactionFilters } from '@/types'
 
 export function Transactions() {
   const { t } = useTranslation('common')
+  const { currency } = useSettings()
+  const rates = useRatesMap()
   const monthRange = getCurrentMonthRange()
   const [filters, setFilters] = useState<TransactionFilters>({
     start_date: monthRange.start,
@@ -55,9 +59,9 @@ export function Transactions() {
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.income')}</p><p className="text-2xl font-bold font-numbers text-green-600">{formatCurrency(income)}</p></Card>
-        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.expense')}</p><p className="text-2xl font-bold font-numbers text-red-600">{formatCurrency(expense)}</p></Card>
-        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.difference')}</p><p className="text-2xl font-bold font-numbers text-blue-600">{formatCurrency(net)}</p></Card>
+        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.income')}</p><p className="text-2xl font-bold font-numbers text-green-600">{formatCurrency(income, currency, rates, false)}</p></Card>
+        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.expense')}</p><p className="text-2xl font-bold font-numbers text-red-600">{formatCurrency(expense, currency, rates, false)}</p></Card>
+        <Card><p className="text-sm text-gray-600 mb-1">{t('transactions.difference')}</p><p className="text-2xl font-bold font-numbers text-blue-600">{formatCurrency(net, currency, rates, false)}</p></Card>
       </div>
 
       {/* Transactions Table/List */}
@@ -85,7 +89,7 @@ export function Transactions() {
                     <td className="px-6 py-4"><Badge variant={tx.type === 'income' ? 'info' : 'default'}>{tx.category}</Badge></td>
                     <td className="px-6 py-4 text-sm text-gray-600">{tx.source}</td>
                     <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrencySigned(tx.amount, tx.type)}
+                      {formatCurrencySigned(tx.amount, tx.type, currency, rates, false)}
                     </td>
                   </tr>
                 ))}
@@ -103,7 +107,7 @@ export function Transactions() {
                     <p className="text-sm text-gray-600">{formatDate(tx.date)}</p>
                   </div>
                   <p className={`text-lg font-bold font-numbers ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrencySigned(tx.amount, tx.type)}
+                    {formatCurrencySigned(tx.amount, tx.type, currency, rates, false)}
                   </p>
                 </div>
                 <div className="flex gap-2 text-xs">

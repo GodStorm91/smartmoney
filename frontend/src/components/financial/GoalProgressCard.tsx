@@ -1,6 +1,8 @@
 import { formatCurrency } from '@/utils/formatCurrency'
 import { calculatePercentage } from '@/utils/calculations'
 import { Badge } from '@/components/ui/Badge'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import type { Goal } from '@/types'
 
 interface GoalProgressCardProps {
@@ -32,6 +34,8 @@ const statusConfig = {
 }
 
 export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProps) {
+  const { currency } = useSettings()
+  const { data: exchangeRates } = useExchangeRates()
   const progress = calculatePercentage(goal.current_amount, goal.target_amount)
   const config = statusConfig[goal.status]
 
@@ -42,7 +46,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
           <div>
             <p className="text-sm font-medium text-gray-700">{goal.name || `${goal.years}年目標`}</p>
             <p className="text-xs text-gray-500">
-              {formatCurrency(goal.current_amount)} / {formatCurrency(goal.target_amount)}
+              {formatCurrency(goal.current_amount, currency, exchangeRates?.rates || {}, true)} / {formatCurrency(goal.target_amount, currency, exchangeRates?.rates || {}, true)}
             </p>
           </div>
           <Badge variant={config.variant} aria-label={`目標状態: ${config.label}`}>
@@ -61,7 +65,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
         </div>
         <p className="mt-2 text-xs text-gray-600">
           {progress}% 完了
-          {goal.monthly_required > 0 && ` · 月々${formatCurrency(goal.monthly_required)}必要`}
+          {goal.monthly_required > 0 && ` · 月々${formatCurrency(goal.monthly_required, currency, exchangeRates?.rates || {}, true)}必要`}
         </p>
       </div>
     )
@@ -99,13 +103,13 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
         <div>
           <p className="text-sm text-gray-600 mb-1">目標金額</p>
           <p className="text-3xl font-bold font-numbers text-gray-900">
-            {formatCurrency(goal.target_amount)}
+            {formatCurrency(goal.target_amount, currency, exchangeRates?.rates || {}, true)}
           </p>
         </div>
         <div>
           <p className="text-sm text-gray-600 mb-1">現在の貯蓄</p>
           <p className="text-3xl font-bold font-numbers text-blue-600">
-            {formatCurrency(goal.current_amount)}
+            {formatCurrency(goal.current_amount, currency, exchangeRates?.rates || {}, true)}
           </p>
         </div>
         <div>
@@ -140,7 +144,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
       ) : (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm font-medium text-blue-900">
-            月々{formatCurrency(goal.monthly_required)}の貯蓄が必要です
+            月々{formatCurrency(goal.monthly_required, currency, exchangeRates?.rates || {}, true)}の貯蓄が必要です
           </p>
         </div>
       )}

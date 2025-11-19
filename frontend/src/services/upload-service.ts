@@ -1,14 +1,14 @@
 import { apiClient } from './api-client'
-import type { UploadResult } from '@/types'
+import type { UploadResult, BackendUploadResponse } from '@/types'
 
 /**
  * Upload CSV file
  */
-export async function uploadCSV(file: File): Promise<UploadResult> {
+export async function uploadCSV(file: File): Promise<BackendUploadResponse> {
   const formData = new FormData()
   formData.append('file', file)
 
-  const response = await apiClient.post<UploadResult>('/api/upload/csv', formData, {
+  const response = await apiClient.post<BackendUploadResponse>('/api/upload/csv', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

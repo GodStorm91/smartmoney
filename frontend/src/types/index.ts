@@ -56,6 +56,8 @@ export interface GoalAchievability {
   recommendation: string
   data_source: string
   months_remaining: number
+  trend_months_requested: number
+  trend_months_actual: number
 }
 
 export interface GoalProgress {
@@ -94,6 +96,27 @@ export interface UploadError {
   message: string
 }
 
+// Multiple file upload types
+export type FileUploadStatus = 'pending' | 'uploading' | 'success' | 'error'
+
+export interface BackendUploadResponse {
+  filename: string
+  total_rows: number
+  created: number
+  skipped: number
+  message: string
+}
+
+export interface FileUploadItem {
+  id: string
+  file: File
+  status: FileUploadStatus
+  progress: number
+  result?: UploadResult
+  backendResult?: BackendUploadResponse
+  error?: string
+}
+
 // Settings types
 export interface Settings {
   currency: string
@@ -114,4 +137,74 @@ export interface TransactionFilters {
 export interface DateRange {
   start: string
   end: string
+}
+
+// Account types
+export type AccountType = 'bank' | 'cash' | 'credit_card' | 'investment' | 'receivable' | 'other'
+
+export interface Account {
+  id: number
+  name: string
+  type: AccountType
+  initial_balance: number
+  initial_balance_date: string
+  is_active: boolean
+  currency: string
+  notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface AccountWithBalance extends Account {
+  current_balance: number
+  transaction_count: number
+}
+
+export interface AccountCreate {
+  name: string
+  type: AccountType
+  initial_balance: number
+  initial_balance_date: string
+  currency?: string
+  notes?: string
+}
+
+export interface AccountUpdate {
+  name?: string
+  type?: AccountType
+  is_active?: boolean
+  notes?: string
+  initial_balance?: number  // For accounts with no transactions
+  initial_balance_date?: string
+  desired_current_balance?: number  // For accounts with transactions (triggers adjustment)
+}
+
+// Tag types
+export interface Tag {
+  id: number
+  name: string
+  color?: string
+  created_at: string
+}
+
+export interface TagCreate {
+  name: string
+  color?: string
+}
+
+export interface TagUpdate {
+  name?: string
+  color?: string
+}
+
+// Exchange rate types
+export interface ExchangeRatesResponse {
+  rates: Record<string, number>
+  updated_at: string | null
+  base_currency: string
+}
+
+export interface ExchangeRate {
+  currency: string
+  rate: number
 }

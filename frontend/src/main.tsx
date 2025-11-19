@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { SettingsProvider } from './contexts/SettingsContext'
 import App from './App'
 import './index.css'
 import './i18n/config' // Import i18n configuration
@@ -19,7 +20,9 @@ const queryClient = new QueryClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <App />
+      <SettingsProvider>
+        <App />
+      </SettingsProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 )

@@ -1,5 +1,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import type { CategoryBreakdown } from '@/types'
 
 interface CategoryPieChartProps {
@@ -19,6 +21,8 @@ const COLORS = [
 ]
 
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
+  const { currency } = useSettings()
+  const { data: exchangeRates } = useExchangeRates()
   // Calculate total for percentage calculation
   const total = data.reduce((sum, item) => sum + item.amount, 0)
 
@@ -53,7 +57,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
             borderRadius: '8px',
             fontSize: '14px',
           }}
-          formatter={(value: number) => formatCurrency(value)}
+          formatter={(value: number) => formatCurrency(value, currency, exchangeRates?.rates || {}, false)}
         />
         <Legend
           wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}

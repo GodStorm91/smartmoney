@@ -47,11 +47,13 @@ export async function deleteGoal(id: number): Promise<void> {
  */
 export async function fetchGoalProgress(
   goalId: number,
-  includeAchievability: boolean = true
+  includeAchievability: boolean = true,
+  trendMonths: number = 3
 ): Promise<GoalProgress> {
   const params = new URLSearchParams()
   if (includeAchievability) {
     params.append('include_achievability', 'true')
+    params.append('trend_months', trendMonths.toString())
   }
 
   const response = await apiClient.get<GoalProgress>(

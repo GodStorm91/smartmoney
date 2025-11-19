@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { GoalCreateEmptyState } from '@/components/goals/GoalCreateEmptyState'
@@ -14,6 +15,7 @@ export function Goals() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedYears, setSelectedYears] = useState<number | undefined>()
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null)
+  const [trendMonths, setTrendMonths] = useState<1 | 3 | 6 | 12>(3)
 
   const { data: goals, isLoading: goalsLoading } = useQuery({
     queryKey: ['goals'],
@@ -22,11 +24,11 @@ export function Goals() {
 
   // Fetch goal progress with achievability for each goal
   const { data: goalsProgress, isLoading: goalsProgressLoading } = useQuery({
-    queryKey: ['goals-progress-full', goals?.map(g => g.id)],
+    queryKey: ['goals-progress-full', goals?.map(g => g.id), trendMonths],
     queryFn: async () => {
       if (!goals || goals.length === 0) return []
       return Promise.all(
-        goals.map(goal => fetchGoalProgress(goal.id, true))
+        goals.map(goal => fetchGoalProgress(goal.id, true, trendMonths))
       )
     },
     enabled: !!goals && goals.length > 0,
@@ -60,6 +62,26 @@ export function Goals() {
         <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('goals.title')}</h2>
         <p className="text-gray-600">{t('goals.subtitle')}</p>
       </div>
+
+      {/* Period selector for rolling average */}
+      {goals && goals.length > 0 && (
+        <div className="mb-6">
+          <div className="flex gap-2">
+            {([1, 3, 6, 12] as const).map((months) => (
+              <Button
+                key={months}
+                variant={trendMonths === months ? 'primary' : 'outline'}
+                onClick={() => setTrendMonths(months)}
+              >
+                {t('goals.trendPeriod', { months })}
+              </Button>
+            ))}
+          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            {t('goals.trendPeriodHint')}
+          </p>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="flex justify-center py-12"><LoadingSpinner size="lg" /></div>
