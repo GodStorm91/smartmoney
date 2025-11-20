@@ -156,3 +156,78 @@ export function formatCurrencyCompact(
     maximumFractionDigits: compactFractionDigits,
   }).format(convertedAmount / divisor)
 }
+
+/**
+ * Mask currency value for privacy mode
+ * @param currency - Currency code to determine symbol
+ * @returns Masked value with currency symbol
+ */
+export function maskCurrencyValue(currency: string = 'JPY'): string {
+  const symbolMap: Record<string, string> = {
+    JPY: '¥***',
+    USD: '$***',
+    VND: '***₫',
+  }
+  return symbolMap[currency] || '***'
+}
+
+/**
+ * Format currency with privacy mode support
+ * @param amount - Number to format
+ * @param currency - Currency code
+ * @param rates - Exchange rates
+ * @param isNativeCurrency - If amount is already in target currency
+ * @param isPrivacyMode - If true, returns masked value
+ * @returns Formatted or masked currency string
+ */
+export function formatCurrencyPrivacy(
+  amount: number,
+  currency: string = 'JPY',
+  rates: Record<string, number> = DEFAULT_RATES,
+  isNativeCurrency: boolean = false,
+  isPrivacyMode: boolean = false
+): string {
+  if (isPrivacyMode) {
+    return maskCurrencyValue(currency)
+  }
+  return formatCurrency(amount, currency, rates, isNativeCurrency)
+}
+
+/**
+ * Format signed currency with privacy mode support
+ */
+export function formatCurrencySignedPrivacy(
+  amount: number,
+  type?: 'income' | 'expense',
+  currency: string = 'JPY',
+  rates: Record<string, number> = DEFAULT_RATES,
+  isNativeCurrency: boolean = false,
+  isPrivacyMode: boolean = false
+): string {
+  if (isPrivacyMode) {
+    const masked = maskCurrencyValue(currency)
+    if (type === 'income' || amount > 0) {
+      return `+${masked}`
+    } else if (type === 'expense' || amount < 0) {
+      return `-${masked}`
+    }
+    return masked
+  }
+  return formatCurrencySigned(amount, type, currency, rates, isNativeCurrency)
+}
+
+/**
+ * Format compact currency with privacy mode support
+ */
+export function formatCurrencyCompactPrivacy(
+  amount: number,
+  currency: string = 'JPY',
+  rates: Record<string, number> = DEFAULT_RATES,
+  isNativeCurrency: boolean = false,
+  isPrivacyMode: boolean = false
+): string {
+  if (isPrivacyMode) {
+    return maskCurrencyValue(currency)
+  }
+  return formatCurrencyCompact(amount, currency, rates, isNativeCurrency)
+}

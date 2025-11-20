@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: netuh-qpbwx
+created: 2025-11-19T12:09:20+09:00

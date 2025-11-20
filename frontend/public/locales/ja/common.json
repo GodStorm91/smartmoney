@@ -32,7 +32,10 @@
     "mobileNavigation": "モバイルナビゲーション",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
-    "uploadDropzone": "CSVファイルをドラッグ&ドロップ、またはクリックしてアップロード"
+    "uploadDropzone": "CSVファイルをドラッグ&ドロップ、またはクリックしてアップロード",
+    "togglePrivacy": "プライバシーモード切替",
+    "hideAmounts": "金額を非表示",
+    "showAmounts": "金額を表示"
   },
   "dashboard": {
     "title": "ダッシュボード",

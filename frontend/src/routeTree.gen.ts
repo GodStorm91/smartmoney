@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AccountsRouteImport } from './routes/accounts'
@@ -30,6 +32,16 @@ const TransactionsRoute = TransactionsRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoalsRoute = GoalsRouteImport.update({
@@ -58,6 +70,8 @@ export interface FileRoutesByFullPath {
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
@@ -67,6 +81,8 @@ export interface FileRoutesByTo {
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
@@ -77,6 +93,8 @@ export interface FileRoutesById {
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
   '/goals': typeof GoalsRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
@@ -88,6 +106,8 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/analytics'
     | '/goals'
+    | '/login'
+    | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
@@ -97,6 +117,8 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/analytics'
     | '/goals'
+    | '/login'
+    | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
@@ -106,6 +128,8 @@ export interface FileRouteTypes {
     | '/accounts'
     | '/analytics'
     | '/goals'
+    | '/login'
+    | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
@@ -116,6 +140,8 @@ export interface RootRouteChildren {
   AccountsRoute: typeof AccountsRoute
   AnalyticsRoute: typeof AnalyticsRoute
   GoalsRoute: typeof GoalsRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
   UploadRoute: typeof UploadRoute
@@ -142,6 +168,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/goals': {
@@ -180,6 +220,8 @@ const rootRouteChildren: RootRouteChildren = {
   AccountsRoute: AccountsRoute,
   AnalyticsRoute: AnalyticsRoute,
   GoalsRoute: GoalsRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,
   UploadRoute: UploadRoute,

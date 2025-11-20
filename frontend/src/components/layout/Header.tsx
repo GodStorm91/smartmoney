@@ -1,13 +1,16 @@
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { useAuth } from '@/contexts/AuthContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 
 export function Header() {
   const { t } = useTranslation('common')
   const { logout } = useAuth()
+  const { isPrivacyMode, togglePrivacyMode } = usePrivacy()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
@@ -47,6 +50,20 @@ export function Header() {
             <NavLink to="/goals">{t('header.goals')}</NavLink>
             <NavLink to="/settings">{t('header.settings')}</NavLink>
 
+            {/* Privacy Toggle - Desktop */}
+            <button
+              onClick={togglePrivacyMode}
+              className="text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 focus-ring"
+              aria-label={isPrivacyMode ? t('aria.showAmounts') : t('aria.hideAmounts')}
+              title={isPrivacyMode ? t('aria.showAmounts') : t('aria.hideAmounts')}
+            >
+              {isPrivacyMode ? (
+                <EyeOff className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <Eye className="w-5 h-5" aria-hidden="true" />
+              )}
+            </button>
+
             {/* Language Switcher - Desktop */}
             <LanguageSwitcher />
 
@@ -62,8 +79,19 @@ export function Header() {
             </button>
           </nav>
 
-          {/* Mobile: Language Switcher + Menu Button */}
+          {/* Mobile: Privacy Toggle + Language Switcher + Menu Button */}
           <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={togglePrivacyMode}
+              className="text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100 focus-ring"
+              aria-label={isPrivacyMode ? t('aria.showAmounts') : t('aria.hideAmounts')}
+            >
+              {isPrivacyMode ? (
+                <EyeOff className="w-5 h-5" aria-hidden="true" />
+              ) : (
+                <Eye className="w-5 h-5" aria-hidden="true" />
+              )}
+            </button>
             <LanguageSwitcher />
             <button
               className="p-2 rounded-lg hover:bg-gray-100 focus-ring"

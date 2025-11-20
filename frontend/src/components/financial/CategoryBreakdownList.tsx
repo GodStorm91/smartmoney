@@ -1,6 +1,7 @@
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 import type { CategoryBreakdown } from '@/types'
 
 interface CategoryBreakdownListProps {
@@ -22,6 +23,7 @@ const categoryEmojis: Record<string, string> = {
 export function CategoryBreakdownList({ categories, maxItems }: CategoryBreakdownListProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
+  const { isPrivacyMode } = usePrivacy()
   const displayCategories = maxItems ? categories.slice(0, maxItems) : categories
 
   return (
@@ -36,7 +38,7 @@ export function CategoryBreakdownList({ categories, maxItems }: CategoryBreakdow
               <span className="text-sm font-medium text-gray-700">{category.category}</span>
             </div>
             <span className="text-sm font-semibold font-numbers text-gray-900">
-              {formatCurrency(category.amount, currency, exchangeRates?.rates || {}, false)}
+              {formatCurrencyPrivacy(category.amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
             </span>
           </div>
           <div className="h-2 bg-gray-100 rounded-full overflow-hidden">

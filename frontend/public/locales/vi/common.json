@@ -32,7 +32,10 @@
     "mobileNavigation": "Điều hướng di động",
     "openMenu": "Mở menu",
     "closeMenu": "Đóng menu",
-    "uploadDropzone": "Kéo và thả tệp CSV hoặc nhấp để tải lên"
+    "uploadDropzone": "Kéo và thả tệp CSV hoặc nhấp để tải lên",
+    "togglePrivacy": "Chuyển đổi chế độ riêng tư",
+    "hideAmounts": "Ẩn số tiền",
+    "showAmounts": "Hiện số tiền"
   },
   "dashboard": {
     "title": "Bảng điều khiển",

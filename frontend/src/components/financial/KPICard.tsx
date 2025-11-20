@@ -1,8 +1,9 @@
 import { Card } from '@/components/ui/Card'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 
 interface KPICardProps {
   title: string
@@ -16,6 +17,7 @@ interface KPICardProps {
 export function KPICard({ title, amount, change, icon, type, ...props }: KPICardProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
+  const { isPrivacyMode } = usePrivacy()
   const colorClasses = {
     income: {
       bg: 'bg-green-50',
@@ -77,7 +79,7 @@ export function KPICard({ title, amount, change, icon, type, ...props }: KPICard
       <div>
         <p className="text-sm text-gray-600 mb-1">{title}</p>
         <p className={cn('text-4xl font-bold font-numbers', type === 'net' && 'text-blue-600')}>
-          {formatCurrency(amount, currency, exchangeRates?.rates || {}, false)}
+          {formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         </p>
       </div>
     </Card>

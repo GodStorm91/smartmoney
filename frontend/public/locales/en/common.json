@@ -32,7 +32,10 @@
     "mobileNavigation": "Mobile Navigation",
     "openMenu": "Open Menu",
     "closeMenu": "Close Menu",
-    "uploadDropzone": "Drag and drop CSV file, or click to upload"
+    "uploadDropzone": "Drag and drop CSV file, or click to upload",
+    "togglePrivacy": "Toggle privacy mode",
+    "hideAmounts": "Hide amounts",
+    "showAmounts": "Show amounts"
   },
   "dashboard": {
     "title": "Dashboard",

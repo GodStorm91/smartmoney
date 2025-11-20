@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { useCreateAccount, useUpdateAccount, useAccount } from '@/hooks/useAccounts'
 import type { AccountType, AccountCreate, AccountUpdate, AccountWithBalance } from '@/types'
 import { cn } from '@/utils/cn'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useRatesMap } from '@/hooks/useExchangeRates'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 
 interface AccountFormModalProps {
   isOpen: boolean
@@ -22,6 +23,7 @@ export function AccountFormModal({
   const updateMutation = useUpdateAccount()
   const { data: existingAccount } = useAccount(editingAccountId || 0)
   const rates = useRatesMap()
+  const { isPrivacyMode } = usePrivacy()
 
   // Form state
   const [name, setName] = useState('')
@@ -326,11 +328,12 @@ export function AccountFormModal({
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-blue-900">Current Balance</span>
                   <span className="text-lg font-bold text-blue-900">
-                    {formatCurrency(
+                    {formatCurrencyPrivacy(
                       (existingAccount as AccountWithBalance).current_balance,
                       existingAccount.currency,
                       rates,
-                      true
+                      true,
+                      isPrivacyMode
                     )}
                   </span>
                 </div>
@@ -385,11 +388,12 @@ export function AccountFormModal({
                         'text-lg font-bold',
                         adjustmentAmount > 0 ? 'text-green-900' : 'text-red-900'
                       )}>
-                        {formatCurrency(
+                        {formatCurrencyPrivacy(
                           Math.abs(adjustmentAmount),
                           existingAccount.currency,
                           rates,
-                          true
+                          true,
+                          isPrivacyMode
                         )}
                       </span>
                     </div>
@@ -417,11 +421,12 @@ export function AccountFormModal({
                       <p className="text-sm text-yellow-700 mt-1">
                         This will create a balance adjustment transaction of{' '}
                         <span className="font-semibold">
-                          {formatCurrency(
+                          {formatCurrencyPrivacy(
                             Math.abs(adjustmentAmount),
                             existingAccount.currency,
                             rates,
-                            true
+                            true,
+                            isPrivacyMode
                           )}
                         </span>
                         {' '}to reconcile your account balance.

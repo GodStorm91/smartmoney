@@ -4,7 +4,8 @@ import { Card } from '@/components/ui/Card'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
-import { formatCurrency, formatCurrencyCompact } from '@/utils/formatCurrency'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { formatCurrencyPrivacy, formatCurrencyCompactPrivacy } from '@/utils/formatCurrency'
 import { RadialBarChart, RadialBar, ResponsiveContainer } from 'recharts'
 import { cn } from '@/utils/cn'
 
@@ -64,6 +65,7 @@ export function GoalAchievabilityCard({
   const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
+  const { isPrivacyMode } = usePrivacy()
   const isMobile = useMediaQuery('(max-width: 768px)')
 
   // Cap achievability percentage at 0-200%
@@ -98,7 +100,7 @@ export function GoalAchievabilityCard({
     if (gap < 10000) {
       return {
         emoji: '💡',
-        message: t('goal.insight.smallGap', { gap: formatCurrency(gap, currency, exchangeRates?.rates || {}, false) }),
+        message: t('goal.insight.smallGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
       }
     }
 
@@ -106,14 +108,14 @@ export function GoalAchievabilityCard({
     if (gap < 50000) {
       return {
         emoji: '⚠️',
-        message: t('goal.insight.mediumGap', { gap: formatCurrency(gap, currency, exchangeRates?.rates || {}, false) }),
+        message: t('goal.insight.mediumGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
       }
     }
 
     // Large gap
     return {
       emoji: '🔴',
-      message: t('goal.insight.largeGap', { gap: formatCurrency(gap, currency, exchangeRates?.rates || {}, false) }),
+      message: t('goal.insight.largeGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
     }
   }
 
@@ -228,11 +230,11 @@ export function GoalAchievabilityCard({
                 {Math.round(progressPercentage)}%
               </div>
               <div className="text-sm font-mono mt-1 text-gray-700">
-                {formatCurrencyCompact(currentAmount, currency, exchangeRates?.rates || {}, true)}
+                {formatCurrencyCompactPrivacy(currentAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
               <div className="text-xs text-gray-400 my-1">─────</div>
               <div className="text-sm font-mono text-gray-700">
-                {formatCurrencyCompact(targetAmount, currency, exchangeRates?.rates || {}, true)}
+                {formatCurrencyCompactPrivacy(targetAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
             </div>
           </div>
@@ -250,8 +252,8 @@ export function GoalAchievabilityCard({
             </div>
           </div>
           <div className="text-lg font-mono font-semibold mb-2">
-            {formatCurrency(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false)} /{' '}
-            {formatCurrency(achievability.required_monthly, currency, exchangeRates?.rates || {}, false)}
+            {formatCurrencyPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)} /{' '}
+            {formatCurrencyPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
             <span className="text-sm ml-2 text-gray-600">
               ({Math.round(monthlySavingsPercentage)}%)
             </span>

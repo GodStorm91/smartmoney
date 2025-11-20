@@ -2,7 +2,8 @@ import type { AccountWithBalance, AccountType } from '@/types'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 
 interface AccountCardProps {
@@ -27,6 +28,7 @@ const ACCOUNT_TYPE_CONFIG: Record<
 export function AccountCard({ account, onEdit }: AccountCardProps) {
   const { t } = useTranslation('common')
   const { data: exchangeRates } = useExchangeRates()
+  const { isPrivacyMode } = usePrivacy()
 
   const typeConfig = ACCOUNT_TYPE_CONFIG[account.type]
   const balancePositive = account.current_balance >= 0
@@ -88,7 +90,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
             balancePositive ? 'text-green-600' : 'text-red-600'
           )}
         >
-          {formatCurrency(account.current_balance, account.currency, exchangeRates?.rates || {}, true)}
+          {formatCurrencyPrivacy(account.current_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
         </p>
       </div>
 
@@ -97,7 +99,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
         <div>
           <p className="text-xs text-gray-500">{t('account.initialBalance')}</p>
           <p className="text-sm font-mono text-gray-700">
-            {formatCurrency(account.initial_balance, account.currency, exchangeRates?.rates || {}, true)}
+            {formatCurrencyPrivacy(account.initial_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
           </p>
         </div>
         <div>

@@ -9,9 +9,10 @@ import {
   Legend,
 } from 'recharts'
 import { useTranslation } from 'react-i18next'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 import type { MonthlyData } from '@/types'
 
 interface TrendLineChartProps {
@@ -28,6 +29,7 @@ const colorMap = {
 export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
+  const { isPrivacyMode } = usePrivacy()
   const { t } = useTranslation('common')
 
   const labelMap = {
@@ -48,7 +50,7 @@ export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
         <YAxis
           stroke="#6B7280"
           style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
-          tickFormatter={(value) => formatCurrency(value, currency, exchangeRates?.rates || {}, false)}
+          tickFormatter={(value) => formatCurrencyPrivacy(value, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         />
         <Tooltip
           contentStyle={{
@@ -57,7 +59,7 @@ export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
             borderRadius: '8px',
             fontSize: '14px',
           }}
-          formatter={(value: number) => [formatCurrency(value, currency, exchangeRates?.rates || {}, false), labelMap[dataKey]]}
+          formatter={(value: number) => [formatCurrencyPrivacy(value, currency, exchangeRates?.rates || {}, false, isPrivacyMode), labelMap[dataKey]]}
         />
         <Legend
           wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}

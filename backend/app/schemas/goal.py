@@ -45,8 +45,10 @@ class GoalAchievabilityResponse(BaseModel):
     monthly_gap: int
     status_tier: str  # on_track, achievable, challenging, deficit, severe_deficit
     recommendation: str
-    data_source: str  # e.g., "2025-10"
+    data_source: str  # e.g., "2025-08 to 2025-10 (3 months avg)"
     months_remaining: int
+    trend_months_requested: int  # Number of months requested for rolling average
+    trend_months_actual: int  # Actual months used (may be less than requested)
 
 
 class GoalProgressResponse(BaseModel):

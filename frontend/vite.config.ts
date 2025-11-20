@@ -13,6 +13,11 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: true, // Allow external access
+    allowedHosts: [
+      'tunnel.khanh.page',
+      '.tunnel.khanh.page', // Allow all subdomains
+    ],
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
