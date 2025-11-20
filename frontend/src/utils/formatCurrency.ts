@@ -9,6 +9,19 @@ const DEFAULT_RATES: Record<string, number> = {
 }
 
 /**
+ * Currency decimal places configuration
+ * Zero-decimal currencies (JPY, VND, KRW) have no sub-units
+ * Decimal currencies (USD, EUR) have cents/sub-units
+ */
+const CURRENCY_DECIMALS: Record<string, number> = {
+  JPY: 0,  // Japanese Yen - no sen/rin in modern use
+  VND: 0,  // Vietnamese Dong - no decimal places
+  KRW: 0,  // Korean Won - no decimal places
+  USD: 2,  // US Dollar - cents (1/100)
+  EUR: 2,  // Euro - cents (1/100)
+}
+
+/**
  * Convert amount from JPY to target currency
  * @param amountInJPY - Amount in JPY (base currency in database)
  * @param targetCurrency - Target currency code
@@ -26,7 +39,7 @@ function convertCurrency(
 
 /**
  * Format number as currency
- * @param amount - Number to format (in cents)
+ * @param amount - Number to format (integer stored in database)
  * @param currency - Target currency code (JPY, USD, VND)
  * @param rates - Exchange rates from API
  * @param isNativeCurrency - If true, amount already in target currency (skip conversion)
@@ -34,11 +47,14 @@ function convertCurrency(
  * @returns Formatted currency string
  *
  * @example
- * // Account balance (native currency)
- * formatCurrency(10000, 'VND', rates, true)  // "₫100"
+ * // JPY (zero-decimal currency, stored as-is)
+ * formatCurrency(823935, 'JPY', rates, true)  // "¥823,935"
  *
- * // Transaction amount (JPY-based)
- * formatCurrency(10000, 'VND', rates, false) // "₫1,600,000" (10000 JPY → VND)
+ * // USD (decimal currency, stored in cents)
+ * formatCurrency(10000, 'USD', rates, true)  // "$100.00"
+ *
+ * // Transaction amount (JPY-based conversion)
+ * formatCurrency(823935, 'VND', rates, false) // "₫131,829,600" (823935 JPY × 160)
  */
 export function formatCurrency(
   amount: number,
@@ -48,8 +64,16 @@ export function formatCurrency(
 ): string {
   // Skip exchange rate conversion for amounts already in native currency
   const convertedAmount = isNativeCurrency
-    ? amount  // Already in native currency cents
+    ? amount  // Already in native currency
     : convertCurrency(amount, currency, rates)  // Convert from JPY base
+
+  // Get decimal places for this currency
+  const decimalPlaces = CURRENCY_DECIMALS[currency] ?? 0
+
+  // Calculate divisor: 10^decimalPlaces
+  // JPY/VND (0 decimals): divisor = 1 (no division)
+  // USD/EUR (2 decimals): divisor = 100 (convert cents to dollars)
+  const divisor = Math.pow(10, decimalPlaces)
 
   // Locale mapping
   const localeMap: Record<string, string> = {
@@ -59,15 +83,12 @@ export function formatCurrency(
   }
   const locale = localeMap[currency] || 'ja-JP'
 
-  // Decimal places
-  const fractionDigits = currency === 'USD' ? 2 : 0
-
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  }).format(convertedAmount / 100)  // Convert cents to units
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  }).format(convertedAmount / divisor)
 }
 
 /**
@@ -99,7 +120,7 @@ export function formatCurrencySigned(
 
 /**
  * Format number as compact notation
- * @param amount - Number to format (in cents)
+ * @param amount - Number to format (integer stored in database)
  * @param currency - Target currency code
  * @param rates - Exchange rates from API
  * @param isNativeCurrency - If true, amount already in target currency (skip conversion)
@@ -112,8 +133,12 @@ export function formatCurrencyCompact(
   isNativeCurrency: boolean = false
 ): string {
   const convertedAmount = isNativeCurrency
-    ? amount  // Already in native currency cents
+    ? amount  // Already in native currency
     : convertCurrency(amount, currency, rates)  // Convert from JPY base
+
+  // Get decimal places for this currency
+  const decimalPlaces = CURRENCY_DECIMALS[currency] ?? 0
+  const divisor = Math.pow(10, decimalPlaces)
 
   const localeMap: Record<string, string> = {
     JPY: 'ja-JP',
@@ -121,13 +146,13 @@ export function formatCurrencyCompact(
     VND: 'vi-VN',
   }
   const locale = localeMap[currency] || 'ja-JP'
-  const fractionDigits = currency === 'USD' ? 1 : 0
+  const compactFractionDigits = decimalPlaces > 0 ? 1 : 0
 
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
     notation: 'compact',
     minimumFractionDigits: 0,
-    maximumFractionDigits: fractionDigits,
-  }).format(convertedAmount / 100)  // Convert cents to units
+    maximumFractionDigits: compactFractionDigits,
+  }).format(convertedAmount / divisor)
 }
