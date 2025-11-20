@@ -18,7 +18,7 @@ async def get_settings(db: Session = Depends(get_db), current_user: User = Depen
     Returns:
         Settings with currency, base_date, categories, and sources
     """
-    return SettingsService.get_settings(db=db)
+    return SettingsService.get_settings(db=db, user_id=current_user.id)
 
 
 @router.put("", response_model=SettingsResponse)
@@ -42,6 +42,7 @@ async def update_settings(
     try:
         return SettingsService.update_settings(
             db=db,
+            user_id=current_user.id,
             updates=settings_update.model_dump(exclude_unset=True)
         )
     except ValueError as e:
@@ -55,7 +56,7 @@ async def get_categories(db: Session = Depends(get_db), current_user: User = Dep
     Returns:
         List of unique category names
     """
-    return SettingsService.get_categories(db=db)
+    return SettingsService.get_categories(db=db, user_id=current_user.id)
 
 
 @router.get("/sources", response_model=list[str])
@@ -65,4 +66,4 @@ async def get_sources(db: Session = Depends(get_db), current_user: User = Depend
     Returns:
         List of unique source names
     """
-    return SettingsService.get_sources(db=db)
+    return SettingsService.get_sources(db=db, user_id=current_user.id)

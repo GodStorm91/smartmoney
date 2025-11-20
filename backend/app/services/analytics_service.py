@@ -13,12 +13,13 @@ class AnalyticsService:
 
     @staticmethod
     def get_monthly_cashflow(
-        db: Session, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> list[dict]:
-        """Get monthly cashflow grouped by month.
+        """Get monthly cashflow grouped by month for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
 
@@ -39,7 +40,10 @@ class AnalyticsService:
                     )
                 ).label("expenses"),
             )
-            .filter(~Transaction.is_transfer)
+            .filter(
+                Transaction.user_id == user_id,
+                ~Transaction.is_transfer
+            )
             .group_by(Transaction.month_key)
             .order_by(Transaction.month_key)
         )
@@ -68,12 +72,13 @@ class AnalyticsService:
 
     @staticmethod
     def get_category_breakdown(
-        db: Session, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> list[dict]:
-        """Get expense breakdown by category.
+        """Get expense breakdown by category for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
 
@@ -86,7 +91,11 @@ class AnalyticsService:
                 func.sum(Transaction.amount).label("total"),
                 func.count(Transaction.id).label("count"),
             )
-            .filter(~Transaction.is_transfer, ~Transaction.is_income)
+            .filter(
+                Transaction.user_id == user_id,
+                ~Transaction.is_transfer,
+                ~Transaction.is_income
+            )
             .group_by(Transaction.category)
             .order_by(func.sum(Transaction.amount).asc())  # Most negative first
         )
@@ -112,12 +121,13 @@ class AnalyticsService:
 
     @staticmethod
     def get_monthly_trend(
-        db: Session, months: int = 12
+        db: Session, user_id: int, months: int = 12
     ) -> list[dict]:
-        """Get monthly trend for last N months.
+        """Get monthly trend for last N months for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             months: Number of months to include
 
         Returns:
@@ -137,7 +147,10 @@ class AnalyticsService:
                     )
                 ).label("expenses"),
             )
-            .filter(~Transaction.is_transfer)
+            .filter(
+                Transaction.user_id == user_id,
+                ~Transaction.is_transfer
+            )
             .group_by(Transaction.month_key)
             .order_by(Transaction.month_key.desc())
             .limit(months)
@@ -162,12 +175,13 @@ class AnalyticsService:
 
     @staticmethod
     def get_sources_breakdown(
-        db: Session, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> list[dict]:
-        """Get transaction breakdown by source.
+        """Get transaction breakdown by source for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
 
@@ -180,7 +194,10 @@ class AnalyticsService:
                 func.sum(Transaction.amount).label("total"),
                 func.count(Transaction.id).label("count"),
             )
-            .filter(~Transaction.is_transfer)
+            .filter(
+                Transaction.user_id == user_id,
+                ~Transaction.is_transfer
+            )
             .group_by(Transaction.source)
             .order_by(func.count(Transaction.id).desc())
         )
@@ -206,12 +223,13 @@ class AnalyticsService:
 
     @staticmethod
     def get_comprehensive_analytics(
-        db: Session, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> dict:
-        """Get comprehensive analytics with all data.
+        """Get comprehensive analytics with all data for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
 
@@ -220,12 +238,12 @@ class AnalyticsService:
         """
         # Get monthly trends
         monthly_trends = AnalyticsService.get_monthly_cashflow(
-            db=db, start_date=start_date, end_date=end_date
+            db=db, user_id=user_id, start_date=start_date, end_date=end_date
         )
 
         # Get category breakdown
         category_breakdown = AnalyticsService.get_category_breakdown(
-            db=db, start_date=start_date, end_date=end_date
+            db=db, user_id=user_id, start_date=start_date, end_date=end_date
         )
 
         # Calculate totals from monthly trends

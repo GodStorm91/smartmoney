@@ -20,15 +20,17 @@ async def create_tag(
 ):
     """Create a new tag."""
     try:
-        # Check if tag with this name already exists
-        existing = TagService.get_tag_by_name(db, tag.name)
+        # Check if tag with this name already exists for this user
+        existing = TagService.get_tag_by_name(db, current_user.id, tag.name)
         if existing:
             raise HTTPException(
                 status_code=400,
                 detail=f"Tag '{tag.name}' already exists"
             )
 
-        created = TagService.create_tag(db, tag.model_dump())
+        tag_data = tag.model_dump()
+        tag_data["user_id"] = current_user.id
+        created = TagService.create_tag(db, tag_data)
         return created
     except HTTPException:
         raise
@@ -47,7 +49,7 @@ async def get_all_tags(
     current_user: User = Depends(get_current_user),
 ):
     """Get all tags."""
-    return TagService.get_all_tags(db)
+    return TagService.get_all_tags(db, current_user.id)
 
 
 @router.get("/{tag_id}", response_model=TagResponse)
@@ -57,7 +59,7 @@ async def get_tag(
     current_user: User = Depends(get_current_user),
 ):
     """Get a tag by ID."""
-    tag = TagService.get_tag(db, tag_id)
+    tag = TagService.get_tag(db, current_user.id, tag_id)
     if not tag:
         raise HTTPException(status_code=404, detail="Tag not found")
     return tag
@@ -72,9 +74,9 @@ async def update_tag(
 ):
     """Update a tag."""
     try:
-        # If updating name, check if new name already exists
+        # If updating name, check if new name already exists for this user
         if tag_update.name:
-            existing = TagService.get_tag_by_name(db, tag_update.name)
+            existing = TagService.get_tag_by_name(db, current_user.id, tag_update.name)
             if existing and existing.id != tag_id:
                 raise HTTPException(
                     status_code=400,
@@ -82,7 +84,7 @@ async def update_tag(
                 )
 
         updated = TagService.update_tag(
-            db, tag_id, tag_update.model_dump(exclude_unset=True)
+            db, current_user.id, tag_id, tag_update.model_dump(exclude_unset=True)
         )
         if not updated:
             raise HTTPException(status_code=404, detail="Tag not found")
@@ -105,7 +107,7 @@ async def delete_tag(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a tag (cascades to transaction_tags)."""
-    deleted = TagService.delete_tag(db, tag_id)
+    deleted = TagService.delete_tag(db, current_user.id, tag_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Tag not found")
     return None

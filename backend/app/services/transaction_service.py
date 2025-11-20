@@ -18,7 +18,7 @@ class TransactionService:
 
         Args:
             db: Database session
-            transaction_data: Transaction data dictionary
+            transaction_data: Transaction data dictionary (must include user_id)
 
         Returns:
             Created transaction
@@ -40,7 +40,7 @@ class TransactionService:
 
         Args:
             db: Database session
-            transactions_data: List of transaction data dictionaries
+            transactions_data: List of transaction data dictionaries (must include user_id)
 
         Returns:
             Tuple of (created_count, skipped_count)
@@ -60,21 +60,26 @@ class TransactionService:
         return created, skipped
 
     @staticmethod
-    def get_transaction(db: Session, transaction_id: int) -> Optional[Transaction]:
-        """Get transaction by ID.
+    def get_transaction(db: Session, user_id: int, transaction_id: int) -> Optional[Transaction]:
+        """Get transaction by ID for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             transaction_id: Transaction ID
 
         Returns:
             Transaction or None
         """
-        return db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        return db.query(Transaction).filter(
+            Transaction.id == transaction_id,
+            Transaction.user_id == user_id
+        ).first()
 
     @staticmethod
     def get_transactions(
         db: Session,
+        user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         category: Optional[str] = None,
@@ -84,10 +89,11 @@ class TransactionService:
         limit: int = 100,
         offset: int = 0,
     ) -> list[Transaction]:
-        """Get filtered transactions.
+        """Get filtered transactions for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
             category: Filter by category
@@ -100,7 +106,7 @@ class TransactionService:
         Returns:
             List of transactions
         """
-        query = db.query(Transaction)
+        query = db.query(Transaction).filter(Transaction.user_id == user_id)
 
         if start_date:
             query = query.filter(Transaction.date >= start_date)
@@ -120,6 +126,7 @@ class TransactionService:
     @staticmethod
     def count_transactions(
         db: Session,
+        user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
         category: Optional[str] = None,
@@ -127,10 +134,11 @@ class TransactionService:
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
     ) -> int:
-        """Count transactions matching filters.
+        """Count transactions matching filters for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
             category: Filter by category
@@ -141,7 +149,7 @@ class TransactionService:
         Returns:
             Count of matching transactions
         """
-        query = db.query(func.count(Transaction.id))
+        query = db.query(func.count(Transaction.id)).filter(Transaction.user_id == user_id)
 
         if start_date:
             query = query.filter(Transaction.date >= start_date)
@@ -161,20 +169,25 @@ class TransactionService:
     @staticmethod
     def get_summary(
         db: Session,
+        user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
     ) -> dict:
-        """Get transaction summary for date range.
+        """Get transaction summary for date range for a specific user.
 
         Args:
             db: Database session
+            user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
 
         Returns:
             Dictionary with income, expenses, and net
         """
-        query = db.query(Transaction).filter(~Transaction.is_transfer)
+        query = db.query(Transaction).filter(
+            Transaction.user_id == user_id,
+            ~Transaction.is_transfer
+        )
 
         if start_date:
             query = query.filter(Transaction.date >= start_date)

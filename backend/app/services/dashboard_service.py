@@ -13,11 +13,12 @@ class DashboardService:
     """Service for dashboard operations."""
 
     @staticmethod
-    def get_summary(db: Session, month: Optional[str] = None) -> dict:
+    def get_summary(db: Session, user_id: int, month: Optional[str] = None) -> dict:
         """Get dashboard summary with current and previous month comparison.
 
         Args:
             db: Database session
+            user_id: User ID
             month: Month in YYYY-MM format (defaults to current month)
 
         Returns:
@@ -36,10 +37,10 @@ class DashboardService:
         previous_month_key = previous_month.strftime("%Y-%m")
 
         # Get current month data
-        current_data = DashboardService._get_month_data(db, current_month_key)
+        current_data = DashboardService._get_month_data(db, user_id, current_month_key)
 
         # Get previous month data
-        previous_data = DashboardService._get_month_data(db, previous_month_key)
+        previous_data = DashboardService._get_month_data(db, user_id, previous_month_key)
 
         # Calculate percentage changes
         income_change = DashboardService._calculate_change(
@@ -62,11 +63,12 @@ class DashboardService:
         }
 
     @staticmethod
-    def _get_month_data(db: Session, month_key: str) -> dict:
+    def _get_month_data(db: Session, user_id: int, month_key: str) -> dict:
         """Get income, expense, and net for a specific month.
 
         Args:
             db: Database session
+            user_id: User ID
             month_key: Month in YYYY-MM format
 
         Returns:
@@ -81,7 +83,11 @@ class DashboardService:
                     case((~Transaction.is_income, Transaction.amount), else_=0)
                 ).label("expenses"),
             )
-            .filter(~Transaction.is_transfer, Transaction.month_key == month_key)
+            .filter(
+                Transaction.user_id == user_id,
+                ~Transaction.is_transfer,
+                Transaction.month_key == month_key
+            )
             .first()
         )
 

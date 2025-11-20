@@ -26,4 +26,4 @@ async def get_dashboard_summary(
     Returns:
         Dashboard summary with income, expense, net, and change percentages
     """
-    return DashboardService.get_summary(db=db, month=month)
+    return DashboardService.get_summary(db=db, user_id=current_user.id, month=month)

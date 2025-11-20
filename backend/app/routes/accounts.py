@@ -26,7 +26,9 @@ async def create_account(
 ):
     """Create a new account."""
     try:
-        created = AccountService.create_account(db, account.model_dump())
+        account_data = account.model_dump()
+        account_data["user_id"] = current_user.id
+        created = AccountService.create_account(db, account_data)
         return created
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -39,7 +41,7 @@ async def get_all_accounts(
     current_user: User = Depends(get_current_user),
 ):
     """Get all accounts with calculated balances."""
-    accounts = AccountService.get_all_accounts(db, include_inactive=include_inactive)
+    accounts = AccountService.get_all_accounts(db, current_user.id, include_inactive=include_inactive)
 
     # Enrich with balance and transaction count
     enriched = []
@@ -55,8 +57,8 @@ async def get_all_accounts(
             "notes": account.notes,
             "created_at": account.created_at,
             "updated_at": account.updated_at,
-            "current_balance": AccountService.calculate_balance(db, account.id),
-            "transaction_count": AccountService.get_transaction_count(db, account.id),
+            "current_balance": AccountService.calculate_balance(db, current_user.id, account.id),
+            "transaction_count": AccountService.get_transaction_count(db, current_user.id, account.id),
         }
         enriched.append(account_dict)
 
@@ -70,7 +72,7 @@ async def get_account(
     current_user: User = Depends(get_current_user),
 ):
     """Get an account by ID with calculated balance."""
-    account = AccountService.get_account(db, account_id)
+    account = AccountService.get_account(db, current_user.id, account_id)
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
@@ -86,8 +88,8 @@ async def get_account(
         "notes": account.notes,
         "created_at": account.created_at,
         "updated_at": account.updated_at,
-        "current_balance": AccountService.calculate_balance(db, account_id),
-        "transaction_count": AccountService.get_transaction_count(db, account_id),
+        "current_balance": AccountService.calculate_balance(db, current_user.id, account_id),
+        "transaction_count": AccountService.get_transaction_count(db, current_user.id, account_id),
     }
 
     return account_dict
@@ -109,7 +111,7 @@ async def update_account(
             detail="Cannot set both initial_balance and desired_current_balance"
         )
 
-    updated = AccountService.update_account(db, account_id, update_data)
+    updated = AccountService.update_account(db, current_user.id, account_id, update_data)
     if not updated:
         raise HTTPException(status_code=404, detail="Account not found")
     return updated
@@ -122,7 +124,7 @@ async def delete_account(
     current_user: User = Depends(get_current_user),
 ):
     """Soft delete an account (set is_active=False)."""
-    deleted = AccountService.delete_account(db, account_id)
+    deleted = AccountService.delete_account(db, current_user.id, account_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Account not found")
     return None
@@ -135,7 +137,7 @@ async def get_account_transactions(
     current_user: User = Depends(get_current_user),
 ):
     """Get all transactions for an account."""
-    account = AccountService.get_account(db, account_id)
+    account = AccountService.get_account(db, current_user.id, account_id)
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 

@@ -26,15 +26,17 @@ async def create_goal(
     try:
         # Pydantic schema already validates 1-10 years range
 
-        # Check if goal for this year horizon already exists
-        existing = GoalService.get_goal_by_years(db, goal.years)
+        # Check if goal for this year horizon already exists for this user
+        existing = GoalService.get_goal_by_years(db, current_user.id, goal.years)
         if existing:
             raise HTTPException(
                 status_code=400,
                 detail=f"Goal for {goal.years} years already exists"
             )
 
-        created = GoalService.create_goal(db, goal.model_dump())
+        goal_data = goal.model_dump()
+        goal_data["user_id"] = current_user.id
+        created = GoalService.create_goal(db, goal_data)
         return created
 
     except HTTPException:
@@ -49,7 +51,7 @@ async def get_all_goals(
     current_user: User = Depends(get_current_user),
 ):
     """Get all financial goals."""
-    return GoalService.get_all_goals(db)
+    return GoalService.get_all_goals(db, current_user.id)
 
 
 @router.get("/{goal_id}", response_model=GoalResponse)
@@ -59,7 +61,7 @@ async def get_goal(
     current_user: User = Depends(get_current_user),
 ):
     """Get a goal by ID."""
-    goal = GoalService.get_goal(db, goal_id)
+    goal = GoalService.get_goal(db, current_user.id, goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found")
     return goal
@@ -74,7 +76,7 @@ async def update_goal(
 ):
     """Update a goal."""
     updated = GoalService.update_goal(
-        db, goal_id, goal_update.model_dump(exclude_unset=True)
+        db, current_user.id, goal_id, goal_update.model_dump(exclude_unset=True)
     )
     if not updated:
         raise HTTPException(status_code=404, detail="Goal not found")
@@ -88,7 +90,7 @@ async def delete_goal(
     current_user: User = Depends(get_current_user),
 ):
     """Delete a goal."""
-    deleted = GoalService.delete_goal(db, goal_id)
+    deleted = GoalService.delete_goal(db, current_user.id, goal_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Goal not found")
     return None
@@ -103,13 +105,13 @@ async def get_goal_progress(
     current_user: User = Depends(get_current_user),
 ):
     """Get progress for a specific goal with optional achievability metrics."""
-    goal = GoalService.get_goal(db, goal_id)
+    goal = GoalService.get_goal(db, current_user.id, goal_id)
     if not goal:
         raise HTTPException(status_code=404, detail="Goal not found")
 
-    progress = GoalService.calculate_goal_progress(db, goal)
+    progress = GoalService.calculate_goal_progress(db, current_user.id, goal)
 
     if include_achievability:
-        progress["achievability"] = GoalService.calculate_achievability(db, goal, trend_months)
+        progress["achievability"] = GoalService.calculate_achievability(db, current_user.id, goal, trend_months)
 
     return progress

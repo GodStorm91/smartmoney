@@ -33,6 +33,7 @@ async def get_analytics(
     """
     return AnalyticsService.get_comprehensive_analytics(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
     )
@@ -48,6 +49,7 @@ async def get_monthly_cashflow(
     """Get monthly cashflow data."""
     return AnalyticsService.get_monthly_cashflow(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
     )
@@ -63,6 +65,7 @@ async def get_category_breakdown(
     """Get category breakdown for expenses."""
     return AnalyticsService.get_category_breakdown(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
     )
@@ -75,7 +78,7 @@ async def get_monthly_trend(
     current_user: User = Depends(get_current_user),
 ):
     """Get monthly trend for last N months."""
-    return AnalyticsService.get_monthly_trend(db=db, months=months)
+    return AnalyticsService.get_monthly_trend(db=db, user_id=current_user.id, months=months)
 
 
 @router.get("/sources", response_model=list[SourceBreakdownResponse])
@@ -88,6 +91,7 @@ async def get_sources_breakdown(
     """Get transaction breakdown by source."""
     return AnalyticsService.get_sources_breakdown(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
     )

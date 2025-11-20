@@ -59,6 +59,10 @@ async def upload_csv(
         # Parse CSV
         transactions_data = parse_csv(file.file, file.filename)
 
+        # Add user_id to each transaction
+        for tx_data in transactions_data:
+            tx_data["user_id"] = current_user.id
+
         # Bulk create transactions
         created, skipped = TransactionService.bulk_create_transactions(
             db, transactions_data

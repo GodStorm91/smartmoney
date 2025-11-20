@@ -30,6 +30,7 @@ async def create_transaction(
     try:
         # Generate month_key and hash
         tx_data = transaction.model_dump()
+        tx_data["user_id"] = current_user.id
         tx_data["month_key"] = transaction.date.strftime("%Y-%m")
         tx_data["tx_hash"] = generate_tx_hash(
             str(transaction.date),
@@ -61,6 +62,7 @@ async def get_transactions(
     """Get filtered transactions with pagination."""
     transactions = TransactionService.get_transactions(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
         category=category,
@@ -73,6 +75,7 @@ async def get_transactions(
 
     total = TransactionService.count_transactions(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
         category=category,
@@ -96,7 +99,7 @@ async def get_transaction(
     current_user: User = Depends(get_current_user),
 ):
     """Get a transaction by ID."""
-    transaction = TransactionService.get_transaction(db, transaction_id)
+    transaction = TransactionService.get_transaction(db, current_user.id, transaction_id)
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return transaction
@@ -112,6 +115,7 @@ async def get_summary(
     """Get transaction summary for a date range."""
     summary = TransactionService.get_summary(
         db=db,
+        user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
     )
