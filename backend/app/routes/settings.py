@@ -1,16 +1,18 @@
 """Settings API routes."""
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from ..auth.dependencies import get_current_user
 from ..database import get_db
-from ..schemas.settings import SettingsResponse
+from ..models.user import User
+from ..schemas.settings import SettingsResponse, SettingsUpdate
 from ..services.settings_service import SettingsService
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
 
 @router.get("", response_model=SettingsResponse)
-async def get_settings(db: Session = Depends(get_db)):
+async def get_settings(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Get app settings with categories and sources from database.
 
     Returns:
@@ -19,8 +21,35 @@ async def get_settings(db: Session = Depends(get_db)):
     return SettingsService.get_settings(db=db)
 
 
+@router.put("", response_model=SettingsResponse)
+async def update_settings(
+    settings_update: SettingsUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update app settings.
+
+    Args:
+        settings_update: Settings fields to update
+        db: Database session
+
+    Returns:
+        Updated settings
+
+    Raises:
+        HTTPException: If settings not initialized
+    """
+    try:
+        return SettingsService.update_settings(
+            db=db,
+            updates=settings_update.model_dump(exclude_unset=True)
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
 @router.get("/categories", response_model=list[str])
-async def get_categories(db: Session = Depends(get_db)):
+async def get_categories(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Get unique categories from transactions.
 
     Returns:
@@ -30,7 +59,7 @@ async def get_categories(db: Session = Depends(get_db)):
 
 
 @router.get("/sources", response_model=list[str])
-async def get_sources(db: Session = Depends(get_db)):
+async def get_sources(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """Get unique sources from transactions.
 
     Returns:

@@ -3,7 +3,9 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.user import User
 from ..services.transaction_service import TransactionService
 from ..utils.csv_parser import CSVParseError, parse_csv
 
@@ -24,6 +26,7 @@ class UploadResponse(BaseModel):
 async def upload_csv(
     file: UploadFile = File(..., description="CSV file to upload"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Upload CSV file and import transactions.
 
@@ -79,7 +82,7 @@ async def upload_csv(
 
 
 @router.get("/history")
-async def get_upload_history(db: Session = Depends(get_db)):
+async def get_upload_history(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     """
     Get upload history (stub for now - returns empty list).
 

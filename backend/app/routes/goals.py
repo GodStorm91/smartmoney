@@ -2,7 +2,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.user import User
 from ..schemas.goal import (
     GoalCreate,
     GoalProgressResponse,
@@ -18,6 +20,7 @@ router = APIRouter(prefix="/api/goals", tags=["goals"])
 async def create_goal(
     goal: GoalCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Create a new financial goal."""
     try:
@@ -43,6 +46,7 @@ async def create_goal(
 @router.get("/", response_model=list[GoalResponse])
 async def get_all_goals(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get all financial goals."""
     return GoalService.get_all_goals(db)
@@ -52,6 +56,7 @@ async def get_all_goals(
 async def get_goal(
     goal_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get a goal by ID."""
     goal = GoalService.get_goal(db, goal_id)
@@ -65,6 +70,7 @@ async def update_goal(
     goal_id: int,
     goal_update: GoalUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Update a goal."""
     updated = GoalService.update_goal(
@@ -79,6 +85,7 @@ async def update_goal(
 async def delete_goal(
     goal_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Delete a goal."""
     deleted = GoalService.delete_goal(db, goal_id)
@@ -91,7 +98,9 @@ async def delete_goal(
 async def get_goal_progress(
     goal_id: int,
     include_achievability: bool = Query(True, description="Include achievability metrics"),
+    trend_months: int = Query(3, ge=1, le=24, description="Number of months for rolling average (1-24)"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get progress for a specific goal with optional achievability metrics."""
     goal = GoalService.get_goal(db, goal_id)
@@ -101,6 +110,6 @@ async def get_goal_progress(
     progress = GoalService.calculate_goal_progress(db, goal)
 
     if include_achievability:
-        progress["achievability"] = GoalService.calculate_achievability(db, goal)
+        progress["achievability"] = GoalService.calculate_achievability(db, goal, trend_months)
 
     return progress
