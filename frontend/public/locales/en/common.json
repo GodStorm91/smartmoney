@@ -252,6 +252,15 @@
       "submitFailed": "Failed to save account"
     }
   },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "loggingIn": "Logging in...",
+    "loginDescription": "Sign in to manage your finances",
+    "loginFailed": "Login failed. Please check your credentials."
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Manage application settings",

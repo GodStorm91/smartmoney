@@ -252,6 +252,15 @@
       "submitFailed": "Không thể lưu tài khoản"
     }
   },
+  "auth": {
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "loggingIn": "Đang đăng nhập...",
+    "loginDescription": "Đăng nhập để quản lý tài chính",
+    "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin."
+  },
   "settings": {
     "title": "Cài đặt",
     "subtitle": "Quản lý cài đặt ứng dụng",

@@ -252,6 +252,15 @@
       "submitFailed": "口座の保存に失敗しました"
     }
   },
+  "auth": {
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "loggingIn": "ログイン中...",
+    "loginDescription": "アカウントにログインしてください",
+    "loginFailed": "ログインに失敗しました。認証情報を確認してください。"
+  },
   "settings": {
     "title": "設定",
     "subtitle": "アプリケーション設定の管理",

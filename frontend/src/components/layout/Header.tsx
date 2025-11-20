@@ -3,9 +3,11 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function Header() {
   const { t } = useTranslation('common')
+  const { logout } = useAuth()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
@@ -47,6 +49,17 @@ export function Header() {
 
             {/* Language Switcher - Desktop */}
             <LanguageSwitcher />
+
+            {/* Logout Button - Desktop */}
+            <button
+              onClick={logout}
+              className="text-gray-600 hover:text-red-600 transition-colors px-3 py-1 rounded focus-ring"
+              title={t('auth.logout')}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+            </button>
           </nav>
 
           {/* Mobile: Language Switcher + Menu Button */}
@@ -113,6 +126,18 @@ export function Header() {
               <MobileNavLink to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('header.settings')}
               </MobileNavLink>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false)
+                  logout()
+                }}
+                className="px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition-colors focus-ring text-left flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {t('auth.logout')}
+              </button>
             </div>
           </nav>
         )}
