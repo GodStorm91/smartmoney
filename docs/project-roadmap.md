@@ -608,6 +608,7 @@ Production readiness, deployment automation, and enhanced user experience featur
 - Row-level security (PostgreSQL RLS)
 - User management UI
 - Permission system
+- Upload history persistence (per-user tracking of CSV imports)
 
 ---
 

@@ -66,7 +66,22 @@
     "noData": "取引データがありません",
     "categoryFood": "食費",
     "categoryHousing": "住宅",
-    "sourceRakuten": "楽天カード"
+    "sourceRakuten": "楽天カード",
+    "actions": "操作",
+    "export": "CSVエクスポート"
+  },
+  "transaction": {
+    "editTitle": "取引を編集",
+    "date": "日付",
+    "description": "内容",
+    "amount": "金額",
+    "type": "種類",
+    "typeIncome": "収入",
+    "typeExpense": "支出",
+    "category": "カテゴリー",
+    "source": "支払元",
+    "deleteTransaction": "この取引を削除",
+    "deleteConfirm": "この取引を削除してもよろしいですか？"
   },
   "upload": {
     "title": "CSVアップロード",
@@ -158,6 +173,14 @@
     "income": "収入",
     "expense": "支出",
     "net": "差額"
+  },
+  "dateRange": {
+    "thisMonth": "今月",
+    "lastMonth": "先月",
+    "last3Months": "過去3ヶ月",
+    "last6Months": "過去6ヶ月",
+    "thisYear": "今年",
+    "allTime": "全期間"
   },
   "kpi": {
     "thisMonthIncome": "今月の収入",

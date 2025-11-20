@@ -2,17 +2,19 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { formatCurrency, formatCurrencySigned } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange } from '@/utils/formatDate'
+import { exportTransactionsCsv } from '@/utils/exportCsv'
 import { fetchTransactions } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
-import type { TransactionFilters } from '@/types'
+import type { Transaction, TransactionFilters } from '@/types'
 
 export function Transactions() {
   const { t } = useTranslation('common')
@@ -26,6 +28,7 @@ export function Transactions() {
     source: '',
     type: 'all',
   })
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions', filters],
@@ -45,15 +48,26 @@ export function Transactions() {
 
       {/* Filters */}
       <Card className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Input type="date" label={t('transactions.startDate')} value={filters.start_date} onChange={(e) => setFilters({ ...filters, start_date: e.target.value })} />
-          <Input type="date" label={t('transactions.endDate')} value={filters.end_date} onChange={(e) => setFilters({ ...filters, end_date: e.target.value })} />
+        <div className="mb-4">
+          <DateRangePicker
+            startDate={filters.start_date || ''}
+            endDate={filters.end_date || ''}
+            onRangeChange={(start, end) => setFilters({ ...filters, start_date: start, end_date: end })}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Select label={t('transactions.category')} value={filters.category || ''} onChange={(e) => setFilters({ ...filters, category: e.target.value })} options={[{ value: '', label: t('transactions.all') }, { value: '食費', label: t('transactions.categoryFood') }, { value: '住宅', label: t('transactions.categoryHousing') }]} />
           <Select label={t('transactions.source')} value={filters.source || ''} onChange={(e) => setFilters({ ...filters, source: e.target.value })} options={[{ value: '', label: t('transactions.all') }, { value: '楽天カード', label: t('transactions.sourceRakuten') }]} />
         </div>
         <div className="mt-4 flex gap-3">
-          <Button onClick={() => {}}>{t('button.apply')}</Button>
           <Button variant="outline" onClick={() => setFilters({ start_date: monthRange.start, end_date: monthRange.end, category: '', source: '', type: 'all' })}>{t('button.reset')}</Button>
+          <Button
+            variant="outline"
+            onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
+            disabled={!transactions || transactions.length === 0}
+          >
+            {t('transactions.export')}
+          </Button>
         </div>
       </Card>
 
@@ -79,6 +93,7 @@ export function Transactions() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">{t('transactions.category')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">{t('transactions.source')}</th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">{t('transactions.amount')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase">{t('transactions.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -91,6 +106,17 @@ export function Transactions() {
                     <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                       {formatCurrencySigned(tx.amount, tx.type, currency, rates, false)}
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => setEditingTransaction(tx)}
+                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                        aria-label={t('button.edit')}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-gray-600">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                        </svg>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -100,27 +126,36 @@ export function Transactions() {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
             {transactions.map((tx) => (
-              <Card key={tx.id}>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-medium text-gray-900">{tx.description}</p>
-                    <p className="text-sm text-gray-600">{formatDate(tx.date)}</p>
+              <div key={tx.id} onClick={() => setEditingTransaction(tx)} className="cursor-pointer active:scale-[0.98] transition-transform">
+                <Card>
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium text-gray-900">{tx.description}</p>
+                      <p className="text-sm text-gray-600">{formatDate(tx.date)}</p>
+                    </div>
+                    <p className={`text-lg font-bold font-numbers ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrencySigned(tx.amount, tx.type, currency, rates, false)}
+                    </p>
                   </div>
-                  <p className={`text-lg font-bold font-numbers ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrencySigned(tx.amount, tx.type, currency, rates, false)}
-                  </p>
-                </div>
-                <div className="flex gap-2 text-xs">
-                  <Badge>{tx.category}</Badge>
-                  <span className="text-gray-600">{tx.source}</span>
-                </div>
-              </Card>
+                  <div className="flex gap-2 text-xs">
+                    <Badge>{tx.category}</Badge>
+                    <span className="text-gray-600">{tx.source}</span>
+                  </div>
+                </Card>
+              </div>
             ))}
           </div>
         </>
       ) : (
         <Card><p className="text-center text-gray-400 py-12">{t('transactions.noData')}</p></Card>
       )}
+
+      {/* Edit Modal */}
+      <TransactionEditModal
+        isOpen={!!editingTransaction}
+        onClose={() => setEditingTransaction(null)}
+        transaction={editingTransaction}
+      />
     </div>
   )
 }

@@ -66,7 +66,22 @@
     "noData": "Không có dữ liệu giao dịch",
     "categoryFood": "Thực phẩm",
     "categoryHousing": "Nhà ở",
-    "sourceRakuten": "Thẻ Rakuten"
+    "sourceRakuten": "Thẻ Rakuten",
+    "actions": "Thao tác",
+    "export": "Xuất CSV"
+  },
+  "transaction": {
+    "editTitle": "Chỉnh sửa giao dịch",
+    "date": "Ngày",
+    "description": "Mô tả",
+    "amount": "Số tiền",
+    "type": "Loại",
+    "typeIncome": "Thu nhập",
+    "typeExpense": "Chi tiêu",
+    "category": "Danh mục",
+    "source": "Nguồn",
+    "deleteTransaction": "Xóa giao dịch này",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?"
   },
   "upload": {
     "title": "Tải lên CSV",
@@ -158,6 +173,14 @@
     "income": "Thu nhập",
     "expense": "Chi tiêu",
     "net": "Chênh lệch"
+  },
+  "dateRange": {
+    "thisMonth": "Tháng này",
+    "lastMonth": "Tháng trước",
+    "last3Months": "3 tháng qua",
+    "last6Months": "6 tháng qua",
+    "thisYear": "Năm nay",
+    "allTime": "Toàn bộ"
   },
   "kpi": {
     "thisMonthIncome": "Thu nhập tháng này",

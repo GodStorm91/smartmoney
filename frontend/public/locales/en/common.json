@@ -66,7 +66,22 @@
     "noData": "No transaction data",
     "categoryFood": "Food",
     "categoryHousing": "Housing",
-    "sourceRakuten": "Rakuten Card"
+    "sourceRakuten": "Rakuten Card",
+    "actions": "Actions",
+    "export": "Export CSV"
+  },
+  "transaction": {
+    "editTitle": "Edit Transaction",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "type": "Type",
+    "typeIncome": "Income",
+    "typeExpense": "Expense",
+    "category": "Category",
+    "source": "Source",
+    "deleteTransaction": "Delete this transaction",
+    "deleteConfirm": "Are you sure you want to delete this transaction?"
   },
   "upload": {
     "title": "CSV Upload",
@@ -158,6 +173,14 @@
     "income": "Income",
     "expense": "Expense",
     "net": "Difference"
+  },
+  "dateRange": {
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "last3Months": "Last 3 Months",
+    "last6Months": "Last 6 Months",
+    "thisYear": "This Year",
+    "allTime": "All Time"
   },
   "kpi": {
     "thisMonthIncome": "Income this month",
