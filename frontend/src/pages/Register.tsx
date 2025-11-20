@@ -1,32 +1,45 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useAuth } from '@/contexts/AuthContext'
+import { apiClient } from '@/services/api-client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 
-export function Login() {
+export function Register() {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
-  const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (password !== confirmPassword) {
+      setError(t('auth.passwordMismatch'))
+      return
+    }
+
+    if (password.length < 6) {
+      setError(t('auth.passwordTooShort'))
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      await login(email, password)
-      navigate({ to: '/' })
+      await apiClient.post('/api/auth/register', {
+        email,
+        password,
+      })
+      // Registration successful, redirect to login
+      navigate({ to: '/login' })
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error
-        ? err.message
-        : (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t('auth.loginFailed')
+      const errorMessage = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail || t('auth.registerFailed')
       setError(errorMessage)
     } finally {
       setIsLoading(false)
@@ -41,7 +54,7 @@ export function Login() {
             SmartMoney
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            {t('auth.loginDescription')}
+            {t('auth.registerDescription')}
           </p>
         </div>
 
@@ -78,7 +91,22 @@ export function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="********"
               required
-              autoComplete="current-password"
+              autoComplete="new-password"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              {t('auth.confirmPassword')}
+            </label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="********"
+              required
+              autoComplete="new-password"
             />
           </div>
 
@@ -87,13 +115,13 @@ export function Login() {
             className="w-full"
             disabled={isLoading}
           >
-            {isLoading ? t('auth.loggingIn') : t('auth.login')}
+            {isLoading ? t('auth.registering') : t('auth.register')}
           </Button>
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            {t('auth.noAccount')}{' '}
-            <Link to="/register" className="text-primary-600 hover:text-primary-500 font-medium">
-              {t('auth.register')}
+            {t('auth.hasAccount')}{' '}
+            <Link to="/login" className="text-primary-600 hover:text-primary-500 font-medium">
+              {t('auth.login')}
             </Link>
           </p>
         </form>
@@ -102,4 +130,4 @@ export function Login() {
   )
 }
 
-export default Login
+export default Register

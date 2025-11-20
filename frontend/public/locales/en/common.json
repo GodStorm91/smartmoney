@@ -255,11 +255,20 @@
   "auth": {
     "login": "Login",
     "logout": "Logout",
+    "register": "Register",
     "email": "Email",
     "password": "Password",
+    "confirmPassword": "Confirm Password",
     "loggingIn": "Logging in...",
+    "registering": "Registering...",
     "loginDescription": "Sign in to manage your finances",
-    "loginFailed": "Login failed. Please check your credentials."
+    "registerDescription": "Create an account to get started",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "registerFailed": "Registration failed. Please try again.",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?"
   },
   "settings": {
     "title": "Settings",

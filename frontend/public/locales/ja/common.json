@@ -255,11 +255,20 @@
   "auth": {
     "login": "ログイン",
     "logout": "ログアウト",
+    "register": "新規登録",
     "email": "メールアドレス",
     "password": "パスワード",
+    "confirmPassword": "パスワード確認",
     "loggingIn": "ログイン中...",
+    "registering": "登録中...",
     "loginDescription": "アカウントにログインしてください",
-    "loginFailed": "ログインに失敗しました。認証情報を確認してください。"
+    "registerDescription": "アカウントを作成してください",
+    "loginFailed": "ログインに失敗しました。認証情報を確認してください。",
+    "registerFailed": "登録に失敗しました。もう一度お試しください。",
+    "passwordMismatch": "パスワードが一致しません",
+    "passwordTooShort": "パスワードは6文字以上必要です",
+    "noAccount": "アカウントをお持ちでない方",
+    "hasAccount": "すでにアカウントをお持ちの方"
   },
   "settings": {
     "title": "設定",

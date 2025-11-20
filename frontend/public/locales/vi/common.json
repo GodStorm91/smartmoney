@@ -255,11 +255,20 @@
   "auth": {
     "login": "Đăng nhập",
     "logout": "Đăng xuất",
+    "register": "Đăng ký",
     "email": "Email",
     "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
     "loggingIn": "Đang đăng nhập...",
+    "registering": "Đang đăng ký...",
     "loginDescription": "Đăng nhập để quản lý tài chính",
-    "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin."
+    "registerDescription": "Tạo tài khoản để bắt đầu",
+    "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin.",
+    "registerFailed": "Đăng ký thất bại. Vui lòng thử lại.",
+    "passwordMismatch": "Mật khẩu không khớp",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 6 ký tự",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?"
   },
   "settings": {
     "title": "Cài đặt",
