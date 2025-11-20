@@ -1,12 +1,19 @@
 """SmartMoney FastAPI application."""
+import logging
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
-from .database import init_db
-from .routes import analytics, dashboard, goals, settings, transactions, upload
+from .database import SessionLocal, init_db
+from .routes import accounts, analytics, auth, dashboard, goals, settings, tags, transactions, upload, exchange_rates
+from .services.exchange_rate_service import ExchangeRateService
+
+logger = logging.getLogger(__name__)
+scheduler = BackgroundScheduler()
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -45,20 +52,56 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
+# Scheduled jobs
+def scheduled_rate_update():
+    """Background job to update exchange rates daily."""
+    db = SessionLocal()
+    try:
+        result = ExchangeRateService.fetch_and_update_rates(db)
+        logger.info(f"Scheduled rate update: {result}")
+    except Exception as e:
+        logger.error(f"Scheduled rate update failed: {e}")
+    finally:
+        db.close()
+
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup."""
+    """Initialize database and start scheduler on startup."""
     init_db()
+
+    # Schedule daily exchange rate updates at 4 AM UTC
+    scheduler.add_job(
+        scheduled_rate_update,
+        trigger="cron",
+        hour=4,
+        minute=0,
+        id="exchange_rate_update",
+        replace_existing=True,
+    )
+    scheduler.start()
+    logger.info("Exchange rate scheduler started (daily at 4 AM UTC)")
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Shutdown scheduler on app shutdown."""
+    scheduler.shutdown()
+    logger.info("Exchange rate scheduler stopped")
 
 
 # Include routers
+app.include_router(auth.router)
+app.include_router(accounts.router)
+app.include_router(tags.router)
 app.include_router(transactions.router)
 app.include_router(analytics.router)
 app.include_router(dashboard.router)
 app.include_router(goals.router)
 app.include_router(settings.router)
 app.include_router(upload.router)
+app.include_router(exchange_rates.router)
 
 
 # Root endpoints

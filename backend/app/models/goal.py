@@ -1,7 +1,7 @@
 """Goal database model."""
 from datetime import date, datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, Date, DateTime, Index, Integer
+from sqlalchemy import BigInteger, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -18,6 +18,11 @@ class Goal(Base):
     target_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # JPY in integers
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    # Foreign Keys
+    user_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
+    )
 
     __table_args__ = (
         CheckConstraint("years >= 1 AND years <= 10", name="valid_years"),

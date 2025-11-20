@@ -16,6 +16,10 @@ from app.config import settings
 from app.models.transaction import Base
 from app.models.goal import Goal
 from app.models.settings import AppSettings
+from app.models.account import Account
+from app.models.tag import Tag
+from app.models.transaction_tag import TransactionTag
+from app.models.exchange_rate import ExchangeRate
 
 # this is the Alembic Config object
 config = context.config

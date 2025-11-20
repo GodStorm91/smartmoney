@@ -5,7 +5,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.user import User
 from ..schemas.transaction import (
     TransactionCreate,
     TransactionListResponse,
@@ -22,6 +24,7 @@ router = APIRouter(prefix="/api/transactions", tags=["transactions"])
 async def create_transaction(
     transaction: TransactionCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Create a new transaction."""
     try:
@@ -53,6 +56,7 @@ async def get_transactions(
     limit: int = Query(100, ge=1, le=1000, description="Results per page"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get filtered transactions with pagination."""
     transactions = TransactionService.get_transactions(
@@ -89,6 +93,7 @@ async def get_transactions(
 async def get_transaction(
     transaction_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get a transaction by ID."""
     transaction = TransactionService.get_transaction(db, transaction_id)
@@ -102,6 +107,7 @@ async def get_summary(
     start_date: Optional[date] = Query(None, description="Filter by start date"),
     end_date: Optional[date] = Query(None, description="Filter by end date"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Get transaction summary for a date range."""
     summary = TransactionService.get_summary(
