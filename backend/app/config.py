@@ -12,7 +12,12 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./smartmoney.db"
 
     # CORS
-    allowed_origins: list[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+    allowed_origins: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:3000",
+        "https://money.khanh.page",
+    ]
 
     # JWT Configuration
     secret_key: str = "smartmoney-dev-secret-change-in-production"
