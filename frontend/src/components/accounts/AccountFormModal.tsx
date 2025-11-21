@@ -7,6 +7,19 @@ import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 
+// Helper to format number with thousand separators
+const formatWithCommas = (value: string): string => {
+  const num = value.replace(/[^\d.]/g, '')
+  const parts = num.split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return parts.join('.')
+}
+
+// Helper to parse formatted number back to raw value
+const parseFormattedNumber = (value: string): string => {
+  return value.replace(/,/g, '')
+}
+
 interface AccountFormModalProps {
   isOpen: boolean
   onClose: () => void
@@ -236,12 +249,13 @@ export function AccountFormModal({
                   {t('account.initialBalance')}
                 </label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   id="initialBalance"
-                  value={initialBalance}
-                  onChange={(e) => setInitialBalance(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  step="0.01"
+                  value={formatWithCommas(initialBalance)}
+                  onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
+                  placeholder="0"
                 />
               </div>
 
@@ -290,12 +304,13 @@ export function AccountFormModal({
                   {t('account.initialBalance')}
                 </label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   id="initialBalance"
-                  value={initialBalance}
-                  onChange={(e) => setInitialBalance(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  step="0.01"
+                  value={formatWithCommas(initialBalance)}
+                  onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
+                  placeholder="0"
                 />
               </div>
 
@@ -348,15 +363,15 @@ export function AccountFormModal({
                   Desired Current Balance
                 </label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   id="desiredBalance"
-                  value={desiredCurrentBalance}
+                  value={formatWithCommas(desiredCurrentBalance)}
                   onChange={(e) => {
-                    setDesiredCurrentBalance(e.target.value)
+                    setDesiredCurrentBalance(parseFormattedNumber(e.target.value))
                     setShowConfirmation(false) // Reset confirmation when value changes
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
                   placeholder="Enter the actual balance"
                 />
                 <p className="text-xs text-gray-500 mt-1">
