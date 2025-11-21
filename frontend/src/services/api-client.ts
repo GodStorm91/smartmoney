@@ -1,8 +1,12 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
 // Create axios instance with base configuration
+// In production (built), use relative URLs (nginx proxies /api to backend)
+// In development, use localhost:8000 or Vite proxy
+const baseURL = import.meta.env.PROD ? '' : 'http://localhost:8000'
+
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
