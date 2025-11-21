@@ -305,7 +305,7 @@ class GoalService:
 
         # Calculate average monthly net from period data
         if monthly_data:
-            monthly_nets = [income - abs(expenses) for _, income, expenses in monthly_data]
+            monthly_nets = [float(income) - abs(float(expenses)) for _, income, expenses in monthly_data]
             current_monthly_net = sum(monthly_nets) / len(monthly_nets)
             actual_months_used = len(monthly_nets)
 
