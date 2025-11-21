@@ -20,6 +20,11 @@ const parseFormattedNumber = (value: string): string => {
   return value.replace(/,/g, '')
 }
 
+// Get currency multiplier (JPY/VND = 1, USD = 100)
+const getCurrencyMultiplier = (curr: string): number => {
+  return curr === 'USD' ? 100 : 1
+}
+
 interface AccountFormModalProps {
   isOpen: boolean
   onClose: () => void
@@ -60,7 +65,8 @@ export function AccountFormModal({
   // Calculate adjustment amount for display
   const calculateAdjustment = (): number | null => {
     if (!existingAccount || !desiredCurrentBalance) return null
-    const desired = parseFloat(desiredCurrentBalance) * 100 // Convert to cents
+    const multiplier = getCurrencyMultiplier(existingAccount.currency)
+    const desired = parseFloat(desiredCurrentBalance) * multiplier
     const current = (existingAccount as AccountWithBalance).current_balance
     return desired - current
   }
@@ -82,7 +88,8 @@ export function AccountFormModal({
           setDesiredCurrentBalance('')
           setShowConfirmation(false)
         } else {
-          setInitialBalance((existingAccount.initial_balance / 100).toString())
+          const multiplier = getCurrencyMultiplier(existingAccount.currency)
+          setInitialBalance((existingAccount.initial_balance / multiplier).toString())
           setInitialBalanceDate(existingAccount.initial_balance_date)
         }
       } else {
@@ -143,23 +150,26 @@ export function AccountFormModal({
         }
 
         // Scenario 1: Account has NO transactions - update initial balance
-        if (!hasTransactions) {
-          updateData.initial_balance = Math.round(parseFloat(initialBalance || '0') * 100)
+        if (!hasTransactions && existingAccount) {
+          const multiplier = getCurrencyMultiplier(existingAccount.currency)
+          updateData.initial_balance = Math.round(parseFloat(initialBalance || '0') * multiplier)
           updateData.initial_balance_date = initialBalanceDate
         }
 
         // Scenario 2: Account HAS transactions - create adjustment transaction
-        if (hasTransactions && desiredCurrentBalance) {
-          updateData.desired_current_balance = Math.round(parseFloat(desiredCurrentBalance) * 100)
+        if (hasTransactions && desiredCurrentBalance && existingAccount) {
+          const multiplier = getCurrencyMultiplier(existingAccount.currency)
+          updateData.desired_current_balance = Math.round(parseFloat(desiredCurrentBalance) * multiplier)
         }
 
         await updateMutation.mutateAsync({ id: editingAccountId, data: updateData })
       } else {
         // Create new account
+        const multiplier = getCurrencyMultiplier(currency)
         const createData: AccountCreate = {
           name: name.trim(),
           type,
-          initial_balance: Math.round(parseFloat(initialBalance || '0') * 100), // Convert to cents
+          initial_balance: Math.round(parseFloat(initialBalance || '0') * multiplier),
           initial_balance_date: initialBalanceDate,
           currency,
           notes: notes.trim() || undefined,
