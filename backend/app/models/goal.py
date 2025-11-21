@@ -27,5 +27,5 @@ class Goal(Base):
     __table_args__ = (
         CheckConstraint("years >= 1 AND years <= 10", name="valid_years"),
         CheckConstraint("target_amount > 0", name="positive_target"),
-        Index("ix_years_unique", "years", unique=True),
+        Index("ix_user_years_unique", "user_id", "years", unique=True),
     )
