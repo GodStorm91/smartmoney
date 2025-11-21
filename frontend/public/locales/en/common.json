@@ -50,7 +50,10 @@
     "quickActions": "Quick Actions",
     "quickActionUpload": "Upload CSV",
     "quickActionGoals": "Set Goals",
-    "quickActionAnalytics": "View Analytics"
+    "quickActionAnalytics": "View Analytics",
+    "netWorth": "Net Worth",
+    "assets": "Assets",
+    "liabilities": "Liabilities"
   },
   "transactions": {
     "title": "Transactions",

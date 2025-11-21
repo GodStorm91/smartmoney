@@ -50,7 +50,10 @@
     "quickActions": "クイックアクション",
     "quickActionUpload": "CSVアップロード",
     "quickActionGoals": "目標を設定",
-    "quickActionAnalytics": "分析を表示"
+    "quickActionAnalytics": "分析を表示",
+    "netWorth": "純資産",
+    "assets": "資産",
+    "liabilities": "負債"
   },
   "transactions": {
     "title": "取引履歴",

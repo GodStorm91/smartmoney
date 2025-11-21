@@ -50,7 +50,10 @@
     "quickActions": "Hành động nhanh",
     "quickActionUpload": "Tải lên CSV",
     "quickActionGoals": "Đặt mục tiêu",
-    "quickActionAnalytics": "Xem phân tích"
+    "quickActionAnalytics": "Xem phân tích",
+    "netWorth": "Tổng tài sản ròng",
+    "assets": "Tài sản",
+    "liabilities": "Nợ phải trả"
   },
   "transactions": {
     "title": "Giao dịch",
