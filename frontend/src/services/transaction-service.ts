@@ -54,7 +54,7 @@ export async function fetchTransactions(
     params.append('is_income', filters.type === 'income' ? 'true' : 'false')
   }
 
-  const response = await apiClient.get<TransactionListResponse>(`/api/transactions?${params.toString()}`)
+  const response = await apiClient.get<TransactionListResponse>(`/api/transactions/?${params.toString()}`)
   return response.data.transactions.map(transformTransaction)
 }
 
@@ -72,7 +72,7 @@ export async function fetchTransaction(id: number): Promise<Transaction> {
 export async function createTransaction(
   data: Omit<Transaction, 'id' | 'created_at'>
 ): Promise<Transaction> {
-  const response = await apiClient.post<Transaction>('/api/transactions', data)
+  const response = await apiClient.post<Transaction>('/api/transactions/', data)
   return response.data
 }
 

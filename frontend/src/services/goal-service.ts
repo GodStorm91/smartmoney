@@ -5,7 +5,7 @@ import type { Goal, GoalProgress } from '@/types'
  * Fetch all goals
  */
 export async function fetchGoals(): Promise<Goal[]> {
-  const response = await apiClient.get<Goal[]>('/api/goals')
+  const response = await apiClient.get<Goal[]>('/api/goals/')
   return response.data
 }
 
@@ -23,7 +23,7 @@ export async function fetchGoal(id: number): Promise<Goal> {
 export async function createGoal(
   data: Omit<Goal, 'id' | 'current_amount' | 'status' | 'monthly_required'>
 ): Promise<Goal> {
-  const response = await apiClient.post<Goal>('/api/goals', data)
+  const response = await apiClient.post<Goal>('/api/goals/', data)
   return response.data
 }
 

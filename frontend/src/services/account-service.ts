@@ -12,7 +12,7 @@ export async function fetchAccounts(params?: {
     queryParams.append('include_inactive', 'true')
   }
 
-  const url = `/api/accounts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+  const url = `/api/accounts/${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
   const response = await apiClient.get<AccountWithBalance[]>(url)
   return response.data
 }
@@ -29,7 +29,7 @@ export async function fetchAccount(id: number): Promise<AccountWithBalance> {
  * Create new account
  */
 export async function createAccount(data: AccountCreate): Promise<Account> {
-  const response = await apiClient.post<Account>('/api/accounts', data)
+  const response = await apiClient.post<Account>('/api/accounts/', data)
   return response.data
 }
 
