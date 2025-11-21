@@ -166,9 +166,46 @@
     "loading": "読み込み中...",
     "noData": "データがありません",
     "saving": "保存中...",
+    "save": "保存",
     "create": "作成",
     "update": "更新",
-    "cancel": "キャンセル"
+    "cancel": "キャンセル",
+    "today": "今日"
+  },
+  "transaction": {
+    "addTransaction": "取引を追加",
+    "expense": "支出",
+    "income": "収入",
+    "date": "日付",
+    "amount": "金額",
+    "description": "説明",
+    "descriptionPlaceholder": "何に使いましたか？",
+    "category": "カテゴリ",
+    "source": "口座",
+    "selectAccount": "口座を選択",
+    "errors": {
+      "amountRequired": "金額は必須です",
+      "descriptionRequired": "説明は必須です",
+      "categoryRequired": "カテゴリは必須です",
+      "sourceRequired": "口座は必須です",
+      "createFailed": "取引の作成に失敗しました"
+    }
+  },
+  "category": {
+    "food": "食費",
+    "housing": "住宅",
+    "transport": "交通",
+    "utilities": "光熱費",
+    "communication": "通信",
+    "entertainment": "娯楽",
+    "shopping": "買い物",
+    "health": "医療",
+    "other": "その他",
+    "salary": "給与",
+    "bonus": "ボーナス",
+    "investment": "投資",
+    "freelance": "副業",
+    "refund": "返金"
   },
   "chart": {
     "trend12months": "12ヶ月のトレンド",

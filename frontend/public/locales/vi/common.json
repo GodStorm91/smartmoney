@@ -166,9 +166,46 @@
     "loading": "Đang tải...",
     "noData": "Không có dữ liệu",
     "saving": "Đang lưu...",
+    "save": "Lưu",
     "create": "Tạo",
     "update": "Cập nhật",
-    "cancel": "Hủy"
+    "cancel": "Hủy",
+    "today": "Hôm nay"
+  },
+  "transaction": {
+    "addTransaction": "Thêm giao dịch",
+    "expense": "Chi tiêu",
+    "income": "Thu nhập",
+    "date": "Ngày",
+    "amount": "Số tiền",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Giao dịch này là gì?",
+    "category": "Danh mục",
+    "source": "Tài khoản",
+    "selectAccount": "Chọn tài khoản",
+    "errors": {
+      "amountRequired": "Số tiền là bắt buộc",
+      "descriptionRequired": "Mô tả là bắt buộc",
+      "categoryRequired": "Danh mục là bắt buộc",
+      "sourceRequired": "Tài khoản là bắt buộc",
+      "createFailed": "Không thể tạo giao dịch"
+    }
+  },
+  "category": {
+    "food": "Ăn uống",
+    "housing": "Nhà ở",
+    "transport": "Di chuyển",
+    "utilities": "Tiện ích",
+    "communication": "Liên lạc",
+    "entertainment": "Giải trí",
+    "shopping": "Mua sắm",
+    "health": "Sức khỏe",
+    "other": "Khác",
+    "salary": "Lương",
+    "bonus": "Thưởng",
+    "investment": "Đầu tư",
+    "freelance": "Freelance",
+    "refund": "Hoàn tiền"
   },
   "chart": {
     "trend12months": "Xu hướng 12 tháng",

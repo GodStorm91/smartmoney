@@ -166,9 +166,46 @@
     "loading": "Loading...",
     "noData": "No data available",
     "saving": "Saving...",
+    "save": "Save",
     "create": "Create",
     "update": "Update",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "today": "Today"
+  },
+  "transaction": {
+    "addTransaction": "Add Transaction",
+    "expense": "Expense",
+    "income": "Income",
+    "date": "Date",
+    "amount": "Amount",
+    "description": "Description",
+    "descriptionPlaceholder": "What was this for?",
+    "category": "Category",
+    "source": "Account",
+    "selectAccount": "Select account",
+    "errors": {
+      "amountRequired": "Amount is required",
+      "descriptionRequired": "Description is required",
+      "categoryRequired": "Category is required",
+      "sourceRequired": "Account is required",
+      "createFailed": "Failed to create transaction"
+    }
+  },
+  "category": {
+    "food": "Food",
+    "housing": "Housing",
+    "transport": "Transport",
+    "utilities": "Utilities",
+    "communication": "Communication",
+    "entertainment": "Entertainment",
+    "shopping": "Shopping",
+    "health": "Health",
+    "other": "Other",
+    "salary": "Salary",
+    "bonus": "Bonus",
+    "investment": "Investment",
+    "freelance": "Freelance",
+    "refund": "Refund"
   },
   "chart": {
     "trend12months": "12-Month Trend",

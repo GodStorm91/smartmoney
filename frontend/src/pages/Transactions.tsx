@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/Badge'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
+import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
@@ -31,6 +32,7 @@ export function Transactions() {
     type: 'all',
   })
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions', filters],
@@ -158,6 +160,30 @@ export function Transactions() {
         onClose={() => setEditingTransaction(null)}
         transaction={editingTransaction}
       />
+
+      {/* Add Transaction Modal */}
+      <TransactionFormModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
+
+      {/* FAB - Add Transaction */}
+      <button
+        onClick={() => setIsAddModalOpen(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
+        aria-label={t('transaction.addTransaction', 'Add Transaction')}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+      </button>
     </div>
   )
 }
