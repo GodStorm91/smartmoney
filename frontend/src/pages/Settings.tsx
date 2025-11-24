@@ -19,12 +19,16 @@ export function Settings() {
   // Local state for form inputs
   const [currency, setCurrency] = useState<string>('JPY')
   const [baseDate, setBaseDate] = useState<number>(25)
+  const [budgetCarryOver, setBudgetCarryOver] = useState<boolean>(false)
+  const [budgetEmailAlerts, setBudgetEmailAlerts] = useState<boolean>(true)
 
   // Sync state with fetched settings
   useEffect(() => {
     if (settings) {
       setCurrency(settings.currency)
       setBaseDate(settings.base_date)
+      setBudgetCarryOver(settings.budget_carry_over)
+      setBudgetEmailAlerts(settings.budget_email_alerts)
     }
   }, [settings])
 
@@ -48,6 +52,8 @@ export function Settings() {
     updateMutation.mutate({
       currency,
       base_date: baseDate,
+      budget_carry_over: budgetCarryOver,
+      budget_email_alerts: budgetEmailAlerts,
     })
   }
 
@@ -87,6 +93,48 @@ export function Settings() {
               min={1}
               max={31}
             />
+          </div>
+          <div className="mt-6">
+            <Button onClick={handleSave} disabled={updateMutation.isPending}>
+              {updateMutation.isPending ? t('common.loading') : t('settings.saveSettings')}
+            </Button>
+          </div>
+        </Card>
+
+        {/* Budget Settings */}
+        <Card>
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.budgetSettings')}</h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <label className="font-medium text-gray-900">{t('settings.budgetCarryOver')}</label>
+                <p className="text-sm text-gray-600">{t('settings.budgetCarryOverDescription')}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer ml-4">
+                <input
+                  type="checkbox"
+                  checked={budgetCarryOver}
+                  onChange={(e) => setBudgetCarryOver(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            <div className="flex items-center justify-between pt-4 border-t">
+              <div className="flex-1">
+                <label className="font-medium text-gray-900">{t('settings.budgetEmailAlerts')}</label>
+                <p className="text-sm text-gray-600">{t('settings.budgetEmailAlertsDescription')}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer ml-4">
+                <input
+                  type="checkbox"
+                  checked={budgetEmailAlerts}
+                  onChange={(e) => setBudgetEmailAlerts(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
           </div>
           <div className="mt-6">
             <Button onClick={handleSave} disabled={updateMutation.isPending}>

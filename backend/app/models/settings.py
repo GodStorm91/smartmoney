@@ -1,7 +1,7 @@
 """Settings database model."""
 from datetime import datetime
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Integer, String
+from sqlalchemy import BigInteger, Boolean, CheckConstraint, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -25,6 +25,10 @@ class AppSettings(Base):
     user_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
     )
+
+    # Budget settings
+    budget_carry_over: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    budget_email_alerts: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     __table_args__ = (
         CheckConstraint("id = 1", name="singleton"),

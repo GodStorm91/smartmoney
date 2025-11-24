@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
 
+    # AI & Email Configuration
+    anthropic_api_key: str = ""
+    sendgrid_api_key: str = ""
+
     class Config:
         env_file = ".env"
 

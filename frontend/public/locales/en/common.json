@@ -6,6 +6,7 @@
     "accounts": "Accounts",
     "analytics": "Analytics",
     "goals": "Goals",
+    "budget": "Budget",
     "settings": "Settings"
   },
   "button": {
@@ -331,6 +332,43 @@
     "addCategory": "Add Category",
     "addSource": "Add Payment Source",
     "saveSuccess": "Settings saved successfully",
+    "budgetSettings": "Budget Settings",
+    "budgetCarryOver": "Carry Over Unused Budget",
+    "budgetCarryOverDescription": "Roll over unused budget to the next month",
+    "budgetEmailAlerts": "Email Budget Alerts",
+    "budgetEmailAlertsDescription": "Receive email notifications when reaching 80% or 100% of budget",
     "saveFailed": "Failed to save settings"
+  },
+  "budget": {
+    "title": "Budget",
+    "subtitle": "AI-powered monthly budget planning",
+    "generateTitle": "Generate Your Budget",
+    "generateDescription": "Enter your monthly income and let AI create a personalized budget based on your spending patterns.",
+    "monthlyIncome": "Monthly Income",
+    "incomeHint": "Enter your total monthly income",
+    "generateButton": "Generate Budget",
+    "generating": "Generating...",
+    "generateError": "Failed to generate budget. Please try again.",
+    "currentBudget": "Current Budget",
+    "regenerate": "Regenerate",
+    "savingsTarget": "Savings Target",
+    "totalAllocated": "Total Allocated",
+    "aiAdvice": "AI Advice",
+    "feedbackTitle": "Provide Feedback to Regenerate",
+    "feedbackPlaceholder": "Tell the AI what you'd like to change. For example: \"I want to save more\" or \"Reduce food budget\"",
+    "submitFeedback": "Regenerate Budget",
+    "regenerating": "Regenerating...",
+    "allocations": "Budget Allocations",
+    "ofTotal": "of total",
+    "noBudget": "No budget found. Generate one to get started!",
+    "draft": "Draft",
+    "save": "Save Budget",
+    "saving": "Saving...",
+    "swipeToEdit": "Swipe left/right on cards to adjust amounts",
+    "swipeLeft": "Decrease",
+    "swipeRight": "Increase"
+  },
+  "common": {
+    "cancel": "Cancel"
   }
 }

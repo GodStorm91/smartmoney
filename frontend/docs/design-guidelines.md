@@ -302,3 +302,154 @@ Account for text length variations:
 3. Check alignment with RTL (future Arabic/Hebrew)
 4. Screenshot test across viewport sizes
 5. Verify flag icons render correctly
+
+## Error Handling Patterns
+
+### Differentiate Empty State from Error State
+- **Empty State (404)**: User has no data yet (expected) → Show creation form
+- **Error State (500, network)**: Something went wrong → Show error message
+
+### API Response Handling with React Query
+```tsx
+// ✅ GOOD: Handle 404 as empty state
+const { data, error } = useQuery({
+  queryKey: ['resource'],
+  queryFn: async () => {
+    try {
+      return await getResource()
+    } catch (err: any) {
+      if (err?.response?.status === 404) {
+        return null  // Empty state, not error
+      }
+      throw err  // Real error
+    }
+  }
+})
+
+// ❌ BAD: Treat all HTTP errors the same
+const { data, error } = useQuery({
+  queryKey: ['resource'],
+  queryFn: getResource  // 404 becomes error
+})
+```
+
+### Error UI Styling
+- **Empty State**: Neutral colors, inviting action
+  ```tsx
+  <Card className="p-6">
+    <p className="text-gray-600">No data yet. Create your first item!</p>
+    <Button>Create</Button>
+  </Card>
+  ```
+- **Error State**: Red semantics, explain issue
+  ```tsx
+  <Card className="p-6 border-red-200 bg-red-50">
+    <p className="text-red-600">{error.message}</p>
+  </Card>
+  ```
+
+### Loading States
+- Use `LoadingSpinner` for full-page loading
+- Use skeleton screens for partial content
+- Show inline spinners for button actions
+- Maintain layout stability (prevent shifts)
+
+## Financial Input Patterns
+
+### Currency Input Fields
+
+Financial input fields display currency symbols and format numbers with thousand separators for better readability.
+
+#### Implementation Pattern
+```tsx
+import { useSettings } from '@/contexts/SettingsContext'
+import {
+  formatNumberWithSeparators,
+  parseFormattedNumber,
+  getCurrencySymbol,
+  getCurrencyPosition,
+  getCurrencyDecimals,
+} from '@/utils/formatNumber'
+
+// Get currency from settings
+const { currency } = useSettings()
+const currencySymbol = getCurrencySymbol(currency)
+const currencyPosition = getCurrencyPosition(currency)
+const decimalPlaces = getCurrencyDecimals(currency)
+
+// Format input on change
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const cleaned = e.target.value.replace(/[^\d.]/g, '')
+  if (cleaned) {
+    const numValue = parseFloat(cleaned)
+    if (!isNaN(numValue)) {
+      setValue(formatNumberWithSeparators(numValue, decimalPlaces))
+    }
+  }
+}
+```
+
+#### UI Structure
+```tsx
+<div className="relative">
+  {/* Prefix currency (JPY, USD) */}
+  {currencyPosition === 'prefix' && (
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <span className="text-gray-500 sm:text-sm font-medium">{currencySymbol}</span>
+    </div>
+  )}
+
+  <Input
+    type="text"
+    inputMode="decimal"
+    value={formattedValue}
+    onChange={handleInputChange}
+    placeholder={formatNumberWithSeparators(500000, decimalPlaces)}
+    className={currencyPosition === 'prefix' ? 'pl-8' : 'pr-10'}
+  />
+
+  {/* Suffix currency (VND) */}
+  {currencyPosition === 'suffix' && (
+    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+      <span className="text-gray-500 sm:text-sm font-medium">{currencySymbol}</span>
+    </div>
+  )}
+</div>
+```
+
+#### Visual Examples
+- **JPY**: `¥ 500,000` (prefix, no decimals)
+- **USD**: `$ 5,000.00` (prefix, 2 decimals)
+- **VND**: `5,000,000 ₫` (suffix, no decimals)
+
+#### Design Specifications
+- **Currency Symbol**: Gray-500 color, sm size, medium weight
+- **Input Padding**: `pl-8` for prefix, `pr-10` for suffix
+- **Symbol Position**: Absolute positioning with pointer-events-none
+- **Input Type**: Use `type="text"` with `inputMode="decimal"` for better mobile UX
+- **Thousand Separators**: Comma (,) as separator, auto-format on input
+- **Decimal Places**: 0 for JPY/VND, 2 for USD/EUR
+
+#### Accessibility
+- Use `inputMode="decimal"` to trigger numeric keyboard on mobile
+- Maintain required validation on numeric value, not formatted string
+- Provide clear placeholder showing expected format
+- Currency symbol has `pointer-events-none` to avoid click interference
+- Keep label and hint text clear about expected input
+
+#### Mobile Considerations
+- `inputMode="decimal"` triggers numeric keyboard with decimal point
+- Touch-friendly input field (min 44px height)
+- Currency symbol visible but doesn't interfere with typing
+- Formatted placeholder guides user input format
+
+#### Data Handling
+```tsx
+// On submit: Parse formatted string back to number
+const numericValue = parseFormattedNumber(formattedValue)
+const amountInCents = Math.round(numericValue * Math.pow(10, decimalPlaces))
+
+// JPY: 500,000 → 500000 (stored as-is)
+// USD: 5,000.00 → 500000 (stored in cents)
+// VND: 5,000,000 → 5000000 (stored as-is)
+```

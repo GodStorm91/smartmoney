@@ -48,6 +48,7 @@ export function Header() {
             <NavLink to="/accounts">{t('header.accounts')}</NavLink>
             <NavLink to="/analytics">{t('header.analytics')}</NavLink>
             <NavLink to="/goals">{t('header.goals')}</NavLink>
+            <NavLink to="/budget">{t('header.budget')}</NavLink>
             <NavLink to="/settings">{t('header.settings')}</NavLink>
 
             {/* Privacy Toggle - Desktop */}
@@ -150,6 +151,9 @@ export function Header() {
               </MobileNavLink>
               <MobileNavLink to="/goals" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('header.goals')}
+              </MobileNavLink>
+              <MobileNavLink to="/budget" onClick={() => setIsMobileMenuOpen(false)}>
+                {t('header.budget')}
               </MobileNavLink>
               <MobileNavLink to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('header.settings')}

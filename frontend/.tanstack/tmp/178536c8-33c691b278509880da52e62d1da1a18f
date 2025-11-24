@@ -15,7 +15,6 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GoalsRouteImport } from './routes/goals'
-import { Route as BudgetRouteImport } from './routes/budget'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -50,11 +49,6 @@ const GoalsRoute = GoalsRouteImport.update({
   path: '/goals',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BudgetRoute = BudgetRouteImport.update({
-  id: '/budget',
-  path: '/budget',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -75,7 +69,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
-  '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -87,7 +80,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
-  '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -100,7 +92,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
-  '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
@@ -114,7 +105,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
-    | '/budget'
     | '/goals'
     | '/login'
     | '/register'
@@ -126,7 +116,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
-    | '/budget'
     | '/goals'
     | '/login'
     | '/register'
@@ -138,7 +127,6 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
-    | '/budget'
     | '/goals'
     | '/login'
     | '/register'
@@ -151,7 +139,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AnalyticsRoute: typeof AnalyticsRoute
-  BudgetRoute: typeof BudgetRoute
   GoalsRoute: typeof GoalsRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
@@ -204,13 +191,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GoalsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/budget': {
-      id: '/budget'
-      path: '/budget'
-      fullPath: '/budget'
-      preLoaderRoute: typeof BudgetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/analytics': {
       id: '/analytics'
       path: '/analytics'
@@ -239,7 +219,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AnalyticsRoute: AnalyticsRoute,
-  BudgetRoute: BudgetRoute,
   GoalsRoute: GoalsRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,

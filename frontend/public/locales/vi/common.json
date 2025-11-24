@@ -6,6 +6,7 @@
     "accounts": "Tài khoản",
     "analytics": "Phân tích",
     "goals": "Mục tiêu",
+    "budget": "Ngân sách",
     "settings": "Cài đặt"
   },
   "button": {
@@ -331,6 +332,40 @@
     "addCategory": "Thêm danh mục",
     "addSource": "Thêm nguồn thanh toán",
     "saveSuccess": "Đã lưu cài đặt thành công",
+    "budgetSettings": "Cài Đặt Ngân Sách",
+    "budgetCarryOver": "Chuyển Ngân Sách Chưa Sử Dụng",
+    "budgetCarryOverDescription": "Chuyển ngân sách chưa sử dụng sang tháng tiếp theo",
+    "budgetEmailAlerts": "Cảnh Báo Email Ngân Sách",
+    "budgetEmailAlertsDescription": "Nhận thông báo email khi đạt 80% hoặc 100% ngân sách",
     "saveFailed": "Không thể lưu cài đặt"
+  },
+  "budget": {
+    "title": "Ngân sách",
+    "subtitle": "Kế hoạch ngân sách hàng tháng được hỗ trợ bởi AI",
+    "generateTitle": "Tạo Ngân Sách",
+    "generateDescription": "Nhập thu nhập hàng tháng và để AI tạo ngân sách cá nhân hóa.",
+    "monthlyIncome": "Thu Nhập Hàng Tháng",
+    "incomeHint": "Nhập tổng thu nhập hàng tháng",
+    "generateButton": "Tạo Ngân Sách",
+    "generating": "Đang tạo...",
+    "generateError": "Không thể tạo ngân sách. Vui lòng thử lại.",
+    "currentBudget": "Ngân Sách Hiện Tại",
+    "regenerate": "Tạo Lại",
+    "savingsTarget": "Mục Tiêu Tiết Kiệm",
+    "totalAllocated": "Tổng Đã Phân Bổ",
+    "aiAdvice": "Lời Khuyên AI",
+    "feedbackTitle": "Cung Cấp Phản Hồi Để Tạo Lại",
+    "feedbackPlaceholder": "Cho AI biết bạn muốn thay đổi gì",
+    "submitFeedback": "Tạo Lại Ngân Sách",
+    "regenerating": "Đang tạo lại...",
+    "allocations": "Phân Bổ Ngân Sách",
+    "ofTotal": "của tổng",
+    "noBudget": "Không tìm thấy ngân sách. Tạo một cái để bắt đầu!",
+    "draft": "Bản Nháp",
+    "save": "Lưu Ngân Sách",
+    "saving": "Đang lưu...",
+    "swipeToEdit": "Vuốt trái/phải trên thẻ để điều chỉnh số tiền",
+    "swipeLeft": "Giảm",
+    "swipeRight": "Tăng"
   }
 }

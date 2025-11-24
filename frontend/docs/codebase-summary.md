@@ -30,12 +30,16 @@ src/
 │   │   ├── Header.tsx              # Main navigation with language switcher
 │   │   └── LanguageSwitcher.tsx    # Language selection dropdown
 │   ├── dashboard/                   # Dashboard-specific components
+│   ├── budget/                      # Budget management components
+│   │   ├── budget-allocation-list.tsx  # Swipe-to-edit allocation cards
+│   │   └── budget-summary-card.tsx     # Budget header with save button
 │   ├── goals/                       # Goals page components
 │   ├── transactions/                # Transaction list components
 │   ├── upload/                      # File upload components
 │   └── analytics/                   # Analytics charts
 ├── pages/
 │   ├── Dashboard.tsx
+│   ├── Budget.tsx                   # Budget page with draft mode
 │   ├── Transactions.tsx
 │   ├── Upload.tsx
 │   ├── Analytics.tsx
@@ -49,9 +53,9 @@ src/
 
 public/
 └── locales/
-    ├── ja/common.json               # Japanese translations
-    ├── en/common.json               # English translations
-    └── vi/common.json               # Vietnamese translations
+    ├── ja/common.json               # Japanese translations (155+ keys)
+    ├── en/common.json               # English translations (155+ keys)
+    └── vi/common.json               # Vietnamese translations (155+ keys)
 ```
 
 ## Multilingual Support Architecture
@@ -98,6 +102,7 @@ public/locales/
 - `language` - Language selector
 - `aria` - ARIA labels for accessibility
 - `dashboard` - Dashboard KPIs, charts
+- `budget` - Budget management (draft mode, swipe instructions, save button)
 - `transactions` - Transaction table, filters
 - `upload` - File upload UI
 - `analytics` - Analytics charts
@@ -184,6 +189,18 @@ Defines `SupportedLanguage` type and translation namespace types for type safety
 - Trend charts (Recharts line charts)
 - Goal progress tracking
 - All text localized
+
+### Budget Management
+- **Draft Mode**: Generated budgets are drafts until explicitly saved
+- **Interactive Editing**: Swipe gestures (touch/mouse) to adjust allocations
+  - Sensitivity: 400px drag = 100% amount change (2.5x improved)
+  - Visual feedback: Scale animation, ring highlight, pulse text
+  - Touch support: preventDefault() disables browser scroll interference
+  - Desktop fallback: Mouse drag support for testing
+- **Save Button**: Persists draft budget to database with loading state
+- **Category Allocation**: Percentage-based budget per category
+- **State Management**: Separate draftBudget and savedBudget tracking
+- **CSS Classes**: `touch-none`, `select-none` for proper gesture handling
 
 ### Transactions
 - Filterable transaction table

@@ -66,6 +66,8 @@ class SettingsService:
         return {
             "currency": currency,
             "base_date": base_date,
+            "budget_carry_over": settings.budget_carry_over,
+            "budget_email_alerts": settings.budget_email_alerts,
             "categories": categories,
             "sources": sources,
         }
@@ -102,6 +104,10 @@ class SettingsService:
             settings.currency = updates["currency"]
         if "base_date" in updates and updates["base_date"] is not None:
             settings.base_date = updates["base_date"]
+        if "budget_carry_over" in updates and updates["budget_carry_over"] is not None:
+            settings.budget_carry_over = updates["budget_carry_over"]
+        if "budget_email_alerts" in updates and updates["budget_email_alerts"] is not None:
+            settings.budget_email_alerts = updates["budget_email_alerts"]
 
         db.commit()
         db.refresh(settings)

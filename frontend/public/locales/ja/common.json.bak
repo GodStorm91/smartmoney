@@ -6,8 +6,7 @@
     "accounts": "口座管理",
     "analytics": "分析",
     "goals": "目標",
-    "settings": "設定",
-    "budget": "予算"
+    "settings": "設定"
   },
   "button": {
     "save": "保存",
@@ -78,23 +77,17 @@
     "export": "CSVエクスポート"
   },
   "transaction": {
-    "addTransaction": "取引を追加",
-    "expense": "支出",
-    "income": "収入",
+    "editTitle": "取引を編集",
     "date": "日付",
+    "description": "内容",
     "amount": "金額",
-    "description": "説明",
-    "descriptionPlaceholder": "何に使いましたか？",
-    "category": "カテゴリ",
-    "source": "口座",
-    "selectAccount": "口座を選択",
-    "errors": {
-      "amountRequired": "金額は必須です",
-      "descriptionRequired": "説明は必須です",
-      "categoryRequired": "カテゴリは必須です",
-      "sourceRequired": "口座は必須です",
-      "createFailed": "取引の作成に失敗しました"
-    }
+    "type": "種類",
+    "typeIncome": "収入",
+    "typeExpense": "支出",
+    "category": "カテゴリー",
+    "source": "支払元",
+    "deleteTransaction": "この取引を削除",
+    "deleteConfirm": "この取引を削除してもよろしいですか？"
   },
   "upload": {
     "title": "CSVアップロード",
@@ -181,6 +174,25 @@
     "update": "更新",
     "cancel": "キャンセル",
     "today": "今日"
+  },
+  "transaction": {
+    "addTransaction": "取引を追加",
+    "expense": "支出",
+    "income": "収入",
+    "date": "日付",
+    "amount": "金額",
+    "description": "説明",
+    "descriptionPlaceholder": "何に使いましたか？",
+    "category": "カテゴリ",
+    "source": "口座",
+    "selectAccount": "口座を選択",
+    "errors": {
+      "amountRequired": "金額は必須です",
+      "descriptionRequired": "説明は必須です",
+      "categoryRequired": "カテゴリは必須です",
+      "sourceRequired": "口座は必須です",
+      "createFailed": "取引の作成に失敗しました"
+    }
   },
   "category": {
     "food": "食費",
@@ -319,40 +331,6 @@
     "addCategory": "カテゴリーを追加",
     "addSource": "支払元を追加",
     "saveSuccess": "設定が正常に保存されました",
-    "budgetSettings": "予算設定",
-    "budgetCarryOver": "未使用予算の繰り越し",
-    "budgetCarryOverDescription": "未使用の予算を翌月に繰り越す",
-    "budgetEmailAlerts": "予算アラートメール",
-    "budgetEmailAlertsDescription": "予算の80%または100%に達したときにメール通知を受け取る",
     "saveFailed": "設定の保存に失敗しました"
-  },
-  "budget": {
-    "title": "予算",
-    "subtitle": "AI搭載の月次予算計画",
-    "generateTitle": "予算を生成",
-    "generateDescription": "月収を入力すると、AIが支出パターンに基づいてパーソナライズされた予算を作成します。",
-    "monthlyIncome": "月収",
-    "incomeHint": "月収の総額を入力してください",
-    "generateButton": "予算を生成",
-    "generating": "生成中...",
-    "generateError": "予算の生成に失敗しました。もう一度お試しください。",
-    "currentBudget": "現在の予算",
-    "regenerate": "再生成",
-    "savingsTarget": "貯蓄目標",
-    "totalAllocated": "割り当て合計",
-    "aiAdvice": "AIアドバイス",
-    "feedbackTitle": "フィードバックを提供して再生成",
-    "feedbackPlaceholder": "変更したい内容をAIに伝えてください。例：「もっと貯金したい」「食費を減らす」",
-    "submitFeedback": "予算を再生成",
-    "regenerating": "再生成中...",
-    "allocations": "予算配分",
-    "ofTotal": "合計の",
-    "noBudget": "予算が見つかりません。生成して始めましょう！",
-    "draft": "下書き",
-    "save": "予算を保存",
-    "saving": "保存中...",
-    "swipeToEdit": "カードを左右にスワイプして金額を調整",
-    "swipeLeft": "減らす",
-    "swipeRight": "増やす"
   }
 }
