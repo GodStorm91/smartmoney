@@ -29,6 +29,8 @@ services:
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       REFRESH_TOKEN_EXPIRE_DAYS: 7
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy
