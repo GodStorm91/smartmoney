@@ -8,7 +8,7 @@ export function AIBudgetSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Visual */}
           <div className="relative">
-            <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-purple-200">
+            <Card className="bg-gradient-to-br from-purple-50 to-green-50 border-purple-200">
               <div className="space-y-4">
                 {/* Before State */}
                 <div className="bg-white rounded-lg p-4 border-2 border-red-200">

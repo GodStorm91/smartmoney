@@ -71,7 +71,7 @@ export function FeatureShowcaseSection() {
           {features.map((feature, index) => (
             <Card key={index} hover className="flex flex-col h-full">
               {/* Icon */}
-              <div className="h-14 w-14 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
+              <div className="h-14 w-14 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center mb-4">
                 <feature.icon className="h-7 w-7 text-white" />
               </div>
 
@@ -86,7 +86,7 @@ export function FeatureShowcaseSection() {
               </p>
 
               {/* Benefit Badge */}
-              <div className="inline-flex items-center gap-2 text-sm text-blue-700 bg-blue-50 px-3 py-2 rounded-lg">
+              <div className="inline-flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">
                 <span className="font-medium">✓ {feature.benefit}</span>
               </div>
             </Card>
@@ -109,8 +109,8 @@ export function FeatureShowcaseSection() {
             <div className="h-8 w-px bg-gray-200" />
 
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-700 font-bold">92</span>
+              <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                <span className="text-green-700 font-bold">92</span>
               </div>
               <div className="text-left">
                 <div className="font-semibold text-gray-900">Code Quality</div>

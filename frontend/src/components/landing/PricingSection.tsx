@@ -73,13 +73,13 @@ export function PricingSection() {
               key={index}
               className={cn(
                 'relative flex flex-col',
-                pkg.popular && 'ring-2 ring-blue-500 shadow-xl'
+                pkg.popular && 'ring-2 ring-green-500 shadow-xl'
               )}
             >
               {/* Popular Badge */}
               {pkg.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <div className="bg-blue-600 text-white px-4 py-1 rounded-full flex items-center gap-1 text-sm font-semibold shadow-lg">
+                  <div className="bg-green-600 text-white px-4 py-1 rounded-full flex items-center gap-1 text-sm font-semibold shadow-lg">
                     <Sparkles className="h-3 w-3" />
                     Most Popular
                   </div>
@@ -96,7 +96,7 @@ export function PricingSection() {
               <div className="text-center mb-6">
                 <div className="text-4xl font-bold text-gray-900 mb-1">{pkg.priceFormatted}</div>
                 <div className="text-sm text-gray-500">VND • One-time payment</div>
-                <div className="text-lg font-semibold text-blue-600 mt-2">{pkg.credits} credits</div>
+                <div className="text-lg font-semibold text-green-600 mt-2">{pkg.credits} credits</div>
               </div>
 
               {/* Value Props */}
@@ -132,7 +132,7 @@ export function PricingSection() {
         </div>
 
         {/* ROI Comparison */}
-        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 max-w-4xl mx-auto">
+        <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 max-w-4xl mx-auto">
           <div className="text-center">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
               Cost Comparison: SmartMoney vs MoneyForward Premium
@@ -149,8 +149,8 @@ export function PricingSection() {
                 <div className="text-xs text-gray-500">¥500/month × 12 months × 31.33 VND/JPY</div>
               </div>
             </div>
-            <div className="mt-6 pt-6 border-t border-blue-200">
-              <div className="text-lg font-semibold text-blue-700">
+            <div className="mt-6 pt-6 border-t border-green-200">
+              <div className="text-lg font-semibold text-green-700">
                 Save <span className="text-2xl">¥177,656</span> per year = 94% cheaper
               </div>
               <p className="text-sm text-gray-600 mt-2">

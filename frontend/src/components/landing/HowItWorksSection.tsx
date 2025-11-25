@@ -33,7 +33,7 @@ const steps = [
 ]
 
 const colorClasses = {
-  blue: 'bg-blue-100 text-blue-700',
+  blue: 'bg-green-100 text-green-700',
   green: 'bg-green-100 text-green-700',
   purple: 'bg-purple-100 text-purple-700',
   orange: 'bg-orange-100 text-orange-700'
@@ -81,7 +81,7 @@ export function HowItWorksSection() {
         {/* Visual Flow Arrow (Desktop Only) */}
         <div className="hidden lg:flex items-center justify-center mt-12 text-gray-400">
           <div className="flex items-center gap-4">
-            <div className="h-1 w-24 bg-gradient-to-r from-blue-300 to-green-300 rounded" />
+            <div className="h-1 w-24 bg-gradient-to-r from-green-300 to-green-300 rounded" />
             <div className="h-1 w-24 bg-gradient-to-r from-green-300 to-purple-300 rounded" />
             <div className="h-1 w-24 bg-gradient-to-r from-purple-300 to-orange-300 rounded" />
           </div>

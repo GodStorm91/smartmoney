@@ -68,21 +68,21 @@ export function FAQSection() {
           <div className="flex flex-wrap items-center justify-center gap-4">
             <a
               href="mailto:support@smartmoney.com"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-green-600 hover:text-green-700 font-medium"
             >
               Email Support
             </a>
             <span className="text-gray-300">•</span>
             <a
               href="https://discord.gg/smartmoney"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-green-600 hover:text-green-700 font-medium"
             >
               Join Discord
             </a>
             <span className="text-gray-300">•</span>
             <a
               href="https://github.com/smartmoney/issues"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-green-600 hover:text-green-700 font-medium"
             >
               GitHub Issues
             </a>
