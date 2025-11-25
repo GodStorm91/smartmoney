@@ -10,7 +10,7 @@ function RootComponent() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const publicPaths = ['/login', '/register']
+    const publicPaths = ['/login', '/register', '/landing']
     if (!isLoading && !isAuthenticated && !publicPaths.includes(location.pathname)) {
       navigate({ to: '/login' })
     }
@@ -24,8 +24,8 @@ function RootComponent() {
     )
   }
 
-  // Auth pages don't need layout
-  if (location.pathname === '/login' || location.pathname === '/register') {
+  // Public pages don't need layout
+  if (location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/landing') {
     return <Outlet />
   }
 
