@@ -26,3 +26,14 @@ class User(Base):
     # accounts: Mapped[list["Account"]] = relationship(back_populates="user")
     # goals: Mapped[list["Goal"]] = relationship(back_populates="user")
     # settings: Mapped["AppSettings"] = relationship(back_populates="user", uselist=False)
+
+    # Credit system relationships
+    credit_account: Mapped["UserCredit"] = relationship(
+        "UserCredit", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    )
+    credit_purchases: Mapped[list["CreditPurchase"]] = relationship(
+        "CreditPurchase", back_populates="user", cascade="all, delete-orphan"
+    )
+    credit_transactions: Mapped[list["CreditTransaction"]] = relationship(
+        "CreditTransaction", back_populates="user", cascade="all, delete-orphan"
+    )

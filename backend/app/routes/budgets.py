@@ -1,5 +1,6 @@
 """Budget API routes."""
 from datetime import date
+from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -18,6 +19,7 @@ from ..schemas.budget import (
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
 from ..services.budget_tracking_service import BudgetTrackingService
+from ..services.credit_service import CreditService, InsufficientCreditsError
 
 router = APIRouter(prefix="/api/budgets", tags=["budgets"])
 
@@ -28,7 +30,7 @@ def generate_budget(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)]
 ):
-    """Generate new budget using Claude AI.
+    """Generate new budget using Claude AI with credit-based payment.
 
     Args:
         request: Budget generation request with monthly_income
@@ -39,14 +41,23 @@ def generate_budget(
         Created budget
 
     Raises:
-        HTTPException: If AI generation fails
+        HTTPException: If insufficient credits or AI generation fails
     """
     try:
-        # Initialize Claude AI service
+        # Initialize services
         ai_service = ClaudeAIService()
+        credit_service = CreditService(db)
 
-        # Generate budget
-        budget_data = ai_service.generate_budget(
+        # Check credit balance before generating (estimate: 0.36 credits)
+        account = credit_service.get_account(current_user.id)
+        if account.balance < Decimal("0.36"):
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="Insufficient credits. Please purchase more credits to generate a budget."
+            )
+
+        # Generate budget with token tracking
+        budget_data, usage = ai_service.generate_budget_with_tracking(
             db=db,
             user_id=current_user.id,
             monthly_income=request.monthly_income,
@@ -54,7 +65,34 @@ def generate_budget(
             language=request.language
         )
 
-        # Save to database
+        # Calculate credit cost based on token usage
+        # Pricing: $0.80/1M input, $4/1M output (with 100x markup)
+        input_cost = Decimal(usage["input_tokens"]) * Decimal("0.080") / Decimal("1000")
+        output_cost = Decimal(usage["output_tokens"]) * Decimal("0.400") / Decimal("1000")
+        total_credits = input_cost + output_cost
+
+        # Deduct credits (atomic transaction)
+        try:
+            credit_service.deduct_credits(
+                user_id=current_user.id,
+                amount=total_credits,
+                transaction_type="usage",
+                description=f"AI budget generation ({usage['input_tokens']} input + {usage['output_tokens']} output tokens)",
+                extra_data={
+                    "input_tokens": usage["input_tokens"],
+                    "output_tokens": usage["output_tokens"],
+                    "monthly_income": request.monthly_income
+                }
+            )
+            db.commit()
+        except InsufficientCreditsError as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail=str(e)
+            )
+
+        # Save budget to database
         current_month = date.today().strftime("%Y-%m")
         budget = BudgetService.create_budget(
             db=db,
@@ -68,7 +106,10 @@ def generate_budget(
 
         return budget
 
+    except HTTPException:
+        raise
     except Exception as e:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate budget: {str(e)}"
@@ -110,7 +151,7 @@ def regenerate_budget(
     db: Annotated[Session, Depends(get_db)],
     current_user: Annotated[User, Depends(get_current_user)]
 ):
-    """Regenerate budget with user feedback.
+    """Regenerate budget with user feedback using credit-based payment.
 
     Args:
         budget_id: Budget ID to regenerate
@@ -122,7 +163,7 @@ def regenerate_budget(
         New budget with feedback applied
 
     Raises:
-        HTTPException: If budget not found or AI generation fails
+        HTTPException: If budget not found, insufficient credits, or AI generation fails
     """
     # Verify budget exists and belongs to user
     existing_budget = db.query(Budget).filter(
@@ -137,18 +178,55 @@ def regenerate_budget(
         )
 
     try:
+        # Initialize services
+        ai_service = ClaudeAIService()
+        credit_service = CreditService(db)
+
+        # Check credit balance before regenerating
+        account = credit_service.get_account(current_user.id)
+        if account.balance < Decimal("0.36"):
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="Insufficient credits. Please purchase more credits to regenerate the budget."
+            )
+
         # Save feedback
         BudgetService.add_feedback(db, budget_id, request.feedback)
 
-        # Regenerate using AI
-        ai_service = ClaudeAIService()
-        budget_data = ai_service.generate_budget(
+        # Regenerate using AI with token tracking
+        budget_data, usage = ai_service.generate_budget_with_tracking(
             db=db,
             user_id=current_user.id,
             monthly_income=existing_budget.monthly_income,
             feedback=request.feedback,
             language=request.language
         )
+
+        # Calculate and deduct credits
+        input_cost = Decimal(usage["input_tokens"]) * Decimal("0.080") / Decimal("1000")
+        output_cost = Decimal(usage["output_tokens"]) * Decimal("0.400") / Decimal("1000")
+        total_credits = input_cost + output_cost
+
+        try:
+            credit_service.deduct_credits(
+                user_id=current_user.id,
+                amount=total_credits,
+                transaction_type="usage",
+                description=f"AI budget regeneration ({usage['input_tokens']} input + {usage['output_tokens']} output tokens)",
+                extra_data={
+                    "input_tokens": usage["input_tokens"],
+                    "output_tokens": usage["output_tokens"],
+                    "budget_id": budget_id,
+                    "feedback": request.feedback
+                }
+            )
+            db.commit()
+        except InsufficientCreditsError as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail=str(e)
+            )
 
         # Create new budget (replaces existing for same month)
         budget = BudgetService.create_budget(
@@ -163,7 +241,10 @@ def regenerate_budget(
 
         return budget
 
+    except HTTPException:
+        raise
     except Exception as e:
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to regenerate budget: {str(e)}"

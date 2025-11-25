@@ -90,6 +90,84 @@ class ClaudeAIService:
         budget_data = self._parse_budget_response(response.content[0].text)
         return budget_data
 
+    def generate_budget_with_tracking(
+        self,
+        db: Session,
+        user_id: int,
+        monthly_income: int,
+        feedback: str | None = None,
+        language: str = "ja"
+    ) -> tuple[dict[str, Any], dict[str, int]]:
+        """Generate budget with token usage tracking for credit deduction.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            monthly_income: Monthly income amount (in cents)
+            feedback: Optional user feedback for regeneration
+            language: Language code for response (ja, en, vi)
+
+        Returns:
+            Tuple of (budget_data dict, usage dict with input_tokens and output_tokens)
+        """
+        # Fetch historical spending data (last 3 months)
+        three_months_ago = date.today() - timedelta(days=90)
+        spending_data = (
+            db.query(
+                Transaction.category,
+                func.sum(Transaction.amount).label("total"),
+                func.count(Transaction.id).label("count")
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.is_income == False,
+                Transaction.is_transfer == False,
+                Transaction.is_adjustment == False,
+                Transaction.date >= three_months_ago
+            )
+            .group_by(Transaction.category)
+            .all()
+        )
+
+        # Calculate average monthly spending per category
+        category_spending = {}
+        for row in spending_data:
+            # Divide by 3 to get monthly average
+            avg_monthly = abs(row.total) / 3
+            category_spending[row.category] = {
+                "average_monthly": int(avg_monthly),
+                "transaction_count": row.count
+            }
+
+        # Build prompt for Claude
+        prompt = self._build_budget_prompt(
+            monthly_income=monthly_income,
+            category_spending=category_spending,
+            feedback=feedback,
+            language=language
+        )
+
+        # Call Claude API
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=2048,
+            temperature=0.7,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        # Extract token usage from response
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens
+        }
+
+        # Parse response
+        budget_data = self._parse_budget_response(response.content[0].text)
+
+        return budget_data, usage
+
     def _build_budget_prompt(
         self,
         monthly_income: int,

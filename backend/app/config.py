@@ -29,6 +29,14 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     sendgrid_api_key: str = ""
 
+    # Backend URL for webhooks
+    backend_url: str = "https://money.khanh.page"
+
+    # SePay Configuration (Vietnamese payment gateway)
+    sepay_api_key: str = ""
+    sepay_secret_key: str = ""
+    sepay_base_url: str = "https://api.sepay.vn"
+
     class Config:
         env_file = ".env"
 
