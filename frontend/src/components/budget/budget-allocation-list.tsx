@@ -1,21 +1,32 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { AlertTriangle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { formatCurrency } from '@/utils/formatCurrency'
-import type { BudgetAllocation } from '@/types'
+import type { BudgetAllocation, BudgetTracking, BudgetTrackingItem } from '@/types'
 
 interface BudgetAllocationListProps {
   allocations: BudgetAllocation[]
   totalBudget: number
+  tracking?: BudgetTracking
   onAllocationChange?: (updatedAllocations: BudgetAllocation[]) => void
 }
 
 export function BudgetAllocationList({
   allocations,
   totalBudget,
+  tracking,
   onAllocationChange
 }: BudgetAllocationListProps) {
   const { t } = useTranslation('common')
+
+  // Create a map of tracking items by category for quick lookup
+  const trackingMap = new Map<string, BudgetTrackingItem>()
+  if (tracking?.categories) {
+    tracking.categories.forEach(item => {
+      trackingMap.set(item.category, item)
+    })
+  }
 
   return (
     <div>
@@ -29,6 +40,7 @@ export function BudgetAllocationList({
             key={index}
             allocation={allocation}
             totalBudget={totalBudget}
+            trackingItem={trackingMap.get(allocation.category)}
             editable={!!onAllocationChange}
             onAmountChange={(newAmount) => {
               if (onAllocationChange) {
@@ -47,6 +59,7 @@ export function BudgetAllocationList({
 interface AllocationCardProps {
   allocation: BudgetAllocation
   totalBudget: number
+  trackingItem?: BudgetTrackingItem
   editable: boolean
   onAmountChange: (newAmount: number) => void
 }
@@ -54,6 +67,7 @@ interface AllocationCardProps {
 function AllocationCard({
   allocation,
   totalBudget,
+  trackingItem,
   editable,
   onAmountChange
 }: AllocationCardProps) {
@@ -128,6 +142,31 @@ function AllocationCard({
 
   const percentage = totalBudget > 0 ? (allocation.amount / totalBudget) * 100 : 0
 
+  // Tracking calculations
+  const spent = trackingItem?.spent || 0
+  const budgeted = trackingItem?.budgeted || allocation.amount
+  const remaining = budgeted - spent
+  const remainingPercent = budgeted > 0 ? Math.max(0, (remaining / budgeted) * 100) : 100
+  const spentPercent = budgeted > 0 ? Math.min((spent / budgeted) * 100, 100) : 0
+  const isOverBudget = spent > budgeted
+
+  // Color based on remaining percentage
+  const getTrackingBarColor = () => {
+    if (isOverBudget) return 'bg-red-500'
+    if (remainingPercent < 5) return 'bg-red-500'
+    if (remainingPercent < 20) return 'bg-orange-500'
+    if (remainingPercent < 40) return 'bg-yellow-500'
+    return 'bg-green-500'
+  }
+
+  const getTrackingTextColor = () => {
+    if (isOverBudget) return 'text-red-600'
+    if (remainingPercent < 5) return 'text-red-600'
+    if (remainingPercent < 20) return 'text-orange-600'
+    if (remainingPercent < 40) return 'text-yellow-600'
+    return 'text-green-600'
+  }
+
   return (
     <div
       className={editable ? 'cursor-grab active:cursor-grabbing touch-none select-none' : ''}
@@ -144,7 +183,12 @@ function AllocationCard({
         className={`p-4 transition-all ${isDragging ? 'ring-2 ring-blue-400 shadow-lg scale-[1.02]' : ''}`}
       >
         <div className="flex justify-between items-start mb-2">
-          <h4 className="font-semibold">{allocation.category}</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-semibold">{allocation.category}</h4>
+            {trackingItem && isOverBudget && (
+              <AlertTriangle className="w-4 h-4 text-red-500" aria-label={t('budget.overBudget')} />
+            )}
+          </div>
           <p className={`text-lg font-bold ${isDragging ? 'text-blue-600 scale-110' : 'text-blue-600'} transition-all`}>
             {formatCurrency(allocation.amount)}
           </p>
@@ -152,6 +196,8 @@ function AllocationCard({
         {allocation.reasoning && (
           <p className="text-sm text-gray-600">{allocation.reasoning}</p>
         )}
+
+        {/* Budget allocation bar (% of total budget) */}
         <div className="mt-2">
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -165,6 +211,33 @@ function AllocationCard({
             {percentage.toFixed(1)}% {t('budget.ofTotal')}
           </p>
         </div>
+
+        {/* Tracking progress bar (spent vs budget) - only show if tracking data exists */}
+        {trackingItem && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs text-gray-600">
+                {t('budget.spent')}: {formatCurrency(spent)} / {formatCurrency(budgeted)}
+              </span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full transition-all ${getTrackingBarColor()}`}
+                style={{
+                  width: `${spentPercent}%`,
+                }}
+              />
+            </div>
+            <p className={`text-xs mt-1 font-medium ${getTrackingTextColor()}`}>
+              {isOverBudget ? (
+                t('budget.overBudget')
+              ) : (
+                `${remainingPercent.toFixed(0)}% ${t('budget.remaining')}`
+              )}
+            </p>
+          </div>
+        )}
+
         {editable && isDragging && (
           <p className="text-xs text-blue-600 mt-2 font-medium animate-pulse">
             ← {t('budget.swipeLeft')} / {t('budget.swipeRight')} →

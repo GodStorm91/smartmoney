@@ -7,7 +7,7 @@ import { BudgetGenerateForm } from '@/components/budget/budget-generate-form'
 import { BudgetSummaryCard } from '@/components/budget/budget-summary-card'
 import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { BudgetAllocationList } from '@/components/budget/budget-allocation-list'
-import { getCurrentBudget, generateBudget, regenerateBudget } from '@/services/budget-service'
+import { getCurrentBudget, generateBudget, regenerateBudget, getBudgetTracking } from '@/services/budget-service'
 import type { Budget } from '@/types'
 
 export function BudgetPage() {
@@ -32,6 +32,24 @@ export function BudgetPage() {
       }
     },
     retry: false,
+  })
+
+  // Fetch budget tracking data (actual spending vs budget)
+  const { data: tracking } = useQuery({
+    queryKey: ['budget', 'tracking'],
+    queryFn: async () => {
+      try {
+        return await getBudgetTracking()
+      } catch (err: any) {
+        // 404 is expected when no budget exists
+        if (err?.response?.status === 404) {
+          return null
+        }
+        throw err
+      }
+    },
+    retry: false,
+    enabled: !!savedBudget, // Only fetch if budget exists
   })
 
   // Generate budget mutation (creates draft, doesn't save)
@@ -126,6 +144,7 @@ export function BudgetPage() {
           <BudgetAllocationList
             allocations={displayBudget.allocations}
             totalBudget={totalBudget}
+            tracking={tracking || undefined}
             onAllocationChange={(updatedAllocations) => {
               if (displayBudget) {
                 // Calculate new total allocated

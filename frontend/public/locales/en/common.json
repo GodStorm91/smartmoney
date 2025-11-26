@@ -36,7 +36,9 @@
     "uploadDropzone": "Drag and drop CSV file, or click to upload",
     "togglePrivacy": "Toggle privacy mode",
     "hideAmounts": "Hide amounts",
-    "showAmounts": "Show amounts"
+    "showAmounts": "Show amounts",
+    "darkMode": "Switch to dark mode",
+    "lightMode": "Switch to light mode"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -366,7 +368,10 @@
     "saving": "Saving...",
     "swipeToEdit": "Swipe left/right on cards to adjust amounts",
     "swipeLeft": "Decrease",
-    "swipeRight": "Increase"
+    "swipeRight": "Increase",
+    "spent": "Spent",
+    "remaining": "remaining",
+    "overBudget": "Over Budget"
   },
   "common": {
     "cancel": "Cancel",

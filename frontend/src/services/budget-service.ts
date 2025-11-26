@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest } from '@/types'
+import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest, BudgetTracking } from '@/types'
 
 /**
  * Generate new budget using AI
@@ -43,5 +43,13 @@ export async function getBudgetHistory(limit: number = 12): Promise<Budget[]> {
  */
 export async function getBudgetByMonth(month: string): Promise<Budget> {
   const response = await apiClient.get<Budget>(`/api/budgets/${month}`)
+  return response.data
+}
+
+/**
+ * Get current month's budget tracking with spending data
+ */
+export async function getBudgetTracking(): Promise<BudgetTracking> {
+  const response = await apiClient.get<BudgetTracking>('/api/budgets/tracking/current')
   return response.data
 }

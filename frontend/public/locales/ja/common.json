@@ -36,7 +36,9 @@
     "uploadDropzone": "CSVファイルをドラッグ&ドロップ、またはクリックしてアップロード",
     "togglePrivacy": "プライバシーモード切替",
     "hideAmounts": "金額を非表示",
-    "showAmounts": "金額を表示"
+    "showAmounts": "金額を表示",
+    "darkMode": "ダークモードに切替",
+    "lightMode": "ライトモードに切替"
   },
   "dashboard": {
     "title": "ダッシュボード",
@@ -353,7 +355,10 @@
     "saving": "保存中...",
     "swipeToEdit": "カードを左右にスワイプして金額を調整",
     "swipeLeft": "減らす",
-    "swipeRight": "増やす"
+    "swipeRight": "増やす",
+    "spent": "支出",
+    "remaining": "残り",
+    "overBudget": "予算オーバー"
   },
   "credits": {
     "balance": "クレジット残高",

@@ -36,7 +36,9 @@
     "uploadDropzone": "Kéo và thả tệp CSV hoặc nhấp để tải lên",
     "togglePrivacy": "Chuyển đổi chế độ riêng tư",
     "hideAmounts": "Ẩn số tiền",
-    "showAmounts": "Hiện số tiền"
+    "showAmounts": "Hiện số tiền",
+    "darkMode": "Chuyển sang chế độ tối",
+    "lightMode": "Chuyển sang chế độ sáng"
   },
   "dashboard": {
     "title": "Bảng điều khiển",
@@ -366,7 +368,10 @@
     "saving": "Đang lưu...",
     "swipeToEdit": "Vuốt trái/phải trên thẻ để điều chỉnh số tiền",
     "swipeLeft": "Giảm",
-    "swipeRight": "Tăng"
+    "swipeRight": "Tăng",
+    "spent": "Đã chi",
+    "remaining": "còn lại",
+    "overBudget": "Vượt Ngân Sách"
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",
