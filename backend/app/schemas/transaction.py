@@ -26,6 +26,21 @@ class TransactionCreate(TransactionBase):
     pass
 
 
+class TransactionUpdate(BaseModel):
+    """Schema for updating a transaction."""
+
+    date: Optional[date] = None
+    description: Optional[str] = Field(None, max_length=500)
+    amount: Optional[int] = Field(None, description="Amount in JPY as integer")
+    category: Optional[str] = Field(None, max_length=100)
+    subcategory: Optional[str] = Field(None, max_length=100)
+    source: Optional[str] = Field(None, max_length=100)
+    payment_method: Optional[str] = Field(None, max_length=100)
+    notes: Optional[str] = Field(None, max_length=1000)
+    is_income: Optional[bool] = None
+    is_transfer: Optional[bool] = None
+
+
 class TransactionResponse(TransactionBase):
     """Schema for transaction response."""
 

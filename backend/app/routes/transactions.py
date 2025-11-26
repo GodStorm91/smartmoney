@@ -10,6 +10,7 @@ from ..database import get_db
 from ..models.user import User
 from ..schemas.transaction import (
     TransactionCreate,
+    TransactionUpdate,
     TransactionListResponse,
     TransactionResponse,
     TransactionSummaryResponse,
@@ -103,6 +104,45 @@ async def get_transaction(
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     return transaction
+
+
+@router.put("/{transaction_id}", response_model=TransactionResponse)
+async def update_transaction(
+    transaction_id: int,
+    transaction_update: TransactionUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update a transaction."""
+    # Filter out None values
+    update_data = {k: v for k, v in transaction_update.model_dump().items() if v is not None}
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+
+    updated = TransactionService.update_transaction(
+        db, current_user.id, transaction_id, update_data
+    )
+
+    if not updated:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    return updated
+
+
+@router.delete("/{transaction_id}", status_code=204)
+async def delete_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete a transaction."""
+    deleted = TransactionService.delete_transaction(db, current_user.id, transaction_id)
+
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    return None
 
 
 @router.get("/summary/total", response_model=TransactionSummaryResponse)

@@ -167,6 +167,75 @@ class TransactionService:
         return query.scalar()
 
     @staticmethod
+    def update_transaction(
+        db: Session,
+        user_id: int,
+        transaction_id: int,
+        update_data: dict
+    ) -> Optional[Transaction]:
+        """Update a transaction.
+
+        Args:
+            db: Database session
+            user_id: User ID (for authorization)
+            transaction_id: Transaction ID
+            update_data: Dictionary of fields to update
+
+        Returns:
+            Updated transaction or None if not found
+
+        Raises:
+            ValueError: If trying to update a transaction that doesn't belong to user
+        """
+        transaction = db.query(Transaction).filter(
+            Transaction.id == transaction_id,
+            Transaction.user_id == user_id
+        ).first()
+
+        if not transaction:
+            return None
+
+        # Update fields
+        for key, value in update_data.items():
+            if hasattr(transaction, key) and key not in ['id', 'created_at', 'user_id']:
+                setattr(transaction, key, value)
+
+        # Regenerate month_key if date changed
+        if 'date' in update_data:
+            transaction.month_key = update_data['date'].strftime("%Y-%m")
+
+        db.commit()
+        db.refresh(transaction)
+        return transaction
+
+    @staticmethod
+    def delete_transaction(db: Session, user_id: int, transaction_id: int) -> bool:
+        """Delete a transaction.
+
+        Args:
+            db: Database session
+            user_id: User ID (for authorization)
+            transaction_id: Transaction ID
+
+        Returns:
+            True if deleted, False if not found
+
+        Raises:
+            ValueError: If trying to delete a transaction that doesn't belong to user
+        """
+        transaction = db.query(Transaction).filter(
+            Transaction.id == transaction_id,
+            Transaction.user_id == user_id
+        ).first()
+
+        if not transaction:
+            return False
+
+        db.delete(transaction)
+        db.commit()
+        return True
+
+    @staticmethod
     def get_summary(
         db: Session,
         user_id: int,
