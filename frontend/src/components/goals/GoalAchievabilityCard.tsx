@@ -166,7 +166,7 @@ export function GoalAchievabilityCard({
         {/* Header */}
         <div className="relative mb-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">{goalName}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{goalName}</h3>
             <span
               className={cn(
                 'text-xs font-semibold uppercase px-2.5 py-1 rounded-full',
@@ -182,7 +182,7 @@ export function GoalAchievabilityCard({
           {!isMobile && onEdit && (
             <button
               onClick={handleEditClick}
-              className="absolute -top-2 -right-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="absolute -top-2 -right-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               aria-label={t('goal.editGoal')}
             >
               <svg
@@ -191,7 +191,7 @@ export function GoalAchievabilityCard({
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5 text-gray-600"
+                className="w-5 h-5 text-gray-600 dark:text-gray-400"
               >
                 <path
                   strokeLinecap="round"
@@ -229,11 +229,11 @@ export function GoalAchievabilityCard({
               <div className={cn('text-3xl font-bold font-mono', status.textColor)}>
                 {Math.round(progressPercentage)}%
               </div>
-              <div className="text-sm font-mono mt-1 text-gray-700">
+              <div className="text-sm font-mono mt-1 text-gray-700 dark:text-gray-300">
                 {formatCurrencyCompactPrivacy(currentAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
-              <div className="text-xs text-gray-400 my-1">─────</div>
-              <div className="text-sm font-mono text-gray-700">
+              <div className="text-xs text-gray-400 dark:text-gray-500 my-1">─────</div>
+              <div className="text-sm font-mono text-gray-700 dark:text-gray-300">
                 {formatCurrencyCompactPrivacy(targetAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
             </div>
@@ -243,22 +243,22 @@ export function GoalAchievabilityCard({
         {/* Monthly Savings Section */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-xs text-gray-500">{t('goal.monthlySavings')}</div>
-            <div className="text-xs text-gray-400">
+            <div className="text-xs text-gray-500 dark:text-gray-400">{t('goal.monthlySavings')}</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500">
               {t('goal.basedOnPeriod', {
                 months: achievability.trend_months_actual,
                 source: achievability.data_source
               })}
             </div>
           </div>
-          <div className="text-lg font-mono font-semibold mb-2">
+          <div className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100 mb-2">
             {formatCurrencyPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)} /{' '}
             {formatCurrencyPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-            <span className="text-sm ml-2 text-gray-600">
+            <span className="text-sm ml-2 text-gray-600 dark:text-gray-400">
               ({Math.round(monthlySavingsPercentage)}%)
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
             <div
               className={cn(getMonthlySavingsBarColor(), 'h-2 rounded-full transition-all duration-500')}
               style={{ width: `${cappedMonthlySavingsPercentage}%` }}
@@ -267,14 +267,14 @@ export function GoalAchievabilityCard({
         </div>
 
         {/* Insight Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-          <div className="text-sm text-blue-900">
+        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+          <div className="text-sm text-blue-900 dark:text-blue-200">
             {insight.emoji} {insight.message}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-xs text-gray-400">{t('goal.monthsRemaining', { months: achievability.months_remaining })}</div>
+        <div className="text-xs text-gray-400 dark:text-gray-500">{t('goal.monthsRemaining', { months: achievability.months_remaining })}</div>
       </Card>
     </div>
   )

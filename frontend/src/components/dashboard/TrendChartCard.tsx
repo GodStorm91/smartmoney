@@ -15,14 +15,14 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
   return (
     <Card className="lg:col-span-2">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">{t('chart.trend12months')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('chart.trend12months')}</h3>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setSelectedMetric('net')}
             className={`px-3 py-1 text-sm font-medium rounded-lg transition-colors ${
               selectedMetric === 'net'
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             {t('chart.net')}
@@ -31,8 +31,8 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
             onClick={() => setSelectedMetric('income')}
             className={`px-3 py-1 text-sm font-medium rounded-lg transition-colors ${
               selectedMetric === 'income'
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             {t('chart.income')}
@@ -41,8 +41,8 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
             onClick={() => setSelectedMetric('expense')}
             className={`px-3 py-1 text-sm font-medium rounded-lg transition-colors ${
               selectedMetric === 'expense'
-                ? 'text-primary-600 bg-primary-50'
-                : 'text-gray-600 hover:bg-gray-50'
+                ? 'text-primary-600 bg-primary-50 dark:bg-primary-900/30'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             {t('chart.expense')}
@@ -54,7 +54,7 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
         {data && data.length > 0 ? (
           <TrendLineChart data={data} dataKey={selectedMetric} />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
             {t('common.noData')}
           </div>
         )}

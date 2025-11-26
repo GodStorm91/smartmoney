@@ -63,8 +63,8 @@ export function Dashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Title */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('dashboard.title')}</h2>
-        <p className="text-gray-600">{t('dashboard.subtitle', { month: formatMonth(new Date()) })}</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('dashboard.subtitle', { month: formatMonth(new Date()) })}</p>
       </div>
 
       {/* Net Worth Hero Card */}
@@ -83,7 +83,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Breakdown */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('dashboard.categoryBreakdown')}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('dashboard.categoryBreakdown')}</h3>
           {categories && categories.length > 0 ? (
             <>
               <CategoryBreakdownList categories={categories} maxItems={4} />
@@ -95,14 +95,14 @@ export function Dashboard() {
               </Link>
             </>
           ) : (
-            <p className="text-center text-gray-400 py-8">{t('dashboard.noData')}</p>
+            <p className="text-center text-gray-400 dark:text-gray-500 py-8">{t('dashboard.noData')}</p>
           )}
         </Card>
 
         {/* Goals Achievability */}
         <Card>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">{t('dashboard.goalAchievability')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.goalAchievability')}</h3>
             <Link
               to="/goals"
               className="text-sm font-medium text-primary-600 hover:text-primary-700"
@@ -131,7 +131,7 @@ export function Dashboard() {
               <LoadingSpinner size="md" />
             </div>
           ) : (
-            <p className="text-center text-gray-400 py-8">{t('dashboard.noGoals')}</p>
+            <p className="text-center text-gray-400 dark:text-gray-500 py-8">{t('dashboard.noGoals')}</p>
           )}
         </Card>
       </div>

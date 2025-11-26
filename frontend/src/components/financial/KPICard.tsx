@@ -20,23 +20,23 @@ export function KPICard({ title, amount, change, icon, type, ...props }: KPICard
   const { isPrivacyMode } = usePrivacy()
   const colorClasses = {
     income: {
-      bg: 'bg-green-50',
-      text: 'text-green-600',
-      badge: 'text-green-700 bg-green-50',
+      bg: 'bg-green-50 dark:bg-green-900/30',
+      text: 'text-green-600 dark:text-green-400',
+      badge: 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30',
     },
     expense: {
-      bg: 'bg-red-50',
-      text: 'text-red-600',
-      badge: 'text-red-700 bg-red-50',
+      bg: 'bg-red-50 dark:bg-red-900/30',
+      text: 'text-red-600 dark:text-red-400',
+      badge: 'text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30',
     },
     net: {
-      bg: 'bg-blue-50',
-      text: 'text-blue-600',
-      badge: 'text-blue-700 bg-blue-50',
+      bg: 'bg-blue-50 dark:bg-blue-900/30',
+      text: 'text-blue-600 dark:text-blue-400',
+      badge: 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30',
     },
   }
 
-  const colors = type ? colorClasses[type] : { bg: 'bg-gray-50', text: 'text-gray-600', badge: 'text-gray-700 bg-gray-50' }
+  const colors = type ? colorClasses[type] : { bg: 'bg-gray-50 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400', badge: 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700' }
 
   return (
     <Card hover role="region" {...props}>
@@ -77,8 +77,8 @@ export function KPICard({ title, amount, change, icon, type, ...props }: KPICard
         )}
       </div>
       <div>
-        <p className="text-sm text-gray-600 mb-1">{title}</p>
-        <p className={cn('text-4xl font-bold font-numbers', type === 'net' && 'text-blue-600')}>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{title}</p>
+        <p className={cn('text-4xl font-bold font-numbers text-gray-900 dark:text-gray-100', type === 'net' && 'text-blue-600 dark:text-blue-400')}>
           {formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         </p>
       </div>
