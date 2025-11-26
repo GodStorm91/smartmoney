@@ -42,13 +42,13 @@ export function LanguageSwitcher() {
       {/* Dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors focus-ring"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-ring"
         aria-label={t('language.selectLanguage')}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
         <span className="text-xl" aria-hidden="true">{currentLang.flag}</span>
-        <span className="text-sm font-medium hidden sm:inline">{currentLang.name}</span>
+        <span className="text-sm font-medium hidden sm:inline text-gray-700 dark:text-gray-200">{currentLang.name}</span>
         <svg
           className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')}
           fill="none"
@@ -62,15 +62,16 @@ export function LanguageSwitcher() {
 
       {/* Dropdown menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+        <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
           {languages.map(lang => (
             <button
               key={lang.code}
               onClick={() => handleLanguageChange(lang.code)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors',
+                'w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors',
                 'first:rounded-t-lg last:rounded-b-lg',
-                i18n.language === lang.code && 'bg-primary-50 text-primary-700'
+                'text-gray-700 dark:text-gray-200',
+                i18n.language === lang.code && 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
               )}
               role="menuitem"
             >
