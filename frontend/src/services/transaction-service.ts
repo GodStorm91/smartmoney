@@ -62,8 +62,19 @@ export async function fetchTransactions(
  * Fetch single transaction by ID
  */
 export async function fetchTransaction(id: number): Promise<Transaction> {
-  const response = await apiClient.get<Transaction>(`/api/transactions/${id}`)
-  return response.data
+  const response = await apiClient.get<BackendTransaction>(`/api/transactions/${id}`)
+  return transformTransaction(response.data)
+}
+
+/**
+ * Transform frontend transaction to backend format
+ */
+function transformToBackend(data: Omit<Transaction, 'id' | 'created_at'> | Partial<Transaction>): any {
+  const { type, ...rest } = data as Transaction
+  return {
+    ...rest,
+    is_income: type === 'income'
+  }
 }
 
 /**
@@ -72,8 +83,9 @@ export async function fetchTransaction(id: number): Promise<Transaction> {
 export async function createTransaction(
   data: Omit<Transaction, 'id' | 'created_at'>
 ): Promise<Transaction> {
-  const response = await apiClient.post<Transaction>('/api/transactions/', data)
-  return response.data
+  const backendData = transformToBackend(data)
+  const response = await apiClient.post<BackendTransaction>('/api/transactions/', backendData)
+  return transformTransaction(response.data)
 }
 
 /**
@@ -83,8 +95,9 @@ export async function updateTransaction(
   id: number,
   data: Partial<Transaction>
 ): Promise<Transaction> {
-  const response = await apiClient.put<Transaction>(`/api/transactions/${id}`, data)
-  return response.data
+  const backendData = transformToBackend(data)
+  const response = await apiClient.put<BackendTransaction>(`/api/transactions/${id}`, backendData)
+  return transformTransaction(response.data)
 }
 
 /**
