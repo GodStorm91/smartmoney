@@ -207,6 +207,52 @@ Production readiness, deployment automation, and enhanced user experience featur
 
 ---
 
+### v0.2.3 - Budget Tracking & Dark Mode (2025-11-26) ✅
+
+**Release Date:** 2025-11-26
+**Status:** Complete - Production Deployed
+**Build:** TypeScript ✅ | Production build 3.05s
+
+#### Features Shipped
+
+**Budget vs Actual Tracking UI:**
+- ✅ Progress bar showing spent vs budgeted amount per category
+- ✅ "X% remaining" text with color-coded status
+- ✅ Color coding: green (>40%), yellow (20-40%), orange (5-20%), red (<5%)
+- ✅ Warning icon (⚠️) when over budget (>100%)
+- ✅ Integrated into existing Budget page
+- ✅ Uses existing backend endpoint `/api/budgets/tracking/current`
+
+**Dark Mode:**
+- ✅ ThemeContext with localStorage persistence
+- ✅ System preference auto-detection (prefers-color-scheme)
+- ✅ Theme toggle in header (Sun/Moon icons)
+- ✅ Mobile and desktop support
+- ✅ Core UI components updated (Card, Button, Input, Select)
+- ✅ Header with full dark mode styling
+- ✅ Landing page excluded (stays light mode)
+- ✅ Tailwind `darkMode: 'class'` configuration
+
+**Files Created:**
+- `frontend/src/contexts/ThemeContext.tsx`
+- `frontend/src/components/layout/ThemeToggle.tsx`
+
+**Files Modified:**
+- `frontend/src/services/budget-service.ts` - getBudgetTracking()
+- `frontend/src/pages/Budget.tsx` - Fetch tracking data
+- `frontend/src/components/budget/budget-allocation-list.tsx` - Tracking progress bars
+- `frontend/src/components/layout/Header.tsx` - Dark mode styles + ThemeToggle
+- `frontend/src/components/ui/Card.tsx` - Dark mode styles
+- `frontend/src/components/ui/Button.tsx` - Dark mode variants
+- `frontend/src/components/ui/Input.tsx` - Dark mode styles
+- `frontend/src/components/ui/Select.tsx` - Dark mode styles
+- `frontend/tailwind.config.js` - darkMode: 'class'
+- `frontend/src/index.css` - Dark body styles
+- `frontend/src/main.tsx` - ThemeProvider wrapper
+- `public/locales/{en,ja,vi}/common.json` - Translations
+
+---
+
 ## Short-Term Roadmap (v0.2.0 - v0.5.0)
 
 ### v0.2.0 - Production Readiness ✅ COMPLETE
@@ -291,7 +337,7 @@ Production readiness, deployment automation, and enhanced user experience featur
 - [ ] Save filter presets
 
 **Export Functionality:**
-- [ ] Export transactions to CSV
+- [x] Export transactions to CSV ✅ (2025-11-24)
 - [ ] Export transactions to JSON
 - [ ] Export monthly report (PDF)
   - Summary statistics
@@ -304,8 +350,8 @@ Production readiness, deployment automation, and enhanced user experience featur
 - [x] Interactive budget editing (swipe gestures) ✅ (2025-11-25)
 - [x] Budget draft mode ✅ (2025-11-25)
 - [x] Save budget button ✅ (2025-11-25)
-- [ ] Budget vs actual comparison
-- [ ] Budget alerts (when approaching limit)
+- [x] Budget vs actual comparison ✅ (2025-11-26)
+- [x] Budget alerts (when approaching limit) ✅ (backend ready)
 - [ ] Budget carry-over (unused → next month)
 
 **Spending Trends:**
@@ -338,9 +384,9 @@ Production readiness, deployment automation, and enhanced user experience featur
 #### Features
 
 **Dark Mode:**
-- [ ] System preference detection
-- [ ] Manual toggle (header button)
-- [ ] Persistent preference (localStorage)
+- [x] System preference detection ✅ (2025-11-26)
+- [x] Manual toggle (header button) ✅ (2025-11-26)
+- [x] Persistent preference (localStorage) ✅ (2025-11-26)
 - [ ] Color palette for dark theme
 - [ ] Chart color adjustments
 
