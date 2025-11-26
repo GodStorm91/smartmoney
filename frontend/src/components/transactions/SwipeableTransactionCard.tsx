@@ -138,12 +138,12 @@ export function SwipeableTransactionCard({
         <Card className="cursor-pointer active:scale-[0.98] transition-transform">
           <div className="flex justify-between items-start mb-2">
             <div>
-              <p className="font-medium text-gray-900">{transaction.description}</p>
-              <p className="text-sm text-gray-600">{formatDate(transaction.date)}</p>
+              <p className="font-medium text-gray-900 dark:text-gray-50">{transaction.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(transaction.date)}</p>
             </div>
             <p
               className={`text-lg font-bold font-numbers ${
-                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
               }`}
             >
               {formatCurrencySignedPrivacy(
@@ -158,7 +158,7 @@ export function SwipeableTransactionCard({
           </div>
           <div className="flex gap-2 text-xs">
             <Badge>{transaction.category}</Badge>
-            <span className="text-gray-600">{transaction.source}</span>
+            <span className="text-gray-600 dark:text-gray-400">{transaction.source}</span>
           </div>
         </Card>
       </div>
