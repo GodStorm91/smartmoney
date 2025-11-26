@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
@@ -9,10 +9,12 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
+import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
+import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
-import { fetchTransactions } from '@/services/transaction-service'
+import { fetchTransactions, deleteTransaction } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
@@ -23,6 +25,7 @@ export function Transactions() {
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const rates = useRatesMap()
+  const queryClient = useQueryClient()
   const monthRange = getCurrentMonthRange()
   const [filters, setFilters] = useState<TransactionFilters>({
     start_date: monthRange.start,
@@ -33,11 +36,29 @@ export function Transactions() {
   })
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions', filters],
     queryFn: () => fetchTransactions(filters),
   })
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteTransaction(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      setDeletingTransaction(null)
+    },
+  })
+
+  const handleDeleteConfirm = () => {
+    if (deletingTransaction) {
+      deleteMutation.mutate(deletingTransaction.id)
+    }
+  }
 
   const income = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) || 0
   const expense = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
@@ -97,7 +118,7 @@ export function Transactions() {
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">{t('transactions.category')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase">{t('transactions.source')}</th>
                   <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 uppercase">{t('transactions.amount')}</th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase">{t('transactions.actions')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase w-24">{t('transactions.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -110,16 +131,27 @@ export function Transactions() {
                     <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                       {formatCurrencySignedPrivacy(tx.amount, tx.type, currency, rates, false, isPrivacyMode)}
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => setEditingTransaction(tx)}
-                        className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
-                        aria-label={t('button.edit')}
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-gray-600">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
-                        </svg>
-                      </button>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-center gap-1">
+                        <button
+                          onClick={() => setEditingTransaction(tx)}
+                          className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                          aria-label={t('button.edit')}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-gray-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setDeletingTransaction(tx)}
+                          className="p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                          aria-label={t('button.delete')}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-red-600">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -130,23 +162,12 @@ export function Transactions() {
           {/* Mobile Cards */}
           <div className="md:hidden space-y-4">
             {transactions.map((tx) => (
-              <div key={tx.id} onClick={() => setEditingTransaction(tx)} className="cursor-pointer active:scale-[0.98] transition-transform">
-                <Card>
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-medium text-gray-900">{tx.description}</p>
-                      <p className="text-sm text-gray-600">{formatDate(tx.date)}</p>
-                    </div>
-                    <p className={`text-lg font-bold font-numbers ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {formatCurrencySignedPrivacy(tx.amount, tx.type, currency, rates, false, isPrivacyMode)}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 text-xs">
-                    <Badge>{tx.category}</Badge>
-                    <span className="text-gray-600">{tx.source}</span>
-                  </div>
-                </Card>
-              </div>
+              <SwipeableTransactionCard
+                key={tx.id}
+                transaction={tx}
+                onEdit={setEditingTransaction}
+                onDelete={setDeletingTransaction}
+              />
             ))}
           </div>
         </>
@@ -165,6 +186,15 @@ export function Transactions() {
       <TransactionFormModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmDialog
+        isOpen={!!deletingTransaction}
+        onClose={() => setDeletingTransaction(null)}
+        onConfirm={handleDeleteConfirm}
+        transaction={deletingTransaction}
+        isDeleting={deleteMutation.isPending}
       />
 
       {/* FAB - Add Transaction */}
