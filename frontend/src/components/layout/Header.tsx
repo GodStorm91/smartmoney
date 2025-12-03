@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -12,7 +11,6 @@ export function Header() {
   const { t } = useTranslation('common')
   const { logout } = useAuth()
   const { isPrivacyMode, togglePrivacyMode } = usePrivacy()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
@@ -84,7 +82,7 @@ export function Header() {
             </button>
           </nav>
 
-          {/* Mobile: Privacy Toggle + Theme Toggle + Language Switcher + Menu Button */}
+          {/* Mobile: Privacy Toggle + Theme Toggle + Language Switcher */}
           <div className="md:hidden flex items-center gap-1">
             <button
               onClick={togglePrivacyMode}
@@ -99,85 +97,8 @@ export function Header() {
             </button>
             <ThemeToggle />
             <LanguageSwitcher />
-            <button
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 focus-ring"
-              aria-label={isMobileMenuOpen ? t('aria.closeMenu') : t('aria.openMenu')}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              {isMobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-            </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <nav
-            className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700"
-            role="navigation"
-            aria-label={t('aria.mobileNavigation')}
-          >
-            <div className="flex flex-col gap-2">
-              <MobileNavLink to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.dashboard')}
-              </MobileNavLink>
-              <MobileNavLink to="/upload" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.upload')}
-              </MobileNavLink>
-              <MobileNavLink to="/transactions" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.transactions')}
-              </MobileNavLink>
-              <MobileNavLink to="/accounts" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.accounts')}
-              </MobileNavLink>
-              <MobileNavLink to="/analytics" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.analytics')}
-              </MobileNavLink>
-              <MobileNavLink to="/goals" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.goals')}
-              </MobileNavLink>
-              <MobileNavLink to="/budget" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.budget')}
-              </MobileNavLink>
-              <MobileNavLink to="/settings" onClick={() => setIsMobileMenuOpen(false)}>
-                {t('header.settings')}
-              </MobileNavLink>
-              <button
-                onClick={() => {
-                  setIsMobileMenuOpen(false)
-                  logout()
-                }}
-                className="px-4 py-3 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors focus-ring text-left flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                {t('auth.logout')}
-              </button>
-            </div>
-          </nav>
-        )}
       </div>
     </header>
   )
@@ -201,21 +122,3 @@ function NavLink({ to, children }: { to: string; children: React.ReactNode }) {
   )
 }
 
-// Mobile navigation link component
-function MobileNavLink({ to, children, onClick }: { to: string; children: React.ReactNode; onClick: () => void }) {
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={cn(
-        'px-4 py-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-        'transition-colors focus-ring'
-      )}
-      activeProps={{
-        className: 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 font-medium',
-      }}
-    >
-      {children}
-    </Link>
-  )
-}

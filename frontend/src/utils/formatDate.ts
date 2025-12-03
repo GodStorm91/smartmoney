@@ -70,3 +70,12 @@ export function getCurrentMonthRange(): { start: string; end: string } {
     end: format(new Date(year, now.getMonth() + 1, 0), 'yyyy-MM-dd'),
   }
 }
+
+/**
+ * Format date for section headers (e.g., "Nov 17 (Mon)")
+ * @param date - Date string or Date object
+ * @returns Formatted date header
+ */
+export function formatDateHeader(date: string | Date): string {
+  return formatDate(date, 'MMM d (EEE)')
+}

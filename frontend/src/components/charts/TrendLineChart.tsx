@@ -13,6 +13,7 @@ import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import type { MonthlyData } from '@/types'
 
 interface TrendLineChartProps {
@@ -31,6 +32,15 @@ export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
   const { t } = useTranslation('common')
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
+  // Dark mode colors (Catppuccin Mocha inspired)
+  const gridColor = isDark ? '#45475a' : '#E5E7EB'
+  const axisColor = isDark ? '#a6adc8' : '#6B7280'
+  const tooltipBg = isDark ? '#1e1e2e' : '#fff'
+  const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
+  const legendColor = isDark ? '#cdd6f4' : '#374151'
 
   const labelMap = {
     income: t('chart.income'),
@@ -41,28 +51,29 @@ export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
         <XAxis
           dataKey="month"
-          stroke="#6B7280"
+          stroke={axisColor}
           style={{ fontSize: '12px', fontFamily: 'Noto Sans JP, sans-serif' }}
         />
         <YAxis
-          stroke="#6B7280"
+          stroke={axisColor}
           style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
           tickFormatter={(value) => formatCurrencyPrivacy(value, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#fff',
-            border: '1px solid #E5E7EB',
+            backgroundColor: tooltipBg,
+            border: `1px solid ${tooltipBorder}`,
             borderRadius: '8px',
             fontSize: '14px',
+            color: legendColor,
           }}
           formatter={(value: number) => [formatCurrencyPrivacy(value, currency, exchangeRates?.rates || {}, false, isPrivacyMode), labelMap[dataKey]]}
         />
         <Legend
-          wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}
+          wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif', color: legendColor }}
         />
         <Line
           type="monotone"

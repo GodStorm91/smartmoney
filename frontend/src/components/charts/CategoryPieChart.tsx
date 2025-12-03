@@ -2,6 +2,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recha
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { useTheme } from '@/contexts/ThemeContext'
 import type { CategoryBreakdown } from '@/types'
 
 interface CategoryPieChartProps {
@@ -23,6 +24,15 @@ const COLORS = [
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
+  // Dark mode colors (Catppuccin Mocha inspired)
+  const tooltipBg = isDark ? '#1e1e2e' : '#fff'
+  const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
+  const legendColor = isDark ? '#cdd6f4' : '#374151'
+  const labelColor = isDark ? '#cdd6f4' : '#374151'
+
   // Calculate total for percentage calculation
   const total = data.reduce((sum, item) => sum + item.amount, 0)
 
@@ -45,6 +55,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
           fill="#8884d8"
           dataKey="amount"
           nameKey="category"
+          style={{ fill: labelColor }}
         >
           {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -52,15 +63,16 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: '#fff',
-            border: '1px solid #E5E7EB',
+            backgroundColor: tooltipBg,
+            border: `1px solid ${tooltipBorder}`,
             borderRadius: '8px',
             fontSize: '14px',
+            color: legendColor,
           }}
           formatter={(value: number) => formatCurrency(value, currency, exchangeRates?.rates || {}, false)}
         />
         <Legend
-          wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif' }}
+          wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif', color: legendColor }}
         />
       </PieChart>
     </ResponsiveContainer>

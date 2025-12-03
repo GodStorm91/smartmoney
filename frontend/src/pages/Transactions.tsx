@@ -1,18 +1,19 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skeleton'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
-import { formatDate, getCurrentMonthRange } from '@/utils/formatDate'
+import { formatDate, getCurrentMonthRange, formatDateHeader } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
 import { fetchTransactions, deleteTransaction } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -64,6 +65,24 @@ export function Transactions() {
   const expense = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
   const net = income - expense
 
+  // Group transactions by date for mobile view
+  const groupedTransactions = useMemo(() => {
+    if (!transactions) return []
+    const groups: { date: string; transactions: Transaction[] }[] = []
+    let currentDate = ''
+
+    transactions.forEach(tx => {
+      if (tx.date !== currentDate) {
+        currentDate = tx.date
+        groups.push({ date: tx.date, transactions: [tx] })
+      } else {
+        groups[groups.length - 1].transactions.push(tx)
+      }
+    })
+
+    return groups
+  }, [transactions])
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
@@ -105,7 +124,30 @@ export function Transactions() {
 
       {/* Transactions Table/List */}
       {isLoading ? (
-        <Card><div className="flex justify-center py-12"><LoadingSpinner size="lg" /></div></Card>
+        <>
+          {/* Desktop Skeleton */}
+          <Card className="hidden md:block overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.date')}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.description')}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.category')}</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.source')}</th>
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.amount')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase w-24">{t('transactions.actions')}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                {[...Array(5)].map((_, i) => <SkeletonTableRow key={i} />)}
+              </tbody>
+            </table>
+          </Card>
+          {/* Mobile Skeleton */}
+          <div className="md:hidden space-y-3">
+            {[...Array(5)].map((_, i) => <SkeletonTransactionCard key={i} />)}
+          </div>
+        </>
       ) : transactions && transactions.length > 0 ? (
         <>
           {/* Desktop Table */}
@@ -159,20 +201,47 @@ export function Transactions() {
             </table>
           </Card>
 
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {transactions.map((tx) => (
-              <SwipeableTransactionCard
-                key={tx.id}
-                transaction={tx}
-                onEdit={setEditingTransaction}
-                onDelete={setDeletingTransaction}
-              />
+          {/* Mobile Cards - Grouped by Date */}
+          <div className="md:hidden space-y-6">
+            {groupedTransactions.map((group) => (
+              <div key={group.date}>
+                <div className="flex items-center gap-3 mb-3">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    {formatDateHeader(group.date)}
+                  </h3>
+                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                </div>
+                <div className="space-y-3">
+                  {group.transactions.map((tx) => (
+                    <SwipeableTransactionCard
+                      key={tx.id}
+                      transaction={tx}
+                      onEdit={setEditingTransaction}
+                      onDelete={setDeletingTransaction}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </>
       ) : (
-        <Card><p className="text-center text-gray-400 dark:text-gray-500 py-12">{t('transactions.noData')}</p></Card>
+        <Card>
+          <EmptyState
+            icon={
+              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            }
+            title={t('transactions.noData')}
+            description={t('transactions.noDataDescription', 'Upload a CSV file or add transactions manually to get started.')}
+            action={
+              <Button onClick={() => setIsAddModalOpen(true)}>
+                {t('transaction.addTransaction')}
+              </Button>
+            }
+          />
+        </Card>
       )}
 
       {/* Edit Modal */}
@@ -200,7 +269,7 @@ export function Transactions() {
       {/* FAB - Add Transaction */}
       <button
         onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
+        className="fixed bottom-24 md:bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
         aria-label={t('transaction.addTransaction', 'Add Transaction')}
       >
         <svg
