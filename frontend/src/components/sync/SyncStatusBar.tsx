@@ -34,7 +34,7 @@ export function SyncStatusBar() {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50" role="status" aria-live="polite">
+    <div className="fixed top-4 right-4 z-[9999]" role="status" aria-live="polite">
       <div className={`
         flex items-center gap-2 px-3 py-2 rounded-lg shadow-lg
         ${getStatusStyles()}
