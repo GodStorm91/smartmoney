@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { Analytics, DateRange } from '@/types'
+import type { Analytics, DateRange, SpendingInsightsResponse } from '@/types'
 
 /**
  * Fetch analytics data for date range
@@ -48,5 +48,13 @@ export async function fetchDashboardSummary(month?: string): Promise<{
 }> {
   const params = month ? `?month=${month}` : ''
   const response = await apiClient.get(`/api/dashboard/summary${params}`)
+  return response.data
+}
+
+/**
+ * Fetch spending insights
+ */
+export async function fetchSpendingInsights(): Promise<SpendingInsightsResponse> {
+  const response = await apiClient.get<SpendingInsightsResponse>('/api/analytics/insights')
   return response.data
 }

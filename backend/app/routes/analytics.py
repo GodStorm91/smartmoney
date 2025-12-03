@@ -13,6 +13,7 @@ from ..schemas.analytics import (
     CategoryBreakdownResponse,
     MonthlyCashflowResponse,
     SourceBreakdownResponse,
+    SpendingInsightsResponse,
 )
 from ..services.analytics_service import AnalyticsService
 
@@ -95,3 +96,25 @@ async def get_sources_breakdown(
         start_date=start_date,
         end_date=end_date,
     )
+
+
+@router.get("/insights", response_model=SpendingInsightsResponse)
+async def get_spending_insights(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get smart spending insights.
+
+    Returns:
+        Spending insights with pattern detection, budget alerts, and trends
+    """
+    from datetime import datetime
+
+    insights = AnalyticsService.generate_spending_insights(
+        db=db,
+        user_id=current_user.id,
+    )
+    return {
+        "insights": insights,
+        "generated_at": datetime.now().isoformat(),
+    }

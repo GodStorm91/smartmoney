@@ -163,7 +163,10 @@
     "categoryBreakdown": "Category Breakdown",
     "monthlyCashFlow": "Monthly Cash Flow",
     "noData": "No data available",
-    "comingSoon": "Monthly detail chart (coming soon)"
+    "comingSoon": "Monthly detail chart (coming soon)",
+    "spendingInsights": "Spending Insights",
+    "noInsights": "No notable spending patterns detected",
+    "insightsHint": "Keep tracking to see personalized insights"
   },
   "goals": {
     "title": "Long-term Goals",

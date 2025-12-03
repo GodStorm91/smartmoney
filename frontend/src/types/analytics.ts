@@ -20,3 +20,18 @@ export interface Analytics {
   total_expense: number
   net_cashflow: number
 }
+
+export interface SpendingInsight {
+  type: 'spike' | 'trend' | 'unusual' | 'budget' | 'saving'
+  severity: 'info' | 'warning' | 'success'
+  title: string
+  message: string
+  category?: string
+  amount?: number
+  percentage_change?: number
+}
+
+export interface SpendingInsightsResponse {
+  insights: SpendingInsight[]
+  generated_at: string
+}

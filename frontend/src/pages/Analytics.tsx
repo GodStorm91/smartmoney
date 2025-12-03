@@ -7,6 +7,8 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
 import { CategoryPieChart } from '@/components/charts/CategoryPieChart'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
+import { ZoomableChart } from '@/components/charts/ZoomableChart'
+import { SpendingInsights } from '@/components/analytics/SpendingInsights'
 import { fetchAnalytics } from '@/services/analytics-service'
 import { getCurrentMonthRange } from '@/utils/formatDate'
 import { format, subMonths } from 'date-fns'
@@ -122,32 +124,32 @@ export function Analytics() {
         <>
           {/* Income vs Expense Chart */}
           <Card className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('analytics.incomeVsExpense')}</h3>
-            <div className="h-80">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('analytics.incomeVsExpense')}</h3>
+            <ZoomableChart className="h-80">
               {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
                 <IncomeExpenseBarChart data={analytics.monthly_trends} />
               ) : (
                 <div className="flex items-center justify-center h-full text-gray-400">{t('analytics.noData')}</div>
               )}
-            </div>
+            </ZoomableChart>
           </Card>
 
           {/* Charts Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('analytics.categoryBreakdown')}</h3>
-              <div className="h-80">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('analytics.categoryBreakdown')}</h3>
+              <ZoomableChart className="h-80">
                 {analytics?.category_breakdown && analytics.category_breakdown.length > 0 ? (
                   <CategoryPieChart data={analytics.category_breakdown} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">{t('analytics.noData')}</div>
                 )}
-              </div>
+              </ZoomableChart>
             </Card>
 
             <Card>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('analytics.monthlyCashFlow')}</h3>
-              <div className="h-80">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('analytics.monthlyCashFlow')}</h3>
+              <ZoomableChart className="h-80">
                 {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
                   <TrendLineChart data={analytics.monthly_trends} dataKey="net" />
                 ) : (
@@ -155,8 +157,13 @@ export function Analytics() {
                     {t('analytics.noData')}
                   </div>
                 )}
-              </div>
+              </ZoomableChart>
             </Card>
+          </div>
+
+          {/* Spending Insights */}
+          <div className="mt-6">
+            <SpendingInsights />
           </div>
         </>
       )}

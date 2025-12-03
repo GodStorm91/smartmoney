@@ -163,7 +163,10 @@
     "categoryBreakdown": "Phân tích theo danh mục",
     "monthlyCashFlow": "Dòng tiền hàng tháng",
     "noData": "Không có dữ liệu",
-    "comingSoon": "Biểu đồ chi tiết hàng tháng (sắp ra mắt)"
+    "comingSoon": "Biểu đồ chi tiết hàng tháng (sắp ra mắt)",
+    "spendingInsights": "Thông tin chi tiêu",
+    "noInsights": "Không phát hiện mẫu chi tiêu đáng chú ý",
+    "insightsHint": "Tiếp tục ghi chép để xem thông tin cá nhân hóa"
   },
   "goals": {
     "title": "Mục tiêu dài hạn",

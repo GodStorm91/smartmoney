@@ -169,7 +169,10 @@
     "categoryBreakdown": "カテゴリー別内訳",
     "monthlyCashFlow": "月次キャッシュフロー",
     "noData": "データがありません",
-    "comingSoon": "月次詳細チャート (実装予定)"
+    "comingSoon": "月次詳細チャート (実装予定)",
+    "spendingInsights": "支出インサイト",
+    "noInsights": "注目すべき支出パターンは検出されませんでした",
+    "insightsHint": "記録を続けてパーソナライズされたインサイトを見ましょう"
   },
   "goals": {
     "title": "長期目標",

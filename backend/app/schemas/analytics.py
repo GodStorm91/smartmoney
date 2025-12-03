@@ -1,5 +1,25 @@
 """Analytics schemas for API validation."""
+from typing import Optional
 from pydantic import BaseModel
+
+
+class SpendingInsight(BaseModel):
+    """Single spending insight."""
+
+    type: str  # 'spike', 'trend', 'unusual', 'budget', 'saving'
+    severity: str  # 'info', 'warning', 'success'
+    title: str
+    message: str
+    category: Optional[str] = None
+    amount: Optional[int] = None
+    percentage_change: Optional[float] = None
+
+
+class SpendingInsightsResponse(BaseModel):
+    """Collection of spending insights."""
+
+    insights: list[SpendingInsight]
+    generated_at: str
 
 
 class MonthlyCashflowResponse(BaseModel):
