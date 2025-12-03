@@ -9,6 +9,13 @@
     "budget": "Ngân sách",
     "settings": "Cài đặt"
   },
+  "nav": {
+    "dashboard": "Trang chủ",
+    "transactions": "Giao dịch",
+    "budget": "Ngân sách",
+    "analytics": "Phân tích",
+    "more": "Thêm"
+  },
   "button": {
     "save": "Lưu",
     "cancel": "Hủy",

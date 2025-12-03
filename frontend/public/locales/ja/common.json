@@ -9,6 +9,13 @@
     "settings": "設定",
     "budget": "予算"
   },
+  "nav": {
+    "dashboard": "ホーム",
+    "transactions": "取引",
+    "budget": "予算",
+    "analytics": "分析",
+    "more": "その他"
+  },
   "button": {
     "save": "保存",
     "cancel": "キャンセル",

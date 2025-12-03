@@ -9,6 +9,13 @@
     "budget": "Budget",
     "settings": "Settings"
   },
+  "nav": {
+    "dashboard": "Home",
+    "transactions": "Transactions",
+    "budget": "Budget",
+    "analytics": "Analytics",
+    "more": "More"
+  },
   "button": {
     "save": "Save",
     "cancel": "Cancel",
