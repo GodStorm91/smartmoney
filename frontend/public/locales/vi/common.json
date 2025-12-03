@@ -440,5 +440,14 @@
     "type": "Loại",
     "description": "Mô tả",
     "showingResults": "Hiển thị {{start}} - {{end}} / {{total}}"
+  },
+  "sync": {
+    "offline": "Ngoại tuyến",
+    "syncing": "Đang đồng bộ",
+    "synced": "Đã đồng bộ",
+    "error": "Lỗi đồng bộ",
+    "lastUpdated": "Cập nhật lần cuối",
+    "syncNow": "Đồng bộ ngay",
+    "syncPending": "Đồng bộ {{count}} đang chờ"
   }
 }

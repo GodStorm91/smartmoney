@@ -427,5 +427,14 @@
     "type": "種類",
     "description": "説明",
     "showingResults": "{{start}} - {{end}} / {{total}}件を表示"
+  },
+  "sync": {
+    "offline": "オフライン",
+    "syncing": "同期中",
+    "synced": "同期完了",
+    "error": "同期エラー",
+    "lastUpdated": "最終更新",
+    "syncNow": "今すぐ同期",
+    "syncPending": "{{count}}件の保留中を同期"
   }
 }

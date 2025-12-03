@@ -1,5 +1,6 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
+import { SyncStatusBar } from './components/sync'
 
 // Create router instance
 const router = createRouter({ routeTree })
@@ -12,7 +13,12 @@ declare module '@tanstack/react-router' {
 }
 
 function App() {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <SyncStatusBar />
+      <RouterProvider router={router} />
+    </>
+  )
 }
 
 export default App

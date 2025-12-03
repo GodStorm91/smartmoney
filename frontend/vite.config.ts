@@ -44,14 +44,16 @@ export default defineConfig({
               },
             },
           },
+          // API GET requests - NetworkFirst with cache fallback
           {
-            urlPattern: /\/api\/.*/i,
+            urlPattern: /\/api\/.*$/i,
             handler: 'NetworkFirst',
+            method: 'GET',
             options: {
               cacheName: 'api-cache',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 5, // 5 minutes
+                maxAgeSeconds: 60 * 60 * 24, // 24 hours
               },
               cacheableResponse: {
                 statuses: [0, 200],

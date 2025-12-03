@@ -450,5 +450,14 @@
     "back": "Back",
     "previous": "Previous",
     "next": "Next"
+  },
+  "sync": {
+    "offline": "Offline",
+    "syncing": "Syncing",
+    "synced": "All synced",
+    "error": "Sync error",
+    "lastUpdated": "Last updated",
+    "syncNow": "Sync now",
+    "syncPending": "Sync {{count}} pending"
   }
 }
