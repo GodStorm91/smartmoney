@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { CategoryGrid } from './CategoryGrid'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
 
@@ -33,7 +33,6 @@ function parseFormattedNumber(value: string): string {
 
 export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalProps) {
   const { t } = useTranslation('common')
-  const queryClient = useQueryClient()
   const { data: accounts } = useAccounts()
 
   // Form state
@@ -77,15 +76,12 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     setCategoryId('')
   }, [isIncome])
 
-  // Mutation
-  const createMutation = useMutation({
-    mutationFn: createTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['analytics'] })
-      onClose()
-    },
-  })
+  // Offline-aware mutation - queues when offline, syncs when back online
+  const createMutation = useOfflineCreate(
+    createTransaction,
+    'transaction',
+    [['transactions'], ['analytics']]
+  )
 
   // Handle amount input with formatting
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,14 +119,20 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const selectedCategory = categories.find(c => c.id === categoryId)
     const amountValue = parseInt(amount)
 
-    await createMutation.mutateAsync({
-      date,
-      description: description.trim(),
-      amount: isIncome ? amountValue : -amountValue,
-      category: selectedCategory?.value || 'Other',
-      source: selectedAccount?.name || '',
-      type: isIncome ? 'income' : 'expense',
-    })
+    try {
+      await createMutation.mutateAsync({
+        date,
+        description: description.trim(),
+        amount: isIncome ? amountValue : -amountValue,
+        category: selectedCategory?.value || 'Other',
+        source: selectedAccount?.name || '',
+        type: isIncome ? 'income' : 'expense',
+      })
+      // Close modal on success (works both online and offline-queued)
+      onClose()
+    } catch {
+      // Error handled by mutation state
+    }
   }
 
   // Handle backdrop click

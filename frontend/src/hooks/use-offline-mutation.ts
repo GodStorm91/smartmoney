@@ -35,6 +35,15 @@ export function useOfflineMutation<TData, TVariables extends Record<string, unkn
 
   return useMutation({
     mutationFn: async (variables: TVariables) => {
+      // Check offline BEFORE making API call to prevent hanging
+      if (!navigator.onLine) {
+        const entityId = getEntityId(variables)
+        await enqueueOperation(operationType, entityType, entityId, variables)
+
+        // Return null for optimistic UI - mutation succeeds but data queued
+        return null as TData
+      }
+
       try {
         const result = await mutationFn(variables)
 
@@ -45,16 +54,14 @@ export function useOfflineMutation<TData, TVariables extends Record<string, unkn
 
         return result
       } catch (error) {
-        // If offline, queue for later sync
-        if (!navigator.onLine) {
+        // Network error while online (e.g., server down) - also queue
+        if (error instanceof TypeError && error.message.includes('fetch')) {
           const entityId = getEntityId(variables)
           await enqueueOperation(operationType, entityType, entityId, variables)
-
-          // Return null for optimistic UI
           return null as TData
         }
 
-        // Re-throw if online (actual server error)
+        // Re-throw for actual server errors (4xx, 5xx)
         throw error
       }
     },
