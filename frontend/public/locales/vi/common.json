@@ -449,5 +449,21 @@
     "lastUpdated": "Cập nhật lần cuối",
     "syncNow": "Đồng bộ ngay",
     "syncPending": "Đồng bộ {{count}} đang chờ"
+  },
+  "receipt": {
+    "scanReceipt": "Quét Hóa Đơn",
+    "takePhoto": "Chụp Ảnh",
+    "dropOrClick": "Kéo thả hình ảnh hoặc nhấn để tải lên",
+    "supportedFormats": "Hỗ trợ JPG, PNG, HEIC",
+    "retake": "Chụp lại",
+    "usePhoto": "Sử dụng ảnh này",
+    "scan": "Quét",
+    "analyzing": "AI đang phân tích hóa đơn...",
+    "scanError": "Không thể quét hóa đơn. Vui lòng thử lại.",
+    "cameraError": "Không thể truy cập camera",
+    "startingCamera": "Đang khởi động camera...",
+    "invalidFile": "Vui lòng chọn file hình ảnh",
+    "processError": "Không thể xử lý hình ảnh",
+    "processing": "Đang xử lý..."
   }
 }

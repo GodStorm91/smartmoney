@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Receipt } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { CategoryGrid } from './CategoryGrid'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
+import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
+import type { ReceiptData } from '@/services/receipt-service'
 
 interface TransactionFormModalProps {
   isOpen: boolean
@@ -44,6 +47,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const [categoryId, setCategoryId] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showScanner, setShowScanner] = useState(false)
 
   // Get selected account and its currency
   const selectedAccount = useMemo(() => {
@@ -88,6 +92,42 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const rawValue = parseFormattedNumber(e.target.value)
     setAmount(rawValue)
     setDisplayAmount(formatWithCommas(rawValue))
+  }
+
+  // Handle receipt scan completion - pre-fill form with extracted data
+  const handleScanComplete = (data: ReceiptData) => {
+    // Set amount if extracted
+    if (data.amount !== null) {
+      const amountStr = Math.abs(data.amount).toString()
+      setAmount(amountStr)
+      setDisplayAmount(formatWithCommas(amountStr))
+      // Determine income/expense from sign
+      setIsIncome(data.amount > 0)
+    }
+
+    // Set date if extracted
+    if (data.date) {
+      setDate(data.date)
+    }
+
+    // Set description from merchant name
+    if (data.merchant) {
+      setDescription(data.merchant)
+    }
+
+    // Try to match category
+    if (data.category) {
+      const categoryLower = data.category.toLowerCase()
+      const matchedCategory = categories.find(
+        c => c.value.toLowerCase() === categoryLower ||
+             c.id.toLowerCase().includes(categoryLower)
+      )
+      if (matchedCategory) {
+        setCategoryId(matchedCategory.id)
+      }
+    }
+
+    setShowScanner(false)
   }
 
   // Validation
@@ -168,6 +208,18 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           <h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100">
             {t('transaction.addTransaction', 'Add Transaction')}
           </h2>
+        </div>
+
+        {/* Scan Receipt Button */}
+        <div className="px-4 pb-4">
+          <button
+            type="button"
+            onClick={() => setShowScanner(true)}
+            className="w-full h-12 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-lg font-medium transition-all shadow-md hover:shadow-lg"
+          >
+            <Receipt size={20} />
+            {t('receipt.scanReceipt', 'Scan Receipt')}
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="px-4 pb-8 space-y-4">
@@ -339,6 +391,13 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           )}
         </form>
       </div>
+
+      {/* Receipt Scanner Modal */}
+      <ReceiptScannerModal
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScanComplete={handleScanComplete}
+      />
     </div>
   )
 }

@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import accounts, analytics, auth, budgets, credits, dashboard, goals, settings, tags, transactions, upload, exchange_rates
+from .routes import accounts, analytics, auth, budgets, credits, dashboard, goals, receipts, settings, tags, transactions, upload, exchange_rates
 from .services.exchange_rate_service import ExchangeRateService
 
 logger = logging.getLogger(__name__)
@@ -104,6 +104,7 @@ app.include_router(upload.router)
 app.include_router(exchange_rates.router)
 app.include_router(budgets.router)
 app.include_router(credits.router)
+app.include_router(receipts.router)
 
 
 # Root endpoints

@@ -459,5 +459,21 @@
     "lastUpdated": "Last updated",
     "syncNow": "Sync now",
     "syncPending": "Sync {{count}} pending"
+  },
+  "receipt": {
+    "scanReceipt": "Scan Receipt",
+    "takePhoto": "Take Photo",
+    "dropOrClick": "Drop image here or click to upload",
+    "supportedFormats": "JPG, PNG, HEIC supported",
+    "retake": "Retake",
+    "usePhoto": "Use Photo",
+    "scan": "Scan",
+    "analyzing": "Analyzing receipt with AI...",
+    "scanError": "Failed to scan receipt. Please try again.",
+    "cameraError": "Could not access camera",
+    "startingCamera": "Starting camera...",
+    "invalidFile": "Please select an image file",
+    "processError": "Failed to process image",
+    "processing": "Processing..."
   }
 }

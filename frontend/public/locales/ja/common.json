@@ -436,5 +436,21 @@
     "lastUpdated": "最終更新",
     "syncNow": "今すぐ同期",
     "syncPending": "{{count}}件の保留中を同期"
+  },
+  "receipt": {
+    "scanReceipt": "レシートをスキャン",
+    "takePhoto": "写真を撮る",
+    "dropOrClick": "画像をドロップまたはクリックしてアップロード",
+    "supportedFormats": "JPG、PNG、HEIC対応",
+    "retake": "撮り直し",
+    "usePhoto": "この写真を使用",
+    "scan": "スキャン",
+    "analyzing": "AIでレシートを解析中...",
+    "scanError": "レシートのスキャンに失敗しました。もう一度お試しください。",
+    "cameraError": "カメラにアクセスできませんでした",
+    "startingCamera": "カメラを起動中...",
+    "invalidFile": "画像ファイルを選択してください",
+    "processError": "画像の処理に失敗しました",
+    "processing": "処理中..."
   }
 }
