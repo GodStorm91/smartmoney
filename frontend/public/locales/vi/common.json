@@ -465,5 +465,13 @@
     "invalidFile": "Vui lòng chọn file hình ảnh",
     "processError": "Không thể xử lý hình ảnh",
     "processing": "Đang xử lý..."
+  },
+  "quickEntry": {
+    "add": "Thêm nhanh",
+    "enterAmount": "Nhập số tiền",
+    "selectCategory": "Chọn danh mục",
+    "selectAccount": "Chọn tài khoản",
+    "expense": "Chi tiêu",
+    "fullForm": "Nhập đầy đủ"
   }
 }

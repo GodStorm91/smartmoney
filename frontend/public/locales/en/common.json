@@ -475,5 +475,13 @@
     "invalidFile": "Please select an image file",
     "processError": "Failed to process image",
     "processing": "Processing..."
+  },
+  "quickEntry": {
+    "add": "Quick Add",
+    "enterAmount": "Enter Amount",
+    "selectCategory": "Select Category",
+    "selectAccount": "Select Account",
+    "expense": "Expense",
+    "fullForm": "Full Form"
   }
 }

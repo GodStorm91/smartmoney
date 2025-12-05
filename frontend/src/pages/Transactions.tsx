@@ -10,6 +10,7 @@ import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skele
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
+import { QuickEntryFAB } from '@/components/transactions/QuickEntryFAB'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
@@ -266,11 +267,15 @@ export function Transactions() {
         isDeleting={deleteMutation.isPending}
       />
 
-      {/* FAB - Add Transaction */}
+      {/* Quick Entry FAB (primary - gradient) */}
+      <QuickEntryFAB />
+
+      {/* Full Form FAB (secondary - solid blue, left of quick entry) */}
       <button
         onClick={() => setIsAddModalOpen(true)}
-        className="fixed bottom-24 md:bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
+        className="fixed bottom-20 right-20 md:bottom-6 md:right-20 w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
         aria-label={t('transaction.addTransaction', 'Add Transaction')}
+        title={t('quickEntry.fullForm', 'Full Form')}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -278,9 +283,9 @@ export function Transactions() {
           viewBox="0 0 24 24"
           strokeWidth={2}
           stroke="currentColor"
-          className="w-6 h-6"
+          className="w-5 h-5"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
       </button>
     </div>

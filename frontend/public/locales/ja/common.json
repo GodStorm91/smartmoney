@@ -452,5 +452,13 @@
     "invalidFile": "画像ファイルを選択してください",
     "processError": "画像の処理に失敗しました",
     "processing": "処理中..."
+  },
+  "quickEntry": {
+    "add": "クイック追加",
+    "enterAmount": "金額を入力",
+    "selectCategory": "カテゴリを選択",
+    "selectAccount": "口座を選択",
+    "expense": "支出",
+    "fullForm": "詳細入力"
   }
 }
