@@ -96,13 +96,14 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
   // Handle receipt scan completion - pre-fill form with extracted data
   const handleScanComplete = (data: ReceiptData) => {
+    // Receipts are almost always expenses, so default to expense
+    setIsIncome(false)
+
     // Set amount if extracted
     if (data.amount !== null) {
       const amountStr = Math.abs(data.amount).toString()
       setAmount(amountStr)
       setDisplayAmount(formatWithCommas(amountStr))
-      // Determine income/expense from sign
-      setIsIncome(data.amount > 0)
     }
 
     // Set date if extracted
