@@ -7,6 +7,7 @@ import { DashboardKPIs } from '@/components/dashboard/DashboardKPIs'
 import { TrendChartCard } from '@/components/dashboard/TrendChartCard'
 import { QuickActionsCard } from '@/components/dashboard/QuickActionsCard'
 import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
+import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { formatMonth } from '@/utils/formatDate'
@@ -66,6 +67,9 @@ export function Dashboard() {
         <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.title')}</h2>
         <p className="text-gray-600 dark:text-gray-400">{t('dashboard.subtitle', { month: formatMonth(new Date()) })}</p>
       </div>
+
+      {/* Onboarding Checklist for new users */}
+      <OnboardingChecklist />
 
       {/* Net Worth Hero Card */}
       <NetWorthCard />

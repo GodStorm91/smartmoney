@@ -460,5 +460,23 @@
     "selectAccount": "口座を選択",
     "expense": "支出",
     "fullForm": "詳細入力"
+  },
+  "onboarding": {
+    "title": "はじめましょう",
+    "subtitle": "{{completed}}/{{total}} ステップ完了",
+    "steps": {
+      "account": {
+        "title": "口座を作成",
+        "description": "銀行口座を追加して残高を管理"
+      },
+      "upload": {
+        "title": "取引をインポート",
+        "description": "銀行のCSVをアップロードまたは手動入力"
+      },
+      "goals": {
+        "title": "目標を設定",
+        "description": "1、3、5、10年の貯蓄目標を設定"
+      }
+    }
   }
 }

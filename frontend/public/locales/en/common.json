@@ -483,5 +483,23 @@
     "selectAccount": "Select Account",
     "expense": "Expense",
     "fullForm": "Full Form"
+  },
+  "onboarding": {
+    "title": "Get Started",
+    "subtitle": "{{completed}}/{{total}} steps completed",
+    "steps": {
+      "account": {
+        "title": "Create an account",
+        "description": "Add your bank accounts to track balances"
+      },
+      "upload": {
+        "title": "Import transactions",
+        "description": "Upload CSV from your bank or add manually"
+      },
+      "goals": {
+        "title": "Set financial goals",
+        "description": "Define 1, 3, 5, or 10-year savings goals"
+      }
+    }
   }
 }

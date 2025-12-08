@@ -473,5 +473,23 @@
     "selectAccount": "Chọn tài khoản",
     "expense": "Chi tiêu",
     "fullForm": "Nhập đầy đủ"
+  },
+  "onboarding": {
+    "title": "Bắt đầu",
+    "subtitle": "{{completed}}/{{total}} bước hoàn thành",
+    "steps": {
+      "account": {
+        "title": "Tạo tài khoản",
+        "description": "Thêm tài khoản ngân hàng để theo dõi số dư"
+      },
+      "upload": {
+        "title": "Nhập giao dịch",
+        "description": "Tải CSV từ ngân hàng hoặc nhập thủ công"
+      },
+      "goals": {
+        "title": "Đặt mục tiêu",
+        "description": "Định nghĩa mục tiêu tiết kiệm 1, 3, 5, 10 năm"
+      }
+    }
   }
 }
