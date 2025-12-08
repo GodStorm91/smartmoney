@@ -1,19 +1,23 @@
 # SmartMoney Cashflow Tracker
 
-**Version:** v0.1.0 (MVP Complete) | **Status:** ✅ 89/89 Tests Passing | **Code Quality:** 92/100
+**Version:** v0.2.4 | **Status:** ✅ Production Live | **Live Demo:** [money.khanh.page](https://money.khanh.page)
 
-Personal finance webapp for tracking income, expenses, and long-term financial goals.
+Privacy-first personal finance app with AI-powered budgets. Self-hosted, multi-currency, multilingual.
+
+![Dashboard Screenshot](frontend/public/screenshots/dashboard-light.webp)
 
 ## Features
 
 - 📊 **CSV Import** - MoneyForward, Zaim (Shift-JIS/UTF-8 auto-detect)
-- 💰 **Cashflow Analytics** - Monthly income/expense/net with category breakdown
-- 🎯 **Goal Tracking** - Multi-horizon (1/3/5/10 years) with progress projections
-- 🎲 **Goal Achievability** - Real-time feasibility analysis based on current cashflow (NEW ✨)
-- 📈 **Interactive Charts** - Recharts visualizations (trends, pie charts, bars)
-- 🗾 **Japanese Support** - Full Japanese text handling (encoding, currency, categories)
+- 🤖 **AI Budgets** - Claude AI generates personalized budgets from spending patterns
+- 💰 **Multi-Currency** - JPY, USD, VND with real-time exchange rates
+- 🎯 **Goal Tracking** - 1/3/5/10 year goals with progress projections
+- 📸 **Receipt Scanning** - OCR-powered receipt capture (mobile)
+- ⚡ **Quick Entry** - 3-4 tap transaction entry with calculator numpad
+- 🌙 **Dark Mode** - System preference + manual toggle
+- 🌐 **Multilingual** - English, Japanese, Vietnamese
 - 🔒 **Self-Hosted** - Privacy-first, no cloud data sharing
-- 🚀 **Performance** - Dashboard loads <500ms with 1000 transactions
+- 📱 **PWA Ready** - Installable, offline-capable
 
 ## Tech Stack
 
@@ -92,29 +96,29 @@ smartmoney/
 └── docs/             # Documentation (15+ files)
 ```
 
+## Screenshots
+
+| Dashboard | Transactions | Budget |
+|-----------|-------------|--------|
+| ![Dashboard](frontend/public/screenshots/dashboard-light.webp) | ![Transactions](frontend/public/screenshots/transactions.webp) | ![Budget](frontend/public/screenshots/budget.webp) |
+
 ## Current Status
 
-**✅ Completed:**
-- Backend API (4 route modules, 3 services)
-- Frontend UI (25 components, 6 pages)
-- CSV Parser (Shift-JIS/UTF-8 auto-detect)
-- Goal Progress Algorithm (linear projection)
-- Goal Achievability Feature (Phase 1) - 5-tier status system with actionable recommendations
-- Testing (89/89 passing, 95%+ coverage)
-- Documentation (15+ docs)
-
-**⏳ Pending:**
-- Docker Compose setup
-- VPS deployment guide
-- PostgreSQL migration
-- Transaction editing UI
+**✅ Production Features:**
+- JWT Authentication with user isolation
+- Multi-currency accounts (JPY, USD, VND)
+- AI-powered budget generation (Claude)
+- Receipt scanning with OCR
+- Quick Entry FAB with currency conversion
+- Dark mode + i18n (EN/JA/VI)
+- PWA with offline support
+- Docker deployment on Hetzner VPS
 
 **📊 Metrics:**
-- Test Coverage: 95%+ (services), 100% (utils)
-- Code Quality: 92/100
-- Files: 102 (57,579 tokens)
 - Response Time: <500ms (dashboard)
+- Build Time: ~3s (production)
+- Bundle Size: ~340KB gzipped
 
 ## License
 
-Private project - All rights reserved
+MIT License - Open Source
