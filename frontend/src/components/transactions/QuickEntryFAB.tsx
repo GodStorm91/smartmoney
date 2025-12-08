@@ -5,16 +5,18 @@
  * - Calculator-style numpad for amount entry
  * - Quick category selection (icons grid)
  * - Account selector
+ * - Currency selector with auto-conversion
  * - 3-4 taps to save: Amount → Category → Account → Save
  * - Always defaults to expense type
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Plus, X, Delete } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
+import { useRatesMap } from '@/hooks/useExchangeRates'
 import { EXPENSE_CATEGORIES } from './constants/categories'
 
 // Currency symbols map
@@ -23,6 +25,10 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   USD: '$',
   VND: '₫',
 }
+
+// Supported currencies for quick entry
+const SUPPORTED_CURRENCIES = ['JPY', 'USD', 'VND'] as const
+type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number]
 
 // Numpad keys
 const NUMPAD_KEYS = [
@@ -37,24 +43,68 @@ type Step = 'closed' | 'amount' | 'category' | 'account'
 export function QuickEntryFAB() {
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
+  const rates = useRatesMap()
 
   const [step, setStep] = useState<Step>('closed')
   const [amount, setAmount] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
+  const [inputCurrency, setInputCurrency] = useState<SupportedCurrency>('JPY')
 
-  // Set default account when accounts load
+  // Get selected account
+  const selectedAccount = accounts?.find(a => a.id === accountId)
+
+  // Set default account and currency when accounts load
   useEffect(() => {
     if (accounts?.length && !accountId) {
       setAccountId(accounts[0].id)
+      // Default input currency to first account's currency
+      const firstAccountCurrency = accounts[0].currency as SupportedCurrency
+      if (SUPPORTED_CURRENCIES.includes(firstAccountCurrency)) {
+        setInputCurrency(firstAccountCurrency)
+      }
     }
   }, [accounts, accountId])
 
-  // Get selected account currency
-  const selectedAccount = accounts?.find(a => a.id === accountId)
-  const currencySymbol = selectedAccount?.currency
-    ? CURRENCY_SYMBOLS[selectedAccount.currency] || selectedAccount.currency
-    : '¥'
+  // Update input currency when account changes
+  useEffect(() => {
+    if (selectedAccount) {
+      const accountCurrency = selectedAccount.currency as SupportedCurrency
+      if (SUPPORTED_CURRENCIES.includes(accountCurrency)) {
+        setInputCurrency(accountCurrency)
+      }
+    }
+  }, [selectedAccount])
+
+  // Get currency symbol for input
+  const currencySymbol = CURRENCY_SYMBOLS[inputCurrency] || inputCurrency
+
+  // Calculate converted amount when currencies differ
+  const convertedAmount = useMemo(() => {
+    if (!amount || !selectedAccount) return null
+
+    const accountCurrency = selectedAccount.currency
+    if (inputCurrency === accountCurrency) return null
+
+    const inputValue = parseInt(amount)
+    if (isNaN(inputValue)) return null
+
+    // Convert: input currency → account currency
+    // rates are relative to JPY (e.g., USD: 150 means 1 USD = 150 JPY)
+    const inputRate = rates[inputCurrency] || 1 // JPY = 1
+    const accountRate = rates[accountCurrency] || 1
+
+    // Convert input to JPY first, then to account currency
+    const inJPY = inputValue * inputRate
+    const converted = Math.round(inJPY / accountRate)
+
+    return {
+      value: converted,
+      formatted: converted.toLocaleString(),
+      currency: accountCurrency,
+      symbol: CURRENCY_SYMBOLS[accountCurrency] || accountCurrency
+    }
+  }, [amount, inputCurrency, selectedAccount, rates])
 
   // Offline-aware mutation
   const createMutation = useOfflineCreate(
@@ -107,11 +157,14 @@ export function QuickEntryFAB() {
 
     if (!amount || !selectedCategory || !account) return
 
+    // Use converted amount if currencies differ, otherwise use input amount
+    const finalAmount = convertedAmount?.value ?? parseInt(amount)
+
     try {
       await createMutation.mutateAsync({
         date: new Date().toISOString().split('T')[0],
         description: selectedCategory.value, // Use category as description
-        amount: -parseInt(amount), // Negative for expense
+        amount: -finalAmount, // Negative for expense
         category: selectedCategory.value,
         source: account.name,
         type: 'expense',
@@ -129,6 +182,7 @@ export function QuickEntryFAB() {
     setStep('closed')
     setAmount('')
     setCategoryId('')
+    // Reset currency to default (will be set by account effect)
   }
 
   // Open quick entry
@@ -211,11 +265,35 @@ export function QuickEntryFAB() {
         {/* Amount Entry */}
         {step === 'amount' && (
           <div className="p-4">
+            {/* Currency Selector Pills */}
+            <div className="flex justify-center gap-2 mb-4">
+              {SUPPORTED_CURRENCIES.map((currency) => (
+                <button
+                  key={currency}
+                  onClick={() => setInputCurrency(currency)}
+                  className={cn(
+                    'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                    inputCurrency === currency
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  {CURRENCY_SYMBOLS[currency]} {currency}
+                </button>
+              ))}
+            </div>
+
             {/* Amount Display */}
-            <div className="text-center py-6">
+            <div className="text-center py-4">
               <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
                 {currencySymbol}{formattedAmount}
               </div>
+              {/* Conversion Preview */}
+              {convertedAmount && (
+                <div className="text-lg text-blue-500 dark:text-blue-400 mt-2 font-numbers">
+                  ≈ {convertedAmount.symbol}{convertedAmount.formatted}
+                </div>
+              )}
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 {t('quickEntry.expense', 'Expense')}
               </p>
@@ -258,11 +336,16 @@ export function QuickEntryFAB() {
         {/* Category Selection */}
         {step === 'category' && (
           <div className="p-4">
-            {/* Amount reminder */}
+            {/* Amount reminder with conversion */}
             <div className="text-center py-2 mb-4">
               <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
                 {currencySymbol}{formattedAmount}
               </span>
+              {convertedAmount && (
+                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                  → {convertedAmount.symbol}{convertedAmount.formatted}
+                </span>
+              )}
             </div>
 
             {/* Category Grid */}
@@ -290,11 +373,16 @@ export function QuickEntryFAB() {
         {/* Account Selection */}
         {step === 'account' && (
           <div className="p-4">
-            {/* Amount + Category reminder */}
+            {/* Amount + Category reminder with conversion */}
             <div className="text-center py-2 mb-4">
               <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
                 {currencySymbol}{formattedAmount}
               </span>
+              {convertedAmount && (
+                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                  → {convertedAmount.symbol}{convertedAmount.formatted}
+                </span>
+              )}
               <span className="ml-2 text-gray-500">
                 {EXPENSE_CATEGORIES.find(c => c.id === categoryId)?.icon}
               </span>
