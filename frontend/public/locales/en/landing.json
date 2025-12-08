@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "headline": "Track Your Money, Own Your Data",
+    "subheadline": "Privacy-first cashflow tracker with AI-powered budgets. Self-host your financial data—no cloud, no subscriptions.",
+    "cta": "Get Started Free",
+    "seeLiveDemo": "See Live Demo",
+    "valueProp1": "Self-Hosted Privacy",
+    "valueProp2": "AI-Powered Budgets",
+    "valueProp3": "Multi-Currency"
+  },
+  "features": {
+    "title": "Everything You Need",
+    "subtitle": "Simple tools to manage your money effectively",
+    "dashboard": {
+      "title": "Beautiful Dashboard",
+      "description": "See your net worth, income, and expenses at a glance with interactive charts"
+    },
+    "transactions": {
+      "title": "Easy Transaction Entry",
+      "description": "Quick entry, receipt scanning, CSV import from MoneyForward & Zaim"
+    },
+    "budget": {
+      "title": "AI Budget Generation",
+      "description": "Claude AI analyzes your spending to create personalized budgets"
+    },
+    "analytics": {
+      "title": "Detailed Analytics",
+      "description": "Monthly trends, category breakdowns, and spending insights"
+    }
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "subtitle": "Get started in 3 simple steps",
+    "step1": {
+      "title": "Import Data",
+      "description": "Upload CSV from your bank or finance app"
+    },
+    "step2": {
+      "title": "Analyze Spending",
+      "description": "See where your money goes each month"
+    },
+    "step3": {
+      "title": "Generate Budget",
+      "description": "Let AI create a personalized budget for you"
+    }
+  },
+  "cta": {
+    "title": "Start Managing Your Money Today",
+    "subtitle": "Free to use. Self-hosted. Open source.",
+    "button": "Get Started Free",
+    "openSource": "Open Source on GitHub",
+    "noAccount": "No credit card required"
+  },
+  "footer": {
+    "copyright": "© 2025 SmartMoney. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}
