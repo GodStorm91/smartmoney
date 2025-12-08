@@ -101,8 +101,8 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       const amountStr = Math.abs(data.amount).toString()
       setAmount(amountStr)
       setDisplayAmount(formatWithCommas(amountStr))
-      // Determine income/expense from sign
-      setIsIncome(data.amount > 0)
+      // Receipts are almost always expenses, default to expense
+      setIsIncome(false)
     }
 
     // Set date if extracted
