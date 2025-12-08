@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import axios from 'axios'
 import { apiClient } from '@/services/api-client'
 
 interface User {
@@ -26,6 +27,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  // Define callbacks BEFORE useEffects that depend on them
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY)
+    localStorage.removeItem(REFRESH_TOKEN_KEY)
+    setUser(null)
+    setIsLoading(false)
+  }, [])
+
+  const refreshToken = useCallback(async (): Promise<boolean> => {
+    const refresh = localStorage.getItem(REFRESH_TOKEN_KEY)
+    if (!refresh) return false
+
+    try {
+      // Use plain axios to avoid interceptor loops
+      const baseURL = import.meta.env.VITE_API_URL || ''
+      const response = await axios.post(`${baseURL}/api/auth/refresh`, {
+        refresh_token: refresh,
+      })
+
+      const { access_token, refresh_token: newRefresh } = response.data
+      localStorage.setItem(TOKEN_KEY, access_token)
+      localStorage.setItem(REFRESH_TOKEN_KEY, newRefresh)
+
+      // Fetch user info with new token
+      const userResponse = await apiClient.get('/api/auth/me')
+      setUser(userResponse.data)
+
+      return true
+    } catch {
+      // Clear invalid tokens
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(REFRESH_TOKEN_KEY)
+      return false
+    }
+  }, [])
+
   // Setup axios interceptors for auth
   useEffect(() => {
     // Request interceptor - add token to requests
@@ -46,8 +83,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (error) => {
         const originalRequest = error.config
 
+        // Don't retry auth endpoints to avoid infinite loops
+        const isAuthEndpoint = originalRequest?.url?.includes('/api/auth/')
+
         // If 401 and not already retried, try to refresh token
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
           originalRequest._retry = true
 
           const refreshed = await refreshToken()
@@ -69,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       apiClient.interceptors.request.eject(requestInterceptor)
       apiClient.interceptors.response.eject(responseInterceptor)
     }
-  }, [])
+  }, [refreshToken, logout])
 
   // Check auth status on mount
   useEffect(() => {
@@ -83,8 +123,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Token invalid, try refresh
           const refreshed = await refreshToken()
           if (!refreshed) {
-            localStorage.removeItem(TOKEN_KEY)
-            localStorage.removeItem(REFRESH_TOKEN_KEY)
+            // Already cleared in refreshToken, just ensure loading stops
+            setUser(null)
           }
         }
       }
@@ -92,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     checkAuth()
-  }, [])
+  }, [refreshToken])
 
   const login = async (email: string, password: string) => {
     const formData = new URLSearchParams()
@@ -112,35 +152,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Fetch user info
     const userResponse = await apiClient.get('/api/auth/me')
     setUser(userResponse.data)
-  }
-
-  const logout = () => {
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(REFRESH_TOKEN_KEY)
-    setUser(null)
-  }
-
-  const refreshToken = async (): Promise<boolean> => {
-    const refresh = localStorage.getItem(REFRESH_TOKEN_KEY)
-    if (!refresh) return false
-
-    try {
-      const response = await apiClient.post('/api/auth/refresh', {
-        refresh_token: refresh,
-      })
-
-      const { access_token, refresh_token: newRefresh } = response.data
-      localStorage.setItem(TOKEN_KEY, access_token)
-      localStorage.setItem(REFRESH_TOKEN_KEY, newRefresh)
-
-      // Fetch user info with new token
-      const userResponse = await apiClient.get('/api/auth/me')
-      setUser(userResponse.data)
-
-      return true
-    } catch {
-      return false
-    }
   }
 
   return (
