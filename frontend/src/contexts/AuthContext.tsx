@@ -50,8 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem(TOKEN_KEY, access_token)
       localStorage.setItem(REFRESH_TOKEN_KEY, newRefresh)
 
-      // Fetch user info with new token
-      const userResponse = await apiClient.get('/api/auth/me')
+      // Fetch user info with explicit auth header
+      const userResponse = await apiClient.get('/api/auth/me', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      })
       setUser(userResponse.data)
 
       return true
@@ -149,8 +153,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, access_token)
     localStorage.setItem(REFRESH_TOKEN_KEY, refresh_token)
 
-    // Fetch user info
-    const userResponse = await apiClient.get('/api/auth/me')
+    // Fetch user info with explicit auth header (don't rely on interceptor timing)
+    const userResponse = await apiClient.get('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    })
     setUser(userResponse.data)
   }
 
