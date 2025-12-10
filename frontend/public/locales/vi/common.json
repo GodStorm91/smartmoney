@@ -189,6 +189,39 @@
     "cancel": "Hủy",
     "today": "Hôm nay"
   },
+  "autocomplete": {
+    "used": "lần dùng"
+  },
+  "recurring": {
+    "title": "Giao dịch định kỳ",
+    "makeRecurring": "Đặt thành định kỳ",
+    "frequency": "Tần suất",
+    "weekly": "Hàng tuần",
+    "monthly": "Hàng tháng",
+    "yearly": "Hàng năm",
+    "custom": "Tùy chỉnh",
+    "everyNDays": "Mỗi {{n}} ngày",
+    "dayOfWeek": "Ngày trong tuần",
+    "dayOfMonth": "Ngày trong tháng",
+    "nextRun": "Lần tiếp theo",
+    "lastRun": "Lần trước",
+    "active": "Hoạt động",
+    "inactive": "Tạm dừng",
+    "noRecurring": "Chưa có giao dịch định kỳ",
+    "addFirst": "Tạo giao dịch định kỳ để tự động hóa các mục nhập lặp lại",
+    "createSuccess": "Đã tạo giao dịch định kỳ",
+    "deleteSuccess": "Đã xóa giao dịch định kỳ",
+    "updateSuccess": "Đã cập nhật giao dịch định kỳ",
+    "days": {
+      "monday": "Thứ Hai",
+      "tuesday": "Thứ Ba",
+      "wednesday": "Thứ Tư",
+      "thursday": "Thứ Năm",
+      "friday": "Thứ Sáu",
+      "saturday": "Thứ Bảy",
+      "sunday": "Chủ Nhật"
+    }
+  },
   "transaction": {
     "addTransaction": "Thêm giao dịch",
     "expense": "Chi tiêu",

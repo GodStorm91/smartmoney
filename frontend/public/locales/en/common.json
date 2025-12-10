@@ -189,6 +189,39 @@
     "cancel": "Cancel",
     "today": "Today"
   },
+  "autocomplete": {
+    "used": "used"
+  },
+  "recurring": {
+    "title": "Recurring Transactions",
+    "makeRecurring": "Make this recurring",
+    "frequency": "Frequency",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "custom": "Custom",
+    "everyNDays": "Every {{n}} days",
+    "dayOfWeek": "Day of week",
+    "dayOfMonth": "Day of month",
+    "nextRun": "Next run",
+    "lastRun": "Last run",
+    "active": "Active",
+    "inactive": "Inactive",
+    "noRecurring": "No recurring transactions",
+    "addFirst": "Create recurring transactions to automate repeated entries",
+    "createSuccess": "Recurring transaction created",
+    "deleteSuccess": "Recurring transaction deleted",
+    "updateSuccess": "Recurring transaction updated",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
+  },
   "transaction": {
     "addTransaction": "Add Transaction",
     "expense": "Expense",

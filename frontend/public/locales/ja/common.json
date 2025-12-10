@@ -195,6 +195,39 @@
     "cancel": "キャンセル",
     "today": "今日"
   },
+  "autocomplete": {
+    "used": "回使用"
+  },
+  "recurring": {
+    "title": "定期取引",
+    "makeRecurring": "定期取引にする",
+    "frequency": "頻度",
+    "weekly": "毎週",
+    "monthly": "毎月",
+    "yearly": "毎年",
+    "custom": "カスタム",
+    "everyNDays": "{{n}}日ごと",
+    "dayOfWeek": "曜日",
+    "dayOfMonth": "日付",
+    "nextRun": "次回実行",
+    "lastRun": "前回実行",
+    "active": "有効",
+    "inactive": "無効",
+    "noRecurring": "定期取引がありません",
+    "addFirst": "繰り返しの入力を自動化する定期取引を作成しましょう",
+    "createSuccess": "定期取引を作成しました",
+    "deleteSuccess": "定期取引を削除しました",
+    "updateSuccess": "定期取引を更新しました",
+    "days": {
+      "monday": "月曜日",
+      "tuesday": "火曜日",
+      "wednesday": "水曜日",
+      "thursday": "木曜日",
+      "friday": "金曜日",
+      "saturday": "土曜日",
+      "sunday": "日曜日"
+    }
+  },
   "category": {
     "food": "食費",
     "housing": "住宅",

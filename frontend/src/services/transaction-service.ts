@@ -106,3 +106,29 @@ export async function updateTransaction(
 export async function deleteTransaction(id: number): Promise<void> {
   await apiClient.delete(`/api/transactions/${id}`)
 }
+
+/**
+ * Transaction suggestion for autocomplete
+ */
+export interface TransactionSuggestion {
+  description: string
+  amount: number
+  category: string
+  is_income: boolean
+  count: number
+}
+
+/**
+ * Fetch autocomplete suggestions based on query
+ */
+export async function fetchTransactionSuggestions(
+  query: string,
+  limit: number = 5
+): Promise<TransactionSuggestion[]> {
+  if (!query || query.length < 2) return []
+
+  const response = await apiClient.get<TransactionSuggestion[]>(
+    `/api/transactions/suggestions?q=${encodeURIComponent(query)}&limit=${limit}`
+  )
+  return response.data
+}

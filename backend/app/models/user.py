@@ -37,3 +37,8 @@ class User(Base):
     credit_transactions: Mapped[list["CreditTransaction"]] = relationship(
         "CreditTransaction", back_populates="user", cascade="all, delete-orphan"
     )
+
+    # Recurring transactions relationship
+    recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
+        "RecurringTransaction", back_populates="user", cascade="all, delete-orphan"
+    )

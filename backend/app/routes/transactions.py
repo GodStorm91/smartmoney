@@ -14,6 +14,7 @@ from ..schemas.transaction import (
     TransactionListResponse,
     TransactionResponse,
     TransactionSummaryResponse,
+    TransactionSuggestion,
 )
 from ..services.transaction_service import TransactionService
 from ..utils.transaction_hasher import generate_tx_hash
@@ -160,3 +161,20 @@ async def get_summary(
         end_date=end_date,
     )
     return summary
+
+
+@router.get("/suggestions", response_model=list[TransactionSuggestion])
+async def get_suggestions(
+    q: str = Query(..., min_length=2, max_length=100, description="Search query"),
+    limit: int = Query(5, ge=1, le=10, description="Max suggestions"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get autocomplete suggestions based on recent transactions."""
+    suggestions = TransactionService.get_suggestions(
+        db=db,
+        user_id=current_user.id,
+        query=q,
+        limit=limit,
+    )
+    return suggestions

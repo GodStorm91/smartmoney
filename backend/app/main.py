@@ -9,8 +9,9 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import accounts, analytics, auth, budgets, credits, dashboard, goals, receipts, settings, tags, transactions, upload, exchange_rates
+from .routes import accounts, analytics, auth, budgets, credits, dashboard, goals, receipts, recurring, settings, tags, transactions, upload, exchange_rates
 from .services.exchange_rate_service import ExchangeRateService
+from .services.recurring_service import RecurringTransactionService
 
 logger = logging.getLogger(__name__)
 scheduler = BackgroundScheduler()
@@ -65,6 +66,18 @@ def scheduled_rate_update():
         db.close()
 
 
+def scheduled_recurring_transactions():
+    """Background job to process due recurring transactions daily."""
+    db = SessionLocal()
+    try:
+        created = RecurringTransactionService.process_due_recurring(db)
+        logger.info(f"Scheduled recurring processing: created {created} transactions")
+    except Exception as e:
+        logger.error(f"Scheduled recurring processing failed: {e}")
+    finally:
+        db.close()
+
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
@@ -80,8 +93,19 @@ async def startup_event():
         id="exchange_rate_update",
         replace_existing=True,
     )
+
+    # Schedule daily recurring transaction processing at 00:05 JST (15:05 UTC previous day)
+    scheduler.add_job(
+        scheduled_recurring_transactions,
+        trigger="cron",
+        hour=15,
+        minute=5,
+        id="recurring_transactions",
+        replace_existing=True,
+    )
+
     scheduler.start()
-    logger.info("Exchange rate scheduler started (daily at 4 AM UTC)")
+    logger.info("Schedulers started (exchange rates: 4 AM UTC, recurring: 00:05 JST)")
 
 
 @app.on_event("shutdown")
@@ -105,6 +129,7 @@ app.include_router(exchange_rates.router)
 app.include_router(budgets.router)
 app.include_router(credits.router)
 app.include_router(receipts.router)
+app.include_router(recurring.router)
 
 
 # Root endpoints

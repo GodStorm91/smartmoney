@@ -68,3 +68,13 @@ class TransactionSummaryResponse(BaseModel):
     expenses: int
     net: int
     count: int
+
+
+class TransactionSuggestion(BaseModel):
+    """Schema for autocomplete suggestion."""
+
+    description: str
+    amount: int
+    category: str
+    is_income: bool
+    count: int

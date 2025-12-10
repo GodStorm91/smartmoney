@@ -39,6 +39,9 @@ class Account(Base):
     transactions: Mapped[list["Transaction"]] = relationship(
         "Transaction", back_populates="account", lazy="select"
     )
+    recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
+        "RecurringTransaction", back_populates="account", lazy="select"
+    )
 
     __table_args__ = (
         CheckConstraint(

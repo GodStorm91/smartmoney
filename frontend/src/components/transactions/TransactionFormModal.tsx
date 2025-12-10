@@ -2,10 +2,11 @@ import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Receipt } from 'lucide-react'
 import { cn } from '@/utils/cn'
-import { createTransaction } from '@/services/transaction-service'
+import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { CategoryGrid } from './CategoryGrid'
+import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
 import type { ReceiptData } from '@/services/receipt-service'
@@ -92,6 +93,26 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const rawValue = parseFormattedNumber(e.target.value)
     setAmount(rawValue)
     setDisplayAmount(formatWithCommas(rawValue))
+  }
+
+  // Handle autocomplete suggestion selection - pre-fill form
+  const handleSuggestionSelect = (suggestion: TransactionSuggestion) => {
+    // Set amount
+    const amountStr = suggestion.amount.toString()
+    setAmount(amountStr)
+    setDisplayAmount(formatWithCommas(amountStr))
+
+    // Set income/expense type
+    setIsIncome(suggestion.is_income)
+
+    // Match category
+    const allCategories = suggestion.is_income ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+    const matchedCategory = allCategories.find(
+      c => c.value.toLowerCase() === suggestion.category.toLowerCase()
+    )
+    if (matchedCategory) {
+      setCategoryId(matchedCategory.id)
+    }
   }
 
   // Handle receipt scan completion - pre-fill form with extracted data
@@ -296,21 +317,17 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             )}
           </div>
 
-          {/* Description */}
+          {/* Description with Autocomplete */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('transaction.description', 'Description')}
             </label>
-            <input
-              type="text"
+            <DescriptionAutocomplete
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
+              onSuggestionSelect={handleSuggestionSelect}
               placeholder={t('transaction.descriptionPlaceholder', 'What was this for?')}
-              className={cn(
-                'w-full h-12 px-4 border rounded-lg text-base',
-                'dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400',
-                errors.description ? 'border-red-500' : 'border-gray-300'
-              )}
+              error={!!errors.description}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-500">{errors.description}</p>

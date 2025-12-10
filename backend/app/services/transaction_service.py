@@ -2,7 +2,7 @@
 from datetime import date
 from typing import Optional
 
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -274,3 +274,77 @@ class TransactionService:
             "net": income - expenses,
             "count": len(transactions),
         }
+
+    @staticmethod
+    def get_suggestions(
+        db: Session,
+        user_id: int,
+        query: str,
+        limit: int = 5,
+    ) -> list[dict]:
+        """Get autocomplete suggestions based on recent transactions.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            query: Search query (prefix match on description)
+            limit: Maximum suggestions to return
+
+        Returns:
+            List of suggestion dicts with description, amount, category, is_income, count
+        """
+        if not query or len(query) < 2:
+            return []
+
+        # Query transactions matching the description prefix
+        # Group by description to get unique suggestions
+        # Return most recent amount/category for each description
+        subquery = (
+            db.query(
+                Transaction.description,
+                Transaction.amount,
+                Transaction.category,
+                Transaction.is_income,
+                Transaction.date,
+                func.count(Transaction.id).over(
+                    partition_by=Transaction.description
+                ).label("count"),
+                func.row_number().over(
+                    partition_by=Transaction.description,
+                    order_by=desc(Transaction.date)
+                ).label("rn")
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.description.ilike(f"%{query}%"),
+                ~Transaction.is_transfer,
+                ~Transaction.is_adjustment,
+            )
+            .subquery()
+        )
+
+        # Get only the most recent transaction per description
+        results = (
+            db.query(
+                subquery.c.description,
+                subquery.c.amount,
+                subquery.c.category,
+                subquery.c.is_income,
+                subquery.c.count,
+            )
+            .filter(subquery.c.rn == 1)
+            .order_by(desc(subquery.c.count), desc(subquery.c.date))
+            .limit(limit)
+            .all()
+        )
+
+        return [
+            {
+                "description": r.description,
+                "amount": abs(r.amount),  # Return positive amount
+                "category": r.category,
+                "is_income": r.is_income,
+                "count": r.count,
+            }
+            for r in results
+        ]
