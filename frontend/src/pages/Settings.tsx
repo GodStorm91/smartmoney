@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RecurringTransactionsList } from '@/components/recurring/RecurringTransactionsList'
+import { CategoryRulesList } from '@/components/settings/CategoryRulesList'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 
 export function Settings() {
@@ -175,6 +176,9 @@ export function Settings() {
             <Button variant="outline">{t('settings.addSource')}</Button>
           </div>
         </Card>
+
+        {/* Category Rules */}
+        <CategoryRulesList />
 
         {/* Recurring Transactions */}
         <RecurringTransactionsList />

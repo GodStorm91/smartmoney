@@ -11,12 +11,14 @@
  */
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, X, Delete } from 'lucide-react'
+import { Plus, X, Delete, Mic } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { useRatesMap } from '@/hooks/useExchangeRates'
+import { useVoiceInput } from '@/hooks/useVoiceInput'
+import { parseVoiceTransaction } from '@/utils/parseVoiceTransaction'
 import { EXPENSE_CATEGORIES } from './constants/categories'
 
 // Currency symbols map
@@ -50,6 +52,28 @@ export function QuickEntryFAB() {
   const [categoryId, setCategoryId] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [inputCurrency, setInputCurrency] = useState<SupportedCurrency>('JPY')
+  const [voiceDescription, setVoiceDescription] = useState('')
+
+  // Voice input hook
+  const {
+    status: voiceStatus,
+    transcript,
+    isSupported: voiceSupported,
+    startListening,
+    stopListening,
+  } = useVoiceInput({
+    language: 'ja-JP',
+    onResult: (text) => {
+      const parsed = parseVoiceTransaction(text)
+      if (parsed) {
+        setAmount(parsed.amount.toString())
+        setInputCurrency(parsed.currency)
+        setVoiceDescription(parsed.description)
+        // Auto-advance to category selection
+        setStep('category')
+      }
+    },
+  })
 
   // Get selected account
   const selectedAccount = accounts?.find(a => a.id === accountId)
@@ -163,7 +187,7 @@ export function QuickEntryFAB() {
     try {
       await createMutation.mutateAsync({
         date: new Date().toISOString().split('T')[0],
-        description: selectedCategory.value, // Use category as description
+        description: voiceDescription || selectedCategory.value, // Use voice description if available
         amount: -finalAmount, // Negative for expense
         category: selectedCategory.value,
         source: account.name,
@@ -182,6 +206,7 @@ export function QuickEntryFAB() {
     setStep('closed')
     setAmount('')
     setCategoryId('')
+    setVoiceDescription('')
     // Reset currency to default (will be set by account effect)
   }
 
@@ -317,19 +342,47 @@ export function QuickEntryFAB() {
               ))}
             </div>
 
-            {/* Next Button */}
-            <button
-              onClick={handleNext}
-              disabled={!amount}
-              className={cn(
-                'w-full h-14 mt-4 rounded-xl font-medium text-white transition-all',
-                amount
-                  ? 'bg-blue-500 hover:bg-blue-600'
-                  : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+            {/* Next Button with Voice Input */}
+            <div className="flex gap-3 mt-4">
+              {/* Voice Input Button */}
+              {voiceSupported && (
+                <button
+                  onClick={voiceStatus === 'listening' ? stopListening : startListening}
+                  className={cn(
+                    'h-14 w-14 rounded-xl flex items-center justify-center transition-all',
+                    voiceStatus === 'listening'
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                  title={voiceStatus === 'listening' ? t('voiceInput.listening') : t('voiceInput.tap')}
+                >
+                  <Mic size={24} />
+                </button>
               )}
-            >
-              {t('common.next', 'Next')}
-            </button>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNext}
+                disabled={!amount}
+                className={cn(
+                  'flex-1 h-14 rounded-xl font-medium text-white transition-all',
+                  amount
+                    ? 'bg-blue-500 hover:bg-blue-600'
+                    : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                )}
+              >
+                {t('common.next', 'Next')}
+              </button>
+            </div>
+
+            {/* Voice Transcript Preview */}
+            {voiceStatus === 'listening' && transcript && (
+              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
+                  {transcript}
+                </p>
+              </div>
+            )}
           </div>
         )}
 

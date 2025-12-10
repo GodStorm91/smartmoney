@@ -42,3 +42,8 @@ class User(Base):
     recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
         "RecurringTransaction", back_populates="user", cascade="all, delete-orphan"
     )
+
+    # Category rules relationship
+    category_rules: Mapped[list["CategoryRule"]] = relationship(
+        "CategoryRule", back_populates="user", cascade="all, delete-orphan"
+    )

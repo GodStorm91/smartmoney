@@ -524,5 +524,36 @@
         "description": "Định nghĩa mục tiêu tiết kiệm 1, 3, 5, 10 năm"
       }
     }
+  },
+  "categoryRules": {
+    "title": "Quy tắc danh mục",
+    "keyword": "Từ khóa",
+    "category": "Danh mục",
+    "matchType": "Kiểu khớp",
+    "contains": "Chứa",
+    "startsWith": "Bắt đầu với",
+    "exact": "Khớp chính xác",
+    "priority": "Ưu tiên",
+    "addRule": "Thêm quy tắc",
+    "seedDefaults": "Thêm quy tắc mặc định",
+    "applyDescription": "Áp dụng quy tắc để phân loại lại các giao dịch 'Khác'",
+    "preview": "Xem trước",
+    "applyNow": "Áp dụng ngay",
+    "previewCount": "{{count}} giao dịch sẽ được cập nhật",
+    "appliedCount": "Đã cập nhật {{count}} giao dịch",
+    "noRules": "Chưa có quy tắc danh mục",
+    "noRulesDescription": "Thêm quy tắc để tự động phân loại giao dịch theo từ khóa",
+    "showSuggestions": "Hiện gợi ý dựa trên dữ liệu của bạn",
+    "hideSuggestions": "Ẩn gợi ý",
+    "noSuggestions": "Không có gợi ý"
+  },
+  "voiceInput": {
+    "tap": "Chạm để nói",
+    "listening": "Đang nghe...",
+    "processing": "Đang xử lý...",
+    "tryAgain": "Không nghe rõ, vui lòng thử lại",
+    "notSupported": "Trình duyệt này không hỗ trợ nhập liệu bằng giọng nói",
+    "confirm": "Thêm giao dịch này?",
+    "edit": "Chỉnh sửa"
   }
 }
