@@ -1,12 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Receipt } from 'lucide-react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Receipt, RefreshCw } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
+import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { CategoryGrid } from './CategoryGrid'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
+import { RecurringOptions } from './RecurringOptions'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
 import type { ReceiptData } from '@/services/receipt-service'
@@ -38,6 +41,7 @@ function parseFormattedNumber(value: string): string {
 export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalProps) {
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
+  const queryClient = useQueryClient()
 
   // Form state
   const [isIncome, setIsIncome] = useState(false)
@@ -49,6 +53,13 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showScanner, setShowScanner] = useState(false)
+
+  // Recurring state
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [frequency, setFrequency] = useState<FrequencyType>('monthly')
+  const [dayOfWeek, setDayOfWeek] = useState(0)
+  const [dayOfMonth, setDayOfMonth] = useState(25)
+  const [intervalDays, setIntervalDays] = useState(7)
 
   // Get selected account and its currency
   const selectedAccount = useMemo(() => {
@@ -73,6 +84,12 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       setCategoryId('')
       setAccountId(accounts?.[0]?.id || null)
       setErrors({})
+      // Reset recurring state
+      setIsRecurring(false)
+      setFrequency('monthly')
+      setDayOfWeek(0)
+      setDayOfMonth(25)
+      setIntervalDays(7)
     }
   }, [isOpen, accounts])
 
@@ -87,6 +104,14 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     'transaction',
     [['transactions'], ['analytics']]
   )
+
+  // Recurring transaction mutation
+  const recurringMutation = useMutation({
+    mutationFn: createRecurringTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] })
+    },
+  })
 
   // Handle amount input with formatting
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,15 +206,31 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const amountValue = parseInt(amount)
 
     try {
-      await createMutation.mutateAsync({
-        date,
-        description: description.trim(),
-        amount: isIncome ? amountValue : -amountValue,
-        category: selectedCategory?.value || 'Other',
-        source: selectedAccount?.name || '',
-        type: isIncome ? 'income' : 'expense',
-      })
-      // Close modal on success (works both online and offline-queued)
+      if (isRecurring) {
+        // Create recurring transaction
+        await recurringMutation.mutateAsync({
+          description: description.trim(),
+          amount: amountValue,
+          category: selectedCategory?.value || 'Other',
+          account_id: accountId,
+          is_income: isIncome,
+          frequency,
+          day_of_week: frequency === 'weekly' ? dayOfWeek : null,
+          day_of_month: frequency === 'monthly' ? dayOfMonth : null,
+          interval_days: frequency === 'custom' ? intervalDays : null,
+          start_date: date,
+        })
+      } else {
+        // Create one-time transaction
+        await createMutation.mutateAsync({
+          date,
+          description: description.trim(),
+          amount: isIncome ? amountValue : -amountValue,
+          category: selectedCategory?.value || 'Other',
+          source: selectedAccount?.name || '',
+          type: isIncome ? 'income' : 'expense',
+        })
+      }
       onClose()
     } catch {
       // Error handled by mutation state
@@ -375,6 +416,35 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             )}
           </div>
 
+          {/* Recurring Toggle */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+              />
+              <RefreshCw className="w-4 h-4 text-blue-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('recurring.makeRecurring')}
+              </span>
+            </label>
+
+            {isRecurring && (
+              <RecurringOptions
+                frequency={frequency}
+                setFrequency={setFrequency}
+                dayOfWeek={dayOfWeek}
+                setDayOfWeek={setDayOfWeek}
+                dayOfMonth={dayOfMonth}
+                setDayOfMonth={setDayOfMonth}
+                intervalDays={intervalDays}
+                setIntervalDays={setIntervalDays}
+              />
+            )}
+          </div>
+
           {/* Submit buttons */}
           <div className="flex gap-3 pt-4">
             <button
@@ -386,14 +456,14 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             </button>
             <button
               type="submit"
-              disabled={createMutation.isPending}
+              disabled={createMutation.isPending || recurringMutation.isPending}
               className={cn(
                 'flex-1 h-12 rounded-lg font-medium text-white',
-                isIncome ? 'bg-green-500' : 'bg-red-500',
-                createMutation.isPending && 'opacity-50 cursor-not-allowed'
+                isRecurring ? 'bg-blue-500' : (isIncome ? 'bg-green-500' : 'bg-red-500'),
+                (createMutation.isPending || recurringMutation.isPending) && 'opacity-50 cursor-not-allowed'
               )}
             >
-              {createMutation.isPending
+              {(createMutation.isPending || recurringMutation.isPending)
                 ? t('common.saving', 'Saving...')
                 : t('common.save', 'Save')
               }
@@ -401,7 +471,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           </div>
 
           {/* Error message */}
-          {createMutation.isError && (
+          {(createMutation.isError || recurringMutation.isError) && (
             <p className="text-sm text-red-500 text-center">
               {t('transaction.errors.createFailed', 'Failed to create transaction')}
             </p>
