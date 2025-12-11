@@ -82,6 +82,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   const statusRef = useRef<VoiceInputStatus>('idle')
   const onResultRef = useRef(onResult)
   const onErrorRef = useRef(onError)
+  const isStartingRef = useRef(false) // Prevent duplicate starts
 
   // Keep refs in sync with current values (avoid stale closures)
   useEffect(() => {
@@ -105,13 +106,14 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     if (!SpeechRecognition) return
 
     const recognition = new SpeechRecognition()
-    recognition.continuous = false
+    recognition.continuous = true // Keep listening until explicitly stopped (PTT mode)
     recognition.interimResults = true
     recognition.lang = language
 
     recognition.onstart = () => {
-      setStatus('listening')
+      isStartingRef.current = false
       setError(null)
+      // Status already set in startListening for instant feedback
     }
 
     recognition.onresult = (event) => {
@@ -121,13 +123,15 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
       setTranscript(text)
 
-      if (lastResult.isFinal) {
-        setStatus('processing')
-        onResultRef.current?.(text)
-      }
+      // Don't auto-process on final result - wait for user to release button
+      // The onResult callback will be called when user releases (stopListening)
     }
 
     recognition.onerror = (event) => {
+      isStartingRef.current = false
+      // Ignore 'aborted' errors (user stopped listening)
+      if (event.error === 'aborted') return
+
       const errorMessage = event.error === 'no-speech'
         ? 'No speech detected'
         : event.error === 'audio-capture'
@@ -142,7 +146,9 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     }
 
     recognition.onend = () => {
-      // Use ref to get current status (avoid stale closure)
+      isStartingRef.current = false
+      // Only reset to idle if we're still in listening state
+      // (not if we transitioned to processing)
       if (statusRef.current === 'listening') {
         setStatus('idle')
       }
@@ -157,28 +163,41 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return
+    // Prevent duplicate starts from touch + mouse events
+    if (isStartingRef.current || statusRef.current === 'listening') return
 
+    isStartingRef.current = true
     setTranscript('')
     setError(null)
+    setStatus('listening') // Set immediately for instant UI feedback
 
     try {
       recognitionRef.current.start()
     } catch (err) {
       // Recognition might already be started
       console.warn('Speech recognition start error:', err)
+      isStartingRef.current = false
     }
   }, [])
 
   const stopListening = useCallback(() => {
     if (!recognitionRef.current) return
+    if (statusRef.current !== 'listening') return
 
     try {
       recognitionRef.current.stop()
     } catch (err) {
       console.warn('Speech recognition stop error:', err)
     }
-    setStatus('idle')
-  }, [])
+
+    // If we have a transcript, process it
+    if (transcript) {
+      setStatus('processing')
+      onResultRef.current?.(transcript)
+    } else {
+      setStatus('idle')
+    }
+  }, [transcript])
 
   const resetTranscript = useCallback(() => {
     setTranscript('')
