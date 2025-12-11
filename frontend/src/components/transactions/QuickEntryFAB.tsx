@@ -69,8 +69,23 @@ export function QuickEntryFAB() {
         setAmount(parsed.amount.toString())
         setInputCurrency(parsed.currency)
         setVoiceDescription(parsed.description)
-        // Auto-advance to category selection
-        setStep('category')
+
+        // If category was auto-detected, skip category selection
+        if (parsed.suggestedCategoryId) {
+          setCategoryId(parsed.suggestedCategoryId)
+          // If only one account, save immediately
+          if (accounts?.length === 1) {
+            // Delay to ensure state is set
+            setTimeout(() => {
+              handleSave(parsed.suggestedCategoryId)
+            }, 100)
+          } else {
+            setStep('account')
+          }
+        } else {
+          // No category detected, go to category selection
+          setStep('category')
+        }
       }
     },
   })
