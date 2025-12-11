@@ -83,6 +83,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   const onResultRef = useRef(onResult)
   const onErrorRef = useRef(onError)
   const isStartingRef = useRef(false) // Prevent duplicate starts
+  const isPressedRef = useRef(false) // Track if user is holding the button (PTT mode)
 
   // Keep refs in sync with current values (avoid stale closures)
   useEffect(() => {
@@ -147,9 +148,12 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
     recognition.onend = () => {
       isStartingRef.current = false
-      // Only reset to idle if we're still in listening state
-      // (not if we transitioned to processing)
-      if (statusRef.current === 'listening') {
+      // In PTT mode: Do NOT reset status here!
+      // Status is controlled by stopListening() when user releases button.
+      // If recognition ends while user is still pressing (e.g., permission prompt,
+      // no mic, timeout), we keep status as 'listening' to maintain UI state.
+      // Only reset if user has released the button (isPressedRef = false)
+      if (!isPressedRef.current && statusRef.current === 'listening') {
         setStatus('idle')
       }
     }
@@ -167,6 +171,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     if (isStartingRef.current || statusRef.current === 'listening') return
 
     isStartingRef.current = true
+    isPressedRef.current = true // User is holding the button
     setTranscript('')
     setError(null)
     setStatus('listening') // Set immediately for instant UI feedback
@@ -177,10 +182,13 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
       // Recognition might already be started
       console.warn('Speech recognition start error:', err)
       isStartingRef.current = false
+      // Don't reset isPressedRef here - user might still be pressing
     }
   }, [])
 
   const stopListening = useCallback(() => {
+    isPressedRef.current = false // User released the button
+
     if (!recognitionRef.current) return
     if (statusRef.current !== 'listening') return
 
