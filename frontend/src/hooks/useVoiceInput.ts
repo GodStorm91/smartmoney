@@ -79,6 +79,19 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
   const [isSupported, setIsSupported] = useState(false)
 
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+  const statusRef = useRef<VoiceInputStatus>('idle')
+  const onResultRef = useRef(onResult)
+  const onErrorRef = useRef(onError)
+
+  // Keep refs in sync with current values (avoid stale closures)
+  useEffect(() => {
+    statusRef.current = status
+  }, [status])
+
+  useEffect(() => {
+    onResultRef.current = onResult
+    onErrorRef.current = onError
+  }, [onResult, onError])
 
   // Check browser support
   useEffect(() => {
@@ -86,7 +99,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     setIsSupported(!!SpeechRecognition)
   }, [])
 
-  // Initialize recognition
+  // Initialize recognition - only depends on language, NOT on status
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) return
@@ -110,7 +123,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
       if (lastResult.isFinal) {
         setStatus('processing')
-        onResult?.(text)
+        onResultRef.current?.(text)
       }
     }
 
@@ -125,11 +138,12 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
 
       setError(errorMessage)
       setStatus('error')
-      onError?.(errorMessage)
+      onErrorRef.current?.(errorMessage)
     }
 
     recognition.onend = () => {
-      if (status === 'listening') {
+      // Use ref to get current status (avoid stale closure)
+      if (statusRef.current === 'listening') {
         setStatus('idle')
       }
     }
@@ -139,7 +153,7 @@ export function useVoiceInput(options: UseVoiceInputOptions = {}): UseVoiceInput
     return () => {
       recognition.abort()
     }
-  }, [language, onResult, onError, status])
+  }, [language]) // Removed status, onResult, onError from deps - they cause re-init
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return
