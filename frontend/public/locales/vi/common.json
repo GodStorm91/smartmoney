@@ -549,6 +549,7 @@
   },
   "voiceInput": {
     "tap": "Chạm để nói",
+    "holdToTalk": "Nhấn giữ để nói",
     "listening": "Đang nghe...",
     "processing": "Đang xử lý...",
     "tryAgain": "Không nghe rõ, vui lòng thử lại",

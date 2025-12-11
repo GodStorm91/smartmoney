@@ -344,17 +344,22 @@ export function QuickEntryFAB() {
 
             {/* Next Button with Voice Input */}
             <div className="flex gap-3 mt-4">
-              {/* Voice Input Button */}
+              {/* Voice Input Button - Press and Hold to Talk */}
               {voiceSupported && (
                 <button
-                  onClick={voiceStatus === 'listening' ? stopListening : startListening}
+                  onMouseDown={startListening}
+                  onMouseUp={stopListening}
+                  onMouseLeave={voiceStatus === 'listening' ? stopListening : undefined}
+                  onTouchStart={startListening}
+                  onTouchEnd={stopListening}
+                  onTouchCancel={stopListening}
                   className={cn(
-                    'h-14 w-14 rounded-xl flex items-center justify-center transition-all',
+                    'h-14 w-14 rounded-xl flex items-center justify-center transition-all select-none touch-none',
                     voiceStatus === 'listening'
-                      ? 'bg-red-500 text-white animate-pulse'
+                      ? 'bg-red-500 text-white animate-pulse scale-110'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   )}
-                  title={voiceStatus === 'listening' ? t('voiceInput.listening') : t('voiceInput.tap')}
+                  title={t('voiceInput.holdToTalk', 'Hold to talk')}
                 >
                   <Mic size={24} />
                 </button>
@@ -376,10 +381,10 @@ export function QuickEntryFAB() {
             </div>
 
             {/* Voice Transcript Preview */}
-            {voiceStatus === 'listening' && transcript && (
-              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                <p className="text-sm text-blue-700 dark:text-blue-300 text-center">
-                  {transcript}
+            {voiceStatus === 'listening' && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border-2 border-red-300 dark:border-red-700">
+                <p className="text-sm text-red-600 dark:text-red-400 text-center font-medium">
+                  {transcript || t('voiceInput.listening', 'Listening...')}
                 </p>
               </div>
             )}
