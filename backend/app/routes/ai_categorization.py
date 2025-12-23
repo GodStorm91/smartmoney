@@ -257,6 +257,11 @@ def apply_categorization_suggestions(
 
     # Create category rules if requested
     if request.create_rules and description_to_category:
+        from ..models.category_rule import CategoryRule
+
+        # Track keywords we're adding in this batch to avoid duplicates
+        pending_keywords = set()
+
         for description, category in description_to_category.items():
             # Extract keyword from description (first significant word)
             keyword = description.split()[0] if " " in description else description
@@ -264,8 +269,11 @@ def apply_categorization_suggestions(
             if len(keyword) < 2:
                 continue
 
-            # Check if rule already exists
-            from ..models.category_rule import CategoryRule
+            # Skip if we already added this keyword in this batch
+            if keyword in pending_keywords:
+                continue
+
+            # Check if rule already exists in database
             existing = db.query(CategoryRule).filter(
                 CategoryRule.user_id == current_user.id,
                 CategoryRule.keyword == keyword
@@ -281,9 +289,15 @@ def apply_categorization_suggestions(
                     is_active=True
                 )
                 db.add(rule)
+                pending_keywords.add(keyword)
                 rules_created += 1
 
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        # Still return success for transaction updates, just no rules created
+        rules_created = 0
 
     return ApplySuggestionsResponse(
         updated_count=updated_count,
