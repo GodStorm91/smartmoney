@@ -57,7 +57,7 @@ async def get_transactions(
     is_income: Optional[bool] = Query(None, description="Filter by income flag"),
     is_transfer: Optional[bool] = Query(None, description="Filter by transfer flag"),
     search: Optional[str] = Query(None, min_length=2, max_length=100, description="Search description"),
-    limit: int = Query(100, ge=1, le=1000, description="Results per page"),
+    limit: int = Query(100, ge=1, le=5000, description="Results per page"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
