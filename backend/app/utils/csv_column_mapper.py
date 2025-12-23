@@ -8,6 +8,12 @@ class CSVParseError(Exception):
     pass
 
 
+def is_paypay_format(df: pd.DataFrame) -> bool:
+    """Check if the CSV is in PayPay export format."""
+    paypay_columns = ["Date & Time", "Amount Outgoing (Yen)", "Business Name", "Transaction Type"]
+    return all(col in df.columns for col in paypay_columns)
+
+
 def map_columns(df: pd.DataFrame, filename: str) -> dict:
     """Map CSV columns to standard field names.
 
@@ -22,6 +28,17 @@ def map_columns(df: pd.DataFrame, filename: str) -> dict:
         CSVParseError: If required columns are missing
     """
     column_map = {}
+
+    # Check for PayPay format first
+    if is_paypay_format(df):
+        column_map["date"] = "Date & Time"
+        column_map["description"] = "Business Name"
+        column_map["amount_out"] = "Amount Outgoing (Yen)"
+        column_map["amount_in"] = "Amount Incoming (Yen)"
+        column_map["category"] = "Transaction Type"
+        column_map["source"] = "Method"
+        column_map["format"] = "paypay"
+        return column_map
 
     # Date column
     for col in ["日付", "Date", "date"]:
