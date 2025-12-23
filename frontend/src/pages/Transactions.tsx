@@ -52,6 +52,10 @@ export function Transactions() {
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
+  // Show count state for display limit
+  type ShowCount = 50 | 100 | 'all'
+  const [showCount, setShowCount] = useState<ShowCount>(50)
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
@@ -199,13 +203,19 @@ export function Transactions() {
     })
   }, [transactions, sortField, sortDirection])
 
+  // Apply display limit
+  const displayedTransactions = useMemo(() => {
+    if (showCount === 'all') return sortedTransactions
+    return sortedTransactions.slice(0, showCount)
+  }, [sortedTransactions, showCount])
+
   // Group transactions by date for mobile view
   const groupedTransactions = useMemo(() => {
-    if (!sortedTransactions.length) return []
+    if (!displayedTransactions.length) return []
     const groups: { date: string; transactions: Transaction[] }[] = []
     let currentDate = ''
 
-    sortedTransactions.forEach(tx => {
+    displayedTransactions.forEach(tx => {
       if (tx.date !== currentDate) {
         currentDate = tx.date
         groups.push({ date: tx.date, transactions: [tx] })
@@ -215,7 +225,7 @@ export function Transactions() {
     })
 
     return groups
-  }, [sortedTransactions])
+  }, [displayedTransactions])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
@@ -301,6 +311,47 @@ export function Transactions() {
           </p>
         </Card>
       </div>
+
+      {/* Show Count Toggle */}
+      {!isLoading && transactions && transactions.length > 0 && (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.show', 'Show')}:</span>
+            {/* Desktop: pills */}
+            <div className="hidden md:flex gap-1">
+              {([50, 100, 'all'] as const).map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => setShowCount(opt)}
+                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                    showCount === opt
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  {opt === 'all' ? t('transactions.showAll', 'All') : opt}
+                </button>
+              ))}
+            </div>
+            {/* Mobile: dropdown */}
+            <select
+              value={showCount}
+              onChange={(e) => setShowCount(e.target.value === 'all' ? 'all' : Number(e.target.value) as 50 | 100)}
+              className="md:hidden px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+            >
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value="all">{t('transactions.showAll', 'All')}</option>
+            </select>
+          </div>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {t('transactions.showingCount', 'Showing {{shown}} of {{total}}', {
+              shown: displayedTransactions.length,
+              total: sortedTransactions.length
+            })}
+          </span>
+        </div>
+      )}
 
       {/* Transactions Table/List */}
       {isLoading ? (
@@ -401,7 +452,7 @@ export function Transactions() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-                {sortedTransactions.map((tx) => (
+                {displayedTransactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td className="px-4 py-4">
                       <input

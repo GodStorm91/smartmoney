@@ -85,7 +85,10 @@
     "categoryHousing": "Nhà ở",
     "sourceRakuten": "Thẻ Rakuten",
     "actions": "Thao tác",
-    "export": "Xuất CSV"
+    "export": "Xuất CSV",
+    "show": "Hiển thị",
+    "showAll": "Tất cả",
+    "showingCount": "Đang hiển thị {{shown}} / {{total}}"
   },
   "transaction": {
     "editTitle": "Chỉnh sửa giao dịch",

@@ -85,7 +85,10 @@
     "categoryHousing": "Housing",
     "sourceRakuten": "Rakuten Card",
     "actions": "Actions",
-    "export": "Export CSV"
+    "export": "Export CSV",
+    "show": "Show",
+    "showAll": "All",
+    "showingCount": "Showing {{shown}} of {{total}}"
   },
   "transaction": {
     "editTitle": "Edit Transaction",

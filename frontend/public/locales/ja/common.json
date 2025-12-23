@@ -85,7 +85,10 @@
     "categoryHousing": "住宅",
     "sourceRakuten": "楽天カード",
     "actions": "操作",
-    "export": "CSVエクスポート"
+    "export": "CSVエクスポート",
+    "show": "表示",
+    "showAll": "すべて",
+    "showingCount": "{{shown}} / {{total}}件を表示"
   },
   "transaction": {
     "addTransaction": "取引を追加",
