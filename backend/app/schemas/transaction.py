@@ -1,5 +1,5 @@
 """Transaction schemas for API validation."""
-from datetime import date
+import datetime
 from typing import Union
 
 from pydantic import BaseModel, Field
@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 class TransactionBase(BaseModel):
     """Base transaction schema."""
 
-    date: date
+    date: datetime.date
     description: str = Field(..., max_length=500)
     amount: int = Field(..., description="Amount in JPY as integer")
     category: str = Field(..., max_length=100)
@@ -29,7 +29,7 @@ class TransactionCreate(TransactionBase):
 class TransactionUpdate(BaseModel):
     """Schema for updating a transaction."""
 
-    date: Union[date, None] = None
+    date: Union[datetime.date, None] = None
     description: Union[str, None] = Field(None, max_length=500)
     amount: Union[int, None] = Field(None, description="Amount in JPY as integer")
     category: Union[str, None] = Field(None, max_length=100)
