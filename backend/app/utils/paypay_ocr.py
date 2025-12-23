@@ -102,7 +102,7 @@ class PayPayOCRService:
 
             # Generate tx_hash for duplicate detection
             tx_hash = generate_tx_hash(
-                date=tx_date,
+                date_str=tx_date,
                 amount=abs(amount),
                 description=description,
                 source="PayPay"
