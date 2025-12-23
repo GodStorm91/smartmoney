@@ -1,6 +1,6 @@
 """Transaction schemas for API validation."""
 from datetime import date
-from typing import Optional
+from typing import Union
 
 from pydantic import BaseModel, Field
 
@@ -12,10 +12,10 @@ class TransactionBase(BaseModel):
     description: str = Field(..., max_length=500)
     amount: int = Field(..., description="Amount in JPY as integer")
     category: str = Field(..., max_length=100)
-    subcategory: Optional[str] = Field(None, max_length=100)
+    subcategory: Union[str, None] = Field(None, max_length=100)
     source: str = Field(..., max_length=100)
-    payment_method: Optional[str] = Field(None, max_length=100)
-    notes: Optional[str] = Field(None, max_length=1000)
+    payment_method: Union[str, None] = Field(None, max_length=100)
+    notes: Union[str, None] = Field(None, max_length=1000)
     is_income: bool = False
     is_transfer: bool = False
 
@@ -29,16 +29,16 @@ class TransactionCreate(TransactionBase):
 class TransactionUpdate(BaseModel):
     """Schema for updating a transaction."""
 
-    date: Optional[date] = None
-    description: Optional[str] = Field(None, max_length=500)
-    amount: Optional[int] = Field(None, description="Amount in JPY as integer")
-    category: Optional[str] = Field(None, max_length=100)
-    subcategory: Optional[str] = Field(None, max_length=100)
-    source: Optional[str] = Field(None, max_length=100)
-    payment_method: Optional[str] = Field(None, max_length=100)
-    notes: Optional[str] = Field(None, max_length=1000)
-    is_income: Optional[bool] = None
-    is_transfer: Optional[bool] = None
+    date: Union[date, None] = None
+    description: Union[str, None] = Field(None, max_length=500)
+    amount: Union[int, None] = Field(None, description="Amount in JPY as integer")
+    category: Union[str, None] = Field(None, max_length=100)
+    subcategory: Union[str, None] = Field(None, max_length=100)
+    source: Union[str, None] = Field(None, max_length=100)
+    payment_method: Union[str, None] = Field(None, max_length=100)
+    notes: Union[str, None] = Field(None, max_length=1000)
+    is_income: Union[bool, None] = None
+    is_transfer: Union[bool, None] = None
 
 
 class TransactionResponse(TransactionBase):
