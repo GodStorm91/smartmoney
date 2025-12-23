@@ -46,6 +46,21 @@ export function Transactions() {
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebouncedValue(searchInput, 300)
 
+  // Sorting state
+  type SortField = 'date' | 'description' | 'category' | 'source' | 'amount'
+  type SortDirection = 'asc' | 'desc'
+  const [sortField, setSortField] = useState<SortField>('date')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('desc')
+    }
+  }
+
   // Update filters when debounced search changes
   useEffect(() => {
     setFilters(prev => ({ ...prev, search: debouncedSearch || undefined }))
@@ -158,13 +173,39 @@ export function Transactions() {
   const expense = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
   const net = income - expense
 
+  // Sort transactions
+  const sortedTransactions = useMemo(() => {
+    if (!transactions) return []
+    return [...transactions].sort((a, b) => {
+      let cmp = 0
+      switch (sortField) {
+        case 'date':
+          cmp = a.date.localeCompare(b.date)
+          break
+        case 'description':
+          cmp = a.description.localeCompare(b.description)
+          break
+        case 'category':
+          cmp = a.category.localeCompare(b.category)
+          break
+        case 'source':
+          cmp = a.source.localeCompare(b.source)
+          break
+        case 'amount':
+          cmp = a.amount - b.amount
+          break
+      }
+      return sortDirection === 'asc' ? cmp : -cmp
+    })
+  }, [transactions, sortField, sortDirection])
+
   // Group transactions by date for mobile view
   const groupedTransactions = useMemo(() => {
-    if (!transactions) return []
+    if (!sortedTransactions.length) return []
     const groups: { date: string; transactions: Transaction[] }[] = []
     let currentDate = ''
 
-    transactions.forEach(tx => {
+    sortedTransactions.forEach(tx => {
       if (tx.date !== currentDate) {
         currentDate = tx.date
         groups.push({ date: tx.date, transactions: [tx] })
@@ -174,7 +215,7 @@ export function Transactions() {
     })
 
     return groups
-  }, [transactions])
+  }, [sortedTransactions])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
@@ -301,16 +342,66 @@ export function Transactions() {
                       className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
                     />
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.date')}</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.description')}</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.category')}</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.source')}</th>
-                  <th className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.amount')}</th>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
+                    onClick={() => handleSort('date')}
+                  >
+                    <span className="flex items-center gap-1">
+                      {t('transactions.date')}
+                      {sortField === 'date' && (
+                        <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </span>
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
+                    onClick={() => handleSort('description')}
+                  >
+                    <span className="flex items-center gap-1">
+                      {t('transactions.description')}
+                      {sortField === 'description' && (
+                        <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </span>
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
+                    onClick={() => handleSort('category')}
+                  >
+                    <span className="flex items-center gap-1">
+                      {t('transactions.category')}
+                      {sortField === 'category' && (
+                        <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </span>
+                  </th>
+                  <th
+                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
+                    onClick={() => handleSort('source')}
+                  >
+                    <span className="flex items-center gap-1">
+                      {t('transactions.source')}
+                      {sortField === 'source' && (
+                        <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </span>
+                  </th>
+                  <th
+                    className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
+                    onClick={() => handleSort('amount')}
+                  >
+                    <span className="flex items-center justify-end gap-1">
+                      {t('transactions.amount')}
+                      {sortField === 'amount' && (
+                        <span className="text-blue-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                      )}
+                    </span>
+                  </th>
                   <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase w-24">{t('transactions.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
-                {transactions.map((tx) => (
+                {sortedTransactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td className="px-4 py-4">
                       <input
