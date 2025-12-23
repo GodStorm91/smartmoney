@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import accounts, analytics, auth, budgets, category_rules, credits, dashboard, goals, receipts, recurring, settings, tags, transactions, upload, exchange_rates
+from .routes import accounts, analytics, auth, budgets, category_rules, credits, dashboard, goals, receipts, recurring, settings, tags, transactions, upload, exchange_rates, user_categories
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
 
@@ -131,6 +131,7 @@ app.include_router(credits.router)
 app.include_router(receipts.router)
 app.include_router(recurring.router)
 app.include_router(category_rules.router)
+app.include_router(user_categories.router)
 
 
 # Root endpoints

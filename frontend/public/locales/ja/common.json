@@ -249,7 +249,17 @@
     "bonus": "ボーナス",
     "investment": "投資",
     "freelance": "副業",
-    "refund": "返金"
+    "refund": "返金",
+    "addCustom": "追加",
+    "createTitle": "カテゴリを作成",
+    "name": "カテゴリ名",
+    "namePlaceholder": "例: サブスク",
+    "icon": "アイコン",
+    "type": "種類",
+    "errors": {
+      "nameRequired": "カテゴリ名は必須です",
+      "createFailed": "カテゴリの作成に失敗しました"
+    }
   },
   "chart": {
     "trend12months": "12ヶ月のトレンド",

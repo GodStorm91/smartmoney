@@ -262,7 +262,17 @@
     "bonus": "Bonus",
     "investment": "Investment",
     "freelance": "Freelance",
-    "refund": "Refund"
+    "refund": "Refund",
+    "addCustom": "Add",
+    "createTitle": "Create Category",
+    "name": "Category Name",
+    "namePlaceholder": "e.g., Subscriptions",
+    "icon": "Icon",
+    "type": "Type",
+    "errors": {
+      "nameRequired": "Category name is required",
+      "createFailed": "Failed to create category"
+    }
   },
   "chart": {
     "trend12months": "12-Month Trend",

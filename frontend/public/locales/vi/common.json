@@ -262,7 +262,17 @@
     "bonus": "Thưởng",
     "investment": "Đầu tư",
     "freelance": "Freelance",
-    "refund": "Hoàn tiền"
+    "refund": "Hoàn tiền",
+    "addCustom": "Thêm",
+    "createTitle": "Tạo danh mục",
+    "name": "Tên danh mục",
+    "namePlaceholder": "VD: Đăng ký dịch vụ",
+    "icon": "Biểu tượng",
+    "type": "Loại",
+    "errors": {
+      "nameRequired": "Tên danh mục là bắt buộc",
+      "createFailed": "Không thể tạo danh mục"
+    }
   },
   "chart": {
     "trend12months": "Xu hướng 12 tháng",

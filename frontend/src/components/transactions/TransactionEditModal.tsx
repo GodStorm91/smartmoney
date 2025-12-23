@@ -5,6 +5,9 @@ import { updateTransaction, deleteTransaction } from '@/services/transaction-ser
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
+import { CategoryGrid } from './CategoryGrid'
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
+import { useCustomCategories } from '@/hooks/useCategories'
 import type { Transaction } from '@/types'
 import { cn } from '@/utils/cn'
 
@@ -21,15 +24,20 @@ export function TransactionEditModal({
 }: TransactionEditModalProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
+  const { data: customCategories = [] } = useCustomCategories()
 
   // Form state
   const [date, setDate] = useState('')
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
+  const [categoryId, setCategoryId] = useState('')
   const [source, setSource] = useState('')
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Get categories based on type
+  const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
 
   // Update mutation
   const updateMutation = useMutation({
@@ -64,8 +72,41 @@ export function TransactionEditModal({
       setSource(transaction.source)
       setType(transaction.type)
       setShowDeleteConfirm(false)
+
+      // Match category to predefined or custom
+      const allPredefined = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]
+      const matchedPredefined = allPredefined.find(
+        c => c.value.toLowerCase() === transaction.category.toLowerCase()
+      )
+      if (matchedPredefined) {
+        setCategoryId(matchedPredefined.id)
+      } else {
+        // Check custom categories
+        const matchedCustom = customCategories.find(
+          c => c.name.toLowerCase() === transaction.category.toLowerCase()
+        )
+        if (matchedCustom) {
+          setCategoryId(`custom_${matchedCustom.id}`)
+        } else {
+          setCategoryId('other') // fallback
+        }
+      }
     }
-  }, [transaction, isOpen])
+  }, [transaction, isOpen, customCategories])
+
+  // Reset categoryId when type changes to prevent mismatch
+  useEffect(() => {
+    if (isOpen && categoryId) {
+      const isIncome = type === 'income'
+      const currentCategories = isIncome ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
+      const isPredefinedMatch = currentCategories.some(c => c.id === categoryId)
+
+      if (!isPredefinedMatch && !categoryId.startsWith('custom_')) {
+        // Set to first category of new type or empty
+        setCategoryId('')
+      }
+    }
+  }, [type, isOpen, categoryId])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -73,11 +114,23 @@ export function TransactionEditModal({
     const amountValue = parseFloat(amount)
     if (isNaN(amountValue)) return
 
+    // Resolve category value from categoryId
+    let categoryValue = category // fallback to current
+    if (categoryId.startsWith('custom_')) {
+      const customId = parseInt(categoryId.replace('custom_', ''))
+      const customCat = customCategories.find(c => c.id === customId)
+      categoryValue = customCat?.name || category
+    } else {
+      const allPredefined = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]
+      const predefined = allPredefined.find(c => c.id === categoryId)
+      categoryValue = predefined?.value || category
+    }
+
     updateMutation.mutate({
       date,
       description,
       amount: type === 'expense' ? -Math.abs(amountValue) : Math.abs(amountValue),
-      category,
+      category: categoryValue,
       source,
       type,
     })
@@ -98,18 +151,18 @@ export function TransactionEditModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             {t('transaction.editTitle')}
           </h2>
 
           {showDeleteConfirm ? (
             <div className="space-y-4">
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-300">
                 {t('transaction.deleteConfirm')}
               </p>
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-gray-900 dark:text-gray-100">
                 {transaction.description}
               </p>
               <div className="flex gap-3 pt-4">
@@ -167,12 +220,18 @@ export function TransactionEditModal({
                 ]}
               />
 
-              <Input
-                label={t('transaction.category')}
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                required
-              />
+              {/* Category Grid */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('transaction.category')}
+                </label>
+                <CategoryGrid
+                  categories={categories}
+                  selected={categoryId}
+                  onSelect={setCategoryId}
+                  isIncome={type === 'income'}
+                />
+              </div>
 
               <Input
                 label={t('transaction.source')}

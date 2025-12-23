@@ -11,6 +11,7 @@ import { CategoryGrid } from './CategoryGrid'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
 import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
+import { useCustomCategories } from '@/hooks/useCategories'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
 import type { ReceiptData } from '@/services/receipt-service'
 
@@ -41,6 +42,7 @@ function parseFormattedNumber(value: string): string {
 export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalProps) {
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
+  const { data: customCategories = [] } = useCustomCategories()
   const queryClient = useQueryClient()
 
   // Form state
@@ -202,7 +204,16 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     e.preventDefault()
     if (!validateForm()) return
 
-    const selectedCategory = categories.find(c => c.id === categoryId)
+    // Resolve category value - handle both predefined and custom categories
+    let categoryValue = 'Other'
+    if (categoryId.startsWith('custom_')) {
+      const customId = parseInt(categoryId.replace('custom_', ''))
+      const customCat = customCategories.find(c => c.id === customId)
+      categoryValue = customCat?.name || 'Other'
+    } else {
+      const selectedCategory = categories.find(c => c.id === categoryId)
+      categoryValue = selectedCategory?.value || 'Other'
+    }
     const amountValue = parseInt(amount)
 
     try {
@@ -211,7 +222,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
         await recurringMutation.mutateAsync({
           description: description.trim(),
           amount: amountValue,
-          category: selectedCategory?.value || 'Other',
+          category: categoryValue,
           account_id: accountId,
           is_income: isIncome,
           frequency,
@@ -226,7 +237,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           date,
           description: description.trim(),
           amount: isIncome ? amountValue : -amountValue,
-          category: selectedCategory?.value || 'Other',
+          category: categoryValue,
           source: selectedAccount?.name || '',
           type: isIncome ? 'income' : 'expense',
         })
@@ -384,6 +395,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
               categories={categories}
               selected={categoryId}
               onSelect={setCategoryId}
+              isIncome={isIncome}
             />
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
