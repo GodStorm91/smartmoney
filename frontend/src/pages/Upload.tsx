@@ -6,11 +6,14 @@ import { UploadDropZone } from '@/components/upload/UploadDropZone'
 import { UploadHistoryList } from '@/components/upload/UploadHistoryList'
 import { UploadFAQ } from '@/components/upload/UploadFAQ'
 import { MultipleFileUploadList } from '@/components/upload/MultipleFileUploadList'
-import { uploadCSV, fetchUploadHistory } from '@/services/upload-service'
+import { uploadCSV, uploadPayPayImage, fetchUploadHistory } from '@/services/upload-service'
 import type { FileUploadItem } from '@/types'
+
+type UploadMode = 'csv' | 'paypay'
 
 export function Upload() {
   const { t } = useTranslation('common')
+  const [uploadMode, setUploadMode] = useState<UploadMode>('csv')
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [fileItems, setFileItems] = useState<FileUploadItem[]>([])
@@ -22,7 +25,7 @@ export function Upload() {
   })
 
   const uploadMutation = useMutation({
-    mutationFn: uploadCSV,
+    mutationFn: uploadMode === 'csv' ? uploadCSV : uploadPayPayImage,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['upload-history'] })
       queryClient.invalidateQueries({ queryKey: ['transactions'] })
@@ -30,19 +33,31 @@ export function Upload() {
     },
   })
 
+  // File validation based on mode
+  const isValidFile = (file: File): boolean => {
+    if (uploadMode === 'csv') {
+      return file.name.endsWith('.csv')
+    }
+    return /\.(png|jpg|jpeg)$/i.test(file.name)
+  }
+
+  const maxFileSize = uploadMode === 'csv' ? 50 * 1024 * 1024 : 10 * 1024 * 1024
+  const acceptedTypes = uploadMode === 'csv' ? '.csv' : '.png,.jpg,.jpeg'
+
   const handleFilesSelect = (files: FileList) => {
     const newFiles: FileUploadItem[] = []
 
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
 
-      // Validate file
-      if (!file.name.endsWith('.csv')) {
-        alert(t('upload.alertSelectCSV', { filename: file.name }))
+      // Validate file type based on mode
+      if (!isValidFile(file)) {
+        const alertKey = uploadMode === 'csv' ? 'upload.alertSelectCSV' : 'upload.alertSelectImage'
+        alert(t(alertKey, { filename: file.name }))
         continue
       }
 
-      if (file.size > 50 * 1024 * 1024) {
+      if (file.size > maxFileSize) {
         alert(t('upload.alertMaxSize', { filename: file.name }))
         continue
       }
@@ -152,6 +167,13 @@ export function Upload() {
     setIsDragOver(false)
   }
 
+  const handleModeChange = (mode: UploadMode) => {
+    if (mode !== uploadMode) {
+      setUploadMode(mode)
+      setFileItems([]) // Clear files when switching modes
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Title */}
@@ -162,6 +184,30 @@ export function Upload() {
 
       {/* Upload Zone */}
       <Card className="mb-8">
+        {/* Tab Switcher */}
+        <div className="flex border-b border-gray-200 mb-6">
+          <button
+            onClick={() => handleModeChange('csv')}
+            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+              uploadMode === 'csv'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('upload.tabCSV')}
+          </button>
+          <button
+            onClick={() => handleModeChange('paypay')}
+            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+              uploadMode === 'paypay'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t('upload.tabPayPay')}
+          </button>
+        </div>
+
         <UploadDropZone
           isDragOver={isDragOver}
           uploading={uploading}
@@ -170,6 +216,8 @@ export function Upload() {
           onDragLeave={handleDragLeave}
           onFileSelect={handleFilesSelect}
           hasFiles={fileItems.length > 0}
+          acceptedTypes={acceptedTypes}
+          uploadMode={uploadMode}
         />
 
         {/* Multiple File Upload List */}

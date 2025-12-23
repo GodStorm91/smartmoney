@@ -1,4 +1,6 @@
-"""CSV upload API route."""
+"""CSV and PayPay image upload API routes."""
+import base64
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -8,6 +10,7 @@ from ..database import get_db
 from ..models.user import User
 from ..services.transaction_service import TransactionService
 from ..utils.csv_parser import CSVParseError, parse_csv
+from ..utils.paypay_ocr import paypay_ocr
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
@@ -82,6 +85,85 @@ async def upload_csv(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to process CSV: {str(e)}"
+        )
+
+
+# Allowed image types for PayPay OCR
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": "image/jpeg",
+    "image/png": "image/png",
+    "image/jpg": "image/jpeg",
+}
+
+
+@router.post("/paypay", response_model=UploadResponse)
+async def upload_paypay_screenshot(
+    file: UploadFile = File(..., description="PayPay screenshot image"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Upload PayPay screenshot and extract transactions using OCR.
+
+    Accepts PNG/JPG images of PayPay transaction history.
+    Uses Claude Vision API to extract transaction data.
+
+    Returns summary of imported transactions.
+    """
+    # Validate content type
+    content_type = file.content_type
+    if content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid image type. Allowed: JPEG, PNG. Got: {content_type}"
+        )
+
+    # File size limit (10MB for images)
+    MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10MB in bytes
+    file_content = await file.read()
+    if len(file_content) > MAX_IMAGE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail="Image size exceeds 10MB limit"
+        )
+
+    try:
+        # Encode image to base64
+        image_base64 = base64.b64encode(file_content).decode("utf-8")
+        media_type = ALLOWED_IMAGE_TYPES[content_type]
+
+        # Extract transactions using Claude Vision
+        transactions_data = paypay_ocr.extract_transactions(
+            image_base64=image_base64,
+            media_type=media_type,
+            user_id=current_user.id
+        )
+
+        if not transactions_data:
+            return {
+                "filename": file.filename,
+                "total_rows": 0,
+                "created": 0,
+                "skipped": 0,
+                "message": "No transactions found in the image"
+            }
+
+        # Bulk create transactions
+        created, skipped = TransactionService.bulk_create_transactions(
+            db, transactions_data
+        )
+
+        return {
+            "filename": file.filename,
+            "total_rows": len(transactions_data),
+            "created": created,
+            "skipped": skipped,
+            "message": f"Successfully imported {created} transactions from PayPay, skipped {skipped} duplicates"
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process PayPay screenshot: {str(e)}"
         )
 
 
