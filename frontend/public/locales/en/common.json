@@ -610,6 +610,11 @@
     "applySelected": "Apply {{count}} Selected",
     "applying": "Applying...",
     "applyError": "Failed to apply changes",
-    "applySuccess": "Changes applied successfully"
+    "applySuccess": "Changes applied successfully",
+    "processingAll": "Processing All Transactions",
+    "processProgress": "Processed {{processed}} of {{total}} (Batch {{batch}}/{{totalBatches}})",
+    "remainingOther": "{{count}} 'Other' transactions remaining",
+    "analyzeAll": "Analyze All ({{count}})",
+    "analyzeAllCredits": "Estimated cost: {{credits}} credits"
   }
 }

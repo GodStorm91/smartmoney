@@ -587,6 +587,11 @@
     "applySelected": "{{count}}件を適用",
     "applying": "適用中...",
     "applyError": "変更の適用に失敗しました",
-    "applySuccess": "変更を適用しました"
+    "applySuccess": "変更を適用しました",
+    "processingAll": "全取引を処理中",
+    "processProgress": "{{processed}}/{{total}}件処理済み（バッチ{{batch}}/{{totalBatches}}）",
+    "remainingOther": "残り{{count}}件の「その他」取引",
+    "analyzeAll": "すべて分析（{{count}}件）",
+    "analyzeAllCredits": "推定コスト: {{credits}}クレジット"
   }
 }

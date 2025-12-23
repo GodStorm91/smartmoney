@@ -600,6 +600,11 @@
     "applySelected": "Áp dụng {{count}} mục đã chọn",
     "applying": "Đang áp dụng...",
     "applyError": "Áp dụng thất bại",
-    "applySuccess": "Áp dụng thành công"
+    "applySuccess": "Áp dụng thành công",
+    "processingAll": "Đang xử lý tất cả giao dịch",
+    "processProgress": "Đã xử lý {{processed}}/{{total}} (Lô {{batch}}/{{totalBatches}})",
+    "remainingOther": "Còn {{count}} giao dịch 'Khác'",
+    "analyzeAll": "Phân tích tất cả ({{count}})",
+    "analyzeAllCredits": "Chi phí ước tính: {{credits}} credit"
   }
 }
