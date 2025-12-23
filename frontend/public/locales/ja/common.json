@@ -569,5 +569,24 @@
     "notSupported": "このブラウザでは音声入力がサポートされていません",
     "confirm": "この取引を追加しますか？",
     "edit": "編集"
+  },
+  "ai": {
+    "categoryCleanup": "AIカテゴリ整理",
+    "categoryCleanupDesc": "AIで「その他」の取引を適切なカテゴリに分類",
+    "analyzeOther": "「その他」を分析",
+    "analyzing": "分析中...",
+    "analyzeError": "分析に失敗しました。クレジットを確認してください。",
+    "noSuggestions": "「その他」の取引がありません",
+    "foundSuggestions": "{{count}}件の提案（全{{total}}件の「その他」取引）",
+    "selectAll": "すべて選択",
+    "deselectAll": "選択解除",
+    "newCategory": "新規",
+    "confidence": "確信度",
+    "newCategoriesSuggested": "AIが新しいカテゴリを提案",
+    "createRulesAuto": "今後の取引用にルールを自動作成",
+    "applySelected": "{{count}}件を適用",
+    "applying": "適用中...",
+    "applyError": "変更の適用に失敗しました",
+    "applySuccess": "変更を適用しました"
   }
 }

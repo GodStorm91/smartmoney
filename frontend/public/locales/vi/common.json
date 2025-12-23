@@ -582,5 +582,24 @@
     "notSupported": "Trình duyệt này không hỗ trợ nhập liệu bằng giọng nói",
     "confirm": "Thêm giao dịch này?",
     "edit": "Chỉnh sửa"
+  },
+  "ai": {
+    "categoryCleanup": "AI Phân loại",
+    "categoryCleanupDesc": "Dùng AI để phân loại các giao dịch đang ở mục 'Khác'",
+    "analyzeOther": "Phân tích mục 'Khác'",
+    "analyzing": "Đang phân tích...",
+    "analyzeError": "Phân tích thất bại. Kiểm tra số dư credit.",
+    "noSuggestions": "Không có giao dịch 'Khác' để phân loại",
+    "foundSuggestions": "Tìm thấy {{count}} gợi ý (tổng {{total}} giao dịch 'Khác')",
+    "selectAll": "Chọn tất cả",
+    "deselectAll": "Bỏ chọn tất cả",
+    "newCategory": "Mới",
+    "confidence": "độ tin cậy",
+    "newCategoriesSuggested": "AI gợi ý danh mục mới",
+    "createRulesAuto": "Tự động tạo quy tắc cho giao dịch tương lai",
+    "applySelected": "Áp dụng {{count}} mục đã chọn",
+    "applying": "Đang áp dụng...",
+    "applyError": "Áp dụng thất bại",
+    "applySuccess": "Áp dụng thành công"
   }
 }

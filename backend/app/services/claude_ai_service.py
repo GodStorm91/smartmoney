@@ -271,3 +271,125 @@ Generate the budget now:"""
                 raise ValueError("Invalid allocation format: missing category or amount")
 
         return budget_data
+
+    def categorize_transactions(
+        self,
+        transactions: list[dict],
+        available_categories: list[str],
+        language: str = "ja"
+    ) -> tuple[list[dict], dict[str, int]]:
+        """Categorize transactions using Claude AI.
+
+        Args:
+            transactions: List of dicts with id, description, amount
+            available_categories: List of allowed category names
+            language: Language code for response
+
+        Returns:
+            Tuple of (categorization results, usage dict with tokens)
+        """
+        if not transactions:
+            return [], {"input_tokens": 0, "output_tokens": 0}
+
+        # Build prompt for Claude
+        prompt = self._build_categorization_prompt(
+            transactions=transactions,
+            available_categories=available_categories,
+            language=language
+        )
+
+        # Call Claude API
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=4096,
+            temperature=0.3,  # Lower temp for more consistent categorization
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+
+        # Extract token usage
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens
+        }
+
+        # Parse response
+        results = self._parse_categorization_response(response.content[0].text)
+        return results, usage
+
+    def _build_categorization_prompt(
+        self,
+        transactions: list[dict],
+        available_categories: list[str],
+        language: str = "ja"
+    ) -> str:
+        """Build prompt for transaction categorization."""
+        language_map = {
+            "ja": "Japanese",
+            "en": "English",
+            "vi": "Vietnamese"
+        }
+        language_name = language_map.get(language, "Japanese")
+
+        # Format transactions list
+        tx_list = "\n".join([
+            f'{i+1}. ID:{tx["id"]} | "{tx["description"]}" | ¥{abs(tx["amount"]):,}'
+            for i, tx in enumerate(transactions)
+        ])
+
+        categories_str = ", ".join(available_categories)
+
+        prompt = f"""You are a financial transaction categorizer. Analyze each transaction description and assign the most appropriate category.
+
+AVAILABLE CATEGORIES (you MUST use one of these, or suggest a new one if none fit):
+{categories_str}
+
+TRANSACTIONS TO CATEGORIZE:
+{tx_list}
+
+TASK: For each transaction, determine the best category based on the description.
+- Match merchant names, keywords, and context clues
+- Use the most specific category that applies
+- If no existing category fits well, suggest "NEW:CategoryName" format
+- Be consistent with similar transactions
+
+REQUIRED OUTPUT FORMAT (JSON array):
+[
+  {{"id": 123, "category": "Food", "confidence": 0.95, "reason": "Restaurant name detected"}},
+  {{"id": 456, "category": "Transportation", "confidence": 0.85, "reason": "Train station keyword"}},
+  {{"id": 789, "category": "NEW:Subscription", "confidence": 0.80, "reason": "Monthly recurring service fee"}}
+]
+
+RULES:
+- Return ONLY valid JSON array
+- Include all transaction IDs from input
+- confidence should be 0.0-1.0
+- reason should be brief (under 50 chars)
+- Respond in {language_name} for the reason field
+
+Generate categorizations now:"""
+
+        return prompt
+
+    def _parse_categorization_response(self, response_text: str) -> list[dict]:
+        """Parse Claude's categorization response."""
+        # Extract JSON from response
+        start_idx = response_text.find("[")
+        end_idx = response_text.rfind("]") + 1
+
+        if start_idx == -1 or end_idx == 0:
+            raise ValueError("No valid JSON array found in Claude response")
+
+        json_str = response_text[start_idx:end_idx]
+        results = json.loads(json_str)
+
+        # Validate structure
+        if not isinstance(results, list):
+            raise ValueError("Invalid categorization format: expected array")
+
+        for item in results:
+            if "id" not in item or "category" not in item:
+                raise ValueError("Invalid categorization item: missing id or category")
+
+        return results

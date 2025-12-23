@@ -9,6 +9,7 @@ import { CategoryBarChart } from '@/components/charts/CategoryBarChart'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
 import { ZoomableChart } from '@/components/charts/ZoomableChart'
 import { SpendingInsights } from '@/components/analytics/SpendingInsights'
+import { AICategoryCleanup } from '@/components/analytics/AICategoryCleanup'
 import { fetchAnalytics } from '@/services/analytics-service'
 import { getCurrentMonthRange } from '@/utils/formatDate'
 import { format, subMonths } from 'date-fns'
@@ -159,6 +160,11 @@ export function Analytics() {
                 )}
               </ZoomableChart>
             </Card>
+          </div>
+
+          {/* AI Category Cleanup */}
+          <div className="mt-6">
+            <AICategoryCleanup />
           </div>
 
           {/* Spending Insights */}

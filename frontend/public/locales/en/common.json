@@ -592,5 +592,24 @@
     "notSupported": "Voice input not supported in this browser",
     "confirm": "Add this transaction?",
     "edit": "Edit"
+  },
+  "ai": {
+    "categoryCleanup": "AI Category Cleanup",
+    "categoryCleanupDesc": "Use AI to categorize transactions currently marked as 'Other'",
+    "analyzeOther": "Analyze 'Other' Transactions",
+    "analyzing": "Analyzing...",
+    "analyzeError": "Failed to analyze transactions. Check your credits.",
+    "noSuggestions": "No 'Other' transactions to categorize",
+    "foundSuggestions": "Found {{count}} suggestions ({{total}} total 'Other' transactions)",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "newCategory": "New",
+    "confidence": "confidence",
+    "newCategoriesSuggested": "AI suggests new categories",
+    "createRulesAuto": "Auto-create rules for future transactions",
+    "applySelected": "Apply {{count}} Selected",
+    "applying": "Applying...",
+    "applyError": "Failed to apply changes",
+    "applySuccess": "Changes applied successfully"
   }
 }
