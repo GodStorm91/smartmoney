@@ -56,8 +56,8 @@ export async function fetchTransactions(
   }
   if (filters?.search) params.append('search', filters.search)
 
-  // Request all transactions (up to 1000) to show complete filtered results
-  params.append('limit', '1000')
+  // Request all transactions (up to 5000) to show complete filtered results
+  params.append('limit', '5000')
 
   const response = await apiClient.get<TransactionListResponse>(`/api/transactions/?${params.toString()}`)
   return response.data.transactions.map(transformTransaction)
