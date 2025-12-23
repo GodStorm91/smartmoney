@@ -538,26 +538,41 @@ export function Transactions() {
 
           {/* Mobile Cards */}
           <div className="md:hidden space-y-6">
-            {groupedTransactions.map((group) => (
-              <div key={group.date}>
-                <div className="flex items-center gap-3 mb-3">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {formatDateHeader(group.date)}
-                  </h3>
-                  <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            {sortField === 'date' ? (
+              // Grouped by date when sorting by date
+              groupedTransactions.map((group) => (
+                <div key={group.date}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      {formatDateHeader(group.date)}
+                    </h3>
+                    <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                  </div>
+                  <div className="space-y-3">
+                    {group.transactions.map((tx) => (
+                      <SwipeableTransactionCard
+                        key={tx.id}
+                        transaction={tx}
+                        onEdit={setEditingTransaction}
+                        onDelete={setDeletingTransaction}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {group.transactions.map((tx) => (
-                    <SwipeableTransactionCard
-                      key={tx.id}
-                      transaction={tx}
-                      onEdit={setEditingTransaction}
-                      onDelete={setDeletingTransaction}
-                    />
-                  ))}
-                </div>
+              ))
+            ) : (
+              // Flat list when sorting by amount (or other non-date fields)
+              <div className="space-y-3">
+                {displayedTransactions.map((tx) => (
+                  <SwipeableTransactionCard
+                    key={tx.id}
+                    transaction={tx}
+                    onEdit={setEditingTransaction}
+                    onDelete={setDeletingTransaction}
+                  />
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
       ) : (
