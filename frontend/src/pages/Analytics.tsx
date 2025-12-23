@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
-import { CategoryPieChart } from '@/components/charts/CategoryPieChart'
+import { CategoryBarChart } from '@/components/charts/CategoryBarChart'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
 import { ZoomableChart } from '@/components/charts/ZoomableChart'
 import { SpendingInsights } from '@/components/analytics/SpendingInsights'
@@ -140,7 +140,7 @@ export function Analytics() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('analytics.categoryBreakdown')}</h3>
               <ZoomableChart className="h-80">
                 {analytics?.category_breakdown && analytics.category_breakdown.length > 0 ? (
-                  <CategoryPieChart data={analytics.category_breakdown} />
+                  <CategoryBarChart data={analytics.category_breakdown} />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">{t('analytics.noData')}</div>
                 )}
