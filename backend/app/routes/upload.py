@@ -1,7 +1,10 @@
 """CSV and PayPay image upload API routes."""
 import base64
+import logging
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+
+logger = logging.getLogger(__name__)
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -161,6 +164,7 @@ async def upload_paypay_screenshot(
         }
 
     except Exception as e:
+        logger.exception("PayPay OCR failed: %s", str(e))
         raise HTTPException(
             status_code=500,
             detail=f"Failed to process PayPay screenshot: {str(e)}"
