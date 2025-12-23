@@ -116,7 +116,7 @@ export function TransactionEditModal({
     updateMutation.mutate({
       date,
       description,
-      amount: type === 'expense' ? -Math.abs(amountValue) : Math.abs(amountValue),
+      amount: Math.round(type === 'expense' ? -Math.abs(amountValue) : Math.abs(amountValue)),
       category: categoryValue,
       source,
       type,
