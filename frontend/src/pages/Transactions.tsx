@@ -56,13 +56,28 @@ export function Transactions() {
   type ShowCount = 50 | 100 | 'all'
   const [showCount, setShowCount] = useState<ShowCount>(50)
 
+  // Sorting transition state for visual feedback
+  const [isSorting, setIsSorting] = useState(false)
+
   const handleSort = (field: SortField) => {
+    setIsSorting(true)
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
     } else {
       setSortField(field)
       setSortDirection('desc')
     }
+    // Brief delay for visual feedback
+    setTimeout(() => setIsSorting(false), 150)
+  }
+
+  // Handle mobile sort dropdown change
+  const handleMobileSort = (value: string) => {
+    setIsSorting(true)
+    const [field, direction] = value.split('-') as [SortField, SortDirection]
+    setSortField(field)
+    setSortDirection(direction)
+    setTimeout(() => setIsSorting(false), 150)
   }
 
   // Update filters when debounced search changes
@@ -352,11 +367,7 @@ export function Transactions() {
               <span className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.sort', 'Sort')}:</span>
               <select
                 value={`${sortField}-${sortDirection}`}
-                onChange={(e) => {
-                  const [field, direction] = e.target.value.split('-') as [SortField, SortDirection]
-                  setSortField(field)
-                  setSortDirection(direction)
-                }}
+                onChange={(e) => handleMobileSort(e.target.value)}
                 className="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
               >
                 <option value="date-desc">{t('transactions.sortDateDesc', 'Date ↓')}</option>
@@ -364,6 +375,12 @@ export function Transactions() {
                 <option value="amount-desc">{t('transactions.sortAmountDesc', 'Amount ↓')}</option>
                 <option value="amount-asc">{t('transactions.sortAmountAsc', 'Amount ↑')}</option>
               </select>
+              {isSorting && (
+                <svg className="animate-spin h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              )}
             </div>
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -401,7 +418,7 @@ export function Transactions() {
           </div>
         </>
       ) : transactions && transactions.length > 0 ? (
-        <>
+        <div className={`transition-opacity duration-150 ${isSorting ? 'opacity-50' : 'opacity-100'}`}>
           {/* Desktop Table */}
           <Card className="hidden md:block overflow-hidden">
             <table className="w-full">
@@ -542,7 +559,7 @@ export function Transactions() {
               </div>
             ))}
           </div>
-        </>
+        </div>
       ) : (
         <Card>
           <EmptyState
