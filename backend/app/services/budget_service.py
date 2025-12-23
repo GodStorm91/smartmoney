@@ -1,12 +1,80 @@
 """Budget service for CRUD operations."""
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from ..models.budget import Budget, BudgetAllocation, BudgetFeedback
+from ..models.transaction import Transaction
+from ..models.settings import AppSettings
 
 
 class BudgetService:
     """Service for budget operations."""
+
+    @staticmethod
+    def get_previous_month(month: str) -> str:
+        """Get previous month string from YYYY-MM format."""
+        year, m = map(int, month.split('-'))
+        if m == 1:
+            return f"{year - 1}-12"
+        return f"{year}-{m - 1:02d}"
+
+    @staticmethod
+    def calculate_carry_over(db: Session, user_id: int, month: str) -> int:
+        """Calculate carry-over from previous month.
+
+        Returns positive if under budget (surplus), negative if over budget (deficit).
+        Returns 0 if carry-over is disabled in settings or no previous budget exists.
+        """
+        # Check if carry-over is enabled
+        settings = db.query(AppSettings).filter(AppSettings.user_id == user_id).first()
+        if not settings or not settings.budget_carry_over:
+            return 0
+
+        # Get previous month budget
+        prev_month = BudgetService.get_previous_month(month)
+        prev_budget = db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.month == prev_month
+        ).first()
+
+        if not prev_budget:
+            return 0
+
+        # Calculate total budgeted amount for previous month
+        total_budgeted = sum(alloc.amount for alloc in prev_budget.allocations)
+
+        # Get previous month date range
+        year, m = map(int, prev_month.split('-'))
+        month_start = date(year, m, 1)
+        if m == 12:
+            month_end = date(year + 1, 1, 1) - timedelta(days=1)
+        else:
+            month_end = date(year, m + 1, 1) - timedelta(days=1)
+
+        # Calculate actual spending for previous month
+        total_spent = (
+            db.query(func.coalesce(func.sum(Transaction.amount), 0))
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.is_income == False,
+                Transaction.is_transfer == False,
+                Transaction.is_adjustment == False,
+                Transaction.date >= month_start,
+                Transaction.date <= month_end
+            )
+            .scalar()
+        )
+        total_spent = abs(total_spent or 0)
+
+        # Carry-over = budgeted - spent
+        # Positive = under budget (surplus), negative = over budget (deficit)
+        carry_over = total_budgeted - total_spent
+
+        # Include any carry-over from the previous budget as well (chain carry-over)
+        carry_over += prev_budget.carry_over or 0
+
+        return carry_over
 
     @staticmethod
     def create_budget(
@@ -41,13 +109,17 @@ class BudgetService:
             db.delete(existing)
             db.flush()
 
+        # Calculate carry-over from previous month
+        carry_over = BudgetService.calculate_carry_over(db, user_id, month)
+
         # Create new budget
         budget = Budget(
             user_id=user_id,
             month=month,
             monthly_income=monthly_income,
             savings_target=savings_target,
-            advice=advice
+            advice=advice,
+            carry_over=carry_over
         )
         db.add(budget)
         db.flush()

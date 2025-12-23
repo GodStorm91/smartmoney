@@ -415,7 +415,8 @@
     "swipeRight": "Tăng",
     "spent": "Đã chi",
     "remaining": "còn lại",
-    "overBudget": "Vượt Ngân Sách"
+    "overBudget": "Vượt Ngân Sách",
+    "carryOver": "Số Dư Chuyển Tiếp"
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",

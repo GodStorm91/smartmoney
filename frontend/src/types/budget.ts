@@ -11,6 +11,7 @@ export interface Budget {
   monthly_income: number
   savings_target?: number
   advice?: string
+  carry_over?: number
   allocations: BudgetAllocation[]
   created_at: string
 }
@@ -43,5 +44,7 @@ export interface BudgetTracking {
   total_budgeted: number
   total_spent: number
   savings_target?: number
+  carry_over?: number
+  effective_budget?: number
   categories: BudgetTrackingItem[]
 }

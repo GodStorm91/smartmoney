@@ -1,8 +1,8 @@
 # SmartMoney Cashflow Tracker - Project Roadmap
 
-**Version:** 1.2
-**Last Updated:** 2025-11-25
-**Current Release:** v0.2.1 (Production Deployed)
+**Version:** 1.3
+**Last Updated:** 2025-12-23
+**Current Release:** v0.3.0 (Production Ready)
 **Status:** ✅ Live at https://money.khanh.page
 
 ---
@@ -311,9 +311,9 @@ Production readiness, deployment automation, and enhanced user experience featur
 
 ---
 
-### v0.3.0 - Enhanced Analytics (In Progress)
+### v0.3.0 - Enhanced Analytics ✅ COMPLETE
 
-**Timeline:** 2-3 weeks
+**Timeline:** Completed 2025-12-23
 **Priority:** High
 **Dependencies:** v0.2.0 (database must be stable)
 
@@ -325,25 +325,22 @@ Production readiness, deployment automation, and enhanced user experience featur
   - Validation (amount > 0, required fields)
 - [x] Delete transaction with confirmation ✅
 - [x] Create new transaction UI ✅
-- [ ] Bulk operations
+- [x] Bulk operations ✅ (2025-12-23)
   - Select multiple transactions (checkboxes)
   - Bulk delete, bulk recategorize
 
 **Advanced Filtering:**
 - [x] Date range picker (start/end dates) ✅
-- [ ] Multiple category selection (multi-select dropdown)
-- [ ] Amount range filter (min/max)
-- [ ] Search by description (full-text search)
-- [ ] Save filter presets
+- [x] Multiple category selection (multi-select dropdown) ✅ (2025-12-23)
+- [ ] Amount range filter (min/max) → Moved to v0.4.0
+- [x] Search by description (case-insensitive partial match) ✅ (2025-12-23)
+- [ ] Save filter presets → Moved to v0.4.0
 
 **Export Functionality:**
 - [x] Export transactions to CSV ✅ (2025-11-24)
-- [ ] Export transactions to JSON
-- [ ] Export monthly report (PDF)
-  - Summary statistics
-  - Category breakdown chart
-  - Transaction list
-- [ ] Excel format support (.xlsx)
+- [ ] Export transactions to JSON → Moved to v0.4.0
+- [ ] Export monthly report (PDF) → Moved to v0.4.0
+- [ ] Excel format support (.xlsx) → Moved to v0.4.0
 
 **Budget Tracking:**
 - [x] Create monthly budgets by category ✅ (2025-11-25)
@@ -352,7 +349,7 @@ Production readiness, deployment automation, and enhanced user experience featur
 - [x] Save budget button ✅ (2025-11-25)
 - [x] Budget vs actual comparison ✅ (2025-11-26)
 - [x] Budget alerts (when approaching limit) ✅ (backend ready)
-- [ ] Budget carry-over (unused → next month)
+- [x] Budget carry-over (unused → next month) ✅ (2025-12-23)
 
 **Spending Trends:**
 - [ ] Year-over-year comparison chart

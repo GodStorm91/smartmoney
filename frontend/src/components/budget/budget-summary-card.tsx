@@ -49,26 +49,35 @@ export function BudgetSummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600 mb-1">{t('budget.monthlyIncome')}</p>
-          <p className="text-2xl font-bold text-blue-600">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.monthlyIncome')}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {formatCurrency(budget.monthly_income)}
           </p>
         </div>
 
-        {budget.savings_target && (
-          <div className="bg-green-50 p-4 rounded-lg">
-            <p className="text-sm text-gray-600 mb-1">{t('budget.savingsTarget')}</p>
-            <p className="text-2xl font-bold text-green-600">
+        {budget.savings_target !== undefined && budget.savings_target > 0 && (
+          <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.savingsTarget')}</p>
+            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
               {formatCurrency(budget.savings_target)}
             </p>
           </div>
         )}
 
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <p className="text-sm text-gray-600 mb-1">{t('budget.totalAllocated')}</p>
-          <p className="text-2xl font-bold text-purple-600">
+        {budget.carry_over !== undefined && budget.carry_over !== 0 && (
+          <div className={`p-4 rounded-lg ${budget.carry_over > 0 ? 'bg-teal-50 dark:bg-teal-900/30' : 'bg-orange-50 dark:bg-orange-900/30'}`}>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.carryOver')}</p>
+            <p className={`text-2xl font-bold ${budget.carry_over > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-orange-600 dark:text-orange-400'}`}>
+              {budget.carry_over > 0 ? '+' : ''}{formatCurrency(budget.carry_over)}
+            </p>
+          </div>
+        )}
+
+        <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.totalAllocated')}</p>
+          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
             {formatCurrency(totalAllocated)}
           </p>
         </div>

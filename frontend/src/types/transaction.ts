@@ -14,9 +14,10 @@ export interface Transaction {
 export interface TransactionFilters {
   start_date?: string
   end_date?: string
-  category?: string
+  categories?: string[]
   source?: string
   type?: 'income' | 'expense' | 'all'
+  search?: string
 }
 
 export interface DateRange {

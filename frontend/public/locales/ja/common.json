@@ -402,7 +402,8 @@
     "swipeRight": "増やす",
     "spent": "支出",
     "remaining": "残り",
-    "overBudget": "予算オーバー"
+    "overBudget": "予算オーバー",
+    "carryOver": "繰越額"
   },
   "credits": {
     "balance": "クレジット残高",

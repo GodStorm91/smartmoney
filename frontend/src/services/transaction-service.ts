@@ -47,12 +47,14 @@ export async function fetchTransactions(
 
   if (filters?.start_date) params.append('start_date', filters.start_date)
   if (filters?.end_date) params.append('end_date', filters.end_date)
-  if (filters?.category) params.append('category', filters.category)
+  if (filters?.categories?.length) {
+    params.append('categories', filters.categories.join(','))
+  }
   if (filters?.source) params.append('source', filters.source)
   if (filters?.type && filters.type !== 'all') {
-    // Map 'income'/'expense' to is_income boolean
     params.append('is_income', filters.type === 'income' ? 'true' : 'false')
   }
+  if (filters?.search) params.append('search', filters.search)
 
   const response = await apiClient.get<TransactionListResponse>(`/api/transactions/?${params.toString()}`)
   return response.data.transactions.map(transformTransaction)
@@ -105,6 +107,32 @@ export async function updateTransaction(
  */
 export async function deleteTransaction(id: number): Promise<void> {
   await apiClient.delete(`/api/transactions/${id}`)
+}
+
+/**
+ * Bulk delete transactions
+ */
+export async function bulkDeleteTransactions(ids: number[]): Promise<{ deleted: number }> {
+  const params = new URLSearchParams()
+  ids.forEach(id => params.append('transaction_ids', id.toString()))
+  const response = await apiClient.delete<{ deleted: number }>(`/api/transactions/bulk/delete?${params.toString()}`)
+  return response.data
+}
+
+/**
+ * Bulk update category for transactions
+ */
+export async function bulkUpdateCategory(
+  ids: number[],
+  category: string
+): Promise<{ updated: number; category: string }> {
+  const params = new URLSearchParams()
+  ids.forEach(id => params.append('transaction_ids', id.toString()))
+  params.append('category', category)
+  const response = await apiClient.patch<{ updated: number; category: string }>(
+    `/api/transactions/bulk/category?${params.toString()}`
+  )
+  return response.data
 }
 
 /**

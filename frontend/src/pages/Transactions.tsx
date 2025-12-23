@@ -1,25 +1,30 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
+import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skeleton'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { MultiSelect } from '@/components/ui/MultiSelect'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 import { QuickEntryFAB } from '@/components/transactions/QuickEntryFAB'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
+import { BulkRecategorizeModal } from '@/components/transactions/BulkRecategorizeModal'
+import { BulkDeleteConfirmDialog } from '@/components/transactions/BulkDeleteConfirmDialog'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange, formatDateHeader } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
-import { fetchTransactions, deleteTransaction } from '@/services/transaction-service'
+import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
+import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import type { Transaction, TransactionFilters } from '@/types'
 
 export function Transactions() {
@@ -29,23 +34,79 @@ export function Transactions() {
   const rates = useRatesMap()
   const queryClient = useQueryClient()
   const monthRange = getCurrentMonthRange()
+
+  // Filter state
   const [filters, setFilters] = useState<TransactionFilters>({
     start_date: monthRange.start,
     end_date: monthRange.end,
-    category: '',
+    categories: [],
     source: '',
     type: 'all',
   })
+  const [searchInput, setSearchInput] = useState('')
+  const debouncedSearch = useDebouncedValue(searchInput, 300)
+
+  // Update filters when debounced search changes
+  useEffect(() => {
+    setFilters(prev => ({ ...prev, search: debouncedSearch || undefined }))
+  }, [debouncedSearch])
+
+  // Modal state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [isBulkRecategorizeOpen, setIsBulkRecategorizeOpen] = useState(false)
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false)
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions', filters],
     queryFn: () => fetchTransactions(filters),
   })
 
-  // Delete mutation
+  // Clear selection when transactions change
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [transactions])
+
+  // Category options for filters
+  const categoryOptions = [
+    { value: '食費', label: t('category.food', 'Food') },
+    { value: '住宅', label: t('category.housing', 'Housing') },
+    { value: '交通', label: t('category.transport', 'Transport') },
+    { value: '娯楽', label: t('category.entertainment', 'Entertainment') },
+    { value: '通信', label: t('category.communication', 'Communication') },
+    { value: '日用品', label: t('category.daily', 'Daily Necessities') },
+    { value: '医療', label: t('category.medical', 'Medical') },
+    { value: '教育', label: t('category.education', 'Education') },
+    { value: 'その他', label: t('category.other', 'Other') },
+  ]
+
+  // Selection handlers
+  const allSelected = transactions && transactions.length > 0 &&
+    transactions.every(tx => selectedIds.has(tx.id))
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(transactions?.map(tx => tx.id) || []))
+    }
+  }
+
+  const toggleSelect = (id: number) => {
+    const newSet = new Set(selectedIds)
+    if (newSet.has(id)) {
+      newSet.delete(id)
+    } else {
+      newSet.add(id)
+    }
+    setSelectedIds(newSet)
+  }
+
+  // Mutations
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteTransaction(id),
     onSuccess: () => {
@@ -56,10 +117,41 @@ export function Transactions() {
     },
   })
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: () => bulkDeleteTransactions(Array.from(selectedIds)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      setSelectedIds(new Set())
+      setIsBulkDeleteOpen(false)
+    },
+  })
+
+  const bulkRecategorizeMutation = useMutation({
+    mutationFn: (category: string) => bulkUpdateCategory(Array.from(selectedIds), category),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      setSelectedIds(new Set())
+      setIsBulkRecategorizeOpen(false)
+    },
+  })
+
   const handleDeleteConfirm = () => {
     if (deletingTransaction) {
       deleteMutation.mutate(deletingTransaction.id)
     }
+  }
+
+  const handleReset = () => {
+    setFilters({
+      start_date: monthRange.start,
+      end_date: monthRange.end,
+      categories: [],
+      source: '',
+      type: 'all',
+    })
+    setSearchInput('')
   }
 
   const income = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) || 0
@@ -85,7 +177,7 @@ export function Transactions() {
   }, [transactions])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('transactions.title')}</h2>
         <p className="text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
@@ -93,6 +185,17 @@ export function Transactions() {
 
       {/* Filters */}
       <Card className="mb-6">
+        {/* Search */}
+        <div className="mb-4">
+          <Input
+            label={t('transactions.search', 'Search')}
+            placeholder={t('transactions.searchPlaceholder', 'Search by description...')}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+
+        {/* Date Range */}
         <div className="mb-4">
           <DateRangePicker
             startDate={filters.start_date || ''}
@@ -100,37 +203,72 @@ export function Transactions() {
             onRangeChange={(start, end) => setFilters({ ...filters, start_date: start, end_date: end })}
           />
         </div>
+
+        {/* Category & Source */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select label={t('transactions.category')} value={filters.category || ''} onChange={(e) => setFilters({ ...filters, category: e.target.value })} options={[{ value: '', label: t('transactions.all') }, { value: '食費', label: t('transactions.categoryFood') }, { value: '住宅', label: t('transactions.categoryHousing') }]} />
-          <Select label={t('transactions.source')} value={filters.source || ''} onChange={(e) => setFilters({ ...filters, source: e.target.value })} options={[{ value: '', label: t('transactions.all') }, { value: '楽天カード', label: t('transactions.sourceRakuten') }]} />
+          <MultiSelect
+            label={t('transactions.category', 'Category')}
+            options={categoryOptions}
+            selected={filters.categories || []}
+            onChange={(categories) => setFilters({ ...filters, categories })}
+            placeholder={t('transactions.allCategories', 'All categories')}
+          />
+          <Select
+            label={t('transactions.source', 'Source')}
+            value={filters.source || ''}
+            onChange={(e) => setFilters({ ...filters, source: e.target.value })}
+            options={[
+              { value: '', label: t('transactions.all', 'All') },
+              { value: '楽天カード', label: t('transactions.sourceRakuten', 'Rakuten Card') },
+            ]}
+          />
         </div>
+
+        {/* Action Buttons */}
         <div className="mt-4 flex gap-3">
-          <Button variant="outline" onClick={() => setFilters({ start_date: monthRange.start, end_date: monthRange.end, category: '', source: '', type: 'all' })}>{t('button.reset')}</Button>
+          <Button variant="outline" onClick={handleReset}>
+            {t('button.reset', 'Reset')}
+          </Button>
           <Button
             variant="outline"
             onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
             disabled={!transactions || transactions.length === 0}
           >
-            {t('transactions.export')}
+            {t('transactions.export', 'Export')}
           </Button>
         </div>
       </Card>
 
       {/* Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card><p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p><p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">{formatCurrencyPrivacy(income, currency, rates, false, isPrivacyMode)}</p></Card>
-        <Card><p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p><p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">{formatCurrencyPrivacy(expense, currency, rates, false, isPrivacyMode)}</p></Card>
-        <Card><p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p><p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">{formatCurrencyPrivacy(net, currency, rates, false, isPrivacyMode)}</p></Card>
+        <Card>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
+          <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
+            {formatCurrencyPrivacy(income, currency, rates, false, isPrivacyMode)}
+          </p>
+        </Card>
+        <Card>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
+          <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
+            {formatCurrencyPrivacy(expense, currency, rates, false, isPrivacyMode)}
+          </p>
+        </Card>
+        <Card>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
+          <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
+            {formatCurrencyPrivacy(net, currency, rates, false, isPrivacyMode)}
+          </p>
+        </Card>
       </div>
 
       {/* Transactions Table/List */}
       {isLoading ? (
         <>
-          {/* Desktop Skeleton */}
           <Card className="hidden md:block overflow-hidden">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
                 <tr>
+                  <th className="px-4 py-4 w-12"></th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.date')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.description')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.category')}</th>
@@ -144,7 +282,6 @@ export function Transactions() {
               </tbody>
             </table>
           </Card>
-          {/* Mobile Skeleton */}
           <div className="md:hidden space-y-3">
             {[...Array(5)].map((_, i) => <SkeletonTransactionCard key={i} />)}
           </div>
@@ -156,6 +293,14 @@ export function Transactions() {
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
                 <tr>
+                  <th className="px-4 py-4 w-12">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                    />
+                  </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.date')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.description')}</th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase">{t('transactions.category')}</th>
@@ -167,6 +312,14 @@ export function Transactions() {
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
                 {transactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td className="px-4 py-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(tx.id)}
+                        onChange={() => toggleSelect(tx.id)}
+                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                      />
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{formatDate(tx.date)}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{tx.description}</td>
                     <td className="px-6 py-4"><Badge variant={tx.type === 'income' ? 'info' : 'default'}>{tx.category}</Badge></td>
@@ -202,7 +355,7 @@ export function Transactions() {
             </table>
           </Card>
 
-          {/* Mobile Cards - Grouped by Date */}
+          {/* Mobile Cards */}
           <div className="md:hidden space-y-6">
             {groupedTransactions.map((group) => (
               <div key={group.date}>
@@ -245,20 +398,40 @@ export function Transactions() {
         </Card>
       )}
 
-      {/* Edit Modal */}
+      {/* Bulk Action Toolbar */}
+      {selectedIds.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg p-4 z-40">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('transactions.selectedCount', '{{count}} selected', { count: selectedIds.size })}
+            </span>
+            <div className="flex gap-3">
+              <Button variant="outline" size="sm" onClick={() => setSelectedIds(new Set())}>
+                {t('button.clearSelection', 'Clear')}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setIsBulkRecategorizeOpen(true)}>
+                {t('transactions.recategorize', 'Recategorize')}
+              </Button>
+              <Button variant="danger" size="sm" onClick={() => setIsBulkDeleteOpen(true)}>
+                {t('transactions.deleteSelected', 'Delete')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
       <TransactionEditModal
         isOpen={!!editingTransaction}
         onClose={() => setEditingTransaction(null)}
         transaction={editingTransaction}
       />
 
-      {/* Add Transaction Modal */}
       <TransactionFormModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
       />
 
-      {/* Delete Confirmation Dialog */}
       <DeleteConfirmDialog
         isOpen={!!deletingTransaction}
         onClose={() => setDeletingTransaction(null)}
@@ -267,24 +440,31 @@ export function Transactions() {
         isDeleting={deleteMutation.isPending}
       />
 
-      {/* Quick Entry FAB (primary - gradient) */}
-      <QuickEntryFAB />
+      <BulkRecategorizeModal
+        isOpen={isBulkRecategorizeOpen}
+        onClose={() => setIsBulkRecategorizeOpen(false)}
+        onConfirm={(category) => bulkRecategorizeMutation.mutate(category)}
+        selectedCount={selectedIds.size}
+        isLoading={bulkRecategorizeMutation.isPending}
+      />
 
-      {/* Full Form FAB (secondary - solid blue, left of quick entry) */}
+      <BulkDeleteConfirmDialog
+        isOpen={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={() => bulkDeleteMutation.mutate()}
+        selectedCount={selectedIds.size}
+        isDeleting={bulkDeleteMutation.isPending}
+      />
+
+      {/* FAB Buttons */}
+      <QuickEntryFAB />
       <button
         onClick={() => setIsAddModalOpen(true)}
         className="fixed bottom-20 right-20 md:bottom-6 md:right-20 w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-40"
         aria-label={t('transaction.addTransaction', 'Add Transaction')}
         title={t('quickEntry.fullForm', 'Full Form')}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={2}
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
       </button>

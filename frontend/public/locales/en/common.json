@@ -415,7 +415,8 @@
     "swipeRight": "Increase",
     "spent": "Spent",
     "remaining": "remaining",
-    "overBudget": "Over Budget"
+    "overBudget": "Over Budget",
+    "carryOver": "Carry Over"
   },
   "common": {
     "cancel": "Cancel",

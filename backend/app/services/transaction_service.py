@@ -82,10 +82,11 @@ class TransactionService:
         user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-        category: Optional[str] = None,
+        categories: Optional[list[str]] = None,
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
+        search: Optional[str] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[Transaction]:
@@ -96,10 +97,11 @@ class TransactionService:
             user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
-            category: Filter by category
+            categories: Filter by categories (list, uses IN clause)
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
+            search: Search description (case-insensitive partial match)
             limit: Maximum results
             offset: Pagination offset
 
@@ -112,14 +114,16 @@ class TransactionService:
             query = query.filter(Transaction.date >= start_date)
         if end_date:
             query = query.filter(Transaction.date <= end_date)
-        if category:
-            query = query.filter(Transaction.category == category)
+        if categories:
+            query = query.filter(Transaction.category.in_(categories))
         if source:
             query = query.filter(Transaction.source == source)
         if is_income is not None:
             query = query.filter(Transaction.is_income == is_income)
         if is_transfer is not None:
             query = query.filter(Transaction.is_transfer == is_transfer)
+        if search:
+            query = query.filter(Transaction.description.ilike(f"%{search}%"))
 
         return query.order_by(Transaction.date.desc()).limit(limit).offset(offset).all()
 
@@ -129,10 +133,11 @@ class TransactionService:
         user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-        category: Optional[str] = None,
+        categories: Optional[list[str]] = None,
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
+        search: Optional[str] = None,
     ) -> int:
         """Count transactions matching filters for a specific user.
 
@@ -141,10 +146,11 @@ class TransactionService:
             user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
-            category: Filter by category
+            categories: Filter by categories (list)
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
+            search: Search description (case-insensitive partial match)
 
         Returns:
             Count of matching transactions
@@ -155,14 +161,16 @@ class TransactionService:
             query = query.filter(Transaction.date >= start_date)
         if end_date:
             query = query.filter(Transaction.date <= end_date)
-        if category:
-            query = query.filter(Transaction.category == category)
+        if categories:
+            query = query.filter(Transaction.category.in_(categories))
         if source:
             query = query.filter(Transaction.source == source)
         if is_income is not None:
             query = query.filter(Transaction.is_income == is_income)
         if is_transfer is not None:
             query = query.filter(Transaction.is_transfer == is_transfer)
+        if search:
+            query = query.filter(Transaction.description.ilike(f"%{search}%"))
 
         return query.scalar()
 
@@ -219,9 +227,6 @@ class TransactionService:
 
         Returns:
             True if deleted, False if not found
-
-        Raises:
-            ValueError: If trying to delete a transaction that doesn't belong to user
         """
         transaction = db.query(Transaction).filter(
             Transaction.id == transaction_id,
@@ -234,6 +239,47 @@ class TransactionService:
         db.delete(transaction)
         db.commit()
         return True
+
+    @staticmethod
+    def bulk_delete(db: Session, user_id: int, transaction_ids: list[int]) -> int:
+        """Delete multiple transactions by ID.
+
+        Args:
+            db: Database session
+            user_id: User ID (for isolation)
+            transaction_ids: List of transaction IDs to delete
+
+        Returns:
+            Number of deleted transactions
+        """
+        result = db.query(Transaction).filter(
+            Transaction.user_id == user_id,
+            Transaction.id.in_(transaction_ids)
+        ).delete(synchronize_session=False)
+        db.commit()
+        return result
+
+    @staticmethod
+    def bulk_update_category(
+        db: Session, user_id: int, transaction_ids: list[int], category: str
+    ) -> int:
+        """Update category for multiple transactions.
+
+        Args:
+            db: Database session
+            user_id: User ID (for isolation)
+            transaction_ids: List of transaction IDs to update
+            category: New category name
+
+        Returns:
+            Number of updated transactions
+        """
+        result = db.query(Transaction).filter(
+            Transaction.user_id == user_id,
+            Transaction.id.in_(transaction_ids)
+        ).update({"category": category}, synchronize_session=False)
+        db.commit()
+        return result
 
     @staticmethod
     def get_summary(

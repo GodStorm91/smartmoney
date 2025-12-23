@@ -52,25 +52,30 @@ async def create_transaction(
 async def get_transactions(
     start_date: Optional[date] = Query(None, description="Filter by start date"),
     end_date: Optional[date] = Query(None, description="Filter by end date"),
-    category: Optional[str] = Query(None, description="Filter by category"),
+    categories: Optional[str] = Query(None, description="Comma-separated category names"),
     source: Optional[str] = Query(None, description="Filter by source"),
     is_income: Optional[bool] = Query(None, description="Filter by income flag"),
     is_transfer: Optional[bool] = Query(None, description="Filter by transfer flag"),
+    search: Optional[str] = Query(None, min_length=2, max_length=100, description="Search description"),
     limit: int = Query(100, ge=1, le=1000, description="Results per page"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Get filtered transactions with pagination."""
+    # Parse comma-separated categories into list
+    category_list = [c.strip() for c in categories.split(',')] if categories else None
+
     transactions = TransactionService.get_transactions(
         db=db,
         user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
-        category=category,
+        categories=category_list,
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,
+        search=search,
         limit=limit,
         offset=offset,
     )
@@ -80,10 +85,11 @@ async def get_transactions(
         user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
-        category=category,
+        categories=category_list,
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,
+        search=search,
     )
 
     return {
@@ -144,6 +150,35 @@ async def delete_transaction(
         raise HTTPException(status_code=404, detail="Transaction not found")
 
     return None
+
+
+@router.delete("/bulk/delete", status_code=200)
+async def bulk_delete_transactions(
+    transaction_ids: list[int] = Query(..., description="Transaction IDs to delete"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete multiple transactions at once."""
+    deleted_count = TransactionService.bulk_delete(db, current_user.id, transaction_ids)
+    if deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No transactions found to delete")
+    return {"deleted": deleted_count}
+
+
+@router.patch("/bulk/category")
+async def bulk_update_category(
+    transaction_ids: list[int] = Query(..., description="Transaction IDs to update"),
+    category: str = Query(..., min_length=1, max_length=100, description="New category"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Update category for multiple transactions."""
+    updated_count = TransactionService.bulk_update_category(
+        db, current_user.id, transaction_ids, category
+    )
+    if updated_count == 0:
+        raise HTTPException(status_code=404, detail="No transactions found to update")
+    return {"updated": updated_count, "category": category}
 
 
 @router.get("/summary/total", response_model=TransactionSummaryResponse)

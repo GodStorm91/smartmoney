@@ -102,6 +102,10 @@ class BudgetTrackingService:
         remaining_budget = total_budgeted - total_spent
         safe_to_spend_today = remaining_budget // days_remaining if days_remaining > 0 else 0
 
+        # Calculate effective budget with carry-over
+        carry_over = budget.carry_over or 0
+        effective_budget = total_budgeted + carry_over
+
         return {
             'month': current_month,
             'monthly_income': budget.monthly_income,
@@ -110,6 +114,8 @@ class BudgetTrackingService:
             'total_budgeted': total_budgeted,
             'total_spent': total_spent,
             'savings_target': budget.savings_target,
+            'carry_over': carry_over,
+            'effective_budget': effective_budget,
             'categories': categories
         }
 
