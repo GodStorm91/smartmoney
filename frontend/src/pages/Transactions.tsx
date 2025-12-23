@@ -312,37 +312,59 @@ export function Transactions() {
         </Card>
       </div>
 
-      {/* Show Count Toggle */}
+      {/* Show Count & Sort Controls */}
       {!isLoading && transactions && transactions.length > 0 && (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.show', 'Show')}:</span>
-            {/* Desktop: pills */}
-            <div className="hidden md:flex gap-1">
-              {([50, 100, 'all'] as const).map((opt) => (
-                <button
-                  key={opt}
-                  onClick={() => setShowCount(opt)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    showCount === opt
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {opt === 'all' ? t('transactions.showAll', 'All') : opt}
-                </button>
-              ))}
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div className="flex items-center gap-4">
+            {/* Show count control */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.show', 'Show')}:</span>
+              {/* Desktop: pills */}
+              <div className="hidden md:flex gap-1">
+                {([50, 100, 'all'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => setShowCount(opt)}
+                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                      showCount === opt
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                  >
+                    {opt === 'all' ? t('transactions.showAll', 'All') : opt}
+                  </button>
+                ))}
+              </div>
+              {/* Mobile: dropdown */}
+              <select
+                value={showCount}
+                onChange={(e) => setShowCount(e.target.value === 'all' ? 'all' : Number(e.target.value) as 50 | 100)}
+                className="md:hidden px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              >
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value="all">{t('transactions.showAll', 'All')}</option>
+              </select>
             </div>
-            {/* Mobile: dropdown */}
-            <select
-              value={showCount}
-              onChange={(e) => setShowCount(e.target.value === 'all' ? 'all' : Number(e.target.value) as 50 | 100)}
-              className="md:hidden px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
-            >
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-              <option value="all">{t('transactions.showAll', 'All')}</option>
-            </select>
+
+            {/* Mobile sort control */}
+            <div className="flex md:hidden items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.sort', 'Sort')}:</span>
+              <select
+                value={`${sortField}-${sortDirection}`}
+                onChange={(e) => {
+                  const [field, direction] = e.target.value.split('-') as [SortField, SortDirection]
+                  setSortField(field)
+                  setSortDirection(direction)
+                }}
+                className="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              >
+                <option value="date-desc">{t('transactions.sortDateDesc', 'Date ↓')}</option>
+                <option value="date-asc">{t('transactions.sortDateAsc', 'Date ↑')}</option>
+                <option value="amount-desc">{t('transactions.sortAmountDesc', 'Amount ↓')}</option>
+                <option value="amount-asc">{t('transactions.sortAmountAsc', 'Amount ↑')}</option>
+              </select>
+            </div>
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             {t('transactions.showingCount', 'Showing {{shown}} of {{total}}', {

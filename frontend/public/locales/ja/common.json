@@ -88,7 +88,12 @@
     "export": "CSVエクスポート",
     "show": "表示",
     "showAll": "すべて",
-    "showingCount": "{{shown}} / {{total}}件を表示"
+    "showingCount": "{{shown}} / {{total}}件を表示",
+    "sort": "並び順",
+    "sortDateDesc": "日付 ↓",
+    "sortDateAsc": "日付 ↑",
+    "sortAmountDesc": "金額 ↓",
+    "sortAmountAsc": "金額 ↑"
   },
   "transaction": {
     "addTransaction": "取引を追加",

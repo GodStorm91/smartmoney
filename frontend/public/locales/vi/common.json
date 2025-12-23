@@ -88,7 +88,12 @@
     "export": "Xuất CSV",
     "show": "Hiển thị",
     "showAll": "Tất cả",
-    "showingCount": "Đang hiển thị {{shown}} / {{total}}"
+    "showingCount": "Đang hiển thị {{shown}} / {{total}}",
+    "sort": "Sắp xếp",
+    "sortDateDesc": "Ngày ↓",
+    "sortDateAsc": "Ngày ↑",
+    "sortAmountDesc": "Số tiền ↓",
+    "sortAmountAsc": "Số tiền ↑"
   },
   "transaction": {
     "editTitle": "Chỉnh sửa giao dịch",
