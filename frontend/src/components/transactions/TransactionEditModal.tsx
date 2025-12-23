@@ -62,7 +62,7 @@ export function TransactionEditModal({
     },
   })
 
-  // Populate form when transaction changes
+  // Populate form when transaction changes - only on open or transaction change
   useEffect(() => {
     if (transaction && isOpen) {
       setDate(transaction.date)
@@ -92,21 +92,8 @@ export function TransactionEditModal({
         }
       }
     }
-  }, [transaction, isOpen, customCategories])
-
-  // Reset categoryId when type changes to prevent mismatch
-  useEffect(() => {
-    if (isOpen && categoryId) {
-      const isIncome = type === 'income'
-      const currentCategories = isIncome ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
-      const isPredefinedMatch = currentCategories.some(c => c.id === categoryId)
-
-      if (!isPredefinedMatch && !categoryId.startsWith('custom_')) {
-        // Set to first category of new type or empty
-        setCategoryId('')
-      }
-    }
-  }, [type, isOpen, categoryId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transaction?.id, isOpen]) // Only re-run when transaction ID or modal open state changes
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
