@@ -158,11 +158,20 @@ def upgrade() -> None:
 
 def migrate_user_categories(conn) -> None:
     """Migrate existing user_categories to new hierarchy."""
-    # Check if user_categories table exists (SQLite compatible)
-    result = conn.execute(sa.text("""
-        SELECT name FROM sqlite_master
-        WHERE type='table' AND name='user_categories'
-    """))
+    # Check if user_categories table exists (database-agnostic)
+    dialect_name = conn.dialect.name
+
+    if dialect_name == "sqlite":
+        result = conn.execute(sa.text("""
+            SELECT name FROM sqlite_master
+            WHERE type='table' AND name='user_categories'
+        """))
+    else:  # PostgreSQL, MySQL, etc.
+        result = conn.execute(sa.text("""
+            SELECT table_name FROM information_schema.tables
+            WHERE table_name = 'user_categories'
+        """))
+
     if not result.scalar():
         return
 
