@@ -78,17 +78,12 @@ export function BudgetPage() {
     },
   })
 
-  // Save budget mutation (persist draft to database)
-  const saveMutation = useMutation({
-    mutationFn: () => generateBudget({
-      monthly_income: draftBudget!.monthly_income,
-      language: i18n.language
-    }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budget'] })
-      setDraftBudget(null) // Clear draft after saving
-    },
-  })
+  // Save budget - budget is already saved by regenerate endpoint
+  // This just clears the draft state and refreshes the UI
+  const handleSave = () => {
+    queryClient.invalidateQueries({ queryKey: ['budget'] })
+    setDraftBudget(null) // Clear draft state to show saved budget
+  }
 
   // Use draft if available, otherwise use saved budget
   const displayBudget = draftBudget || savedBudget
@@ -129,8 +124,8 @@ export function BudgetPage() {
             totalAllocated={totalAllocated}
             isDraft={isDraft}
             onRegenerateClick={() => setShowFeedbackForm(!showFeedbackForm)}
-            onSaveClick={() => saveMutation.mutate()}
-            isSaving={saveMutation.isPending}
+            onSaveClick={handleSave}
+            isSaving={false}
           />
 
           {showFeedbackForm && (
