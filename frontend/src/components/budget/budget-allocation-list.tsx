@@ -1,10 +1,11 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
+import { useCategoryTree } from '@/hooks/useCategories'
 import type { BudgetAllocation, BudgetTracking, BudgetTrackingItem } from '@/types'
 
 interface BudgetAllocationListProps {
@@ -24,6 +25,27 @@ export function BudgetAllocationList({
 }: BudgetAllocationListProps) {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
+  const { data: categoryTree } = useCategoryTree()
+
+  // Build a map of parent category -> all child category names
+  const parentToChildrenMap = useMemo(() => {
+    const map = new Map<string, string[]>()
+    if (!categoryTree) return map
+
+    // Process expense categories
+    categoryTree.expense.forEach(parent => {
+      const childNames = parent.children.map(child => child.name)
+      map.set(parent.name, childNames)
+    })
+
+    // Process income categories
+    categoryTree.income.forEach(parent => {
+      const childNames = parent.children.map(child => child.name)
+      map.set(parent.name, childNames)
+    })
+
+    return map
+  }, [categoryTree])
 
   // Create a map of tracking items by category for quick lookup
   const trackingMap = new Map<string, BudgetTrackingItem>()
@@ -33,11 +55,16 @@ export function BudgetAllocationList({
     })
   }
 
-  // Navigate to transactions filtered by category and month
+  // Navigate to transactions filtered by category (including children) and month
   const handleCategoryClick = (category: string) => {
+    // Get child categories for this parent
+    const children = parentToChildrenMap.get(category) || []
+    // Include parent + all children as comma-separated list
+    const categories = [category, ...children].join(',')
+
     navigate({
       to: '/transactions',
-      search: { category, month: month || undefined }
+      search: { categories, month: month || undefined }
     })
   }
 

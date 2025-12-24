@@ -47,9 +47,12 @@ export function Transactions() {
   const monthRange = getCurrentMonthRange()
 
   // Read URL search params from TanStack Router
-  const { category: categoryParam, month: monthParam } = useSearch({
+  const { categories: categoriesParam, month: monthParam } = useSearch({
     from: '/transactions',
   })
+
+  // Parse categories from comma-separated string
+  const parsedCategories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : []
 
   // Calculate initial date range from URL month param or use current month
   const initialDateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
@@ -58,7 +61,7 @@ export function Transactions() {
   const [filters, setFilters] = useState<TransactionFilters>({
     start_date: initialDateRange.start,
     end_date: initialDateRange.end,
-    categories: categoryParam ? [categoryParam] : [],
+    categories: parsedCategories,
     source: '',
     type: 'all',
   })
@@ -106,16 +109,17 @@ export function Transactions() {
 
   // Update filters when URL params change (browser back/forward)
   useEffect(() => {
-    if (categoryParam || monthParam) {
+    if (categoriesParam || monthParam) {
       const dateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
+      const categories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : []
       setFilters(prev => ({
         ...prev,
-        categories: categoryParam ? [categoryParam] : prev.categories,
+        categories: categories.length > 0 ? categories : prev.categories,
         start_date: dateRange.start,
         end_date: dateRange.end,
       }))
     }
-  }, [categoryParam, monthParam])
+  }, [categoriesParam, monthParam])
 
   // Modal state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
