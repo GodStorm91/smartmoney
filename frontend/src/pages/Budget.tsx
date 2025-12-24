@@ -80,9 +80,11 @@ export function BudgetPage() {
 
   // Save budget - budget is already saved by regenerate endpoint
   // This just clears the draft state and refreshes the UI
-  const handleSave = () => {
-    queryClient.invalidateQueries({ queryKey: ['budget'] })
-    setDraftBudget(null) // Clear draft state to show saved budget
+  const handleSave = async () => {
+    // First refetch and wait for completion to get fresh data from server
+    await queryClient.refetchQueries({ queryKey: ['budget'] })
+    // Then clear draft so UI shows the freshly fetched saved budget
+    setDraftBudget(null)
   }
 
   // Use draft if available, otherwise use saved budget
