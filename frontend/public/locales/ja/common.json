@@ -428,7 +428,20 @@
     "overBudget": "予算オーバー",
     "overBy": "{{amount}} オーバー",
     "carryOver": "繰越額",
-    "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。"
+    "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。",
+    "projection": {
+      "title": "支出予測",
+      "monthProgress": "月間進捗",
+      "days": "日",
+      "elapsed": "経過",
+      "spentSoFar": "現在の支出",
+      "dailyAvg": "日平均",
+      "projectedByMonthEnd": "月末予測",
+      "projectedSpending": "予測支出",
+      "projectedSavings": "予測貯蓄",
+      "onTrack": "貯蓄目標達成の見込みです！",
+      "offTrack": "貯蓄目標に{{amount}}不足の見込みです"
+    }
   },
   "credits": {
     "balance": "クレジット残高",

@@ -441,7 +441,20 @@
     "overBudget": "Over Budget",
     "overBy": "Over by {{amount}}",
     "carryOver": "Carry Over",
-    "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language."
+    "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language.",
+    "projection": {
+      "title": "Spending Projection",
+      "monthProgress": "Month Progress",
+      "days": "days",
+      "elapsed": "elapsed",
+      "spentSoFar": "Spent so far",
+      "dailyAvg": "Daily average",
+      "projectedByMonthEnd": "Projected by month end",
+      "projectedSpending": "Projected spending",
+      "projectedSavings": "Projected savings",
+      "onTrack": "On track to meet your savings goal!",
+      "offTrack": "At risk of missing savings goal by {{amount}}"
+    }
   },
   "common": {
     "cancel": "Cancel",

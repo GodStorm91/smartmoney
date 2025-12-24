@@ -441,7 +441,20 @@
     "overBudget": "Vượt Ngân Sách",
     "overBy": "Vượt {{amount}}",
     "carryOver": "Số Dư Chuyển Tiếp",
-    "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại."
+    "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại.",
+    "projection": {
+      "title": "Dự Báo Chi Tiêu",
+      "monthProgress": "Tiến Độ Tháng",
+      "days": "ngày",
+      "elapsed": "đã qua",
+      "spentSoFar": "Đã chi",
+      "dailyAvg": "Trung bình ngày",
+      "projectedByMonthEnd": "Dự báo cuối tháng",
+      "projectedSpending": "Dự báo chi tiêu",
+      "projectedSavings": "Dự báo tiết kiệm",
+      "onTrack": "Đang trên đà đạt mục tiêu tiết kiệm!",
+      "offTrack": "Có nguy cơ thiếu {{amount}} so với mục tiêu"
+    }
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",

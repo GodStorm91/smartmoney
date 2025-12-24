@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { BudgetGenerateForm } from '@/components/budget/budget-generate-form'
 import { BudgetSummaryCard } from '@/components/budget/budget-summary-card'
 import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
+import { BudgetProjectionCard } from '@/components/budget/budget-projection-card'
 import { BudgetAllocationList } from '@/components/budget/budget-allocation-list'
 import { getCurrentBudget, generateBudget, regenerateBudget, getBudgetTracking } from '@/services/budget-service'
 import type { Budget } from '@/types'
@@ -135,6 +136,14 @@ export function BudgetPage() {
               onSubmit={(feedback) => regenerateMutation.mutate(feedback)}
               onCancel={() => setShowFeedbackForm(false)}
               isLoading={regenerateMutation.isPending}
+            />
+          )}
+
+          {/* Show projection only for saved budgets with tracking data */}
+          {!isDraft && tracking && (
+            <BudgetProjectionCard
+              budget={displayBudget}
+              tracking={tracking}
             />
           )}
 
