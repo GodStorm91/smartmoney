@@ -209,9 +209,10 @@ class ClaudeAIService:
             for cat, data in annual_spending.items()
         ]) if annual_spending else "  No annual data"
 
-        prompt = f"""IMPORTANT: You MUST respond entirely in {language_name} language. All text fields including advice, reasoning, and category names must be in {language_name}.
+        # System category names - MUST use these exact names for budget tracking
+        system_categories = "Food, Housing, Transportation, Entertainment, Shopping, Health, Communication, Other"
 
-You are a personal finance advisor helping create a monthly budget.
+        prompt = f"""You are a personal finance advisor helping create a monthly budget.
 
 INCOME: {income_display}/month
 
@@ -222,6 +223,9 @@ ANNUAL SPENDING (last 12 months - captures seasonal patterns):
 {annual_str}
 
 {'USER FEEDBACK: ' + feedback if feedback else ''}
+
+AVAILABLE BUDGET CATEGORIES (you MUST use these exact English names):
+{system_categories}
 
 ANALYSIS GUIDANCE:
 - Use RECENT spending to understand current lifestyle and immediate priorities
@@ -248,11 +252,12 @@ REQUIRED OUTPUT FORMAT (JSON):
 }}
 
 RULES:
+- CRITICAL: Category names MUST be exactly one of: {system_categories}
 - Use Japanese Yen (¥) as currency
 - All amounts must be integers (no decimals)
 - Total allocations + savings should not exceed income
-- Include 5-10 categories maximum
-- Provide brief reasoning for each allocation
+- Include 5-8 categories maximum (only use relevant ones)
+- Write "reasoning" and "advice" fields in {language_name} language
 - Be realistic and practical
 
 Generate the budget now:"""
