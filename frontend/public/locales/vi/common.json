@@ -440,7 +440,8 @@
     "remaining": "còn lại",
     "overBudget": "Vượt Ngân Sách",
     "overBy": "Vượt {{amount}}",
-    "carryOver": "Số Dư Chuyển Tiếp"
+    "carryOver": "Số Dư Chuyển Tiếp",
+    "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại."
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",

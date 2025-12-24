@@ -18,6 +18,7 @@ class Budget(Base):
     monthly_income: Mapped[int] = mapped_column(BigInteger, nullable=False)
     savings_target: Mapped[int] = mapped_column(BigInteger, nullable=True)
     advice: Mapped[str | None] = mapped_column(Text, nullable=True)
+    language: Mapped[str] = mapped_column(String(5), nullable=False, default="ja")  # Language used for AI advice
     carry_over: Mapped[int | None] = mapped_column(BigInteger, nullable=True, default=0)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False

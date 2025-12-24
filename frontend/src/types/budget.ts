@@ -11,6 +11,7 @@ export interface Budget {
   monthly_income: number
   savings_target?: number
   advice?: string
+  language?: string  // Language used for AI advice ('ja', 'en', 'vi')
   carry_over?: number
   allocations: BudgetAllocation[]
   created_at: string

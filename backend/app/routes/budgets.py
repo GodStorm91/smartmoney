@@ -101,7 +101,8 @@ def generate_budget(
             monthly_income=request.monthly_income,
             allocations=budget_data["allocations"],
             savings_target=budget_data.get("savings_target"),
-            advice=budget_data.get("advice")
+            advice=budget_data.get("advice"),
+            language=request.language
         )
 
         return budget
@@ -236,7 +237,8 @@ def regenerate_budget(
             monthly_income=existing_budget.monthly_income,
             allocations=budget_data["allocations"],
             savings_target=budget_data.get("savings_target"),
-            advice=budget_data.get("advice")
+            advice=budget_data.get("advice"),
+            language=request.language
         )
 
         return budget

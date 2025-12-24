@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -21,7 +22,12 @@ export function BudgetSummaryCard({
   onSaveClick,
   isSaving
 }: BudgetSummaryCardProps) {
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
+
+  // Check if budget advice language matches current UI language
+  const budgetLang = budget.language || 'ja'
+  const currentLang = i18n.language
+  const isLanguageMismatch = budget.advice && budgetLang !== currentLang
 
   return (
     <Card className="p-6">
@@ -84,9 +90,17 @@ export function BudgetSummaryCard({
       </div>
 
       {budget.advice && (
-        <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
-          <p className="text-sm font-medium text-amber-800 mb-1">{t('budget.aiAdvice')}</p>
-          <p className="text-amber-700">{budget.advice}</p>
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4 rounded-lg">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">{t('budget.aiAdvice')}</p>
+          <p className="text-amber-700 dark:text-amber-400">{budget.advice}</p>
+          {isLanguageMismatch && (
+            <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-amber-600 dark:text-amber-400">
+                {t('budget.languageMismatchNotice')}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </Card>

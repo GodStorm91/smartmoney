@@ -427,7 +427,8 @@
     "remaining": "残り",
     "overBudget": "予算オーバー",
     "overBy": "{{amount}} オーバー",
-    "carryOver": "繰越額"
+    "carryOver": "繰越額",
+    "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。"
   },
   "credits": {
     "balance": "クレジット残高",

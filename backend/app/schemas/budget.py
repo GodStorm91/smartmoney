@@ -30,6 +30,7 @@ class BudgetResponse(BaseModel):
     monthly_income: int
     savings_target: int | None = None
     advice: str | None = None
+    language: str = "ja"  # Language used for AI advice
     allocations: list[BudgetAllocationSchema]
     created_at: datetime
 

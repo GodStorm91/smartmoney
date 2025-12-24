@@ -440,7 +440,8 @@
     "remaining": "remaining",
     "overBudget": "Over Budget",
     "overBy": "Over by {{amount}}",
-    "carryOver": "Carry Over"
+    "carryOver": "Carry Over",
+    "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language."
   },
   "common": {
     "cancel": "Cancel",

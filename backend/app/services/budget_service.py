@@ -84,7 +84,8 @@ class BudgetService:
         monthly_income: int,
         allocations: list[dict],
         savings_target: int | None = None,
-        advice: str | None = None
+        advice: str | None = None,
+        language: str = "ja"
     ) -> Budget:
         """Create or replace budget for a month.
 
@@ -96,6 +97,7 @@ class BudgetService:
             allocations: List of allocation dicts with category, amount, reasoning
             savings_target: Optional savings target
             advice: Optional AI advice
+            language: Language used for AI advice
 
         Returns:
             Created budget
@@ -119,6 +121,7 @@ class BudgetService:
             monthly_income=monthly_income,
             savings_target=savings_target,
             advice=advice,
+            language=language,
             carry_over=carry_over
         )
         db.add(budget)
