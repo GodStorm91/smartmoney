@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
@@ -27,19 +28,37 @@ import { useRatesMap } from '@/hooks/useExchangeRates'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import type { Transaction, TransactionFilters } from '@/types'
 
+// Helper to get month date range from YYYY-MM format
+function getMonthDateRange(month: string): { start: string; end: string } {
+  const [year, monthNum] = month.split('-').map(Number)
+  const start = `${year}-${String(monthNum).padStart(2, '0')}-01`
+  const lastDay = new Date(year, monthNum, 0).getDate()
+  const end = `${year}-${String(monthNum).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`
+  return { start, end }
+}
+
 export function Transactions() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const rates = useRatesMap()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const monthRange = getCurrentMonthRange()
 
-  // Filter state
+  // Read URL search params from TanStack Router
+  const { category: categoryParam, month: monthParam } = useSearch({
+    from: '/transactions',
+  })
+
+  // Calculate initial date range from URL month param or use current month
+  const initialDateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
+
+  // Filter state - initialize from URL params if present
   const [filters, setFilters] = useState<TransactionFilters>({
-    start_date: monthRange.start,
-    end_date: monthRange.end,
-    categories: [],
+    start_date: initialDateRange.start,
+    end_date: initialDateRange.end,
+    categories: categoryParam ? [categoryParam] : [],
     source: '',
     type: 'all',
   })
@@ -84,6 +103,19 @@ export function Transactions() {
   useEffect(() => {
     setFilters(prev => ({ ...prev, search: debouncedSearch || undefined }))
   }, [debouncedSearch])
+
+  // Update filters when URL params change (browser back/forward)
+  useEffect(() => {
+    if (categoryParam || monthParam) {
+      const dateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
+      setFilters(prev => ({
+        ...prev,
+        categories: categoryParam ? [categoryParam] : prev.categories,
+        start_date: dateRange.start,
+        end_date: dateRange.end,
+      }))
+    }
+  }, [categoryParam, monthParam])
 
   // Modal state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
@@ -186,6 +218,8 @@ export function Transactions() {
       type: 'all',
     })
     setSearchInput('')
+    // Clear URL params by navigating without search params
+    navigate({ to: '/transactions', search: {} })
   }
 
   const income = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) || 0

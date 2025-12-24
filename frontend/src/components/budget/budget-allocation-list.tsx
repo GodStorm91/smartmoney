@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -10,6 +11,7 @@ interface BudgetAllocationListProps {
   allocations: BudgetAllocation[]
   totalBudget: number
   tracking?: BudgetTracking
+  month?: string  // Budget month in YYYY-MM format
   onAllocationChange?: (updatedAllocations: BudgetAllocation[]) => void
 }
 
@@ -17,15 +19,25 @@ export function BudgetAllocationList({
   allocations,
   totalBudget,
   tracking,
+  month,
   onAllocationChange
 }: BudgetAllocationListProps) {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
 
   // Create a map of tracking items by category for quick lookup
   const trackingMap = new Map<string, BudgetTrackingItem>()
   if (tracking?.categories) {
     tracking.categories.forEach(item => {
       trackingMap.set(item.category, item)
+    })
+  }
+
+  // Navigate to transactions filtered by category and month
+  const handleCategoryClick = (category: string) => {
+    navigate({
+      to: '/transactions',
+      search: { category, month: month || undefined }
     })
   }
 
@@ -52,6 +64,7 @@ export function BudgetAllocationList({
                 onAllocationChange(updated)
               }
             }}
+            onCategoryClick={() => handleCategoryClick(allocation.category)}
           />
         ))}
       </div>
@@ -65,6 +78,7 @@ interface AllocationCardProps {
   trackingItem?: BudgetTrackingItem
   editable: boolean
   onAmountChange: (newAmount: number) => void
+  onCategoryClick: () => void
 }
 
 function AllocationCard({
@@ -72,7 +86,8 @@ function AllocationCard({
   totalBudget,
   trackingItem,
   editable,
-  onAmountChange
+  onAmountChange,
+  onCategoryClick
 }: AllocationCardProps) {
   const { t } = useTranslation('common')
   const [isEditing, setIsEditing] = useState(false)
@@ -122,7 +137,10 @@ function AllocationCard({
   }
 
   return (
-    <Card className="p-4">
+    <Card
+      className="p-4 cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
+      onClick={onCategoryClick}
+    >
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
           <h4 className="font-semibold dark:text-gray-100">{allocation.category}</h4>
@@ -140,12 +158,16 @@ function AllocationCard({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
+            onClick={(e) => e.stopPropagation()}
             className="w-32 text-right text-lg font-bold border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
           />
         ) : (
           <button
             type="button"
-            onClick={handleAmountClick}
+            onClick={(e) => {
+              e.stopPropagation()
+              handleAmountClick()
+            }}
             className={cn(
               'text-lg font-bold text-blue-600 dark:text-blue-400',
               editable && 'hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2 py-1 rounded cursor-pointer transition-colors'

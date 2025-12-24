@@ -142,6 +142,7 @@ export function BudgetPage() {
             allocations={displayBudget.allocations}
             totalBudget={totalBudget}
             tracking={tracking || undefined}
+            month={displayBudget.month}
             onAllocationChange={(updatedAllocations) => {
               if (displayBudget) {
                 // Calculate new total allocated
