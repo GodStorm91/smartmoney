@@ -19,6 +19,52 @@ class ClaudeAIService:
         self.client = Anthropic(api_key=settings.anthropic_api_key)
         self.model = "claude-3-5-haiku-20241022"
 
+    def _get_spending_summary(
+        self,
+        db: Session,
+        user_id: int,
+        days: int
+    ) -> dict[str, dict]:
+        """Get aggregated spending by category for given time period.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            days: Number of days to look back
+
+        Returns:
+            Dict mapping category to {average_monthly, transaction_count}
+        """
+        cutoff_date = date.today() - timedelta(days=days)
+        months = days / 30  # Approximate months for averaging
+
+        spending_data = (
+            db.query(
+                Transaction.category,
+                func.sum(Transaction.amount).label("total"),
+                func.count(Transaction.id).label("count")
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.is_income == False,
+                Transaction.is_transfer == False,
+                Transaction.is_adjustment == False,
+                Transaction.date >= cutoff_date
+            )
+            .group_by(Transaction.category)
+            .all()
+        )
+
+        category_spending = {}
+        for row in spending_data:
+            avg_monthly = abs(row.total) / months
+            category_spending[row.category] = {
+                "average_monthly": int(avg_monthly),
+                "transaction_count": row.count
+            }
+
+        return category_spending
+
     def generate_budget(
         self,
         db: Session,
@@ -39,39 +85,15 @@ class ClaudeAIService:
         Returns:
             dict with allocations, savings_target, advice
         """
-        # Fetch historical spending data (last 3 months)
-        three_months_ago = date.today() - timedelta(days=90)
-        spending_data = (
-            db.query(
-                Transaction.category,
-                func.sum(Transaction.amount).label("total"),
-                func.count(Transaction.id).label("count")
-            )
-            .filter(
-                Transaction.user_id == user_id,
-                Transaction.is_income == False,
-                Transaction.is_transfer == False,
-                Transaction.is_adjustment == False,
-                Transaction.date >= three_months_ago
-            )
-            .group_by(Transaction.category)
-            .all()
-        )
-
-        # Calculate average monthly spending per category
-        category_spending = {}
-        for row in spending_data:
-            # Divide by 3 to get monthly average
-            avg_monthly = abs(row.total) / 3
-            category_spending[row.category] = {
-                "average_monthly": int(avg_monthly),
-                "transaction_count": row.count
-            }
+        # Fetch spending data for both timeframes
+        recent_spending = self._get_spending_summary(db, user_id, days=90)   # 3 months
+        annual_spending = self._get_spending_summary(db, user_id, days=365)  # 12 months
 
         # Build prompt for Claude
         prompt = self._build_budget_prompt(
             monthly_income=monthly_income,
-            category_spending=category_spending,
+            recent_spending=recent_spending,
+            annual_spending=annual_spending,
             feedback=feedback,
             language=language
         )
@@ -110,39 +132,15 @@ class ClaudeAIService:
         Returns:
             Tuple of (budget_data dict, usage dict with input_tokens and output_tokens)
         """
-        # Fetch historical spending data (last 3 months)
-        three_months_ago = date.today() - timedelta(days=90)
-        spending_data = (
-            db.query(
-                Transaction.category,
-                func.sum(Transaction.amount).label("total"),
-                func.count(Transaction.id).label("count")
-            )
-            .filter(
-                Transaction.user_id == user_id,
-                Transaction.is_income == False,
-                Transaction.is_transfer == False,
-                Transaction.is_adjustment == False,
-                Transaction.date >= three_months_ago
-            )
-            .group_by(Transaction.category)
-            .all()
-        )
-
-        # Calculate average monthly spending per category
-        category_spending = {}
-        for row in spending_data:
-            # Divide by 3 to get monthly average
-            avg_monthly = abs(row.total) / 3
-            category_spending[row.category] = {
-                "average_monthly": int(avg_monthly),
-                "transaction_count": row.count
-            }
+        # Fetch spending data for both timeframes
+        recent_spending = self._get_spending_summary(db, user_id, days=90)   # 3 months
+        annual_spending = self._get_spending_summary(db, user_id, days=365)  # 12 months
 
         # Build prompt for Claude
         prompt = self._build_budget_prompt(
             monthly_income=monthly_income,
-            category_spending=category_spending,
+            recent_spending=recent_spending,
+            annual_spending=annual_spending,
             feedback=feedback,
             language=language
         )
@@ -171,7 +169,8 @@ class ClaudeAIService:
     def _build_budget_prompt(
         self,
         monthly_income: int,
-        category_spending: dict[str, dict],
+        recent_spending: dict[str, dict],
+        annual_spending: dict[str, dict],
         feedback: str | None,
         language: str = "ja"
     ) -> str:
@@ -179,7 +178,8 @@ class ClaudeAIService:
 
         Args:
             monthly_income: Monthly income in cents
-            category_spending: Historical spending by category
+            recent_spending: Last 3 months spending by category (current habits)
+            annual_spending: Last 12 months spending by category (seasonal patterns)
             feedback: User feedback for regeneration
             language: Language code for response (ja, en, vi)
 
@@ -196,11 +196,17 @@ class ClaudeAIService:
 
         income_display = f"¥{monthly_income:,}"
 
-        # Format spending history
-        spending_str = "\n".join([
-            f"  - {cat}: ¥{data['average_monthly']:,} (avg/month, {data['transaction_count']} transactions)"
-            for cat, data in category_spending.items()
-        ])
+        # Format recent spending (3 months - current habits)
+        recent_str = "\n".join([
+            f"  - {cat}: ¥{data['average_monthly']:,}/month ({data['transaction_count']} txns)"
+            for cat, data in recent_spending.items()
+        ]) if recent_spending else "  No recent data"
+
+        # Format annual spending (12 months - seasonal patterns)
+        annual_str = "\n".join([
+            f"  - {cat}: ¥{data['average_monthly']:,}/month ({data['transaction_count']} txns)"
+            for cat, data in annual_spending.items()
+        ]) if annual_spending else "  No annual data"
 
         prompt = f"""IMPORTANT: You MUST respond entirely in {language_name} language. All text fields including advice, reasoning, and category names must be in {language_name}.
 
@@ -208,15 +214,24 @@ You are a personal finance advisor helping create a monthly budget.
 
 INCOME: {income_display}/month
 
-HISTORICAL SPENDING (last 3 months average):
-{spending_str if spending_str else "  No historical data available"}
+RECENT SPENDING (last 3 months - reflects current habits):
+{recent_str}
+
+ANNUAL SPENDING (last 12 months - captures seasonal patterns):
+{annual_str}
 
 {'USER FEEDBACK: ' + feedback if feedback else ''}
+
+ANALYSIS GUIDANCE:
+- Use RECENT spending to understand current lifestyle and immediate priorities
+- Use ANNUAL spending to identify seasonal expenses (holidays, vacations, insurance)
+- If a category appears only in annual data, it may be periodic/seasonal
+- If recent spending differs significantly from annual, note the trend
 
 TASK: Create a realistic, balanced monthly budget that:
 1. Allocates funds across relevant expense categories
 2. Recommends a reasonable savings target (20-30% of income if possible)
-3. Considers historical spending patterns
+3. Considers both recent habits AND seasonal patterns
 4. Follows the 50/30/20 rule (needs/wants/savings) as a guideline
 5. Provides 1-2 sentences of practical advice
 
