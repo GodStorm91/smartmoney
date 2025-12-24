@@ -1,6 +1,7 @@
 """Claude AI service for budget generation."""
 import json
 from datetime import date, timedelta
+from decimal import Decimal
 from typing import Any
 
 from anthropic import Anthropic
@@ -36,7 +37,7 @@ class ClaudeAIService:
             Dict mapping category to {average_monthly, transaction_count}
         """
         cutoff_date = date.today() - timedelta(days=days)
-        months = days / 30  # Approximate months for averaging
+        months = Decimal(days) / Decimal(30)  # Approximate months for averaging
 
         spending_data = (
             db.query(
