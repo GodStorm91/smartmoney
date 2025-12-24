@@ -5,9 +5,7 @@ import { updateTransaction, deleteTransaction } from '@/services/transaction-ser
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { CategoryGrid } from './CategoryGrid'
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
-import { useCustomCategories } from '@/hooks/useCategories'
+import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
 import type { Transaction } from '@/types'
 import { cn } from '@/utils/cn'
 
@@ -24,20 +22,15 @@ export function TransactionEditModal({
 }: TransactionEditModalProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
-  const { data: customCategories = [] } = useCustomCategories()
 
   // Form state
   const [date, setDate] = useState('')
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
-  const [categoryId, setCategoryId] = useState('')
   const [source, setSource] = useState('')
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-
-  // Get categories based on type
-  const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
 
   // Update mutation
   const updateMutation = useMutation({
@@ -72,28 +65,8 @@ export function TransactionEditModal({
       setSource(transaction.source)
       setType(transaction.type)
       setShowDeleteConfirm(false)
-
-      // Match category to predefined or custom
-      const allPredefined = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]
-      const matchedPredefined = allPredefined.find(
-        c => c.value.toLowerCase() === transaction.category.toLowerCase()
-      )
-      if (matchedPredefined) {
-        setCategoryId(matchedPredefined.id)
-      } else {
-        // Check custom categories
-        const matchedCustom = customCategories.find(
-          c => c.name.toLowerCase() === transaction.category.toLowerCase()
-        )
-        if (matchedCustom) {
-          setCategoryId(`custom_${matchedCustom.id}`)
-        } else {
-          setCategoryId('other') // fallback
-        }
-      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [transaction?.id, isOpen]) // Only re-run when transaction ID or modal open state changes
+  }, [transaction?.id, isOpen])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,23 +74,11 @@ export function TransactionEditModal({
     const amountValue = parseFloat(amount)
     if (isNaN(amountValue)) return
 
-    // Resolve category value from categoryId
-    let categoryValue = category // fallback to current
-    if (categoryId.startsWith('custom_')) {
-      const customId = parseInt(categoryId.replace('custom_', ''))
-      const customCat = customCategories.find(c => c.id === customId)
-      categoryValue = customCat?.name || category
-    } else {
-      const allPredefined = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]
-      const predefined = allPredefined.find(c => c.id === categoryId)
-      categoryValue = predefined?.value || category
-    }
-
     updateMutation.mutate({
       date,
       description,
       amount: Math.round(type === 'expense' ? -Math.abs(amountValue) : Math.abs(amountValue)),
-      category: categoryValue,
+      category: category || 'Other',
       source,
       type,
     })
@@ -207,15 +168,14 @@ export function TransactionEditModal({
                 ]}
               />
 
-              {/* Category Grid */}
+              {/* Category Picker */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {t('transaction.category')}
                 </label>
-                <CategoryGrid
-                  categories={categories}
-                  selected={categoryId}
-                  onSelect={setCategoryId}
+                <HierarchicalCategoryPicker
+                  selected={category}
+                  onSelect={(childName) => setCategory(childName)}
                   isIncome={type === 'income'}
                 />
               </div>

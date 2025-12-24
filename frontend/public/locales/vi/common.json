@@ -435,12 +435,11 @@
     "draft": "Bản Nháp",
     "save": "Lưu Ngân Sách",
     "saving": "Đang lưu...",
-    "swipeToEdit": "Vuốt trái/phải trên thẻ để điều chỉnh số tiền",
-    "swipeLeft": "Giảm",
-    "swipeRight": "Tăng",
+    "tapToEdit": "Nhấn vào số tiền để chỉnh sửa",
     "spent": "Đã chi",
     "remaining": "còn lại",
     "overBudget": "Vượt Ngân Sách",
+    "overBy": "Vượt {{amount}}",
     "carryOver": "Số Dư Chuyển Tiếp"
   },
   "credits": {

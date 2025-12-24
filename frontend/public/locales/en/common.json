@@ -435,12 +435,11 @@
     "draft": "Draft",
     "save": "Save Budget",
     "saving": "Saving...",
-    "swipeToEdit": "Swipe left/right on cards to adjust amounts",
-    "swipeLeft": "Decrease",
-    "swipeRight": "Increase",
+    "tapToEdit": "Tap amount to edit",
     "spent": "Spent",
     "remaining": "remaining",
     "overBudget": "Over Budget",
+    "overBy": "Over by {{amount}}",
     "carryOver": "Carry Over"
   },
   "common": {

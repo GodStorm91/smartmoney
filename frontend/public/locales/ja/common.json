@@ -422,12 +422,11 @@
     "draft": "下書き",
     "save": "予算を保存",
     "saving": "保存中...",
-    "swipeToEdit": "カードを左右にスワイプして金額を調整",
-    "swipeLeft": "減らす",
-    "swipeRight": "増やす",
+    "tapToEdit": "金額をタップして編集",
     "spent": "支出",
     "remaining": "残り",
     "overBudget": "予算オーバー",
+    "overBy": "{{amount}} オーバー",
     "carryOver": "繰越額"
   },
   "credits": {

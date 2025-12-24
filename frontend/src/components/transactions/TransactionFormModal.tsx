@@ -7,11 +7,9 @@ import { createTransaction, type TransactionSuggestion } from '@/services/transa
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
-import { CategoryGrid } from './CategoryGrid'
+import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES } from './constants/categories'
-import { useCustomCategories } from '@/hooks/useCategories'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
 import type { ReceiptData } from '@/services/receipt-service'
 
@@ -42,7 +40,6 @@ function parseFormattedNumber(value: string): string {
 export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalProps) {
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
-  const { data: customCategories = [] } = useCustomCategories()
   const queryClient = useQueryClient()
 
   // Form state
@@ -51,7 +48,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const [amount, setAmount] = useState('')
   const [displayAmount, setDisplayAmount] = useState('')
   const [description, setDescription] = useState('')
-  const [categoryId, setCategoryId] = useState('')
+  const [category, setCategory] = useState('')  // child category name
   const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showScanner, setShowScanner] = useState(false)
@@ -72,9 +69,6 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     ? CURRENCY_SYMBOLS[selectedAccount.currency] || selectedAccount.currency
     : '¥'
 
-  // Get current categories based on income/expense
-  const categories = isIncome ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
-
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -83,7 +77,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       setAmount('')
       setDisplayAmount('')
       setDescription('')
-      setCategoryId('')
+      setCategory('')
       setAccountId(accounts?.[0]?.id || null)
       setErrors({})
       // Reset recurring state
@@ -97,7 +91,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
   // Reset category when switching income/expense
   useEffect(() => {
-    setCategoryId('')
+    setCategory('')
   }, [isIncome])
 
   // Offline-aware mutation - queues when offline, syncs when back online
@@ -132,13 +126,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     // Set income/expense type
     setIsIncome(suggestion.is_income)
 
-    // Match category
-    const allCategories = suggestion.is_income ? INCOME_CATEGORIES : EXPENSE_CATEGORIES
-    const matchedCategory = allCategories.find(
-      c => c.value.toLowerCase() === suggestion.category.toLowerCase()
-    )
-    if (matchedCategory) {
-      setCategoryId(matchedCategory.id)
+    // Set category directly from suggestion
+    if (suggestion.category) {
+      setCategory(suggestion.category)
     }
   }
 
@@ -163,16 +153,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       setDescription(data.merchant)
     }
 
-    // Try to match category
+    // Set category directly from receipt scan
     if (data.category) {
-      const categoryLower = data.category.toLowerCase()
-      const matchedCategory = categories.find(
-        c => c.value.toLowerCase() === categoryLower ||
-             c.id.toLowerCase().includes(categoryLower)
-      )
-      if (matchedCategory) {
-        setCategoryId(matchedCategory.id)
-      }
+      setCategory(data.category)
     }
 
     setShowScanner(false)
@@ -188,7 +171,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     if (!description.trim()) {
       newErrors.description = t('transaction.errors.descriptionRequired', 'Description is required')
     }
-    if (!categoryId) {
+    if (!category) {
       newErrors.category = t('transaction.errors.categoryRequired', 'Category is required')
     }
     if (!accountId) {
@@ -204,16 +187,8 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     e.preventDefault()
     if (!validateForm()) return
 
-    // Resolve category value - handle both predefined and custom categories
-    let categoryValue = 'Other'
-    if (categoryId.startsWith('custom_')) {
-      const customId = parseInt(categoryId.replace('custom_', ''))
-      const customCat = customCategories.find(c => c.id === customId)
-      categoryValue = customCat?.name || 'Other'
-    } else {
-      const selectedCategory = categories.find(c => c.id === categoryId)
-      categoryValue = selectedCategory?.value || 'Other'
-    }
+    // Category is now directly the child category name
+    const categoryValue = category || 'Other'
     const amountValue = parseInt(amount)
 
     try {
@@ -386,15 +361,14 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             )}
           </div>
 
-          {/* Category Grid */}
+          {/* Category Picker */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               {t('transaction.category', 'Category')}
             </label>
-            <CategoryGrid
-              categories={categories}
-              selected={categoryId}
-              onSelect={setCategoryId}
+            <HierarchicalCategoryPicker
+              selected={category}
+              onSelect={(childName) => setCategory(childName)}
               isIncome={isIncome}
             />
             {errors.category && (

@@ -12,6 +12,33 @@ class BudgetTrackingService:
     """Service for tracking budget spending and sending alerts."""
 
     @staticmethod
+    def get_parent_category_map(db: Session, user_id: int) -> dict[str, str]:
+        """Build mapping from child category name to parent name.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Dict mapping child name -> parent name
+        """
+        from ..models.category import Category
+
+        mapping = {}
+
+        # Get all children (system + user's custom)
+        children = db.query(Category).filter(
+            Category.parent_id != None,
+            (Category.is_system == True) | (Category.user_id == user_id)
+        ).all()
+
+        for child in children:
+            if child.parent:
+                mapping[child.name] = child.parent.name
+
+        return mapping
+
+    @staticmethod
     def get_budget_tracking(db: Session, user_id: int) -> dict | None:
         """Get current month's budget tracking data.
 
@@ -59,8 +86,14 @@ class BudgetTrackingService:
             .all()
         )
 
+        # Build parent mapping for category rollup
+        parent_map = BudgetTrackingService.get_parent_category_map(db, user_id)
+
+        # Aggregate spending by PARENT category
         for row in spending_data:
-            category_spending[row.category] = abs(row.total)
+            child_name = row.category
+            parent_name = parent_map.get(child_name, child_name)  # fallback to self if not found
+            category_spending[parent_name] = category_spending.get(parent_name, 0) + abs(row.total)
 
         # Build tracking items
         categories = []

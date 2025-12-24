@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { AlertTriangle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { cn } from '@/utils/cn'
 import type { BudgetAllocation, BudgetTracking, BudgetTrackingItem } from '@/types'
 
 interface BudgetAllocationListProps {
@@ -32,7 +33,9 @@ export function BudgetAllocationList({
     <div>
       <h3 className="text-lg font-semibold mb-4">{t('budget.allocations')}</h3>
       {onAllocationChange && (
-        <p className="text-sm text-gray-600 mb-4">{t('budget.swipeToEdit')}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {t('budget.tapToEdit', 'Tap amount to edit')}
+        </p>
       )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {allocations.map((allocation, index) => (
@@ -72,71 +75,31 @@ function AllocationCard({
   onAmountChange
 }: AllocationCardProps) {
   const { t } = useTranslation('common')
-  const [isDragging, setIsDragging] = useState(false)
-  const startX = useRef<number>(0)
-  const initialAmount = useRef<number>(allocation.amount)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  // Touch handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
+  // Handle tap-to-edit
+  const handleAmountClick = () => {
     if (!editable) return
-    e.preventDefault()
-    setIsDragging(true)
-    startX.current = e.touches[0].clientX
-    initialAmount.current = allocation.amount
+    setEditValue(String(allocation.amount))
+    setIsEditing(true)
+    setTimeout(() => inputRef.current?.focus(), 0)
   }
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!editable || !isDragging) return
-    e.preventDefault()
-    const currentX = e.touches[0].clientX
-    const deltaX = currentX - startX.current
-
-    // Improved sensitivity: 200px swipe = 50% change (more responsive)
-    const percentChange = deltaX / 400
-    const amountChange = initialAmount.current * percentChange
-    const newAmount = Math.max(0, Math.round(initialAmount.current + amountChange))
-
-    onAmountChange(newAmount)
+  const handleBlur = () => {
+    const newAmount = parseInt(editValue) || 0
+    if (newAmount !== allocation.amount) {
+      onAmountChange(newAmount)
+    }
+    setIsEditing(false)
   }
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (!editable) return
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  // Mouse handlers for desktop testing
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!editable) return
-    e.preventDefault()
-    setIsDragging(true)
-    startX.current = e.clientX
-    initialAmount.current = allocation.amount
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!editable || !isDragging) return
-    e.preventDefault()
-    const currentX = e.clientX
-    const deltaX = currentX - startX.current
-
-    // Same sensitivity as touch
-    const percentChange = deltaX / 400
-    const amountChange = initialAmount.current * percentChange
-    const newAmount = Math.max(0, Math.round(initialAmount.current + amountChange))
-
-    onAmountChange(newAmount)
-  }
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    if (!editable) return
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  const handleMouseLeave = () => {
-    if (isDragging) {
-      setIsDragging(false)
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleBlur()
+    } else if (e.key === 'Escape') {
+      setIsEditing(false)
     }
   }
 
@@ -146,104 +109,109 @@ function AllocationCard({
   const spent = trackingItem?.spent || 0
   const budgeted = trackingItem?.budgeted || allocation.amount
   const remaining = budgeted - spent
-  const remainingPercent = budgeted > 0 ? Math.max(0, (remaining / budgeted) * 100) : 100
   const spentPercent = budgeted > 0 ? Math.min((spent / budgeted) * 100, 100) : 0
   const isOverBudget = spent > budgeted
+  const overAmount = spent - budgeted
 
-  // Color based on remaining percentage
-  const getTrackingBarColor = () => {
+  // Color based on spent percentage
+  const getProgressBarColor = () => {
     if (isOverBudget) return 'bg-red-500'
-    if (remainingPercent < 5) return 'bg-red-500'
-    if (remainingPercent < 20) return 'bg-orange-500'
-    if (remainingPercent < 40) return 'bg-yellow-500'
+    if (spentPercent >= 80) return 'bg-orange-500'
+    if (spentPercent >= 60) return 'bg-yellow-500'
     return 'bg-green-500'
   }
 
-  const getTrackingTextColor = () => {
-    if (isOverBudget) return 'text-red-600'
-    if (remainingPercent < 5) return 'text-red-600'
-    if (remainingPercent < 20) return 'text-orange-600'
-    if (remainingPercent < 40) return 'text-yellow-600'
-    return 'text-green-600'
-  }
-
   return (
-    <div
-      className={editable ? 'cursor-grab active:cursor-grabbing touch-none select-none' : ''}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onTouchCancel={handleTouchEnd}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseLeave}
-    >
-      <Card
-        className={`p-4 transition-all ${isDragging ? 'ring-2 ring-blue-400 shadow-lg scale-[1.02]' : ''}`}
-      >
-        <div className="flex justify-between items-start mb-2">
-          <div className="flex items-center gap-2">
-            <h4 className="font-semibold">{allocation.category}</h4>
-            {trackingItem && isOverBudget && (
-              <AlertTriangle className="w-4 h-4 text-red-500" aria-label={t('budget.overBudget')} />
-            )}
-          </div>
-          <p className={`text-lg font-bold ${isDragging ? 'text-blue-600 scale-110' : 'text-blue-600'} transition-all`}>
-            {formatCurrency(allocation.amount)}
-          </p>
+    <Card className="p-4">
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex items-center gap-2">
+          <h4 className="font-semibold dark:text-gray-100">{allocation.category}</h4>
+          {trackingItem && isOverBudget && (
+            <AlertTriangle className="w-4 h-4 text-red-500" aria-label={t('budget.overBudget')} />
+          )}
         </div>
-        {allocation.reasoning && (
-          <p className="text-sm text-gray-600">{allocation.reasoning}</p>
-        )}
 
-        {/* Budget allocation bar (% of total budget) */}
-        <div className="mt-2">
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        {/* Tap-to-edit amount */}
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="number"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            className="w-32 text-right text-lg font-bold border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={handleAmountClick}
+            className={cn(
+              'text-lg font-bold text-blue-600 dark:text-blue-400',
+              editable && 'hover:bg-blue-50 dark:hover:bg-blue-900/30 px-2 py-1 rounded cursor-pointer transition-colors'
+            )}
+          >
+            {formatCurrency(allocation.amount)}
+          </button>
+        )}
+      </div>
+
+      {allocation.reasoning && (
+        <p className="text-sm text-gray-600 dark:text-gray-400">{allocation.reasoning}</p>
+      )}
+
+      {/* Budget allocation bar (% of total budget) */}
+      <div className="mt-2">
+        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-500 transition-all"
+            style={{ width: `${Math.min(percentage, 100)}%` }}
+          />
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          {percentage.toFixed(1)}% {t('budget.ofTotal')}
+        </p>
+      </div>
+
+      {/* Tracking progress bar (spent vs budget) */}
+      {trackingItem && (
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+          {/* Spent / Budgeted display */}
+          <div className="flex justify-between text-sm mb-1">
+            <span className="text-gray-600 dark:text-gray-400">
+              {formatCurrency(spent)} / {formatCurrency(budgeted)}
+            </span>
+            <span className={cn(
+              'font-medium',
+              isOverBudget ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'
+            )}>
+              {isOverBudget ? (
+                <>⚠️ {t('budget.overBy', { amount: formatCurrency(overAmount) })}</>
+              ) : (
+                <>{formatCurrency(remaining)} {t('budget.remaining')}</>
+              )}
+            </span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-              className={`h-full transition-all ${isDragging ? 'bg-blue-600' : 'bg-blue-500'}`}
-              style={{
-                width: `${Math.min(percentage, 100)}%`,
-              }}
+              className={cn('h-full transition-all', getProgressBarColor())}
+              style={{ width: `${Math.min(spentPercent, 100)}%` }}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            {percentage.toFixed(1)}% {t('budget.ofTotal')}
-          </p>
-        </div>
 
-        {/* Tracking progress bar (spent vs budget) - only show if tracking data exists */}
-        {trackingItem && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-gray-600">
-                {t('budget.spent')}: {formatCurrency(spent)} / {formatCurrency(budgeted)}
-              </span>
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          {/* Over-budget indicator bar */}
+          {isOverBudget && (
+            <div className="h-1 bg-red-200 dark:bg-red-900/50 rounded-full mt-1 overflow-hidden">
               <div
-                className={`h-full transition-all ${getTrackingBarColor()}`}
-                style={{
-                  width: `${spentPercent}%`,
-                }}
+                className="h-full bg-red-500"
+                style={{ width: `${Math.min(((spent - budgeted) / budgeted) * 100, 100)}%` }}
               />
             </div>
-            <p className={`text-xs mt-1 font-medium ${getTrackingTextColor()}`}>
-              {isOverBudget ? (
-                t('budget.overBudget')
-              ) : (
-                `${remainingPercent.toFixed(0)}% ${t('budget.remaining')}`
-              )}
-            </p>
-          </div>
-        )}
-
-        {editable && isDragging && (
-          <p className="text-xs text-blue-600 mt-2 font-medium animate-pulse">
-            ← {t('budget.swipeLeft')} / {t('budget.swipeRight')} →
-          </p>
-        )}
-      </Card>
-    </div>
+          )}
+        </div>
+      )}
+    </Card>
   )
 }

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
-import { useCreateCategory } from '@/hooks/useCategories'
+import { useCreateUserCategory } from '@/hooks/useCategories'
 import { cn } from '@/utils/cn'
 
 interface CreateCategoryModalProps {
@@ -25,7 +25,7 @@ export function CreateCategoryModal({
   onCreated
 }: CreateCategoryModalProps) {
   const { t } = useTranslation('common')
-  const createMutation = useCreateCategory()
+  const createMutation = useCreateUserCategory()
 
   const [name, setName] = useState('')
   const [icon, setIcon] = useState('📁')

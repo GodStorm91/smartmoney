@@ -275,14 +275,15 @@ Generate the budget now:"""
     def categorize_transactions(
         self,
         transactions: list[dict],
-        available_categories: list[str],
+        available_categories: list[str] | dict[str, list[str]],
         language: str = "ja"
     ) -> tuple[list[dict], dict[str, int]]:
         """Categorize transactions using Claude AI.
 
         Args:
             transactions: List of dicts with id, description, amount
-            available_categories: List of allowed category names
+            available_categories: Either flat list of category names OR
+                                  dict mapping parent -> list of children for hierarchy
             language: Language code for response
 
         Returns:
@@ -291,12 +292,19 @@ Generate the budget now:"""
         if not transactions:
             return [], {"input_tokens": 0, "output_tokens": 0}
 
-        # Build prompt for Claude
-        prompt = self._build_categorization_prompt(
-            transactions=transactions,
-            available_categories=available_categories,
-            language=language
-        )
+        # Build prompt for Claude - detect if hierarchical
+        if isinstance(available_categories, dict):
+            prompt = self._build_hierarchical_categorization_prompt(
+                transactions=transactions,
+                category_hierarchy=available_categories,
+                language=language
+            )
+        else:
+            prompt = self._build_categorization_prompt(
+                transactions=transactions,
+                available_categories=available_categories,
+                language=language
+            )
 
         # Call Claude API
         response = self.client.messages.create(
@@ -364,6 +372,67 @@ REQUIRED OUTPUT FORMAT (JSON array):
 RULES:
 - Return ONLY valid JSON array
 - Include all transaction IDs from input
+- confidence should be 0.0-1.0
+- reason should be brief (under 50 chars)
+- Respond in {language_name} for the reason field
+
+Generate categorizations now:"""
+
+        return prompt
+
+    def _build_hierarchical_categorization_prompt(
+        self,
+        transactions: list[dict],
+        category_hierarchy: dict[str, list[str]],
+        language: str = "ja"
+    ) -> str:
+        """Build prompt for hierarchical transaction categorization."""
+        language_map = {
+            "ja": "Japanese",
+            "en": "English",
+            "vi": "Vietnamese"
+        }
+        language_name = language_map.get(language, "Japanese")
+
+        # Format transactions list
+        tx_list = "\n".join([
+            f'{i+1}. ID:{tx["id"]} | "{tx["description"]}" | ¥{abs(tx["amount"]):,}'
+            for i, tx in enumerate(transactions)
+        ])
+
+        # Build hierarchy string
+        hierarchy_lines = []
+        for parent, children in category_hierarchy.items():
+            children_str = ", ".join(children)
+            hierarchy_lines.append(f"- {parent}: {children_str}")
+        hierarchy_str = "\n".join(hierarchy_lines)
+
+        prompt = f"""You are a financial transaction categorizer. Analyze each transaction and suggest the most appropriate CHILD category.
+
+CATEGORY HIERARCHY (Parent: Children):
+{hierarchy_str}
+
+TRANSACTIONS TO CATEGORIZE:
+{tx_list}
+
+TASK: For each transaction, determine the best CHILD category based on the description.
+- Always return a CHILD category (not parent)
+- Match merchant names, keywords, and context clues
+- If unsure, use "Misc" child under the most likely parent
+- For new/unique items, suggest "NEW:CategoryName" under appropriate parent
+
+REQUIRED OUTPUT FORMAT (JSON array):
+[
+  {{"id": 123, "category": "Cafe", "parent": "Food", "confidence": 0.95, "reason": "Starbucks detected"}},
+  {{"id": 456, "category": "Train", "parent": "Transportation", "confidence": 0.85, "reason": "Station keyword"}},
+  {{"id": 789, "category": "NEW:Gym", "parent": "Health", "confidence": 0.80, "reason": "Fitness facility"}}
+]
+
+RULES:
+- Return ONLY valid JSON array
+- Include all transaction IDs from input
+- category = child category name
+- parent = parent category name
 - confidence should be 0.0-1.0
 - reason should be brief (under 50 chars)
 - Respond in {language_name} for the reason field

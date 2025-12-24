@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.category import Category
 from ..models.transaction import Transaction
 from ..models.user import User
 from ..services.claude_ai_service import ClaudeAIService
@@ -15,13 +16,6 @@ from ..services.credit_service import CreditService, InsufficientCreditsError
 from ..services.category_rule_service import CategoryRuleService
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
-
-# Default expense categories
-DEFAULT_CATEGORIES = [
-    "Food", "Housing", "Transportation", "Utilities", "Communication",
-    "Entertainment", "Shopping", "Health", "Other", "Groceries",
-    "Dining", "Cafe", "Convenience", "Clothing", "Investment", "Transfer"
-]
 
 
 class CategorizeSuggestionsRequest(BaseModel):
@@ -115,16 +109,33 @@ def get_categorization_suggestions(
             detail="Insufficient credits. Please purchase more credits."
         )
 
-    # Get user's custom categories
-    from ..models.user_category import UserCategory
-    user_categories = db.query(UserCategory.name).filter(
-        UserCategory.user_id == current_user.id,
-        UserCategory.type == "expense"
+    # Build category hierarchy from Category model
+    # Get all system parent categories (expense type)
+    parent_categories = db.query(Category).filter(
+        Category.is_system == True,
+        Category.parent_id == None,
+        Category.type == "expense"
     ).all()
-    custom_category_names = [uc.name for uc in user_categories]
 
-    # Combine default and custom categories
-    available_categories = list(set(DEFAULT_CATEGORIES + custom_category_names))
+    # Build hierarchy dict: {parent_name: [child_names]}
+    category_hierarchy: dict[str, list[str]] = {}
+    for parent in parent_categories:
+        # Get system children
+        system_children = db.query(Category).filter(
+            Category.parent_id == parent.id,
+            Category.is_system == True
+        ).all()
+
+        # Get user's custom children under this parent
+        user_children = db.query(Category).filter(
+            Category.parent_id == parent.id,
+            Category.user_id == current_user.id,
+            Category.is_system == False
+        ).all()
+
+        child_names = [c.name for c in system_children] + [c.name for c in user_children]
+        if child_names:
+            category_hierarchy[parent.name] = child_names
 
     # Prepare transaction data for AI
     tx_data = [
@@ -132,12 +143,12 @@ def get_categorization_suggestions(
         for tx in other_transactions
     ]
 
-    # Call AI service
+    # Call AI service with hierarchy
     try:
         ai_service = ClaudeAIService()
         results, usage = ai_service.categorize_transactions(
             transactions=tx_data,
-            available_categories=available_categories,
+            available_categories=category_hierarchy,
             language=request.language
         )
 
