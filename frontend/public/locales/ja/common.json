@@ -294,7 +294,8 @@
     "update": "更新",
     "cancel": "キャンセル",
     "today": "今日",
-    "back": "戻る"
+    "back": "戻る",
+    "optional": "任意"
   },
   "autocomplete": {
     "used": "回使用"
@@ -702,6 +703,26 @@
     "noCredits": "クレジットが不足しています。追加購入してください。",
     "welcomeMessage": "こんにちは！私はあなたの家計アシスタントです。支出、貯蓄目標、予算について何でもお聞きください。",
     "error": "応答の取得に失敗しました。もう一度お試しください。"
+  },
+  "transfer": {
+    "title": "口座間振替",
+    "fromAccount": "振替元",
+    "toAccount": "振替先",
+    "selectAccount": "口座を選択",
+    "amount": "金額",
+    "convertedAmount": "換算金額",
+    "fee": "振替手数料",
+    "date": "日付",
+    "description": "説明",
+    "descriptionPlaceholder": "例: 月次貯蓄振替",
+    "create": "振替を作成",
+    "error": "振替の作成に失敗しました",
+    "errors": {
+      "fromRequired": "振替元を選択してください",
+      "toRequired": "振替先を選択してください",
+      "sameAccount": "同じ口座には振替できません",
+      "amountRequired": "金額は必須です"
+    }
   },
   "ai": {
     "categoryCleanup": "AIカテゴリ整理",

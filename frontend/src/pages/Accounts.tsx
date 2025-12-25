@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ArrowRightLeft } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { AccountCard } from '@/components/accounts/AccountCard'
 import { AccountFormModal } from '@/components/accounts/AccountFormModal'
+import { TransferFormModal } from '@/components/transfers'
 import type { AccountType } from '@/types'
 
 export default function Accounts() {
   const { t } = useTranslation('common')
   const [includeInactive, setIncludeInactive] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null)
 
   const { data: accounts, isLoading, error } = useAccounts(includeInactive)
@@ -49,22 +52,31 @@ export default function Accounts() {
             <h1 className="text-3xl font-bold text-gray-900">{t('account.accounts')}</h1>
             <p className="text-gray-600 mt-1">{t('account.manageYourAccounts')}</p>
           </div>
-          <button
-            onClick={handleCreateAccount}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-5 h-5"
+          <div className="flex gap-3">
+            <button
+              onClick={() => setIsTransferModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            {t('account.createAccount')}
-          </button>
+              <ArrowRightLeft className="w-5 h-5" />
+              {t('transfer.title')}
+            </button>
+            <button
+              onClick={handleCreateAccount}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-5 h-5"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              {t('account.createAccount')}
+            </button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -174,6 +186,12 @@ export default function Accounts() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         editingAccountId={editingAccountId}
+      />
+
+      {/* Transfer Form Modal */}
+      <TransferFormModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
       />
     </div>
   )

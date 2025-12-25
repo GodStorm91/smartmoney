@@ -288,7 +288,8 @@
     "update": "Cập nhật",
     "cancel": "Hủy",
     "today": "Hôm nay",
-    "back": "Quay lại"
+    "back": "Quay lại",
+    "optional": "Tùy chọn"
   },
   "autocomplete": {
     "used": "lần dùng"
@@ -715,6 +716,26 @@
     "noCredits": "Hết credit. Vui lòng mua thêm.",
     "welcomeMessage": "Xin chào! Tôi là trợ lý tài chính của bạn. Hãy hỏi tôi bất cứ điều gì về chi tiêu, mục tiêu tiết kiệm, hoặc ngân sách.",
     "error": "Không thể nhận phản hồi. Vui lòng thử lại."
+  },
+  "transfer": {
+    "title": "Chuyển tiền giữa tài khoản",
+    "fromAccount": "Từ tài khoản",
+    "toAccount": "Đến tài khoản",
+    "selectAccount": "Chọn tài khoản",
+    "amount": "Số tiền",
+    "convertedAmount": "Số tiền quy đổi",
+    "fee": "Phí chuyển khoản",
+    "date": "Ngày",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "VD: Chuyển tiết kiệm hàng tháng",
+    "create": "Tạo chuyển khoản",
+    "error": "Không thể tạo chuyển khoản",
+    "errors": {
+      "fromRequired": "Vui lòng chọn tài khoản nguồn",
+      "toRequired": "Vui lòng chọn tài khoản đích",
+      "sameAccount": "Không thể chuyển đến cùng tài khoản",
+      "amountRequired": "Số tiền là bắt buộc"
+    }
   },
   "ai": {
     "categoryCleanup": "AI Phân loại",

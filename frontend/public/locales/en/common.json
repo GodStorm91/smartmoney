@@ -288,7 +288,8 @@
     "update": "Update",
     "cancel": "Cancel",
     "today": "Today",
-    "back": "Back"
+    "back": "Back",
+    "optional": "Optional"
   },
   "autocomplete": {
     "used": "used"
@@ -725,6 +726,26 @@
     "noCredits": "No credits remaining. Please purchase more credits.",
     "welcomeMessage": "Hi! I'm your financial assistant. Ask me anything about your spending, savings goals, or budget.",
     "error": "Failed to get response. Please try again."
+  },
+  "transfer": {
+    "title": "Transfer Between Accounts",
+    "fromAccount": "From Account",
+    "toAccount": "To Account",
+    "selectAccount": "Select account",
+    "amount": "Amount",
+    "convertedAmount": "Converted Amount",
+    "fee": "Transfer Fee",
+    "date": "Date",
+    "description": "Description",
+    "descriptionPlaceholder": "e.g., Monthly savings transfer",
+    "create": "Create Transfer",
+    "error": "Failed to create transfer",
+    "errors": {
+      "fromRequired": "Please select source account",
+      "toRequired": "Please select destination account",
+      "sameAccount": "Cannot transfer to the same account",
+      "amountRequired": "Amount is required"
+    }
   },
   "ai": {
     "categoryCleanup": "AI Category Cleanup",
