@@ -152,7 +152,7 @@ export function GoalCreateModal({
       return
     }
 
-    const amount = parseInt(targetAmount.replace(/,/g, ''), 10)
+    const amount = parseInt(targetAmount.replace(/[,.\s]/g, ''), 10)
     const startDate = calculateStartDate(startDateOption, customDate)
 
     if (editingGoalId) {
