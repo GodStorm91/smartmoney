@@ -1,14 +1,15 @@
 import { apiClient } from './api-client'
 
-export interface ChatMessage {
-  role: 'user' | 'assistant'
-  content: string
-}
-
 export interface SuggestedAction {
   type: 'create_goal' | 'create_budget'
   payload: Record<string, unknown>
   description: string
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
+  action?: SuggestedAction | null
 }
 
 export interface ChatResponse {

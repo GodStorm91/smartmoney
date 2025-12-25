@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { cn } from '@/utils/cn'
 import { ChatHeader } from './ChatHeader'
 import { ChatMessages } from './ChatMessages'
 import { ChatInput } from './ChatInput'
-import { sendChatMessage, type ChatMessage } from '@/services/chat-service'
+import { sendChatMessage, type ChatMessage, type SuggestedAction } from '@/services/chat-service'
+import { createGoal } from '@/services/goal-service'
+import { generateBudget } from '@/services/budget-service'
 
 interface ChatPanelProps {
   isOpen: boolean
@@ -13,9 +16,11 @@ interface ChatPanelProps {
 
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const { t, i18n } = useTranslation()
+  const queryClient = useQueryClient()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [credits, setCredits] = useState<number | null>(null)
+  const [applyingAction, setApplyingAction] = useState<number | null>(null)
 
   // Handle escape key to close
   useEffect(() => {
@@ -39,15 +44,11 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
 
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: response.message
+        content: response.message,
+        action: response.suggested_action
       }])
 
       setCredits(response.credits_remaining)
-
-      // TODO: Handle suggested_action in Phase 2
-      if (response.suggested_action) {
-        console.log('Suggested action:', response.suggested_action)
-      }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
@@ -67,6 +68,85 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       setIsLoading(false)
     }
   }, [messages, i18n.language, t])
+
+  const handleApplyAction = useCallback(async (messageIndex: number) => {
+    const message = messages[messageIndex]
+    if (!message?.action) return
+
+    setApplyingAction(messageIndex)
+
+    try {
+      await executeAction(message.action)
+
+      // Remove the action from the message and add success message
+      setMessages(prev => {
+        const updated = [...prev]
+        updated[messageIndex] = { ...updated[messageIndex], action: null }
+        return [...updated, {
+          role: 'assistant' as const,
+          content: t('chat.actionApplied')
+        }]
+      })
+
+      // Invalidate relevant queries
+      if (message.action.type === 'create_goal') {
+        queryClient.invalidateQueries({ queryKey: ['goals'] })
+      } else if (message.action.type === 'create_budget') {
+        queryClient.invalidateQueries({ queryKey: ['budget'] })
+      }
+    } catch (error) {
+      console.error('Failed to apply action:', error)
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: t('chat.actionFailed')
+      }])
+    } finally {
+      setApplyingAction(null)
+    }
+  }, [messages, queryClient, t])
+
+  const executeAction = async (action: SuggestedAction) => {
+    if (action.type === 'create_goal') {
+      const payload = action.payload as {
+        goal_type?: string
+        target_amount?: number
+        years?: number
+        name?: string
+      }
+      // Validate goal_type
+      const validTypes = ['emergency_fund', 'home_down_payment', 'vacation_travel', 'vehicle',
+        'education', 'wedding', 'large_purchase', 'debt_payoff', 'retirement', 'investment', 'custom']
+      const goalType = validTypes.includes(payload.goal_type || '')
+        ? payload.goal_type as 'custom' | 'emergency_fund' | 'home_down_payment' | 'vacation_travel' | 'vehicle' | 'education' | 'wedding' | 'large_purchase' | 'debt_payoff' | 'retirement' | 'investment'
+        : 'custom'
+
+      await createGoal({
+        goal_type: goalType,
+        target_amount: payload.target_amount || 100000,
+        years: payload.years || 1,
+        name: payload.name
+      })
+    } else if (action.type === 'create_budget') {
+      const payload = action.payload as {
+        monthly_income?: number
+        feedback?: string
+      }
+      await generateBudget({
+        monthly_income: payload.monthly_income || 300000,
+        feedback: payload.feedback,
+        language: i18n.language
+      })
+    }
+  }
+
+  const handleSkipAction = useCallback((messageIndex: number) => {
+    // Remove the action from the message
+    setMessages(prev => {
+      const updated = [...prev]
+      updated[messageIndex] = { ...updated[messageIndex], action: null }
+      return updated
+    })
+  }, [])
 
   return (
     <>
@@ -91,7 +171,13 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
         )}
       >
         <ChatHeader onClose={onClose} credits={credits} />
-        <ChatMessages messages={messages} isLoading={isLoading} />
+        <ChatMessages
+          messages={messages}
+          isLoading={isLoading}
+          applyingAction={applyingAction}
+          onApplyAction={handleApplyAction}
+          onSkipAction={handleSkipAction}
+        />
         <ChatInput onSend={handleSendMessage} disabled={isLoading} />
       </div>
     </>

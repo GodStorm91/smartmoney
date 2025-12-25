@@ -2,19 +2,31 @@ import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
 import { ChatMessage } from './ChatMessage'
+import { ActionCard } from './ActionCard'
 import { Loader2 } from 'lucide-react'
+import type { SuggestedAction } from '@/services/chat-service'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  action?: SuggestedAction | null
 }
 
 interface ChatMessagesProps {
   messages: Message[]
   isLoading: boolean
+  applyingAction: number | null
+  onApplyAction: (index: number) => void
+  onSkipAction: (index: number) => void
 }
 
-export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
+export function ChatMessages({
+  messages,
+  isLoading,
+  applyingAction,
+  onApplyAction,
+  onSkipAction
+}: ChatMessagesProps) {
   const { t } = useTranslation()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -36,7 +48,19 @@ export function ChatMessages({ messages, isLoading }: ChatMessagesProps) {
       )}
 
       {messages.map((message, index) => (
-        <ChatMessage key={index} role={message.role} content={message.content} />
+        <div key={index}>
+          <ChatMessage role={message.role} content={message.content} />
+          {message.action && (
+            <div className="ml-11">
+              <ActionCard
+                action={message.action}
+                onApply={() => onApplyAction(index)}
+                onSkip={() => onSkipAction(index)}
+                isApplying={applyingAction === index}
+              />
+            </div>
+          )}
+        </div>
       ))}
 
       {isLoading && (
