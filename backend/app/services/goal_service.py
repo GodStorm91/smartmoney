@@ -292,6 +292,7 @@ class GoalService:
             "name": goal.name,
             "years": goal.years,
             "target_amount": goal.target_amount,
+            "currency": goal.currency,
             "start_date": start_date.isoformat(),
             "target_date": target_date.isoformat(),
             "current_date": now.isoformat(),

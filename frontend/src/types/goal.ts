@@ -12,12 +12,16 @@ export type GoalType =
   | 'investment'
   | 'custom'
 
+// Supported currencies
+export type GoalCurrency = 'JPY' | 'USD' | 'VND'
+
 // Goal create/update interfaces
 export interface GoalCreate {
   goal_type: GoalType
   name?: string
   years: number // 1-10 years
   target_amount: number
+  currency?: GoalCurrency
   start_date?: string
   account_id?: number
 }
@@ -37,6 +41,7 @@ export interface Goal {
   name?: string
   years: number
   target_amount: number
+  currency: GoalCurrency
   start_date?: string
   priority: number
   account_id?: number
@@ -70,6 +75,7 @@ export interface GoalProgress {
   name?: string
   years: number
   target_amount: number
+  currency: GoalCurrency
   start_date: string
   target_date: string
   current_date: string

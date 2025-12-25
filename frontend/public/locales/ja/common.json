@@ -35,6 +35,11 @@
     "english": "English",
     "vietnamese": "Tiếng Việt"
   },
+  "currency": {
+    "JPY": "¥ 円",
+    "USD": "$ ドル",
+    "VND": "₫ ドン"
+  },
   "aria": {
     "mainNavigation": "メインナビゲーション",
     "mobileNavigation": "モバイルナビゲーション",
@@ -242,6 +247,7 @@
       "nameAriaLabel": "目標名を入力",
       "years": "期間（年）",
       "yearsAriaLabel": "目標期間を年単位で入力",
+      "currency": "通貨",
       "targetAmount": "目標金額",
       "targetAmountPlaceholder": "例: 1,000,000",
       "targetAmountAriaLabel": "目標金額を入力",

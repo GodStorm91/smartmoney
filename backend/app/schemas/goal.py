@@ -13,7 +13,8 @@ class GoalBase(BaseModel):
     goal_type: GoalType = Field(default=GoalType.CUSTOM)
     name: Optional[str] = Field(None, max_length=100)
     years: int = Field(..., ge=1, le=10, description="Goal horizon in years (1-10)")
-    target_amount: int = Field(..., gt=0, description="Target amount in JPY")
+    target_amount: int = Field(..., gt=0, description="Target amount")
+    currency: str = Field(default="JPY", pattern="^(JPY|USD|VND)$", description="Currency code")
     start_date: Optional[date] = None
     account_id: Optional[int] = None
 
@@ -42,6 +43,7 @@ class GoalResponse(BaseModel):
     name: Optional[str] = None
     years: int
     target_amount: int
+    currency: str = "JPY"
     start_date: Optional[date] = None
     priority: int = 0
     account_id: Optional[int] = None
@@ -82,6 +84,7 @@ class GoalProgressResponse(BaseModel):
     name: Optional[str] = None
     years: int
     target_amount: int
+    currency: str = "JPY"
     start_date: str
     target_date: str
     current_date: str

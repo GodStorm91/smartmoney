@@ -35,6 +35,11 @@
     "english": "English",
     "vietnamese": "Tiếng Việt"
   },
+  "currency": {
+    "JPY": "¥ Yên",
+    "USD": "$ Đô la",
+    "VND": "₫ Đồng"
+  },
   "aria": {
     "mainNavigation": "Điều hướng chính",
     "mobileNavigation": "Điều hướng di động",
@@ -236,6 +241,7 @@
       "nameAriaLabel": "Nhập tên mục tiêu",
       "years": "Thời gian (Năm)",
       "yearsAriaLabel": "Nhập thời gian mục tiêu theo năm",
+      "currency": "Tiền tệ",
       "targetAmount": "Số tiền mục tiêu",
       "targetAmountPlaceholder": "VD: 100,000,000",
       "targetAmountAriaLabel": "Nhập số tiền mục tiêu",

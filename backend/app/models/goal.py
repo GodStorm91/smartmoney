@@ -21,7 +21,8 @@ class Goal(Base):
 
     # Core goal fields
     years: Mapped[int] = mapped_column(Integer, nullable=False)  # 1-10 years
-    target_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # JPY in integers
+    target_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # Amount in currency's smallest unit
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     # Priority and account linking

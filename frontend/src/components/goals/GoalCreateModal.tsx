@@ -13,7 +13,7 @@ import {
   type StartDateOption,
   type GoalFormErrors,
 } from './goal-form-helpers'
-import type { GoalType, GoalCreate, GoalUpdate } from '@/types/goal'
+import type { GoalType, GoalCreate, GoalUpdate, GoalCurrency } from '@/types/goal'
 
 interface GoalCreateModalProps {
   isOpen: boolean
@@ -41,6 +41,7 @@ export function GoalCreateModal({
   const [targetAmount, setTargetAmount] = useState<string>('')
   const [startDateOption, setStartDateOption] = useState<StartDateOption>('today')
   const [customDate, setCustomDate] = useState<string>('')
+  const [currency, setCurrency] = useState<GoalCurrency>('JPY')
   const [errors, setErrors] = useState<GoalFormErrors>({})
   const [serverError, setServerError] = useState<string>('')
 
@@ -79,6 +80,7 @@ export function GoalCreateModal({
         setTargetAmount('')
         setStartDateOption('today')
         setCustomDate('')
+        setCurrency('JPY')
       }
       setErrors({})
       setServerError('')
@@ -136,6 +138,7 @@ export function GoalCreateModal({
         goal_type: goalType || 'custom',
         name: name || undefined,
         target_amount: amount,
+        currency,
         years,
         start_date: startDate || undefined,
       })
@@ -190,17 +193,34 @@ export function GoalCreateModal({
                 />
               )}
 
-              <div>
-                <Input
-                  label={t('goals.form.targetAmount')}
-                  type="text"
-                  value={targetAmount}
-                  onChange={handleAmountChange}
-                  error={errors.targetAmount}
-                  placeholder={t('goals.form.targetAmountPlaceholder')}
-                  required
-                />
-                <p className="mt-1 text-xs text-gray-500">{t('goals.form.amountHint')}</p>
+              {/* Currency and Amount row */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('goals.form.currency')}
+                  </label>
+                  <select
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value as GoalCurrency)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={!!editingGoalId}
+                  >
+                    <option value="JPY">{t('currency.JPY')}</option>
+                    <option value="USD">{t('currency.USD')}</option>
+                    <option value="VND">{t('currency.VND')}</option>
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <Input
+                    label={t('goals.form.targetAmount')}
+                    type="text"
+                    value={targetAmount}
+                    onChange={handleAmountChange}
+                    error={errors.targetAmount}
+                    placeholder={t('goals.form.targetAmountPlaceholder')}
+                    required
+                  />
+                </div>
               </div>
 
               <StartDateSelector

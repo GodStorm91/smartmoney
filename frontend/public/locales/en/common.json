@@ -35,6 +35,11 @@
     "english": "English",
     "vietnamese": "Tiếng Việt"
   },
+  "currency": {
+    "JPY": "¥ JPY",
+    "USD": "$ USD",
+    "VND": "₫ VND"
+  },
   "aria": {
     "mainNavigation": "Main Navigation",
     "mobileNavigation": "Mobile Navigation",
@@ -236,6 +241,7 @@
       "nameAriaLabel": "Enter goal name",
       "years": "Period (Years)",
       "yearsAriaLabel": "Enter goal period in years",
+      "currency": "Currency",
       "targetAmount": "Target Amount",
       "targetAmountPlaceholder": "e.g., 1,000,000",
       "targetAmountAriaLabel": "Enter target amount",
