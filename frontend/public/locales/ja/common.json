@@ -265,7 +265,7 @@
       "updateFailed": "目標の更新に失敗しました。もう一度お試しください。",
       "yearsRange": "期間は1年から10年の間で設定してください",
       "amountRequired": "目標金額を入力してください",
-      "amountMinimum": "目標金額は¥10,000以上で設定してください",
+      "amountMinimum": "目標金額は{{amount}}以上で設定してください",
       "dateRequired": "開始日を選択してください"
     },
     "card": {

@@ -259,7 +259,7 @@
       "updateFailed": "Failed to update goal. Please try again.",
       "yearsRange": "Period must be between 1 and 10 years",
       "amountRequired": "Please enter a target amount",
-      "amountMinimum": "Target amount must be at least ¥10,000",
+      "amountMinimum": "Target amount must be at least {{amount}}",
       "dateRequired": "Please select a start date"
     },
     "card": {

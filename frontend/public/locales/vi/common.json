@@ -259,7 +259,7 @@
       "updateFailed": "Không thể cập nhật mục tiêu. Vui lòng thử lại.",
       "yearsRange": "Kỳ hạn phải từ 1 đến 10 năm",
       "amountRequired": "Vui lòng nhập số tiền mục tiêu",
-      "amountMinimum": "Số tiền mục tiêu tối thiểu là 10,000₫",
+      "amountMinimum": "Số tiền mục tiêu tối thiểu là {{amount}}",
       "dateRequired": "Vui lòng chọn ngày bắt đầu"
     },
     "card": {

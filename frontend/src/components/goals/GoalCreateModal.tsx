@@ -117,13 +117,35 @@ export function GoalCreateModal({
     setStep(2)
   }
 
+  // Format minimum amount based on selected currency
+  const getMinAmountFormatted = () => {
+    const minAmount = 10000
+    switch (currency) {
+      case 'JPY':
+        return `¥${minAmount.toLocaleString()}`
+      case 'USD':
+        return `$${minAmount.toLocaleString()}`
+      case 'VND':
+        return `${minAmount.toLocaleString()}₫`
+      default:
+        return minAmount.toLocaleString()
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const rawErrors = validateGoalForm(years, targetAmount, startDateOption, customDate, preselectedYears)
     // Translate error keys to localized messages
     const translatedErrors: GoalFormErrors = {}
     for (const [key, value] of Object.entries(rawErrors)) {
-      if (value) translatedErrors[key as keyof GoalFormErrors] = t(value)
+      if (value) {
+        // Pass dynamic amount for amountMinimum error
+        if (value === 'goals.errors.amountMinimum') {
+          translatedErrors[key as keyof GoalFormErrors] = t(value, { amount: getMinAmountFormatted() })
+        } else {
+          translatedErrors[key as keyof GoalFormErrors] = t(value)
+        }
+      }
     }
     if (Object.keys(translatedErrors).length > 0) {
       setErrors(translatedErrors)
