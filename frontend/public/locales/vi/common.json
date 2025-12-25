@@ -392,8 +392,22 @@
       "challenging": "Thử thách",
       "severe": "Khó khăn"
     },
+    "pace": {
+      "onTrack": "Đúng tiến độ",
+      "slightlyBehind": "Hơi chậm",
+      "behind": "Chậm tiến độ",
+      "needsAttention": "Cần chú ý"
+    },
+    "milestone": {
+      "completed": "Đã đạt mục tiêu!",
+      "next": "Mốc tiếp theo: {{percent}}%"
+    },
     "insight": {
       "onPace": "Bạn đang đi đúng hướng để đạt được mục tiêu!",
+      "achieved": "Chúc mừng! Bạn đã đạt được mục tiêu!",
+      "keepGoing": "Tiếp tục cố gắng! Còn {{months}} tháng.",
+      "saveMore": "Hãy tiết kiệm thêm {{amount}}/tháng.",
+      "everyBitCounts": "Mỗi đồng tiết kiệm đều có giá trị!",
       "smallGap": "Chỉ cần thêm {{gap}}/tháng để đạt mục tiêu",
       "mediumGap": "Cần tăng {{gap}}/tháng",
       "largeGap": "Cần tiết kiệm thêm {{gap}}/tháng"

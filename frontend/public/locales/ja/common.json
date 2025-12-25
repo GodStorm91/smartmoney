@@ -379,8 +379,22 @@
       "challenging": "挑戦的",
       "severe": "厳しい"
     },
+    "pace": {
+      "onTrack": "順調",
+      "slightlyBehind": "やや遅れ",
+      "behind": "遅れ気味",
+      "needsAttention": "要注意"
+    },
+    "milestone": {
+      "completed": "目標達成！",
+      "next": "次の目標: {{percent}}%"
+    },
     "insight": {
       "onPace": "このペースで達成できます！",
+      "achieved": "おめでとうございます！目標を達成しました！",
+      "keepGoing": "この調子で！残り{{months}}ヶ月",
+      "saveMore": "月{{amount}}多く貯蓄してみましょう",
+      "everyBitCounts": "少しずつの貯蓄が大切です！",
       "smallGap": "あと{{gap}}/月で達成可能",
       "mediumGap": "月{{gap}}増やす必要があります",
       "largeGap": "月{{gap}}の追加貯蓄が必要です"

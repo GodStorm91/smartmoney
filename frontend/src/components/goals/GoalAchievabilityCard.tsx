@@ -18,41 +18,44 @@ interface GoalAchievabilityCardProps {
   onEdit?: (goalId: number) => void
 }
 
-// Simplified status config based on capped percentage
+// Simplified status config - focus on pace
 const STATUS_CONFIG = {
   on_track: {
     color: '#10b981', // emerald-500
     textColor: 'text-emerald-500',
     bgColor: 'bg-emerald-50',
+    darkBgColor: 'dark:bg-emerald-900/30',
     borderColor: 'border-l-emerald-500',
-    labelKey: 'goal.status.onTrack',
-    emoji: '🟢',
+    labelKey: 'goal.pace.onTrack',
   },
-  achievable: {
+  slightly_behind: {
     color: '#3b82f6', // blue-500
     textColor: 'text-blue-500',
     bgColor: 'bg-blue-50',
+    darkBgColor: 'dark:bg-blue-900/30',
     borderColor: 'border-l-blue-500',
-    labelKey: 'goal.status.achievable',
-    emoji: '🔵',
+    labelKey: 'goal.pace.slightlyBehind',
   },
-  challenging: {
+  behind: {
     color: '#f97316', // orange-500
     textColor: 'text-orange-500',
     bgColor: 'bg-orange-50',
+    darkBgColor: 'dark:bg-orange-900/30',
     borderColor: 'border-l-orange-500',
-    labelKey: 'goal.status.challenging',
-    emoji: '🟠',
+    labelKey: 'goal.pace.behind',
   },
-  severe: {
-    color: '#dc2626', // red-600
-    textColor: 'text-red-600',
-    bgColor: 'bg-red-50',
-    borderColor: 'border-l-red-600',
-    labelKey: 'goal.status.severe',
-    emoji: '🔴',
+  needs_attention: {
+    color: '#eab308', // yellow-500
+    textColor: 'text-yellow-600',
+    bgColor: 'bg-yellow-50',
+    darkBgColor: 'dark:bg-yellow-900/30',
+    borderColor: 'border-l-yellow-500',
+    labelKey: 'goal.pace.needsAttention',
   },
 } as const
+
+// Milestone thresholds
+const MILESTONES = [25, 50, 75, 100]
 
 export function GoalAchievabilityCard({
   goalId,
@@ -68,73 +71,58 @@ export function GoalAchievabilityCard({
   const { isPrivacyMode } = usePrivacy()
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  // Cap achievability percentage at 0-200%
-  const cappedPercentage = Math.max(0, Math.min(200, achievability.achievable_percentage))
-
   // Calculate progress percentage (current vs target)
   const progressPercentage = targetAmount > 0 ? Math.min(100, (currentAmount / targetAmount) * 100) : 0
 
-  // Determine status based on capped percentage
-  const getStatus = (percentage: number) => {
-    if (percentage >= 100) return STATUS_CONFIG.on_track
-    if (percentage >= 75) return STATUS_CONFIG.achievable
-    if (percentage >= 50) return STATUS_CONFIG.challenging
-    return STATUS_CONFIG.severe
+  // Determine if on pace based on monthly savings vs required
+  const isOnPace = achievability.current_monthly_net >= achievability.required_monthly
+  const paceRatio = achievability.required_monthly > 0
+    ? achievability.current_monthly_net / achievability.required_monthly
+    : 1
+
+  // Determine status based on pace (not achievability percentage)
+  const getStatus = () => {
+    if (isOnPace || paceRatio >= 1) return STATUS_CONFIG.on_track
+    if (paceRatio >= 0.75) return STATUS_CONFIG.slightly_behind
+    if (paceRatio >= 0.5) return STATUS_CONFIG.behind
+    return STATUS_CONFIG.needs_attention
   }
 
-  const status = getStatus(cappedPercentage)
+  const status = getStatus()
 
-  // Generate insight message
-  const getInsightMessage = (): { emoji: string; message: string } => {
+  // Get current milestone
+  const getCurrentMilestone = () => {
+    for (let i = MILESTONES.length - 1; i >= 0; i--) {
+      if (progressPercentage >= MILESTONES[i]) {
+        return MILESTONES[i]
+      }
+    }
+    return 0
+  }
+
+  const currentMilestone = getCurrentMilestone()
+  const nextMilestone = MILESTONES.find(m => m > progressPercentage) || 100
+
+  // Generate simple, actionable insight
+  const getInsight = (): string => {
+    // Goal achieved
+    if (progressPercentage >= 100) {
+      return t('goal.insight.achieved')
+    }
+
+    // On pace
+    if (isOnPace) {
+      return t('goal.insight.keepGoing', { months: achievability.months_remaining })
+    }
+
+    // Calculate how much more needed per month
     const gap = achievability.monthly_gap
-
-    // Already on track or ahead
-    if (gap <= 0 || achievability.current_monthly_net >= achievability.required_monthly) {
-      return {
-        emoji: '🎉',
-        message: t('goal.insight.onPace'),
-      }
+    if (gap > 0) {
+      const formattedGap = formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+      return t('goal.insight.saveMore', { amount: formattedGap })
     }
 
-    // Small gap (<¥10,000)
-    if (gap < 10000) {
-      return {
-        emoji: '💡',
-        message: t('goal.insight.smallGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
-      }
-    }
-
-    // Medium gap (<¥50,000)
-    if (gap < 50000) {
-      return {
-        emoji: '⚠️',
-        message: t('goal.insight.mediumGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
-      }
-    }
-
-    // Large gap
-    return {
-      emoji: '🔴',
-      message: t('goal.insight.largeGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
-    }
-  }
-
-  const insight = getInsightMessage()
-
-  // Calculate monthly savings ratio percentage
-  const monthlySavingsPercentage =
-    achievability.required_monthly > 0
-      ? (achievability.current_monthly_net / achievability.required_monthly) * 100
-      : 0
-
-  const cappedMonthlySavingsPercentage = Math.min(100, monthlySavingsPercentage)
-
-  // Get color for monthly savings progress bar
-  const getMonthlySavingsBarColor = () => {
-    if (monthlySavingsPercentage >= 100) return 'bg-green-500'
-    if (monthlySavingsPercentage >= 75) return 'bg-blue-500'
-    if (monthlySavingsPercentage >= 50) return 'bg-orange-500'
-    return 'bg-red-500'
+    return t('goal.insight.everyBitCounts')
   }
 
   const handleCardClick = () => {
@@ -169,12 +157,13 @@ export function GoalAchievabilityCard({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{goalName}</h3>
             <span
               className={cn(
-                'text-xs font-semibold uppercase px-2.5 py-1 rounded-full',
+                'text-xs font-semibold px-2.5 py-1 rounded-full',
                 status.bgColor,
+                status.darkBgColor,
                 status.textColor
               )}
             >
-              {status.emoji} {t(status.labelKey)}
+              {isOnPace ? '✓' : '○'} {t(status.labelKey)}
             </span>
           </div>
 
@@ -204,8 +193,8 @@ export function GoalAchievabilityCard({
         </div>
 
         {/* Hero Section: Progress Ring */}
-        <div className="mb-6">
-          <div className="relative w-[200px] h-[200px] mx-auto">
+        <div className="mb-4">
+          <div className="relative w-[180px] h-[180px] mx-auto">
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart
                 cx="50%"
@@ -232,7 +221,7 @@ export function GoalAchievabilityCard({
               <div className="text-sm font-mono mt-1 text-gray-700 dark:text-gray-300">
                 {formatCurrencyCompactPrivacy(currentAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
-              <div className="text-xs text-gray-400 dark:text-gray-500 my-1">─────</div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 my-0.5">/</div>
               <div className="text-sm font-mono text-gray-700 dark:text-gray-300">
                 {formatCurrencyCompactPrivacy(targetAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </div>
@@ -240,41 +229,64 @@ export function GoalAchievabilityCard({
           </div>
         </div>
 
-        {/* Monthly Savings Section */}
+        {/* Milestone Indicator */}
         <div className="mb-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-xs text-gray-500 dark:text-gray-400">{t('goal.monthlySavings')}</div>
-            <div className="text-xs text-gray-400 dark:text-gray-500">
-              {t('goal.basedOnPeriod', {
-                months: achievability.trend_months_actual,
-                source: achievability.data_source
-              })}
-            </div>
+          <div className="flex items-center justify-center gap-2">
+            {MILESTONES.map((milestone, index) => {
+              const isCompleted = progressPercentage >= milestone
+              const isCurrent = currentMilestone === milestone && milestone > 0
+              return (
+                <div key={milestone} className="flex items-center">
+                  {/* Milestone dot */}
+                  <div
+                    className={cn(
+                      'w-3 h-3 rounded-full transition-all',
+                      isCompleted
+                        ? 'bg-emerald-500'
+                        : 'bg-gray-300 dark:bg-gray-600',
+                      isCurrent && 'ring-2 ring-emerald-300 ring-offset-1'
+                    )}
+                    title={`${milestone}%`}
+                  />
+                  {/* Connector line (except after last) */}
+                  {index < MILESTONES.length - 1 && (
+                    <div
+                      className={cn(
+                        'w-8 h-0.5 mx-1',
+                        progressPercentage > milestone
+                          ? 'bg-emerald-500'
+                          : 'bg-gray-300 dark:bg-gray-600'
+                      )}
+                    />
+                  )}
+                </div>
+              )
+            })}
           </div>
-          <div className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {formatCurrencyPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)} /{' '}
-            {formatCurrencyPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-            <span className="text-sm ml-2 text-gray-600 dark:text-gray-400">
-              ({Math.round(monthlySavingsPercentage)}%)
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-            <div
-              className={cn(getMonthlySavingsBarColor(), 'h-2 rounded-full transition-all duration-500')}
-              style={{ width: `${cappedMonthlySavingsPercentage}%` }}
-            />
+          <div className="text-center mt-2 text-xs text-gray-500 dark:text-gray-400">
+            {progressPercentage >= 100
+              ? t('goal.milestone.completed')
+              : t('goal.milestone.next', { percent: nextMilestone })}
           </div>
         </div>
 
-        {/* Insight Section */}
-        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
-          <div className="text-sm text-blue-900 dark:text-blue-200">
-            {insight.emoji} {insight.message}
+        {/* Simple Insight */}
+        <div className={cn(
+          'rounded-lg p-3 mb-3',
+          status.bgColor,
+          status.darkBgColor,
+          'border',
+          isOnPace ? 'border-emerald-200 dark:border-emerald-800' : 'border-gray-200 dark:border-gray-700'
+        )}>
+          <div className={cn('text-sm', status.textColor, 'dark:text-gray-200')}>
+            💡 {getInsight()}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="text-xs text-gray-400 dark:text-gray-500">{t('goal.monthsRemaining', { months: achievability.months_remaining })}</div>
+        <div className="text-xs text-gray-400 dark:text-gray-500 text-center">
+          {t('goal.monthsRemaining', { months: achievability.months_remaining })}
+        </div>
       </Card>
     </div>
   )

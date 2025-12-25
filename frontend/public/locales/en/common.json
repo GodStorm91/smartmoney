@@ -392,8 +392,22 @@
       "challenging": "Challenging",
       "severe": "Severe"
     },
+    "pace": {
+      "onTrack": "On Track",
+      "slightlyBehind": "Slightly Behind",
+      "behind": "Behind Pace",
+      "needsAttention": "Needs Attention"
+    },
+    "milestone": {
+      "completed": "Goal achieved!",
+      "next": "Next milestone: {{percent}}%"
+    },
     "insight": {
       "onPace": "You're on pace to achieve this!",
+      "achieved": "Congratulations! You've reached your goal!",
+      "keepGoing": "Keep going! {{months}} months to go.",
+      "saveMore": "Try to save {{amount}} more per month.",
+      "everyBitCounts": "Every bit of savings counts!",
       "smallGap": "Just {{gap}}/month more to achieve",
       "mediumGap": "Need to increase by {{gap}}/month",
       "largeGap": "Need additional savings of {{gap}}/month"
