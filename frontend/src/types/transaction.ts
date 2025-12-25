@@ -8,6 +8,7 @@ export interface Transaction {
   source: string
   type: 'income' | 'expense'
   created_at: string
+  account_id?: number | null
 }
 
 // Filter types

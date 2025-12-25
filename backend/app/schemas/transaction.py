@@ -18,6 +18,7 @@ class TransactionBase(BaseModel):
     notes: Union[str, None] = Field(None, max_length=1000)
     is_income: bool = False
     is_transfer: bool = False
+    account_id: Union[int, None] = Field(None, description="Account ID for balance tracking")
 
 
 class TransactionCreate(TransactionBase):
@@ -39,6 +40,7 @@ class TransactionUpdate(BaseModel):
     notes: Union[str, None] = Field(None, max_length=1000)
     is_income: Union[bool, None] = None
     is_transfer: Union[bool, None] = None
+    account_id: Union[int, None] = None
 
 
 class TransactionResponse(TransactionBase):

@@ -215,6 +215,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           category: categoryValue,
           source: selectedAccount?.name || '',
           type: isIncome ? 'income' : 'expense',
+          account_id: accountId,
         })
       }
       onClose()
