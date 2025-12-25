@@ -248,6 +248,19 @@
       "amountRequired": "Vui lòng nhập số tiền mục tiêu",
       "amountMinimum": "Số tiền mục tiêu tối thiểu là 10,000₫",
       "dateRequired": "Vui lòng chọn ngày bắt đầu"
+    },
+    "card": {
+      "yearGoal": "Mục tiêu {{years}} năm",
+      "customPeriod": "Kỳ hạn tùy chỉnh",
+      "shortTerm": "Mục tiêu tiết kiệm ngắn hạn",
+      "mediumTerm": "Kế hoạch trung hạn",
+      "mediumLongTerm": "Mục tiêu trung-dài hạn",
+      "longTerm": "Tầm nhìn dài hạn",
+      "customDescription": "Tự do thiết lập kỳ hạn",
+      "createGoal": "Tạo mục tiêu",
+      "alreadySet": "Đã thiết lập",
+      "ariaDisabled": "{{label}} - Đã thiết lập",
+      "ariaCreate": "Tạo {{label}}"
     }
   },
   "common": {

@@ -254,6 +254,19 @@
       "amountRequired": "目標金額を入力してください",
       "amountMinimum": "目標金額は¥10,000以上で設定してください",
       "dateRequired": "開始日を選択してください"
+    },
+    "card": {
+      "yearGoal": "{{years}}年目標",
+      "customPeriod": "カスタム期間",
+      "shortTerm": "短期的な貯蓄目標",
+      "mediumTerm": "中期的な計画",
+      "mediumLongTerm": "中長期的な目標",
+      "longTerm": "長期的なビジョン",
+      "customDescription": "自由に期間を設定",
+      "createGoal": "目標を作成",
+      "alreadySet": "設定済み",
+      "ariaDisabled": "{{label}} - 設定済み",
+      "ariaCreate": "{{label}}を作成"
     }
   },
   "common": {

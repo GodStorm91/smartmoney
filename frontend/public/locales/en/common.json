@@ -248,6 +248,19 @@
       "amountRequired": "Please enter a target amount",
       "amountMinimum": "Target amount must be at least ¥10,000",
       "dateRequired": "Please select a start date"
+    },
+    "card": {
+      "yearGoal": "{{years}}-Year Goal",
+      "customPeriod": "Custom Period",
+      "shortTerm": "Short-term savings goal",
+      "mediumTerm": "Medium-term plan",
+      "mediumLongTerm": "Medium-long term goal",
+      "longTerm": "Long-term vision",
+      "customDescription": "Set your own timeframe",
+      "createGoal": "Create goal",
+      "alreadySet": "Already set",
+      "ariaDisabled": "{{label}} - Already set",
+      "ariaCreate": "Create {{label}}"
     }
   },
   "common": {
