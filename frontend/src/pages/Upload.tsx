@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { UploadDropZone } from '@/components/upload/UploadDropZone'
@@ -7,6 +7,7 @@ import { UploadHistoryList } from '@/components/upload/UploadHistoryList'
 import { UploadFAQ } from '@/components/upload/UploadFAQ'
 import { MultipleFileUploadList } from '@/components/upload/MultipleFileUploadList'
 import { uploadCSV, uploadPayPayImage, fetchUploadHistory } from '@/services/upload-service'
+import { fetchAccounts } from '@/services/account-service'
 import type { FileUploadItem } from '@/types'
 
 type UploadMode = 'csv' | 'paypay'
@@ -17,21 +18,24 @@ export function Upload() {
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [fileItems, setFileItems] = useState<FileUploadItem[]>([])
+  const [selectedAccountId, setSelectedAccountId] = useState<number | undefined>()
   const queryClient = useQueryClient()
+
+  const { data: accounts } = useQuery({
+    queryKey: ['accounts'],
+    queryFn: () => fetchAccounts(),
+  })
 
   const { data: history, isLoading } = useQuery({
     queryKey: ['upload-history'],
     queryFn: fetchUploadHistory,
   })
 
-  const uploadMutation = useMutation({
-    mutationFn: uploadMode === 'csv' ? uploadCSV : uploadPayPayImage,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['upload-history'] })
-      queryClient.invalidateQueries({ queryKey: ['transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
-    },
-  })
+  const invalidateAfterUpload = () => {
+    queryClient.invalidateQueries({ queryKey: ['upload-history'] })
+    queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+  }
 
   // File validation based on mode
   const isValidFile = (file: File): boolean => {
@@ -99,7 +103,10 @@ export function Upload() {
     )
 
     try {
-      const result = await uploadMutation.mutateAsync(item.file)
+      // For CSV uploads, pass accountId; for PayPay, just pass file
+      const result = uploadMode === 'csv'
+        ? await uploadCSV(item.file, selectedAccountId)
+        : await uploadPayPayImage(item.file)
 
       // Update status to success
       setFileItems(prev =>
@@ -118,6 +125,7 @@ export function Upload() {
           backendResult: result
         } : f)
       )
+      invalidateAfterUpload()
     } catch (error) {
       console.error('Upload failed:', error)
 
@@ -207,6 +215,28 @@ export function Upload() {
             {t('upload.tabPayPay')}
           </button>
         </div>
+
+        {/* Account Selection for CSV */}
+        {uploadMode === 'csv' && accounts && accounts.length > 0 && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('upload.selectAccount')}
+            </label>
+            <select
+              value={selectedAccountId || ''}
+              onChange={(e) => setSelectedAccountId(e.target.value ? Number(e.target.value) : undefined)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">{t('upload.noAccountSelected')}</option>
+              {accounts.map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name} ({account.type})
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">{t('upload.accountHint')}</p>
+          </div>
+        )}
 
         <UploadDropZone
           isDragOver={isDragOver}

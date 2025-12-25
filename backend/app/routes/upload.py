@@ -31,6 +31,7 @@ class UploadResponse(BaseModel):
 @router.post("/csv", response_model=UploadResponse)
 async def upload_csv(
     file: UploadFile = File(..., description="CSV file to upload"),
+    account_id: int | None = None,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -65,9 +66,11 @@ async def upload_csv(
         # Parse CSV
         transactions_data = parse_csv(file.file, file.filename)
 
-        # Add user_id to each transaction
+        # Add user_id and account_id to each transaction
         for tx_data in transactions_data:
             tx_data["user_id"] = current_user.id
+            if account_id:
+                tx_data["account_id"] = account_id
 
         # Bulk create transactions
         created, skipped = TransactionService.bulk_create_transactions(
