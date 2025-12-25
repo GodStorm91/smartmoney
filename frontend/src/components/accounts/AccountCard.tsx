@@ -1,5 +1,6 @@
 import type { AccountWithBalance, AccountType } from '@/types'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from '@tanstack/react-router'
 import { Card } from '@/components/ui/Card'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -27,14 +28,28 @@ const ACCOUNT_TYPE_CONFIG: Record<
 
 export function AccountCard({ account, onEdit }: AccountCardProps) {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
 
   const typeConfig = ACCOUNT_TYPE_CONFIG[account.type]
   const balancePositive = account.current_balance >= 0
 
+  // Navigate to transactions page filtered by this account
+  const handleCardClick = () => {
+    const now = new Date()
+    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+    navigate({
+      to: '/transactions',
+      search: { accountId: account.id, month, fromAccounts: true }
+    })
+  }
+
   return (
-    <Card className="relative hover:shadow-md transition-shadow">
+    <Card
+      className="relative hover:shadow-md transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -53,7 +68,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
         <div className="flex items-center gap-2">
           {onEdit && (
             <button
-              onClick={() => onEdit(account.id)}
+              onClick={(e) => { e.stopPropagation(); onEdit(account.id) }}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label={t('account.edit')}
             >

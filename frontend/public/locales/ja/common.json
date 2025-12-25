@@ -295,7 +295,8 @@
     "cancel": "キャンセル",
     "today": "今日",
     "back": "戻る",
-    "optional": "任意"
+    "optional": "任意",
+    "backToAccounts": "口座一覧に戻る"
   },
   "autocomplete": {
     "used": "回使用"

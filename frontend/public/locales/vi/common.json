@@ -289,7 +289,8 @@
     "cancel": "Hủy",
     "today": "Hôm nay",
     "back": "Quay lại",
-    "optional": "Tùy chọn"
+    "optional": "Tùy chọn",
+    "backToAccounts": "Quay lại Tài khoản"
   },
   "autocomplete": {
     "used": "lần dùng"

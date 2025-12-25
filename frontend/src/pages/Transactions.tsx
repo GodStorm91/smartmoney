@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -47,7 +48,7 @@ export function Transactions() {
   const monthRange = getCurrentMonthRange()
 
   // Read URL search params from TanStack Router
-  const { categories: categoriesParam, month: monthParam } = useSearch({
+  const { categories: categoriesParam, month: monthParam, accountId, fromAccounts } = useSearch({
     from: '/transactions',
   })
 
@@ -230,10 +231,17 @@ export function Transactions() {
   const expense = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
   const net = income - expense
 
+  // Filter transactions by account (client-side)
+  const accountFilteredTransactions = useMemo(() => {
+    if (!transactions) return []
+    if (!accountId) return transactions
+    return transactions.filter(tx => tx.account_id === accountId)
+  }, [transactions, accountId])
+
   // Sort transactions
   const sortedTransactions = useMemo(() => {
-    if (!transactions) return []
-    return [...transactions].sort((a, b) => {
+    if (!accountFilteredTransactions.length) return []
+    return [...accountFilteredTransactions].sort((a, b) => {
       let cmp = 0
       switch (sortField) {
         case 'date':
@@ -254,7 +262,7 @@ export function Transactions() {
       }
       return sortDirection === 'asc' ? cmp : -cmp
     })
-  }, [transactions, sortField, sortDirection])
+  }, [accountFilteredTransactions, sortField, sortDirection])
 
   // Apply display limit
   const displayedTransactions = useMemo(() => {
@@ -282,6 +290,19 @@ export function Transactions() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
+      {/* Back to Accounts button (shown when navigating from Accounts page) */}
+      {fromAccounts && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate({ to: '/accounts' })}
+          className="mb-4 -ml-2"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t('common.backToAccounts')}
+        </Button>
+      )}
+
       <div className="mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('transactions.title')}</h2>
         <p className="text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>

@@ -289,7 +289,8 @@
     "cancel": "Cancel",
     "today": "Today",
     "back": "Back",
-    "optional": "Optional"
+    "optional": "Optional",
+    "backToAccounts": "Back to Accounts"
   },
   "autocomplete": {
     "used": "used"
