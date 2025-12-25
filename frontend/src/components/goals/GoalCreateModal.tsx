@@ -29,7 +29,7 @@ export function GoalCreateModal({
   editingGoalId,
 }: GoalCreateModalProps) {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   // Step state (1 = type selection, 2 = details)
   const [step, setStep] = useState(1)
@@ -67,7 +67,9 @@ export function GoalCreateModal({
         setGoalType(existingGoal.goal_type || 'custom')
         setName(existingGoal.name || '')
         setYears(existingGoal.years)
-        setTargetAmount(existingGoal.target_amount.toString())
+        // Format with thousands separator based on locale
+        const locale = i18n.language === 'ja' ? 'ja-JP' : i18n.language === 'vi' ? 'vi-VN' : 'en-US'
+        setTargetAmount(existingGoal.target_amount.toLocaleString(locale))
         if (existingGoal.start_date) {
           setStartDateOption('custom')
           setCustomDate(existingGoal.start_date)
@@ -146,7 +148,9 @@ export function GoalCreateModal({
   }
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTargetAmount(formatAmountInput(e.target.value))
+    // Get locale for number formatting
+    const locale = i18n.language === 'ja' ? 'ja-JP' : i18n.language === 'vi' ? 'vi-VN' : 'en-US'
+    setTargetAmount(formatAmountInput(e.target.value, locale))
   }
 
   if (!isOpen) return null

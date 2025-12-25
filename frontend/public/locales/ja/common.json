@@ -251,7 +251,14 @@
       "targetAmount": "目標金額",
       "targetAmountPlaceholder": "例: 1,000,000",
       "targetAmountAriaLabel": "目標金額を入力",
-      "amountHint": "最小額: ¥10,000 / 刻み: ¥10,000"
+      "amountHint": "最小額: ¥10,000 / 刻み: ¥10,000",
+      "startDate": "開始日",
+      "startDateToday": "今日",
+      "startDateTodayAria": "今日から開始",
+      "startDateNextMonth": "来月1日",
+      "startDateNextMonthAria": "来月1日から開始",
+      "startDateCustom": "カスタム",
+      "startDateCustomAria": "カスタム日付を選択"
     },
     "errors": {
       "createFailed": "目標の作成に失敗しました。もう一度お試しください。",

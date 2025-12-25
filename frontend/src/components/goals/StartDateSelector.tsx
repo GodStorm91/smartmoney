@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/ui/Input'
 import type { StartDateOption } from './goal-form-helpers'
 
@@ -16,16 +17,21 @@ export function StartDateSelector({
   onOptionChange,
   onCustomDateChange,
 }: StartDateSelectorProps) {
+  const { t, i18n } = useTranslation()
+
   const nextMonthDate = new Date(
     new Date().getFullYear(),
     new Date().getMonth() + 1,
     1
   )
 
+  // Get locale for date formatting
+  const dateLocale = i18n.language === 'ja' ? 'ja-JP' : i18n.language === 'vi' ? 'vi-VN' : 'en-US'
+
   return (
     <div>
       <label className="block text-sm font-medium text-gray-700 mb-3">
-        開始日
+        {t('goals.form.startDate')}
       </label>
       <div className="space-y-3">
         {/* Today option */}
@@ -37,12 +43,12 @@ export function StartDateSelector({
             checked={selectedOption === 'today'}
             onChange={() => onOptionChange('today')}
             className="mt-1 w-4 h-4 text-primary-500 focus:ring-primary-500"
-            aria-label="今日から開始"
+            aria-label={t('goals.form.startDateTodayAria')}
           />
           <div>
-            <div className="text-sm font-medium text-gray-900">今日</div>
+            <div className="text-sm font-medium text-gray-900">{t('goals.form.startDateToday')}</div>
             <div className="text-xs text-gray-600">
-              {new Date().toLocaleDateString('ja-JP')}
+              {new Date().toLocaleDateString(dateLocale)}
             </div>
           </div>
         </label>
@@ -56,12 +62,12 @@ export function StartDateSelector({
             checked={selectedOption === 'month_start'}
             onChange={() => onOptionChange('month_start')}
             className="mt-1 w-4 h-4 text-primary-500 focus:ring-primary-500"
-            aria-label="来月1日から開始"
+            aria-label={t('goals.form.startDateNextMonthAria')}
           />
           <div>
-            <div className="text-sm font-medium text-gray-900">来月1日</div>
+            <div className="text-sm font-medium text-gray-900">{t('goals.form.startDateNextMonth')}</div>
             <div className="text-xs text-gray-600">
-              {nextMonthDate.toLocaleDateString('ja-JP')}
+              {nextMonthDate.toLocaleDateString(dateLocale)}
             </div>
           </div>
         </label>
@@ -75,10 +81,10 @@ export function StartDateSelector({
             checked={selectedOption === 'custom'}
             onChange={() => onOptionChange('custom')}
             className="mt-1 w-4 h-4 text-primary-500 focus:ring-primary-500"
-            aria-label="カスタム日付を選択"
+            aria-label={t('goals.form.startDateCustomAria')}
           />
           <div className="flex-1">
-            <div className="text-sm font-medium text-gray-900 mb-2">カスタム</div>
+            <div className="text-sm font-medium text-gray-900 mb-2">{t('goals.form.startDateCustom')}</div>
             {selectedOption === 'custom' && (
               <Input
                 type="date"
@@ -86,7 +92,7 @@ export function StartDateSelector({
                 onChange={(e) => onCustomDateChange(e.target.value)}
                 error={customDateError}
                 className="text-sm"
-                aria-label="カスタム開始日を選択"
+                aria-label={t('goals.form.startDateCustomAria')}
               />
             )}
           </div>

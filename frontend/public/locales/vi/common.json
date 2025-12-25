@@ -245,7 +245,14 @@
       "targetAmount": "Số tiền mục tiêu",
       "targetAmountPlaceholder": "VD: 100,000,000",
       "targetAmountAriaLabel": "Nhập số tiền mục tiêu",
-      "amountHint": "Tối thiểu: 10,000₫ / Bước: 10,000₫"
+      "amountHint": "Tối thiểu: 10,000₫ / Bước: 10,000₫",
+      "startDate": "Ngày bắt đầu",
+      "startDateToday": "Hôm nay",
+      "startDateTodayAria": "Bắt đầu từ hôm nay",
+      "startDateNextMonth": "Ngày 1 tháng sau",
+      "startDateNextMonthAria": "Bắt đầu từ ngày 1 tháng sau",
+      "startDateCustom": "Tùy chỉnh",
+      "startDateCustomAria": "Chọn ngày tùy chỉnh"
     },
     "errors": {
       "createFailed": "Không thể tạo mục tiêu. Vui lòng thử lại.",

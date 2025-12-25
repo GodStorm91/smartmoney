@@ -245,7 +245,14 @@
       "targetAmount": "Target Amount",
       "targetAmountPlaceholder": "e.g., 1,000,000",
       "targetAmountAriaLabel": "Enter target amount",
-      "amountHint": "Min: ¥10,000 / Step: ¥10,000"
+      "amountHint": "Min: ¥10,000 / Step: ¥10,000",
+      "startDate": "Start Date",
+      "startDateToday": "Today",
+      "startDateTodayAria": "Start from today",
+      "startDateNextMonth": "1st of next month",
+      "startDateNextMonthAria": "Start from 1st of next month",
+      "startDateCustom": "Custom",
+      "startDateCustomAria": "Select custom date"
     },
     "errors": {
       "createFailed": "Failed to create goal. Please try again.",
