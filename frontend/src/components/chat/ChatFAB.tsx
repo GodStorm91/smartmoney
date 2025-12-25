@@ -11,7 +11,7 @@ export function ChatFAB({ onClick, hasUnread = false }: ChatFABProps) {
     <button
       onClick={onClick}
       className={cn(
-        'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-40',
+        'fixed bottom-36 right-4 sm:bottom-6 sm:right-6 z-40',
         'w-14 h-14 rounded-full',
         'bg-primary-500 text-white shadow-lg',
         'hover:bg-primary-600 hover:scale-105',
