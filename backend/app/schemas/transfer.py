@@ -1,5 +1,5 @@
 """Transfer schemas for API validation."""
-from datetime import date
+import datetime
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -14,7 +14,7 @@ class TransferCreate(BaseModel):
     to_amount: int = Field(..., gt=0, description="Amount in target currency (smallest unit)")
     exchange_rate: Optional[float] = Field(None, description="Exchange rate used for conversion")
     fee_amount: int = Field(0, ge=0, description="Transfer fee in source currency")
-    date: date = Field(..., description="Transfer date")
+    date: datetime.date = Field(..., description="Transfer date")
     description: Optional[str] = Field(None, max_length=500, description="Transfer description")
 
 
@@ -40,7 +40,7 @@ class TransferListItem(BaseModel):
     from_amount: int
     to_amount: int
     fee_amount: int
-    date: date
+    date: datetime.date
     description: Optional[str] = None
 
     class Config:
