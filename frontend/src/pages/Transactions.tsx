@@ -235,15 +235,9 @@ export function Transactions() {
   const accountFilteredTransactions = useMemo(() => {
     if (!transactions) return []
     if (!accountId) return transactions
-    // Debug: log filter values
-    console.log('Filter debug:', {
-      accountId,
-      accountIdType: typeof accountId,
-      sampleTxAccountId: transactions[0]?.account_id,
-      sampleTxAccountIdType: typeof transactions[0]?.account_id,
-      totalTxns: transactions.length,
-    })
-    return transactions.filter(tx => tx.account_id === accountId)
+    // Convert both to numbers for robust comparison (URL params may be strings)
+    const targetAccountId = Number(accountId)
+    return transactions.filter(tx => tx.account_id != null && Number(tx.account_id) === targetAccountId)
   }, [transactions, accountId])
 
   // Sort transactions
