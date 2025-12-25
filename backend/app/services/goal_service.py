@@ -1,5 +1,5 @@
 """Goal service for financial goal tracking and progress calculations."""
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from dateutil.relativedelta import relativedelta
@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..models.goal import Goal
 from ..models.transaction import Transaction
+from ..models.account import Account
 
 
 class GoalService:
@@ -66,7 +67,7 @@ class GoalService:
 
     @staticmethod
     def get_all_goals(db: Session, user_id: int) -> list[Goal]:
-        """Get all goals ordered by years for a specific user.
+        """Get all goals ordered by priority for a specific user.
 
         Args:
             db: Database session
@@ -75,7 +76,101 @@ class GoalService:
         Returns:
             List of goals
         """
-        return db.query(Goal).filter(Goal.user_id == user_id).order_by(Goal.years).all()
+        return db.query(Goal).filter(Goal.user_id == user_id).order_by(Goal.priority).all()
+
+    @staticmethod
+    def has_emergency_fund(db: Session, user_id: int) -> bool:
+        """Check if user has emergency fund goal.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            True if emergency fund goal exists
+        """
+        return db.query(Goal).filter(
+            Goal.user_id == user_id,
+            Goal.goal_type == "emergency_fund"
+        ).first() is not None
+
+    @staticmethod
+    def get_next_priority(db: Session, user_id: int) -> int:
+        """Get next priority number for new goal.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Next priority number
+        """
+        max_priority = db.query(func.max(Goal.priority)).filter(
+            Goal.user_id == user_id
+        ).scalar()
+        return (max_priority or 0) + 1
+
+    @staticmethod
+    def reorder_goals(db: Session, user_id: int, goal_ids: list[int]) -> list[Goal]:
+        """Reorder goals by priority. Emergency fund must remain #1.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            goal_ids: Ordered list of goal IDs
+
+        Returns:
+            Reordered list of goals
+
+        Raises:
+            ValueError: If goal IDs are invalid or emergency fund is not first
+        """
+        goals = db.query(Goal).filter(
+            Goal.user_id == user_id,
+            Goal.id.in_(goal_ids)
+        ).all()
+
+        if len(goals) != len(goal_ids):
+            raise ValueError("Invalid goal IDs")
+
+        # Check emergency fund constraint
+        emergency_goal = next((g for g in goals if g.goal_type == "emergency_fund"), None)
+        if emergency_goal and goal_ids[0] != emergency_goal.id:
+            raise ValueError("Emergency fund must be priority 1")
+
+        # Update priorities
+        for priority, goal_id in enumerate(goal_ids, start=1):
+            goal = next(g for g in goals if g.id == goal_id)
+            goal.priority = priority
+
+        db.commit()
+        return GoalService.get_all_goals(db, user_id)
+
+    @staticmethod
+    def update_milestones(db: Session, goal: Goal, progress_pct: float) -> Goal:
+        """Update milestone timestamps if reached.
+
+        Args:
+            db: Database session
+            goal: Goal object
+            progress_pct: Current progress percentage
+
+        Returns:
+            Updated goal
+        """
+        now = datetime.now()
+
+        if progress_pct >= 25 and not goal.milestone_25_at:
+            goal.milestone_25_at = now
+        if progress_pct >= 50 and not goal.milestone_50_at:
+            goal.milestone_50_at = now
+        if progress_pct >= 75 and not goal.milestone_75_at:
+            goal.milestone_75_at = now
+        if progress_pct >= 100 and not goal.milestone_100_at:
+            goal.milestone_100_at = now
+
+        db.commit()
+        return goal
 
     @staticmethod
     def update_goal(db: Session, user_id: int, goal_id: int, goal_data: dict) -> Optional[Goal]:
@@ -186,8 +281,15 @@ class GoalService:
         else:
             status = "behind"
 
+        # Get linked account info if available
+        account_name = None
+        if goal.account_id and goal.account:
+            account_name = goal.account.name
+
         return {
             "goal_id": goal.id,
+            "goal_type": goal.goal_type,
+            "name": goal.name,
             "years": goal.years,
             "target_amount": goal.target_amount,
             "start_date": start_date.isoformat(),
@@ -203,6 +305,13 @@ class GoalService:
             "needed_remaining": needed_remaining,
             "projected_total": round(projected_total, 0),
             "status": status,
+            "priority": goal.priority,
+            "account_id": goal.account_id,
+            "account_name": account_name,
+            "milestone_25_at": goal.milestone_25_at,
+            "milestone_50_at": goal.milestone_50_at,
+            "milestone_75_at": goal.milestone_75_at,
+            "milestone_100_at": goal.milestone_100_at,
         }
 
     @staticmethod

@@ -190,9 +190,65 @@
     "selectPeriod": "Select a period to set your savings goal",
     "remainingSlots": "{{count}} remaining",
     "maxGoalsReached": "You can set up to {{max}} goals. To add a new goal, please delete an existing one.",
-    "yearGoal": "{{years}}-year goal",
+    "yearGoal": "-Year Goal",
     "trendPeriod": "{{months}}M",
-    "trendPeriodHint": "Select calculation period for achievability"
+    "trendPeriodHint": "Select calculation period for achievability",
+    "selectType": "What are you saving for?",
+    "emergencyFundFirst": "We recommend setting up an Emergency Fund first before other goals.",
+    "complete": "Complete",
+    "progress": "Progress",
+    "targetAmount": "Target Amount",
+    "currentSavings": "Current Savings",
+    "achievementRate": "Achievement Rate",
+    "monthlyRequired": "Monthly: {{amount}} required",
+    "monthlyNeeded": "You need to save {{amount}} monthly",
+    "achievedMessage": "Congratulations! You achieved your {{years}}-year goal!",
+    "status": {
+      "ahead": "Ahead",
+      "on_track": "On Track",
+      "behind": "Behind"
+    },
+    "types": {
+      "emergency_fund": "Emergency Fund",
+      "home_down_payment": "Home Down Payment",
+      "vacation_travel": "Vacation/Travel",
+      "vehicle": "Vehicle",
+      "education": "Education",
+      "wedding": "Wedding",
+      "large_purchase": "Large Purchase",
+      "debt_payoff": "Debt Payoff",
+      "retirement": "Retirement",
+      "investment": "Investment",
+      "custom": "Custom Goal"
+    },
+    "modal": {
+      "createTitle": "Create New Goal",
+      "editTitle": "Edit Goal",
+      "createWithYears": "Create {{years}}-Year Goal",
+      "create": "Create",
+      "update": "Update",
+      "creating": "Creating...",
+      "updating": "Updating..."
+    },
+    "form": {
+      "name": "Goal Name",
+      "namePlaceholder": "e.g., Emergency Fund, Home Down Payment",
+      "nameAriaLabel": "Enter goal name",
+      "years": "Period (Years)",
+      "yearsAriaLabel": "Enter goal period in years",
+      "targetAmount": "Target Amount",
+      "targetAmountPlaceholder": "e.g., 1,000,000",
+      "targetAmountAriaLabel": "Enter target amount",
+      "amountHint": "Min: ¥10,000 / Step: ¥10,000"
+    },
+    "errors": {
+      "createFailed": "Failed to create goal. Please try again.",
+      "updateFailed": "Failed to update goal. Please try again.",
+      "yearsRange": "Period must be between 1 and 10 years",
+      "amountRequired": "Please enter a target amount",
+      "amountMinimum": "Target amount must be at least ¥10,000",
+      "dateRequired": "Please select a start date"
+    }
   },
   "common": {
     "loading": "Loading...",
@@ -202,7 +258,8 @@
     "create": "Create",
     "update": "Update",
     "cancel": "Cancel",
-    "today": "Today"
+    "today": "Today",
+    "back": "Back"
   },
   "autocomplete": {
     "used": "used"

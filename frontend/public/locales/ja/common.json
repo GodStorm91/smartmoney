@@ -196,9 +196,65 @@
     "selectPeriod": "期間を選択して貯蓄目標を設定しましょう",
     "remainingSlots": "残り{{count}}枠",
     "maxGoalsReached": "最大{{max}}個の目標を設定できます。新しい目標を追加するには、既存の目標を削除してください。",
-    "yearGoal": "{{years}}年目標",
+    "yearGoal": "年目標",
     "trendPeriod": "{{months}}ヶ月",
-    "trendPeriodHint": "達成可能性の計算期間を選択してください"
+    "trendPeriodHint": "達成可能性の計算期間を選択してください",
+    "selectType": "何のために貯金しますか？",
+    "emergencyFundFirst": "他の目標を設定する前に、まず緊急予備資金を設定することをお勧めします。",
+    "complete": "完了",
+    "progress": "進捗状況",
+    "targetAmount": "目標金額",
+    "currentSavings": "現在の貯蓄",
+    "achievementRate": "達成率",
+    "monthlyRequired": "月々{{amount}}必要",
+    "monthlyNeeded": "月々{{amount}}の貯蓄が必要です",
+    "achievedMessage": "おめでとうございます！{{years}}年目標を達成しました！",
+    "status": {
+      "ahead": "順調",
+      "on_track": "目標通り",
+      "behind": "注意"
+    },
+    "types": {
+      "emergency_fund": "緊急予備資金",
+      "home_down_payment": "住宅頭金",
+      "vacation_travel": "旅行",
+      "vehicle": "車両",
+      "education": "教育",
+      "wedding": "結婚",
+      "large_purchase": "大型購入",
+      "debt_payoff": "借金返済",
+      "retirement": "老後資金",
+      "investment": "投資",
+      "custom": "カスタム目標"
+    },
+    "modal": {
+      "createTitle": "新しい目標を作成",
+      "editTitle": "目標を編集",
+      "createWithYears": "{{years}}年目標を作成",
+      "create": "作成",
+      "update": "更新",
+      "creating": "作成中...",
+      "updating": "更新中..."
+    },
+    "form": {
+      "name": "目標名",
+      "namePlaceholder": "例: 緊急予備資金、住宅頭金",
+      "nameAriaLabel": "目標名を入力",
+      "years": "期間（年）",
+      "yearsAriaLabel": "目標期間を年単位で入力",
+      "targetAmount": "目標金額",
+      "targetAmountPlaceholder": "例: 1,000,000",
+      "targetAmountAriaLabel": "目標金額を入力",
+      "amountHint": "最小額: ¥10,000 / 刻み: ¥10,000"
+    },
+    "errors": {
+      "createFailed": "目標の作成に失敗しました。もう一度お試しください。",
+      "updateFailed": "目標の更新に失敗しました。もう一度お試しください。",
+      "yearsRange": "期間は1年から10年の間で設定してください",
+      "amountRequired": "目標金額を入力してください",
+      "amountMinimum": "目標金額は¥10,000以上で設定してください",
+      "dateRequired": "開始日を選択してください"
+    }
   },
   "common": {
     "loading": "読み込み中...",
@@ -208,7 +264,8 @@
     "create": "作成",
     "update": "更新",
     "cancel": "キャンセル",
-    "today": "今日"
+    "today": "今日",
+    "back": "戻る"
   },
   "autocomplete": {
     "used": "回使用"

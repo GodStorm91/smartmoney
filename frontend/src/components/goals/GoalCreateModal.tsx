@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { createGoal, updateGoal, fetchGoal } from '@/services/goal-service'
+import { useTranslation } from 'react-i18next'
+import { createGoal, updateGoal, fetchGoal, hasEmergencyFund } from '@/services/goal-service'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { StartDateSelector } from './StartDateSelector'
+import { GoalTypeSelector } from './GoalTypeSelector'
 import {
   validateGoalForm,
   calculateStartDate,
@@ -11,6 +13,7 @@ import {
   type StartDateOption,
   type GoalFormErrors,
 } from './goal-form-helpers'
+import type { GoalType, GoalCreate, GoalUpdate } from '@/types/goal'
 
 interface GoalCreateModalProps {
   isOpen: boolean
@@ -26,14 +29,27 @@ export function GoalCreateModal({
   editingGoalId,
 }: GoalCreateModalProps) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  // Step state (1 = type selection, 2 = details)
+  const [step, setStep] = useState(1)
 
   // Form state
-  const [years, setYears] = useState<number>(preselectedYears || 1)
+  const [goalType, setGoalType] = useState<GoalType | null>(null)
+  const [name, setName] = useState<string>('')
+  const [years, setYears] = useState<number>(preselectedYears || 3)
   const [targetAmount, setTargetAmount] = useState<string>('')
   const [startDateOption, setStartDateOption] = useState<StartDateOption>('today')
   const [customDate, setCustomDate] = useState<string>('')
   const [errors, setErrors] = useState<GoalFormErrors>({})
   const [serverError, setServerError] = useState<string>('')
+
+  // Check if user has emergency fund
+  const { data: hasEF = true } = useQuery({
+    queryKey: ['has-emergency-fund'],
+    queryFn: hasEmergencyFund,
+    enabled: isOpen && !editingGoalId,
+  })
 
   // Fetch existing goal if editing
   const { data: existingGoal } = useQuery({
@@ -42,23 +58,24 @@ export function GoalCreateModal({
     enabled: !!editingGoalId && isOpen,
   })
 
-  // Reset form when modal opens/closes or preselectedYears changes
+  // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       if (editingGoalId && existingGoal) {
-        // Pre-fill form with existing data
+        setStep(2) // Skip type selection when editing
+        setGoalType(existingGoal.goal_type || 'custom')
+        setName(existingGoal.name || '')
         setYears(existingGoal.years)
         setTargetAmount(existingGoal.target_amount.toString())
         if (existingGoal.start_date) {
           setStartDateOption('custom')
           setCustomDate(existingGoal.start_date)
-        } else {
-          setStartDateOption('today')
-          setCustomDate('')
         }
       } else {
-        // Reset form for new goal
-        setYears(preselectedYears || 1)
+        setStep(1)
+        setGoalType(null)
+        setName('')
+        setYears(preselectedYears || 3)
         setTargetAmount('')
         setStartDateOption('today')
         setCustomDate('')
@@ -70,156 +87,147 @@ export function GoalCreateModal({
 
   // Create/Update goal mutation
   const goalMutation = useMutation({
-    mutationFn: editingGoalId
-      ? (data: any) => updateGoal(editingGoalId, data)
-      : createGoal,
+    mutationFn: async (data: GoalCreate | GoalUpdate) => {
+      if (editingGoalId) {
+        return updateGoal(editingGoalId, data as GoalUpdate)
+      }
+      return createGoal(data as GoalCreate)
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] })
       queryClient.invalidateQueries({ queryKey: ['goals-progress-full'] })
+      queryClient.invalidateQueries({ queryKey: ['has-emergency-fund'] })
       onClose()
     },
     onError: () => {
-      setServerError(
-        editingGoalId
-          ? '目標の更新に失敗しました。もう一度お試しください。'
-          : '目標の作成に失敗しました。もう一度お試しください。'
-      )
+      setServerError(editingGoalId ? t('goals.errors.updateFailed') : t('goals.errors.createFailed'))
     },
   })
 
-  // Handle submit
+  const handleTypeSelect = (type: GoalType) => {
+    setGoalType(type)
+    // Auto-set name based on type
+    if (!name) {
+      setName(t(`goals.types.${type}`))
+    }
+    setStep(2)
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
-    // Validate form
-    const validationErrors = validateGoalForm(
-      years,
-      targetAmount,
-      startDateOption,
-      customDate,
-      preselectedYears
-    )
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors)
+    const rawErrors = validateGoalForm(years, targetAmount, startDateOption, customDate, preselectedYears)
+    // Translate error keys to localized messages
+    const translatedErrors: GoalFormErrors = {}
+    for (const [key, value] of Object.entries(rawErrors)) {
+      if (value) translatedErrors[key as keyof GoalFormErrors] = t(value)
+    }
+    if (Object.keys(translatedErrors).length > 0) {
+      setErrors(translatedErrors)
       return
     }
 
-    // Prepare data
     const amount = parseInt(targetAmount.replace(/,/g, ''), 10)
     const startDate = calculateStartDate(startDateOption, customDate)
 
-    // Submit
-    goalMutation.mutate({
-      name: `${years}年貯蓄目標`,
-      target_amount: amount,
-      years,
-      start_date: startDate,
-      end_date: '', // Backend calculates this
-    })
+    if (editingGoalId) {
+      goalMutation.mutate({ name: name || undefined, target_amount: amount, start_date: startDate || undefined })
+    } else {
+      goalMutation.mutate({
+        goal_type: goalType || 'custom',
+        name: name || undefined,
+        target_amount: amount,
+        years,
+        start_date: startDate || undefined,
+      })
+    }
   }
 
-  // Handle amount input with formatting
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatAmountInput(e.target.value)
-    setTargetAmount(formatted)
+    setTargetAmount(formatAmountInput(e.target.value))
   }
 
   if (!isOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-    >
-      <div
-        className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="border-b border-gray-200 px-6 py-4">
-          <h2 id="modal-title" className="text-xl font-bold text-gray-900">
-            {editingGoalId
-              ? '目標を編集'
-              : preselectedYears
-              ? `${preselectedYears}年目標を作成`
-              : '新しい目標を作成'}
+          <h2 className="text-xl font-bold text-gray-900">
+            {editingGoalId ? t('goals.modal.editTitle') : step === 1 ? t('goals.modal.createTitle') : t(`goals.types.${goalType}`)}
           </h2>
+          {!editingGoalId && step === 2 && (
+            <button onClick={() => setStep(1)} className="text-sm text-blue-600 hover:underline mt-1">
+              ← {t('common.back')}
+            </button>
+          )}
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Years input (only if not preselected) */}
-          {!preselectedYears && (
-            <Input
-              label="期間（年）"
-              type="number"
-              min={1}
-              max={10}
-              value={years}
-              onChange={(e) => setYears(parseInt(e.target.value, 10))}
-              error={errors.years}
-              placeholder="1〜10"
-              aria-label="目標期間を年単位で入力"
-              required
-            />
+        {/* Content */}
+        <div className="p-6">
+          {step === 1 && !editingGoalId ? (
+            <GoalTypeSelector selectedType={goalType} onSelect={handleTypeSelect} hasEmergencyFund={hasEF} />
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <Input
+                label={t('goals.form.name')}
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={t('goals.form.namePlaceholder')}
+              />
+
+              {!preselectedYears && !editingGoalId && (
+                <Input
+                  label={t('goals.form.years')}
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={years}
+                  onChange={(e) => setYears(parseInt(e.target.value, 10) || 1)}
+                  error={errors.years}
+                  required
+                />
+              )}
+
+              <div>
+                <Input
+                  label={t('goals.form.targetAmount')}
+                  type="text"
+                  value={targetAmount}
+                  onChange={handleAmountChange}
+                  error={errors.targetAmount}
+                  placeholder={t('goals.form.targetAmountPlaceholder')}
+                  required
+                />
+                <p className="mt-1 text-xs text-gray-500">{t('goals.form.amountHint')}</p>
+              </div>
+
+              <StartDateSelector
+                selectedOption={startDateOption}
+                customDate={customDate}
+                customDateError={errors.customDate}
+                onOptionChange={setStartDateOption}
+                onCustomDateChange={setCustomDate}
+              />
+
+              {serverError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">{serverError}</div>
+              )}
+            </form>
           )}
-
-          {/* Target amount input */}
-          <div>
-            <Input
-              label="目標金額"
-              type="text"
-              value={targetAmount}
-              onChange={handleAmountChange}
-              error={errors.targetAmount}
-              placeholder="例: 1,000,000"
-              aria-label="目標金額を入力"
-              required
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              最小額: ¥10,000 / 刻み: ¥10,000
-            </p>
-          </div>
-
-          {/* Start date selector */}
-          <StartDateSelector
-            selectedOption={startDateOption}
-            customDate={customDate}
-            customDateError={errors.customDate}
-            onOptionChange={setStartDateOption}
-            onCustomDateChange={setCustomDate}
-          />
-
-          {/* Server error display */}
-          {serverError && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
-              <p className="text-sm text-red-800">{serverError}</p>
-            </div>
-          )}
-        </form>
+        </div>
 
         {/* Footer */}
         <div className="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
           <Button variant="outline" onClick={onClose} disabled={goalMutation.isPending}>
-            キャンセル
+            {t('common.cancel')}
           </Button>
-          <Button
-            variant="primary"
-            onClick={handleSubmit}
-            disabled={goalMutation.isPending}
-          >
-            {goalMutation.isPending
-              ? editingGoalId
-                ? '更新中...'
-                : '作成中...'
-              : editingGoalId
-              ? '更新'
-              : '作成'}
-          </Button>
+          {step === 2 && (
+            <Button variant="primary" onClick={handleSubmit} disabled={goalMutation.isPending || !targetAmount}>
+              {goalMutation.isPending ? t('goals.modal.creating') : editingGoalId ? t('goals.modal.update') : t('goals.modal.create')}
+            </Button>
+          )}
         </div>
       </div>
     </div>

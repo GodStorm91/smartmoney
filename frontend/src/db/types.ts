@@ -57,17 +57,35 @@ export interface DBBudget extends OfflineMetadata {
   updated_at?: string
 }
 
+// Goal type enum
+export type DBGoalType =
+  | 'emergency_fund'
+  | 'home_down_payment'
+  | 'vacation_travel'
+  | 'vehicle'
+  | 'education'
+  | 'wedding'
+  | 'large_purchase'
+  | 'debt_payoff'
+  | 'retirement'
+  | 'investment'
+  | 'custom'
+
 // Goal entity for IndexedDB
 export interface DBGoal extends OfflineMetadata {
   id: number
-  name: string
-  target_amount: number
-  current_amount: number
+  goal_type: DBGoalType
+  name?: string
   years: number
-  start_date: string
-  end_date: string
-  status: 'ahead' | 'on-track' | 'behind' | 'achieved'
-  monthly_required: number
+  target_amount: number
+  start_date?: string
+  priority: number
+  account_id?: number
+  ai_advice?: string
+  milestone_25_at?: string
+  milestone_50_at?: string
+  milestone_75_at?: string
+  milestone_100_at?: string
   created_at?: string
   updated_at?: string
 }

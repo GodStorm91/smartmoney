@@ -1,4 +1,4 @@
-"""Claude AI service for budget generation."""
+"""Claude AI service for budget generation and goal suggestions."""
 import json
 from datetime import date, timedelta
 from decimal import Decimal
@@ -10,6 +10,7 @@ from sqlalchemy import func
 
 from ..config import settings
 from ..models.transaction import Transaction
+from ..models.goal import Goal
 
 
 class ClaudeAIService:
@@ -483,3 +484,120 @@ Generate categorizations now:"""
                 raise ValueError("Invalid categorization item: missing id or category")
 
         return results
+
+    def generate_goal_suggestion(
+        self,
+        db: Session,
+        user_id: int,
+        goal_type: str,
+        years: int,
+        language: str = "ja"
+    ) -> tuple[dict[str, Any], dict[str, int]]:
+        """Generate goal target suggestion based on user's financial data.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            goal_type: Type of goal (emergency_fund, home_down_payment, etc.)
+            years: Goal timeline in years
+            language: Language code for response
+
+        Returns:
+            Tuple of (suggestion dict, usage dict with tokens)
+        """
+        # Get financial summary
+        monthly_income = self._get_monthly_income(db, user_id)
+        monthly_expenses = self._get_monthly_expenses(db, user_id)
+        monthly_net = monthly_income - monthly_expenses
+        existing_goals = self._get_existing_goals_summary(db, user_id)
+
+        prompt = self._build_goal_suggestion_prompt(
+            goal_type=goal_type,
+            years=years,
+            monthly_income=monthly_income,
+            monthly_expenses=monthly_expenses,
+            monthly_net=monthly_net,
+            existing_goals=existing_goals,
+            language=language
+        )
+
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=1024,
+            temperature=0.5,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens
+        }
+
+        suggestion = self._parse_goal_suggestion_response(response.content[0].text)
+        return suggestion, usage
+
+    def _get_monthly_income(self, db: Session, user_id: int) -> int:
+        """Get average monthly income for last 6 months."""
+        cutoff = date.today() - timedelta(days=180)
+        result = db.query(func.sum(Transaction.amount)).filter(
+            Transaction.user_id == user_id,
+            Transaction.is_income == True,
+            Transaction.is_transfer == False,
+            Transaction.date >= cutoff
+        ).scalar() or 0
+        return int(abs(result) / 6)
+
+    def _get_monthly_expenses(self, db: Session, user_id: int) -> int:
+        """Get average monthly expenses for last 6 months."""
+        cutoff = date.today() - timedelta(days=180)
+        result = db.query(func.sum(Transaction.amount)).filter(
+            Transaction.user_id == user_id,
+            Transaction.is_income == False,
+            Transaction.is_transfer == False,
+            Transaction.is_adjustment == False,
+            Transaction.date >= cutoff
+        ).scalar() or 0
+        return int(abs(result) / 6)
+
+    def _get_existing_goals_summary(self, db: Session, user_id: int) -> list[dict]:
+        """Get summary of user's existing goals."""
+        goals = db.query(Goal).filter(Goal.user_id == user_id).all()
+        return [{"type": g.goal_type, "name": g.name, "target": g.target_amount, "years": g.years} for g in goals]
+
+    def _build_goal_suggestion_prompt(
+        self, goal_type: str, years: int, monthly_income: int,
+        monthly_expenses: int, monthly_net: int, existing_goals: list[dict], language: str
+    ) -> str:
+        """Build prompt for goal suggestion."""
+        lang_name = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}.get(language, "Japanese")
+        goal_info = {
+            "emergency_fund": "3-6 months of expenses",
+            "home_down_payment": "10-20% of home price",
+            "vacation_travel": "Travel fund", "vehicle": "Vehicle purchase",
+            "education": "Education costs", "wedding": "Wedding expenses",
+            "large_purchase": "Major purchase", "debt_payoff": "Debt repayment",
+            "retirement": "Retirement savings", "investment": "Investment capital", "custom": "Custom"
+        }
+        existing_str = "\n".join([f"- {g['name'] or g['type']}: ¥{g['target']:,} ({g['years']}y)" for g in existing_goals]) or "None"
+
+        return f"""Financial advisor: suggest realistic savings goal.
+
+GOAL: {goal_type} ({goal_info.get(goal_type, 'Custom')}) | TIMELINE: {years} years
+
+FINANCES: Income ¥{monthly_income:,}/mo | Expenses ¥{monthly_expenses:,}/mo | Net ¥{monthly_net:,}/mo
+
+EXISTING GOALS:
+{existing_str}
+
+OUTPUT JSON:
+{{"suggested_target": 500000, "monthly_required": 8333, "achievable": true, "advice": "Brief advice"}}
+
+RULES: achievable=true if monthly_required <= 80% of net. Advice in {lang_name}. For emergency_fund, suggest 3-6x expenses."""
+
+    def _parse_goal_suggestion_response(self, response_text: str) -> dict[str, Any]:
+        """Parse goal suggestion response."""
+        start_idx = response_text.find("{")
+        end_idx = response_text.rfind("}") + 1
+        if start_idx == -1 or end_idx == 0:
+            raise ValueError("No valid JSON in response")
+        return json.loads(response_text[start_idx:end_idx])

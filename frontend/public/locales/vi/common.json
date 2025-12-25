@@ -190,9 +190,65 @@
     "selectPeriod": "Chọn khoảng thời gian để đặt mục tiêu tiết kiệm của bạn",
     "remainingSlots": "Còn lại {{count}} vị trí",
     "maxGoalsReached": "Bạn có thể đặt tối đa {{max}} mục tiêu. Để thêm mục tiêu mới, vui lòng xóa mục tiêu hiện có.",
-    "yearGoal": "Mục tiêu {{years}} năm",
+    "yearGoal": " Năm",
     "trendPeriod": "{{months}} tháng",
-    "trendPeriodHint": "Chọn khoảng thời gian tính toán khả năng đạt được"
+    "trendPeriodHint": "Chọn khoảng thời gian tính toán khả năng đạt được",
+    "selectType": "Bạn đang tiết kiệm cho mục đích gì?",
+    "emergencyFundFirst": "Chúng tôi khuyên bạn nên thiết lập Quỹ dự phòng trước khi đặt các mục tiêu khác.",
+    "complete": "Hoàn thành",
+    "progress": "Tiến độ",
+    "targetAmount": "Số tiền mục tiêu",
+    "currentSavings": "Tiết kiệm hiện tại",
+    "achievementRate": "Tỷ lệ đạt được",
+    "monthlyRequired": "Hàng tháng: cần {{amount}}",
+    "monthlyNeeded": "Bạn cần tiết kiệm {{amount}} mỗi tháng",
+    "achievedMessage": "Chúc mừng! Bạn đã đạt được mục tiêu {{years}} năm!",
+    "status": {
+      "ahead": "Vượt tiến độ",
+      "on_track": "Đúng tiến độ",
+      "behind": "Chậm tiến độ"
+    },
+    "types": {
+      "emergency_fund": "Quỹ dự phòng",
+      "home_down_payment": "Tiền đặt cọc nhà",
+      "vacation_travel": "Du lịch",
+      "vehicle": "Xe cộ",
+      "education": "Giáo dục",
+      "wedding": "Đám cưới",
+      "large_purchase": "Mua sắm lớn",
+      "debt_payoff": "Trả nợ",
+      "retirement": "Hưu trí",
+      "investment": "Đầu tư",
+      "custom": "Mục tiêu tùy chỉnh"
+    },
+    "modal": {
+      "createTitle": "Tạo mục tiêu mới",
+      "editTitle": "Chỉnh sửa mục tiêu",
+      "createWithYears": "Tạo mục tiêu {{years}} năm",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "creating": "Đang tạo...",
+      "updating": "Đang cập nhật..."
+    },
+    "form": {
+      "name": "Tên mục tiêu",
+      "namePlaceholder": "VD: Quỹ dự phòng, Tiền đặt cọc nhà",
+      "nameAriaLabel": "Nhập tên mục tiêu",
+      "years": "Thời gian (Năm)",
+      "yearsAriaLabel": "Nhập thời gian mục tiêu theo năm",
+      "targetAmount": "Số tiền mục tiêu",
+      "targetAmountPlaceholder": "VD: 100,000,000",
+      "targetAmountAriaLabel": "Nhập số tiền mục tiêu",
+      "amountHint": "Tối thiểu: 10,000₫ / Bước: 10,000₫"
+    },
+    "errors": {
+      "createFailed": "Không thể tạo mục tiêu. Vui lòng thử lại.",
+      "updateFailed": "Không thể cập nhật mục tiêu. Vui lòng thử lại.",
+      "yearsRange": "Kỳ hạn phải từ 1 đến 10 năm",
+      "amountRequired": "Vui lòng nhập số tiền mục tiêu",
+      "amountMinimum": "Số tiền mục tiêu tối thiểu là 10,000₫",
+      "dateRequired": "Vui lòng chọn ngày bắt đầu"
+    }
   },
   "common": {
     "loading": "Đang tải...",
@@ -202,7 +258,8 @@
     "create": "Tạo",
     "update": "Cập nhật",
     "cancel": "Hủy",
-    "today": "Hôm nay"
+    "today": "Hôm nay",
+    "back": "Quay lại"
   },
   "autocomplete": {
     "used": "lần dùng"
