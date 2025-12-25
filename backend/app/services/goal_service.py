@@ -443,11 +443,11 @@ class GoalService:
 
         # Calculate required monthly savings
         total_saved = GoalService._calculate_net_savings(db, user_id, start_date)
-        needed_remaining = goal.target_amount - total_saved
+        needed_remaining = float(goal.target_amount) - float(total_saved)
         required_monthly = needed_remaining / months_remaining
 
         # Calculate monthly gap
-        monthly_gap = required_monthly - current_monthly_net
+        monthly_gap = required_monthly - float(current_monthly_net)
 
         # Determine status tier based on achievable percentage
         if achievable_percentage >= 100:
