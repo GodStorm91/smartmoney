@@ -660,9 +660,9 @@ RULES: achievable=true if monthly_required <= 80% of net. Advice in {lang_name}.
         monthly_expenses = self._get_monthly_expenses(db, user_id)
         monthly_net = monthly_income - monthly_expenses
 
-        # Get account balances
+        # Get account balances (use initial_balance as base)
         accounts = db.query(Account).filter(Account.user_id == user_id).all()
-        total_balance = sum(a.current_balance or 0 for a in accounts)
+        total_balance = sum(a.initial_balance or 0 for a in accounts)
 
         # Get goals count
         goals_count = db.query(Goal).filter(Goal.user_id == user_id).count()
