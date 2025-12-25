@@ -676,6 +676,26 @@
     "confirm": "Add this transaction?",
     "edit": "Edit"
   },
+  "chat": {
+    "title": "AI Assistant",
+    "placeholder": "Ask about your finances...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "apply": "Apply",
+    "skip": "Skip",
+    "action": {
+      "create_goal": "Create Goal",
+      "create_budget": "Create Budget"
+    },
+    "goalCreated": "Goal created successfully!",
+    "budgetCreated": "Budget created successfully!",
+    "actionApplied": "Done! I've applied that for you.",
+    "actionFailed": "Failed to apply. Please try manually.",
+    "credits": "{{count}} credits",
+    "noCredits": "No credits remaining. Please purchase more credits.",
+    "welcomeMessage": "Hi! I'm your financial assistant. Ask me anything about your spending, savings goals, or budget.",
+    "error": "Failed to get response. Please try again."
+  },
   "ai": {
     "categoryCleanup": "AI Category Cleanup",
     "categoryCleanupDesc": "Use AI to categorize transactions currently marked as 'Other'",

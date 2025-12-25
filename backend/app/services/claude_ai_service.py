@@ -11,6 +11,9 @@ from sqlalchemy import func
 from ..config import settings
 from ..models.transaction import Transaction
 from ..models.goal import Goal
+from ..models.account import Account
+from ..models.budget import Budget
+import re
 
 
 class ClaudeAIService:
@@ -601,3 +604,173 @@ RULES: achievable=true if monthly_required <= 80% of net. Advice in {lang_name}.
         if start_idx == -1 or end_idx == 0:
             raise ValueError("No valid JSON in response")
         return json.loads(response_text[start_idx:end_idx])
+
+    def chat_with_context(
+        self,
+        db: Session,
+        user_id: int,
+        messages: list[dict],
+        language: str = "ja"
+    ) -> tuple[dict[str, Any], dict[str, int]]:
+        """Chat with AI using user's financial context.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            messages: List of chat messages with role and content
+            language: Language code (ja, en, vi)
+
+        Returns:
+            Tuple of (response dict with message and optional action, usage dict)
+        """
+        # Build financial context
+        context = self._build_financial_context(db, user_id)
+
+        # Build system prompt
+        system_prompt = self._build_chat_system_prompt(context, language)
+
+        # Call Claude API
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=1024,
+            temperature=0.7,
+            system=system_prompt,
+            messages=messages
+        )
+
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens
+        }
+
+        response_text = response.content[0].text
+
+        # Parse action from response if present
+        action = self._parse_chat_action(response_text)
+
+        # Clean message (remove action tags)
+        clean_message = self._clean_chat_message(response_text)
+
+        return {"message": clean_message, "action": action}, usage
+
+    def _build_financial_context(self, db: Session, user_id: int) -> dict:
+        """Build lightweight financial context for chat."""
+        # Get monthly summary
+        monthly_income = self._get_monthly_income(db, user_id)
+        monthly_expenses = self._get_monthly_expenses(db, user_id)
+        monthly_net = monthly_income - monthly_expenses
+
+        # Get account balances
+        accounts = db.query(Account).filter(Account.user_id == user_id).all()
+        total_balance = sum(a.current_balance or 0 for a in accounts)
+
+        # Get goals count
+        goals_count = db.query(Goal).filter(Goal.user_id == user_id).count()
+
+        # Check if budget exists
+        has_budget = db.query(Budget).filter(Budget.user_id == user_id).first() is not None
+
+        # Get top spending categories (current month)
+        top_categories = self._get_top_categories(db, user_id, limit=5)
+
+        return {
+            "monthly_income": monthly_income,
+            "monthly_expenses": monthly_expenses,
+            "monthly_net": monthly_net,
+            "total_balance": total_balance,
+            "goals_count": goals_count,
+            "has_budget": has_budget,
+            "top_categories": top_categories
+        }
+
+    def _get_top_categories(self, db: Session, user_id: int, limit: int = 5) -> str:
+        """Get top spending categories for current month."""
+        cutoff = date.today().replace(day=1)
+        results = (
+            db.query(Transaction.category, func.sum(Transaction.amount).label("total"))
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.is_income == False,
+                Transaction.is_transfer == False,
+                Transaction.date >= cutoff
+            )
+            .group_by(Transaction.category)
+            .order_by(func.sum(Transaction.amount))
+            .limit(limit)
+            .all()
+        )
+        if not results:
+            return "No spending data this month"
+        return "\n".join([f"- {r.category}: ¥{abs(r.total):,}" for r in results])
+
+    def _build_chat_system_prompt(self, context: dict, language: str) -> str:
+        """Build system prompt for chat with financial context."""
+        lang_name = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}.get(language, "Japanese")
+
+        return f"""You are a helpful financial advisor assistant for SmartMoney app.
+You help users understand their finances, create savings goals, and manage budgets.
+
+USER'S FINANCIAL CONTEXT:
+- Monthly Income: ¥{context['monthly_income']:,}
+- Monthly Expenses: ¥{context['monthly_expenses']:,}
+- Net Savings: ¥{context['monthly_net']:,}
+- Total Balance: ¥{context['total_balance']:,}
+- Active Goals: {context['goals_count']}
+- Has Budget: {'Yes' if context['has_budget'] else 'No'}
+
+Top Spending Categories (this month):
+{context['top_categories']}
+
+CAPABILITIES:
+When you recommend creating a goal or budget, output an action block in this format:
+
+<action type="create_goal">
+{{"goal_type": "emergency_fund", "target_amount": 500000, "years": 1, "name": "Emergency Fund"}}
+</action>
+
+<action type="create_budget">
+{{"monthly_income": 300000, "feedback": "Focus on reducing food spending"}}
+</action>
+
+RULES:
+- Be concise and helpful (1-3 sentences per response)
+- Use the user's financial data to give personalized advice
+- Respond in {lang_name}
+- Only suggest actions when explicitly asked or clearly appropriate
+- For goal creation, suggest realistic targets based on their net savings
+- For budgets, consider their spending patterns"""
+
+    def _parse_chat_action(self, response_text: str) -> dict | None:
+        """Parse action block from AI response."""
+        # Match <action type="...">...</action>
+        pattern = r'<action\s+type="([^"]+)">\s*(\{[^}]+\})\s*</action>'
+        match = re.search(pattern, response_text, re.DOTALL)
+
+        if not match:
+            return None
+
+        action_type = match.group(1)
+        try:
+            payload = json.loads(match.group(2))
+        except json.JSONDecodeError:
+            return None
+
+        # Build description based on action type
+        if action_type == "create_goal":
+            desc = f"Create {payload.get('name', 'goal')}: ¥{payload.get('target_amount', 0):,}"
+        elif action_type == "create_budget":
+            desc = "Generate AI budget based on your spending"
+        else:
+            desc = "Apply suggested action"
+
+        return {
+            "type": action_type,
+            "payload": payload,
+            "description": desc
+        }
+
+    def _clean_chat_message(self, response_text: str) -> str:
+        """Remove action blocks from response text."""
+        pattern = r'<action\s+type="[^"]+">.*?</action>'
+        cleaned = re.sub(pattern, '', response_text, flags=re.DOTALL)
+        return cleaned.strip()

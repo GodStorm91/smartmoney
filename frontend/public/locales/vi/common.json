@@ -666,6 +666,26 @@
     "confirm": "Thêm giao dịch này?",
     "edit": "Chỉnh sửa"
   },
+  "chat": {
+    "title": "Trợ lý AI",
+    "placeholder": "Hỏi về tài chính của bạn...",
+    "send": "Gửi",
+    "thinking": "Đang suy nghĩ...",
+    "apply": "Áp dụng",
+    "skip": "Bỏ qua",
+    "action": {
+      "create_goal": "Tạo mục tiêu",
+      "create_budget": "Tạo ngân sách"
+    },
+    "goalCreated": "Đã tạo mục tiêu thành công!",
+    "budgetCreated": "Đã tạo ngân sách thành công!",
+    "actionApplied": "Xong! Đã áp dụng cho bạn.",
+    "actionFailed": "Áp dụng thất bại. Vui lòng thử thủ công.",
+    "credits": "{{count}} credit",
+    "noCredits": "Hết credit. Vui lòng mua thêm.",
+    "welcomeMessage": "Xin chào! Tôi là trợ lý tài chính của bạn. Hãy hỏi tôi bất cứ điều gì về chi tiêu, mục tiêu tiết kiệm, hoặc ngân sách.",
+    "error": "Không thể nhận phản hồi. Vui lòng thử lại."
+  },
   "ai": {
     "categoryCleanup": "AI Phân loại",
     "categoryCleanupDesc": "Dùng AI để phân loại các giao dịch đang ở mục 'Khác'",

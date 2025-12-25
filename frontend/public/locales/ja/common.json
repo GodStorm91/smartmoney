@@ -653,6 +653,26 @@
     "confirm": "この取引を追加しますか？",
     "edit": "編集"
   },
+  "chat": {
+    "title": "AIアシスタント",
+    "placeholder": "家計について質問してください...",
+    "send": "送信",
+    "thinking": "考え中...",
+    "apply": "適用",
+    "skip": "スキップ",
+    "action": {
+      "create_goal": "目標を作成",
+      "create_budget": "予算を作成"
+    },
+    "goalCreated": "目標を作成しました！",
+    "budgetCreated": "予算を作成しました！",
+    "actionApplied": "完了！適用しました。",
+    "actionFailed": "適用に失敗しました。手動でお試しください。",
+    "credits": "{{count}}クレジット",
+    "noCredits": "クレジットが不足しています。追加購入してください。",
+    "welcomeMessage": "こんにちは！私はあなたの家計アシスタントです。支出、貯蓄目標、予算について何でもお聞きください。",
+    "error": "応答の取得に失敗しました。もう一度お試しください。"
+  },
   "ai": {
     "categoryCleanup": "AIカテゴリ整理",
     "categoryCleanupDesc": "AIで「その他」の取引を適切なカテゴリに分類",
