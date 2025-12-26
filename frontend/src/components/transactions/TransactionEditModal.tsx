@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { updateTransaction, deleteTransaction } from '@/services/transaction-service'
+import { useAccounts } from '@/hooks/useAccounts'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -22,13 +23,14 @@ export function TransactionEditModal({
 }: TransactionEditModalProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
+  const { data: accounts = [] } = useAccounts()
 
   // Form state
   const [date, setDate] = useState('')
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState('')
-  const [source, setSource] = useState('')
+  const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
@@ -62,7 +64,7 @@ export function TransactionEditModal({
       setDescription(transaction.description)
       setAmount(Math.abs(transaction.amount).toString())
       setCategory(transaction.category)
-      setSource(transaction.source)
+      setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
       setShowDeleteConfirm(false)
     }
@@ -74,6 +76,10 @@ export function TransactionEditModal({
     const amountValue = parseFloat(amount)
     if (isNaN(amountValue)) return
 
+    // Get account name for source field (backward compatibility)
+    const selectedAccount = accounts.find(a => a.id === accountId)
+    const source = selectedAccount?.name || transaction?.source || ''
+
     updateMutation.mutate({
       date,
       description,
@@ -81,6 +87,7 @@ export function TransactionEditModal({
       category: category || 'Other',
       source,
       type,
+      account_id: accountId,
     })
   }
 
@@ -180,11 +187,17 @@ export function TransactionEditModal({
                 />
               </div>
 
-              <Input
-                label={t('transaction.source')}
-                value={source}
-                onChange={(e) => setSource(e.target.value)}
-                required
+              <Select
+                label={t('account.account')}
+                value={accountId?.toString() || ''}
+                onChange={(e) => setAccountId(e.target.value ? Number(e.target.value) : null)}
+                options={[
+                  { value: '', label: t('account.selectAccount') },
+                  ...accounts.map(account => ({
+                    value: account.id.toString(),
+                    label: account.name,
+                  })),
+                ]}
               />
 
               {/* Actions */}
