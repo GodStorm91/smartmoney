@@ -189,7 +189,22 @@
     "comingSoon": "Monthly detail chart (coming soon)",
     "spendingInsights": "Spending Insights",
     "noInsights": "No notable spending patterns detected",
-    "insightsHint": "Keep tracking to see personalized insights"
+    "insightsHint": "Keep tracking to see personalized insights",
+    "heroIncome": "Income",
+    "heroExpense": "Expense",
+    "heroNet": "Net",
+    "heroTopCategory": "Top Category",
+    "vsLastPeriod": "vs last period",
+    "swipeHint": "Swipe for more insights",
+    "aiTools": "AI Tools",
+    "viewTransactions": "View Transactions",
+    "viewBreakdown": "View Breakdown",
+    "learnMore": "Learn More",
+    "insightSpike": "Spending Spike",
+    "insightTrend": "Trend Alert",
+    "insightUnusual": "Unusual Activity",
+    "insightBudget": "Budget Alert",
+    "insightSaving": "Savings Opportunity"
   },
   "goals": {
     "title": "Long-term Goals",

@@ -47,6 +47,22 @@ class SourceBreakdownResponse(BaseModel):
     count: int
 
 
+class ComparisonData(BaseModel):
+    """Comparison data vs previous period."""
+
+    income_change: Optional[float] = None
+    expense_change: Optional[float] = None
+    net_change: Optional[float] = None
+
+
+class TopCategory(BaseModel):
+    """Top spending category."""
+
+    name: str
+    amount: int
+    percentage: float
+
+
 class AnalyticsResponse(BaseModel):
     """Comprehensive analytics response with all data."""
 
@@ -55,3 +71,5 @@ class AnalyticsResponse(BaseModel):
     total_income: int
     total_expense: int
     net_cashflow: int
+    comparison: Optional[ComparisonData] = None
+    top_category: Optional[TopCategory] = None

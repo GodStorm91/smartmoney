@@ -13,12 +13,26 @@ export interface CategoryBreakdown {
   emoji?: string
 }
 
+export interface ComparisonData {
+  income_change: number | null
+  expense_change: number | null
+  net_change: number | null
+}
+
+export interface TopCategory {
+  name: string
+  amount: number
+  percentage: number
+}
+
 export interface Analytics {
   monthly_trends: MonthlyData[]
   category_breakdown: CategoryBreakdown[]
   total_income: number
   total_expense: number
   net_cashflow: number
+  comparison: ComparisonData | null
+  top_category: TopCategory | null
 }
 
 export interface SpendingInsight {

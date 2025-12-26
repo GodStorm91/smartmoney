@@ -223,6 +223,57 @@ class AnalyticsService:
         return sources
 
     @staticmethod
+    def _calculate_period_totals(
+        db: Session, user_id: int, start_date: date, end_date: date
+    ) -> dict:
+        """Calculate income/expense/net totals for a specific period.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            start_date: Period start date
+            end_date: Period end date
+
+        Returns:
+            Dictionary with income, expense, net totals
+        """
+        results = (
+            db.query(
+                func.sum(
+                    case((Transaction.is_income, Transaction.amount), else_=0)
+                ).label("income"),
+                func.sum(
+                    case((~Transaction.is_income, Transaction.amount), else_=0)
+                ).label("expenses"),
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.date >= start_date,
+                Transaction.date <= end_date,
+                ~Transaction.is_transfer,
+            )
+            .first()
+        )
+
+        income = results.income or 0
+        expenses = abs(results.expenses or 0)
+        return {
+            "income": income,
+            "expense": expenses,
+            "net": income - expenses,
+        }
+
+    @staticmethod
+    def _calculate_percentage_change(current: int, previous: int) -> Optional[float]:
+        """Calculate percentage change between two values.
+
+        Returns None if previous is 0 (avoid division by zero).
+        """
+        if previous == 0:
+            return None
+        return round(((current - previous) / previous) * 100, 1)
+
+    @staticmethod
     def get_comprehensive_analytics(
         db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> dict:
@@ -235,7 +286,8 @@ class AnalyticsService:
             end_date: Filter by end date
 
         Returns:
-            Dictionary with monthly trends, category breakdown, and totals
+            Dictionary with monthly trends, category breakdown, totals,
+            comparison data (vs previous period), and top category
         """
         # Get monthly trends
         monthly_trends = AnalyticsService.get_monthly_cashflow(
@@ -252,12 +304,50 @@ class AnalyticsService:
         total_expense = sum(month["expenses"] for month in monthly_trends)
         net_cashflow = total_income - total_expense
 
+        # Calculate comparison data (vs previous period)
+        comparison = None
+        if start_date and end_date:
+            # Calculate previous period dates
+            period_length = (end_date - start_date).days + 1
+            prev_end = start_date - timedelta(days=1)
+            prev_start = prev_end - timedelta(days=period_length - 1)
+
+            # Get previous period totals
+            prev_totals = AnalyticsService._calculate_period_totals(
+                db=db, user_id=user_id, start_date=prev_start, end_date=prev_end
+            )
+
+            # Calculate percentage changes
+            comparison = {
+                "income_change": AnalyticsService._calculate_percentage_change(
+                    total_income, prev_totals["income"]
+                ),
+                "expense_change": AnalyticsService._calculate_percentage_change(
+                    total_expense, prev_totals["expense"]
+                ),
+                "net_change": AnalyticsService._calculate_percentage_change(
+                    net_cashflow, prev_totals["net"]
+                ) if prev_totals["net"] != 0 else None,
+            }
+
+        # Extract top category
+        top_category = None
+        if category_breakdown and total_expense > 0:
+            top_cat = category_breakdown[0]  # Already sorted DESC by amount
+            top_category = {
+                "name": top_cat["category"],
+                "amount": top_cat["amount"],
+                "percentage": round((top_cat["amount"] / total_expense) * 100, 1),
+            }
+
         return {
             "monthly_trends": monthly_trends,
             "category_breakdown": category_breakdown,
             "total_income": total_income,
             "total_expense": total_expense,
             "net_cashflow": net_cashflow,
+            "comparison": comparison,
+            "top_category": top_category,
         }
 
     @staticmethod

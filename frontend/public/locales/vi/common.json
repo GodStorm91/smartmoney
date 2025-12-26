@@ -189,7 +189,22 @@
     "comingSoon": "Biểu đồ chi tiết hàng tháng (sắp ra mắt)",
     "spendingInsights": "Thông tin chi tiêu",
     "noInsights": "Không phát hiện mẫu chi tiêu đáng chú ý",
-    "insightsHint": "Tiếp tục ghi chép để xem thông tin cá nhân hóa"
+    "insightsHint": "Tiếp tục ghi chép để xem thông tin cá nhân hóa",
+    "heroIncome": "Thu nhập",
+    "heroExpense": "Chi tiêu",
+    "heroNet": "Chênh lệch",
+    "heroTopCategory": "Danh mục hàng đầu",
+    "vsLastPeriod": "so với kỳ trước",
+    "swipeHint": "Vuốt để xem thêm",
+    "aiTools": "Công cụ AI",
+    "viewTransactions": "Xem giao dịch",
+    "viewBreakdown": "Xem chi tiết",
+    "learnMore": "Tìm hiểu thêm",
+    "insightSpike": "Chi tiêu tăng đột biến",
+    "insightTrend": "Cảnh báo xu hướng",
+    "insightUnusual": "Hoạt động bất thường",
+    "insightBudget": "Cảnh báo ngân sách",
+    "insightSaving": "Cơ hội tiết kiệm"
   },
   "goals": {
     "title": "Mục tiêu dài hạn",

@@ -195,7 +195,22 @@
     "comingSoon": "月次詳細チャート (実装予定)",
     "spendingInsights": "支出インサイト",
     "noInsights": "注目すべき支出パターンは検出されませんでした",
-    "insightsHint": "記録を続けてパーソナライズされたインサイトを見ましょう"
+    "insightsHint": "記録を続けてパーソナライズされたインサイトを見ましょう",
+    "heroIncome": "収入",
+    "heroExpense": "支出",
+    "heroNet": "差額",
+    "heroTopCategory": "トップカテゴリ",
+    "vsLastPeriod": "前期比",
+    "swipeHint": "スワイプして詳細を見る",
+    "aiTools": "AIツール",
+    "viewTransactions": "取引を見る",
+    "viewBreakdown": "内訳を見る",
+    "learnMore": "詳細",
+    "insightSpike": "支出急増",
+    "insightTrend": "トレンドアラート",
+    "insightUnusual": "異常な活動",
+    "insightBudget": "予算アラート",
+    "insightSaving": "節約チャンス"
   },
   "goals": {
     "title": "長期目標",
