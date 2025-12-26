@@ -227,10 +227,6 @@ export function Transactions() {
     navigate({ to: '/transactions', search: {} })
   }
 
-  const income = transactions?.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0) || 0
-  const expense = transactions?.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0) || 0
-  const net = income - expense
-
   // Filter transactions by account (client-side)
   const accountFilteredTransactions = useMemo(() => {
     if (!transactions) return []
@@ -239,6 +235,14 @@ export function Transactions() {
     const targetAccountId = Number(accountId)
     return transactions.filter(tx => tx.account_id != null && Number(tx.account_id) === targetAccountId)
   }, [transactions, accountId])
+
+  // Calculate summary from filtered transactions (respects account filter)
+  const { income, expense, net } = useMemo(() => {
+    const txList = accountFilteredTransactions
+    const inc = txList.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
+    const exp = txList.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0)
+    return { income: inc, expense: exp, net: inc - exp }
+  }, [accountFilteredTransactions])
 
   // Sort transactions
   const sortedTransactions = useMemo(() => {
