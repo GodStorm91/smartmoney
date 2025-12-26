@@ -34,6 +34,12 @@ class Account(Base):
     user_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
     )
+    crypto_wallet_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("crypto_wallets.id", ondelete="SET NULL"), nullable=True
+    )
+
+    # Account subtype for crypto accounts (native, lp_position, staking, etc.)
+    account_subtype: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Relationships
     transactions: Mapped[list["Transaction"]] = relationship(
@@ -42,10 +48,13 @@ class Account(Base):
     recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
         "RecurringTransaction", back_populates="account", lazy="select"
     )
+    crypto_wallet: Mapped["CryptoWallet"] = relationship(
+        "CryptoWallet", back_populates="accounts", lazy="select"
+    )
 
     __table_args__ = (
         CheckConstraint(
-            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'other')",
+            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'other')",
             name="valid_account_type",
         ),
         Index("ix_accounts_type_active", "type", "is_active"),

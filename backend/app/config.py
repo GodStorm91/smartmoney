@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     sepay_secret_key: str = ""
     sepay_base_url: str = "https://api.sepay.vn"
 
+    # Crypto APIs
+    zerion_api_key: str = ""  # Base64 encoded API key for Zerion
+
     class Config:
         env_file = ".env"
 

@@ -1,0 +1,133 @@
+"""Crypto wallet database models."""
+from datetime import datetime
+from decimal import Decimal
+
+from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, JSON, Numeric, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.sql import func
+
+from .transaction import Base
+
+
+class CryptoWallet(Base):
+    """Crypto wallet model for storing EVM wallet addresses."""
+
+    __tablename__ = "crypto_wallets"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False, index=True)
+    label: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    chains: Mapped[list] = mapped_column(JSON, nullable=False, default=["eth", "bsc", "polygon"])
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="crypto_wallets", lazy="select")
+    sync_states: Mapped[list["CryptoSyncState"]] = relationship(
+        "CryptoSyncState", back_populates="wallet", lazy="select", cascade="all, delete-orphan"
+    )
+    accounts: Mapped[list["Account"]] = relationship(
+        "Account", back_populates="crypto_wallet", lazy="select"
+    )
+
+    __table_args__ = (
+        Index("ix_crypto_wallets_user_address", "user_id", "wallet_address", unique=True),
+    )
+
+
+class RewardContract(Base):
+    """Reward contract model for tracking LP reward sources."""
+
+    __tablename__ = "reward_contracts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+    contract_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    label: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    token_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    token_decimals: Mapped[int] = mapped_column(Integer, nullable=False, default=18)
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="reward_contracts", lazy="select")
+
+    __table_args__ = (
+        Index("ix_reward_contracts_user_chain_address", "user_id", "chain_id", "contract_address", unique=True),
+    )
+
+
+class CryptoSyncState(Base):
+    """Sync state tracking for crypto wallet balances."""
+
+    __tablename__ = "crypto_sync_state"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    wallet_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("crypto_wallets.id", ondelete="CASCADE"), nullable=False
+    )
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+    last_sync_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    last_block_number: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    last_balance_usd: Mapped[Decimal | None] = mapped_column(Numeric(20, 2), nullable=True)
+    sync_status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    # Relationships
+    wallet: Mapped["CryptoWallet"] = relationship("CryptoWallet", back_populates="sync_states", lazy="select")
+
+    __table_args__ = (
+        Index("ix_crypto_sync_user_wallet_chain", "user_id", "wallet_address", "chain_id", unique=True),
+    )
+
+
+class RewardClaim(Base):
+    """Detected reward claims from LP positions."""
+
+    __tablename__ = "reward_claims"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+    tx_hash: Mapped[str] = mapped_column(String(66), nullable=False)
+    from_contract: Mapped[str] = mapped_column(String(42), nullable=False)
+    token_address: Mapped[str | None] = mapped_column(String(42), nullable=True)
+    token_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    token_amount: Mapped[Decimal | None] = mapped_column(Numeric(30, 18), nullable=True)
+    fiat_value: Mapped[Decimal | None] = mapped_column(Numeric(20, 2), nullable=True)
+    fiat_currency: Mapped[str] = mapped_column(String(3), nullable=False, default="USD")
+    token_price: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
+    block_number: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    block_timestamp: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    transaction_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="reward_claims", lazy="select")
+    transaction: Mapped["Transaction"] = relationship("Transaction", lazy="select")
+
+    __table_args__ = (
+        Index("ix_reward_claims_tx_chain", "tx_hash", "chain_id", unique=True),
+    )

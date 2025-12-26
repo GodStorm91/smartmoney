@@ -47,3 +47,14 @@ class User(Base):
     category_rules: Mapped[list["CategoryRule"]] = relationship(
         "CategoryRule", back_populates="user", cascade="all, delete-orphan"
     )
+
+    # Crypto wallet relationships
+    crypto_wallets: Mapped[list["CryptoWallet"]] = relationship(
+        "CryptoWallet", back_populates="user", cascade="all, delete-orphan"
+    )
+    reward_contracts: Mapped[list["RewardContract"]] = relationship(
+        "RewardContract", back_populates="user", cascade="all, delete-orphan"
+    )
+    reward_claims: Mapped[list["RewardClaim"]] = relationship(
+        "RewardClaim", back_populates="user", cascade="all, delete-orphan"
+    )

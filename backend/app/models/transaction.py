@@ -1,7 +1,7 @@
 """Transaction database model."""
 from datetime import date, datetime
 
-from sqlalchemy import BigInteger, Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, String
+from sqlalchemy import BigInteger, Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, Numeric, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -33,6 +33,11 @@ class Transaction(Base):
     month_key: Mapped[str] = mapped_column(String(7), nullable=False, index=True)  # YYYY-MM
     tx_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)  # SHA-256
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    # Crypto transaction fields (for reward claims)
+    token_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    token_amount: Mapped[float | None] = mapped_column(Numeric(30, 18), nullable=True)
+    chain_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Foreign Keys
     user_id: Mapped[int | None] = mapped_column(

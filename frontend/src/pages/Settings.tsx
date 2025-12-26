@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RecurringTransactionsList } from '@/components/recurring/RecurringTransactionsList'
 import { CategoryRulesList } from '@/components/settings/CategoryRulesList'
+import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 
 export function Settings() {
@@ -182,6 +183,9 @@ export function Settings() {
 
         {/* Recurring Transactions */}
         <RecurringTransactionsList />
+
+        {/* Crypto Wallets */}
+        <CryptoWalletSettings />
       </div>
     </div>
   )
