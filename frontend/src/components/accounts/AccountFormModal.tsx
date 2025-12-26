@@ -7,17 +7,20 @@ import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 
-// Helper to format number with thousand separators
+// Helper to format number with thousand separators (supports negative)
 const formatWithCommas = (value: string): string => {
+  const isNegative = value.startsWith('-')
   const num = value.replace(/[^\d.]/g, '')
   const parts = num.split('.')
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return parts.join('.')
+  return (isNegative ? '-' : '') + parts.join('.')
 }
 
-// Helper to parse formatted number back to raw value
+// Helper to parse formatted number back to raw value (preserves negative)
 const parseFormattedNumber = (value: string): string => {
-  return value.replace(/,/g, '')
+  const isNegative = value.startsWith('-')
+  const num = value.replace(/[^\d.]/g, '')
+  return (isNegative ? '-' : '') + num
 }
 
 // Get currency multiplier (JPY/VND = 1, USD = 100)
