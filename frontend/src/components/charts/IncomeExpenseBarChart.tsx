@@ -1,6 +1,7 @@
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -60,18 +61,18 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
   const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
   const legendColor = isDark ? '#cdd6f4' : '#374151'
 
-  // Check if all expenses are zero
-  const hasNoExpenses = data.every(d => d.expense === 0)
+  // Check if all expenses are zero (backend returns 'expenses' field)
+  const hasNoExpenses = data.every(d => d.expenses === 0)
 
-  // Calculate net for tooltip enhancement
+  // Calculate net for line overlay
   const enhancedData = data.map(d => ({
     ...d,
-    net: d.income - d.expense,
+    net: d.income - d.expenses,
   }))
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={enhancedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+      <ComposedChart data={enhancedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
         <XAxis
           dataKey="month"
@@ -108,7 +109,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
             style={{ fontSize: '10px', fill: '#4CAF50', fontWeight: 500 }}
           />
         </Bar>
-        <Bar dataKey="expense" fill="#F44336" name={t('chart.expense')} radius={[4, 4, 0, 0]}>
+        <Bar dataKey="expenses" fill="#F44336" name={t('chart.expense')} radius={[4, 4, 0, 0]}>
           {hasNoExpenses ? (
             // Show subtle indicator for zero expense
             enhancedData.map((_, index) => (
@@ -116,17 +117,26 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
             ))
           ) : (
             enhancedData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.expense === 0 ? '#F4433633' : '#F44336'} />
+              <Cell key={`cell-${index}`} fill={entry.expenses === 0 ? '#F4433633' : '#F44336'} />
             ))
           )}
           <LabelList
-            dataKey="expense"
+            dataKey="expenses"
             position="top"
             formatter={(value: number) => formatCompact(value, currency)}
             style={{ fontSize: '10px', fill: '#F44336', fontWeight: 500 }}
           />
         </Bar>
-      </BarChart>
+        <Line
+          type="monotone"
+          dataKey="net"
+          name={t('chart.net')}
+          stroke="#2196F3"
+          strokeWidth={2}
+          dot={{ fill: '#2196F3', strokeWidth: 2, r: 4 }}
+          activeDot={{ r: 6 }}
+        />
+      </ComposedChart>
     </ResponsiveContainer>
   )
 }

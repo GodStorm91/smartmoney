@@ -2,7 +2,7 @@
 export interface MonthlyData {
   month: string
   income: number
-  expense: number
+  expenses: number  // Note: backend returns 'expenses' (plural)
   net: number
 }
 
