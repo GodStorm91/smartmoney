@@ -69,14 +69,14 @@ export function Settings() {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('settings.title')}</h2>
-        <p className="text-gray-600">{t('settings.subtitle')}</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('settings.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('settings.subtitle')}</p>
       </div>
 
       <div className="space-y-6">
         {/* General Settings */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.general')}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.general')}</h3>
           <div className="space-y-4">
             <Select
               label={t('settings.currency')}
@@ -106,12 +106,12 @@ export function Settings() {
 
         {/* Budget Settings */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.budgetSettings')}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.budgetSettings')}</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <label className="font-medium text-gray-900">{t('settings.budgetCarryOver')}</label>
-                <p className="text-sm text-gray-600">{t('settings.budgetCarryOverDescription')}</p>
+                <label className="font-medium text-gray-900 dark:text-white">{t('settings.budgetCarryOver')}</label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.budgetCarryOverDescription')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer ml-4">
                 <input
@@ -123,10 +123,10 @@ export function Settings() {
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
             </div>
-            <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="flex-1">
-                <label className="font-medium text-gray-900">{t('settings.budgetEmailAlerts')}</label>
-                <p className="text-sm text-gray-600">{t('settings.budgetEmailAlertsDescription')}</p>
+                <label className="font-medium text-gray-900 dark:text-white">{t('settings.budgetEmailAlerts')}</label>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{t('settings.budgetEmailAlertsDescription')}</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer ml-4">
                 <input
@@ -148,14 +148,14 @@ export function Settings() {
 
         {/* Categories */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.categoryManagement')}</h3>
-          <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.categoryManagement')}</h3>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.categories?.map((cat, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span>{cat}</span>
-                <button className="text-red-600 hover:text-red-700 text-sm">{t('settings.delete')}</button>
+              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-900 dark:text-gray-100">{cat}</span>
+                <button className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm">{t('settings.delete')}</button>
               </div>
-            )) || <p className="text-gray-400 text-center py-4">{t('settings.noCategories')}</p>}
+            )) || <p className="text-gray-400 dark:text-gray-500 text-center py-4">{t('settings.noCategories')}</p>}
           </div>
           <div className="mt-4">
             <Button variant="outline">{t('settings.addCategory')}</Button>
@@ -164,14 +164,14 @@ export function Settings() {
 
         {/* Payment Sources */}
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('settings.paymentSourceManagement')}</h3>
-          <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.paymentSourceManagement')}</h3>
+          <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.sources?.map((source, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span>{source}</span>
-                <button className="text-red-600 hover:text-red-700 text-sm">{t('settings.delete')}</button>
+              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <span className="text-gray-900 dark:text-gray-100">{source}</span>
+                <button className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm">{t('settings.delete')}</button>
               </div>
-            )) || <p className="text-gray-400 text-center py-4">{t('settings.noSources')}</p>}
+            )) || <p className="text-gray-400 dark:text-gray-500 text-center py-4">{t('settings.noSources')}</p>}
           </div>
           <div className="mt-4">
             <Button variant="outline">{t('settings.addSource')}</Button>
