@@ -410,6 +410,7 @@
     "basedOnPeriod": "{{months}}ヶ月平均"
   },
   "account": {
+    "account": "口座",
     "accounts": "口座",
     "manageYourAccounts": "口座を管理",
     "createAccount": "口座を作成",

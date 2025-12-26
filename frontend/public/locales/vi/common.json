@@ -423,6 +423,7 @@
     "basedOnPeriod": "Trung bình {{months}} tháng"
   },
   "account": {
+    "account": "Tài khoản",
     "accounts": "Tài khoản",
     "manageYourAccounts": "Quản lý tài khoản của bạn",
     "createAccount": "Tạo tài khoản",
