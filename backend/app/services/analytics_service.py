@@ -289,9 +289,24 @@ class AnalyticsService:
             Dictionary with monthly trends, category breakdown, totals,
             comparison data (vs previous period), and top category
         """
-        # Get monthly trends
+        # For monthly trends, ensure at least 3 months of data for meaningful charts
+        # Extend start_date backwards if needed
+        trends_start = start_date
+        if start_date and end_date:
+            # Calculate months between dates
+            months_diff = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month
+            if months_diff < 2:  # Less than 3 months
+                # Extend back to get 3 months total
+                months_to_add = 2 - months_diff
+                trends_start = date(
+                    start_date.year if start_date.month > months_to_add else start_date.year - 1,
+                    (start_date.month - months_to_add - 1) % 12 + 1,
+                    1
+                )
+
+        # Get monthly trends (with extended date range for meaningful charts)
         monthly_trends = AnalyticsService.get_monthly_cashflow(
-            db=db, user_id=user_id, start_date=start_date, end_date=end_date
+            db=db, user_id=user_id, start_date=trends_start, end_date=end_date
         )
 
         # Get category breakdown

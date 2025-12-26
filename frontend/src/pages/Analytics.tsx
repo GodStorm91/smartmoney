@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
 import { CategoryBarChart } from '@/components/charts/CategoryBarChart'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
+import { CashFlowSummary } from '@/components/charts/CashFlowSummary'
 import { ZoomableChart } from '@/components/charts/ZoomableChart'
 import { SpendingInsights } from '@/components/analytics/SpendingInsights'
 import { AICategoryCleanup } from '@/components/analytics/AICategoryCleanup'
@@ -17,6 +18,7 @@ import {
 } from '@/components/analytics'
 import type { PeriodType } from '@/components/analytics'
 import { fetchAnalytics, fetchSpendingInsights } from '@/services/analytics-service'
+import { fetchGoals } from '@/services/goal-service'
 import { getCurrentMonthRange } from '@/utils/formatDate'
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 import { cn } from '@/utils/cn'
@@ -72,6 +74,17 @@ export function Analytics() {
     queryKey: ['insights'],
     queryFn: fetchSpendingInsights,
   })
+
+  // Fetch goals for savings target
+  const { data: goals } = useQuery({
+    queryKey: ['goals'],
+    queryFn: fetchGoals,
+  })
+
+  // Get monthly savings target from first goal (if exists)
+  const monthlySavingsTarget = goals && goals.length > 0
+    ? Math.round(goals[0].target_amount / (goals[0].years * 12))
+    : null
 
   // Handle period change
   const handlePeriodChange = (period: PeriodType) => {
@@ -173,15 +186,25 @@ export function Analytics() {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {t('analytics.monthlyCashFlow')}
               </h3>
-              <ZoomableChart className="h-64 sm:h-80">
+              <div className="h-64 sm:h-80">
                 {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
-                  <TrendLineChart data={analytics.monthly_trends} dataKey="net" />
+                  // Use CashFlowSummary for sparse data (< 3 points), TrendLineChart otherwise
+                  analytics.monthly_trends.length < 3 ? (
+                    <CashFlowSummary
+                      data={analytics.monthly_trends}
+                      savingsGoal={monthlySavingsTarget}
+                    />
+                  ) : (
+                    <ZoomableChart className="h-full">
+                      <TrendLineChart data={analytics.monthly_trends} dataKey="net" />
+                    </ZoomableChart>
+                  )
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400">
                     {t('analytics.noData')}
                   </div>
                 )}
-              </ZoomableChart>
+              </div>
             </Card>
           </div>
 

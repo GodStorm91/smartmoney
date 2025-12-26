@@ -204,7 +204,18 @@
     "insightTrend": "Cảnh báo xu hướng",
     "insightUnusual": "Hoạt động bất thường",
     "insightBudget": "Cảnh báo ngân sách",
-    "insightSaving": "Cơ hội tiết kiệm"
+    "insightSaving": "Cơ hội tiết kiệm",
+    "otherCategories": "Khác",
+    "showAllCategories": "Xem tất cả {{count}} danh mục",
+    "showLessCategories": "Thu gọn",
+    "netCashFlow": "Dòng tiền ròng",
+    "positiveCashFlow": "Dòng tiền dương tháng này",
+    "savingsGoal": "Mục tiêu tiết kiệm",
+    "target": "mục tiêu",
+    "thisMonth": "Tháng này",
+    "average": "TB 3 tháng",
+    "vsAverage": "so với TB",
+    "goal": "Mục tiêu"
   },
   "goals": {
     "title": "Mục tiêu dài hạn",

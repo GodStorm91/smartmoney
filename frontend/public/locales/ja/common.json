@@ -210,7 +210,18 @@
     "insightTrend": "トレンドアラート",
     "insightUnusual": "異常な活動",
     "insightBudget": "予算アラート",
-    "insightSaving": "節約チャンス"
+    "insightSaving": "節約チャンス",
+    "otherCategories": "その他",
+    "showAllCategories": "全{{count}}カテゴリを表示",
+    "showLessCategories": "折りたたむ",
+    "netCashFlow": "純キャッシュフロー",
+    "positiveCashFlow": "今月はプラス収支です",
+    "savingsGoal": "貯蓄目標",
+    "target": "目標",
+    "thisMonth": "今月",
+    "average": "3ヶ月平均",
+    "vsAverage": "平均比",
+    "goal": "目標"
   },
   "goals": {
     "title": "長期目標",

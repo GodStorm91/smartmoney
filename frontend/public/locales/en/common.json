@@ -204,7 +204,18 @@
     "insightTrend": "Trend Alert",
     "insightUnusual": "Unusual Activity",
     "insightBudget": "Budget Alert",
-    "insightSaving": "Savings Opportunity"
+    "insightSaving": "Savings Opportunity",
+    "otherCategories": "Other",
+    "showAllCategories": "Show all {{count}} categories",
+    "showLessCategories": "Show less",
+    "netCashFlow": "Net Cash Flow",
+    "positiveCashFlow": "Positive cash flow this month",
+    "savingsGoal": "Savings Goal",
+    "target": "target",
+    "thisMonth": "This Month",
+    "average": "3-Month Avg",
+    "vsAverage": "vs average",
+    "goal": "Goal"
   },
   "goals": {
     "title": "Long-term Goals",
