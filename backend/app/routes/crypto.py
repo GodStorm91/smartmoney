@@ -111,7 +111,7 @@ async def get_portfolio(
     current_user: User = Depends(get_current_user),
 ):
     """Get portfolio breakdown for a wallet."""
-    portfolio = CryptoWalletService.get_portfolio(db, current_user.id, wallet_id)
+    portfolio = await CryptoWalletService.get_portfolio(db, current_user.id, wallet_id)
     if not portfolio:
         raise HTTPException(status_code=404, detail="Wallet not found or not synced")
     return portfolio

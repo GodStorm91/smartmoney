@@ -353,41 +353,83 @@ class CryptoWalletService:
             raise
 
     @staticmethod
-    def get_portfolio(db: Session, user_id: int, wallet_id: int) -> Optional[PortfolioResponse]:
-        """Get cached portfolio from last sync."""
+    async def get_portfolio(db: Session, user_id: int, wallet_id: int) -> Optional[PortfolioResponse]:
+        """Get portfolio with token breakdown from Zerion API."""
         wallet = CryptoWalletService.get_wallet(db, user_id, wallet_id)
         if not wallet:
             return None
 
-        sync_states = db.query(CryptoSyncState).filter(
-            CryptoSyncState.user_id == user_id,
-            CryptoSyncState.wallet_address == wallet.wallet_address
-        ).all()
+        try:
+            # Fetch fresh portfolio data from Zerion API
+            portfolio_data = await ZerionApiService.get_portfolio(
+                wallet.wallet_address,
+                wallet.chains
+            )
 
-        if not sync_states or all(s.sync_status == "pending" for s in sync_states):
-            return None
+            # Convert to response format
+            chains = []
+            for chain_data in portfolio_data.get("chains", []):
+                tokens = [
+                    TokenBalance(
+                        chain_id=t.get("chain_id", ""),
+                        token_address=t.get("token_address", ""),
+                        symbol=t.get("symbol", ""),
+                        name=t.get("name", ""),
+                        decimals=t.get("decimals", 18),
+                        balance=Decimal(str(t.get("balance", 0))),
+                        balance_usd=Decimal(str(t.get("balance_usd", 0))),
+                        price_usd=Decimal(str(t.get("price_usd", 0))) if t.get("price_usd") else None,
+                        logo_url=t.get("logo_url"),
+                    )
+                    for t in chain_data.get("tokens", [])
+                ]
 
-        total_balance = Decimal("0")
-        chains = []
-        last_sync = None
+                chains.append(ChainBalance(
+                    chain_id=chain_data.get("chain_id", ""),
+                    chain_name=chain_data.get("chain_name", ""),
+                    total_usd=Decimal(str(chain_data.get("total_usd", 0))),
+                    tokens=tokens,
+                ))
 
-        for state in sync_states:
-            if state.last_balance_usd:
-                total_balance += state.last_balance_usd
-            if state.last_sync_at:
-                if not last_sync or state.last_sync_at > last_sync:
-                    last_sync = state.last_sync_at
+            return PortfolioResponse(
+                wallet_address=portfolio_data.get("wallet_address", wallet.wallet_address),
+                total_balance_usd=Decimal(str(portfolio_data.get("total_balance_usd", 0))),
+                chains=chains,
+                last_sync_at=datetime.utcnow(),
+            )
 
-            chains.append(ChainBalance(
-                chain_id=state.chain_id,
-                chain_name=state.chain_id.upper(),
-                total_usd=state.last_balance_usd or Decimal("0"),
-                tokens=[],
-            ))
+        except Exception as e:
+            logger.error(f"Failed to fetch portfolio for wallet {wallet_id}: {e}")
+            # Fallback to cached data without tokens
+            sync_states = db.query(CryptoSyncState).filter(
+                CryptoSyncState.user_id == user_id,
+                CryptoSyncState.wallet_address == wallet.wallet_address
+            ).all()
 
-        return PortfolioResponse(
-            wallet_address=wallet.wallet_address,
-            total_balance_usd=total_balance,
-            chains=chains,
-            last_sync_at=last_sync,
-        )
+            if not sync_states:
+                return None
+
+            total_balance = Decimal("0")
+            chains = []
+            last_sync = None
+
+            for state in sync_states:
+                if state.last_balance_usd:
+                    total_balance += state.last_balance_usd
+                if state.last_sync_at:
+                    if not last_sync or state.last_sync_at > last_sync:
+                        last_sync = state.last_sync_at
+
+                chains.append(ChainBalance(
+                    chain_id=state.chain_id,
+                    chain_name=state.chain_id.upper(),
+                    total_usd=state.last_balance_usd or Decimal("0"),
+                    tokens=[],
+                ))
+
+            return PortfolioResponse(
+                wallet_address=wallet.wallet_address,
+                total_balance_usd=total_balance,
+                chains=chains,
+                last_sync_at=last_sync,
+            )
