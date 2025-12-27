@@ -556,7 +556,9 @@
     "noContracts": "コントラクトが登録されていません",
     "unnamedContract": "名称未設定",
     "confirmDeleteContract": "このコントラクトを削除してもよろしいですか？",
-    "totalBalance": "暗号資産残高"
+    "totalBalance": "暗号資産残高",
+    "tokens": "トークン",
+    "noTokens": "トークンが見つかりません"
   },
   "budget": {
     "title": "予算",

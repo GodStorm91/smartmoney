@@ -569,7 +569,9 @@
     "noContracts": "Chưa có hợp đồng nào",
     "unnamedContract": "Hợp Đồng Chưa Đặt Tên",
     "confirmDeleteContract": "Bạn có chắc muốn xóa hợp đồng này?",
-    "totalBalance": "Số Dư Crypto"
+    "totalBalance": "Số Dư Crypto",
+    "tokens": "Token",
+    "noTokens": "Không tìm thấy token"
   },
   "budget": {
     "title": "Ngân sách",

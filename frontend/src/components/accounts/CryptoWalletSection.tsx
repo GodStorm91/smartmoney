@@ -1,11 +1,11 @@
 /**
  * CryptoWalletSection - Display crypto wallets in Accounts page
- * Simplified view focused on balances, with collapsible UI
+ * Simplified view focused on balances, with collapsible UI and token breakdown
  */
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { RefreshCw, Plus, Trash2, Wallet, ExternalLink } from 'lucide-react'
+import { RefreshCw, Plus, Trash2, Wallet, ExternalLink, ChevronDown, ChevronRight } from 'lucide-react'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -16,14 +16,50 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import {
   fetchWallets,
   fetchWallet,
+  fetchPortfolio,
   createWallet,
   deleteWallet,
   syncWallet,
 } from '@/services/crypto-service'
-import type { ChainId } from '@/types'
+import type { ChainId, TokenBalance } from '@/types'
 import { CHAIN_INFO } from '@/types/crypto'
 
 const SUPPORTED_CHAINS: ChainId[] = ['eth', 'bsc', 'polygon']
+
+/** Compact token row for token list */
+function TokenRow({ token }: { token: TokenBalance }) {
+  return (
+    <div className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700/50">
+      <div className="flex items-center gap-2 min-w-0">
+        {token.logo_url ? (
+          <img
+            src={token.logo_url}
+            alt={token.symbol}
+            className="w-5 h-5 rounded-full"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none'
+            }}
+          />
+        ) : (
+          <div className="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-[10px] font-medium">
+            {token.symbol.slice(0, 2)}
+          </div>
+        )}
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+          {token.symbol}
+        </span>
+      </div>
+      <div className="text-right">
+        <p className="text-sm text-gray-900 dark:text-white">
+          {token.balance < 0.0001 ? '<0.0001' : token.balance.toFixed(4)}
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          ${token.balance_usd.toFixed(2)}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export function CryptoWalletSection() {
   const { t } = useTranslation('common')
@@ -37,6 +73,7 @@ export function CryptoWalletSection() {
   const [walletLabel, setWalletLabel] = useState('')
   const [selectedChains, setSelectedChains] = useState<ChainId[]>(['eth', 'bsc', 'polygon'])
   const [syncingWalletId, setSyncingWalletId] = useState<number | null>(null)
+  const [expandedWalletId, setExpandedWalletId] = useState<number | null>(null)
 
   // Queries
   const { data: wallets, isLoading } = useQuery({
@@ -52,6 +89,13 @@ export function CryptoWalletSection() {
       return Promise.all(wallets.map(w => fetchWallet(w.id)))
     },
     enabled: !!wallets && wallets.length > 0,
+  })
+
+  // Fetch portfolio (token breakdown) for expanded wallet
+  const { data: expandedPortfolio, isLoading: isLoadingPortfolio } = useQuery({
+    queryKey: ['crypto-portfolio', expandedWalletId],
+    queryFn: () => fetchPortfolio(expandedWalletId!),
+    enabled: !!expandedWalletId,
   })
 
   // Mutations
@@ -113,6 +157,10 @@ export function CryptoWalletSection() {
         ? prev.filter(c => c !== chain)
         : [...prev, chain]
     )
+  }
+
+  const toggleWalletExpand = (walletId: number) => {
+    setExpandedWalletId(prev => prev === walletId ? null : walletId)
   }
 
   const shortenAddress = (addr: string) =>
@@ -212,6 +260,65 @@ export function CryptoWalletSection() {
                   </div>
                 </div>
               </div>
+
+              {/* Token Breakdown Toggle */}
+              <button
+                onClick={() => toggleWalletExpand(wallet.id)}
+                className="flex items-center gap-2 mt-3 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+              >
+                {expandedWalletId === wallet.id ? (
+                  <ChevronDown className="w-4 h-4" />
+                ) : (
+                  <ChevronRight className="w-4 h-4" />
+                )}
+                {t('crypto.tokens')}
+              </button>
+
+              {/* Token List */}
+              {expandedWalletId === wallet.id && (
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  {isLoadingPortfolio ? (
+                    <div className="flex justify-center py-4">
+                      <LoadingSpinner size="sm" />
+                    </div>
+                  ) : expandedPortfolio?.chains && expandedPortfolio.chains.length > 0 ? (
+                    <div className="space-y-4">
+                      {expandedPortfolio.chains
+                        .filter(chain => chain.tokens.length > 0 || chain.native_balance)
+                        .sort((a, b) => b.total_usd - a.total_usd)
+                        .map(chain => (
+                          <div key={chain.chain_id}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                                {chain.chain_name}
+                              </span>
+                              <span className="text-xs text-gray-400 dark:text-gray-500">
+                                ${chain.total_usd.toFixed(2)}
+                              </span>
+                            </div>
+                            <div className="space-y-1">
+                              {/* Native token first */}
+                              {chain.native_balance && chain.native_balance.balance > 0 && (
+                                <TokenRow token={chain.native_balance} />
+                              )}
+                              {/* Other tokens sorted by value */}
+                              {chain.tokens
+                                .filter(t => t.balance > 0)
+                                .sort((a, b) => b.balance_usd - a.balance_usd)
+                                .map(token => (
+                                  <TokenRow key={token.token_address} token={token} />
+                                ))}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-2">
+                      {t('crypto.noTokens')}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">

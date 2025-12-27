@@ -569,7 +569,9 @@
     "noContracts": "No contracts registered",
     "unnamedContract": "Unnamed Contract",
     "confirmDeleteContract": "Are you sure you want to delete this contract?",
-    "totalBalance": "Crypto Balance"
+    "totalBalance": "Crypto Balance",
+    "tokens": "Tokens",
+    "noTokens": "No tokens found"
   },
   "budget": {
     "title": "Budget",
