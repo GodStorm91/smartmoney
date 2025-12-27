@@ -183,9 +183,10 @@ export function CryptoWalletSection() {
     0
   ) || 0
 
-  // Convert to display currency (USD to JPY cents for consistency)
-  const usdToJpyRate = rates?.USD || 150
-  const totalBalanceJpy = Math.round(totalBalanceUsd * usdToJpyRate * 100)
+  // Convert to display currency (USD to JPY)
+  // rates.USD is JPY→USD (0.00667), so invert to get USD→JPY (~150)
+  const usdToJpyRate = 1 / (rates?.USD || 0.00667)
+  const totalBalanceJpy = Math.round(totalBalanceUsd * usdToJpyRate)
 
   if (isLoading) {
     return (
@@ -301,9 +302,9 @@ export function CryptoWalletSection() {
                               {chain.native_balance && Number(chain.native_balance.balance) > 0 && (
                                 <TokenRow token={chain.native_balance} />
                               )}
-                              {/* Other tokens sorted by value */}
+                              {/* Other tokens sorted by value (hide < $1) */}
                               {chain.tokens
-                                .filter(t => Number(t.balance) > 0)
+                                .filter(t => Number(t.balance_usd) >= 1)
                                 .sort((a, b) => Number(b.balance_usd) - Number(a.balance_usd))
                                 .map(token => (
                                   <TokenRow key={token.token_address} token={token} />
