@@ -129,17 +129,21 @@ class ZerionApiService:
             chain_balances[our_chain_id]["total_usd"] += value
 
             # Parse token info
-            fungible = attrs.get("fungible_info", {})
+            fungible = attrs.get("fungible_info") or {}
+            implementations = fungible.get("implementations") or [{}]
+            first_impl = implementations[0] if implementations else {}
+            icon = fungible.get("icon") or {}
+            quantity = attrs.get("quantity") or {}
             token = {
                 "chain_id": our_chain_id,
-                "token_address": fungible.get("implementations", [{}])[0].get("address", ""),
+                "token_address": first_impl.get("address", ""),
                 "symbol": fungible.get("symbol", ""),
                 "name": fungible.get("name", ""),
-                "decimals": fungible.get("implementations", [{}])[0].get("decimals", 18),
-                "balance": Decimal(str(attrs.get("quantity", {}).get("float", 0) or 0)),
+                "decimals": first_impl.get("decimals", 18),
+                "balance": Decimal(str(quantity.get("float", 0) or 0)),
                 "balance_usd": value,
                 "price_usd": Decimal(str(attrs.get("price", 0) or 0)),
-                "logo_url": fungible.get("icon", {}).get("url"),
+                "logo_url": icon.get("url"),
             }
             chain_balances[our_chain_id]["tokens"].append(token)
 
