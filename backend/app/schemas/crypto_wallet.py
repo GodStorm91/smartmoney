@@ -191,5 +191,36 @@ class PortfolioResponse(BaseModel):
     last_sync_at: Optional[datetime] = None
 
 
+# LP/DeFi Position schemas
+PositionType = Literal["deposit", "stake", "borrow", "reward", "liquidity"]
+
+
+class DefiPosition(BaseModel):
+    """DeFi/LP position from Zerion API."""
+
+    id: str = ""
+    chain_id: str = ""
+    protocol: str = ""
+    protocol_id: str = ""
+    protocol_module: str = ""  # liquidity_pool, staking, lending
+    position_type: str = "deposit"  # deposit, stake, borrow, reward
+    name: str = ""
+    symbol: str = ""
+    token_name: str = ""
+    balance: Decimal = Decimal("0")
+    balance_usd: Decimal = Decimal("0")
+    price_usd: Optional[Decimal] = None
+    logo_url: Optional[str] = None
+
+
+class DefiPositionsResponse(BaseModel):
+    """DeFi positions response for a wallet."""
+
+    wallet_address: str
+    total_value_usd: Decimal = Decimal("0")
+    positions: list[DefiPosition] = []
+    last_sync_at: Optional[datetime] = None
+
+
 # Update forward reference
 CryptoWalletWithBalanceResponse.model_rebuild()

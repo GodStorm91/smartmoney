@@ -5,6 +5,7 @@ import { useAccounts } from '@/hooks/useAccounts'
 import { AccountCard } from '@/components/accounts/AccountCard'
 import { AccountFormModal } from '@/components/accounts/AccountFormModal'
 import { CryptoWalletSection } from '@/components/accounts/CryptoWalletSection'
+import { LPPositionsSection } from '@/components/accounts/LPPositionsSection'
 import { TransferFormModal } from '@/components/transfers'
 import type { AccountType } from '@/types'
 
@@ -182,13 +183,17 @@ export default function Accounts() {
 
           {/* Crypto Wallets Section */}
           <CryptoWalletSection />
+
+          {/* DeFi/LP Positions Section */}
+          <LPPositionsSection />
         </div>
       )}
 
       {/* Crypto Wallets (shown even when no traditional accounts) */}
       {!isLoading && !error && (!accounts || accounts.length === 0) && (
-        <div className="mt-8">
+        <div className="mt-8 space-y-6">
           <CryptoWalletSection />
+          <LPPositionsSection />
         </div>
       )}
 

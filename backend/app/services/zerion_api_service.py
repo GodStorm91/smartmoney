@@ -155,6 +155,117 @@ class ZerionApiService:
         }
 
     @staticmethod
+    async def get_defi_positions(
+        wallet_address: str,
+        chains: list[str] | None = None
+    ) -> list[dict]:
+        """Fetch DeFi/LP positions for a wallet.
+
+        Args:
+            wallet_address: EVM wallet address (0x...)
+            chains: Optional list of chain IDs to filter
+
+        Returns:
+            List of DeFi positions (staking, LP, lending)
+        """
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                # Build chain filter
+                chain_filter = ""
+                if chains:
+                    zerion_chains = [CHAIN_MAPPING.get(c, c) for c in chains if c in CHAIN_MAPPING]
+                    if zerion_chains:
+                        chain_filter = f"&filter[chain_ids]={','.join(zerion_chains)}"
+
+                # Use only_complex filter to get DeFi positions only (excludes simple token balances)
+                url = (
+                    f"{ZerionApiService.BASE_URL}/wallets/{wallet_address}/positions/"
+                    f"?currency=usd&filter[positions]=only_complex&filter[trash]=only_non_trash"
+                    f"&sort=value{chain_filter}"
+                )
+
+                response = await client.get(
+                    url,
+                    headers=ZerionApiService._get_headers(),
+                )
+                response.raise_for_status()
+
+                data = response.json()
+                return ZerionApiService._parse_defi_positions(wallet_address, data, chains)
+
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Zerion DeFi API error: {e.response.status_code} - {e.response.text}")
+            raise
+        except Exception as e:
+            logger.error(f"Zerion DeFi API request failed: {e}")
+            raise
+
+    @staticmethod
+    def _parse_defi_positions(
+        wallet_address: str,
+        data: dict,
+        chains: list[str] | None
+    ) -> list[dict]:
+        """Parse Zerion DeFi positions response."""
+        positions = data.get("data", [])
+        result = []
+
+        for position in positions:
+            attrs = position.get("attributes", {})
+
+            # Get chain ID
+            chain_id = position.get("relationships", {}).get("chain", {}).get("data", {}).get("id")
+            our_chain_id = None
+            for k, v in CHAIN_MAPPING.items():
+                if v == chain_id:
+                    our_chain_id = k
+                    break
+
+            if not our_chain_id:
+                continue
+
+            if chains and our_chain_id not in chains:
+                continue
+
+            # Get position details
+            protocol = attrs.get("protocol") or "Unknown"
+            protocol_module = attrs.get("protocol_module") or ""
+            position_type = attrs.get("position_type") or "deposit"
+            name = attrs.get("name") or ""
+            value = Decimal(str(attrs.get("value", 0) or 0))
+
+            # Skip positions with very low value
+            if value < Decimal("1"):
+                continue
+
+            # Get token info
+            fungible = attrs.get("fungible_info") or {}
+            quantity = attrs.get("quantity") or {}
+            icon = fungible.get("icon") or {}
+
+            # Get protocol info
+            protocol_info = position.get("relationships", {}).get("dapp", {}).get("data", {})
+            protocol_id = protocol_info.get("id") or ""
+
+            result.append({
+                "id": position.get("id", ""),
+                "chain_id": our_chain_id,
+                "protocol": protocol,
+                "protocol_id": protocol_id,
+                "protocol_module": protocol_module,
+                "position_type": position_type,
+                "name": name,
+                "symbol": fungible.get("symbol") or "",
+                "token_name": fungible.get("name") or "",
+                "balance": Decimal(str(quantity.get("float", 0) or 0)),
+                "balance_usd": value,
+                "price_usd": Decimal(str(attrs.get("price", 0) or 0)),
+                "logo_url": icon.get("url"),
+            })
+
+        return result
+
+    @staticmethod
     async def get_token_transfers(
         wallet_address: str,
         chain: str,

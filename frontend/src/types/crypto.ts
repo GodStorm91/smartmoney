@@ -113,6 +113,30 @@ export interface RewardClaim {
   created_at: string
 }
 
+// DeFi/LP Position types
+export interface DefiPosition {
+  id: string
+  chain_id: string
+  protocol: string
+  protocol_id: string
+  protocol_module: string  // liquidity_pool, staking, lending
+  position_type: string    // deposit, stake, borrow, reward
+  name: string
+  symbol: string
+  token_name: string
+  balance: number
+  balance_usd: number
+  price_usd: number | null
+  logo_url: string | null
+}
+
+export interface DefiPositionsResponse {
+  wallet_address: string
+  total_value_usd: number
+  positions: DefiPosition[]
+  last_sync_at: string | null
+}
+
 // Chain display info
 export const CHAIN_INFO: Record<ChainId, { name: string; icon: string; color: string }> = {
   eth: { name: 'Ethereum', icon: '⟠', color: '#627EEA' },

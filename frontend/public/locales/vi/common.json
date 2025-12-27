@@ -571,7 +571,12 @@
     "confirmDeleteContract": "Bạn có chắc muốn xóa hợp đồng này?",
     "totalBalance": "Số Dư Crypto",
     "tokens": "Token",
-    "noTokens": "Không tìm thấy token"
+    "noTokens": "Không tìm thấy token",
+    "defiPositions": "Vị Thế DeFi",
+    "totalDefiValue": "Tổng Giá Trị DeFi",
+    "noDefiPositions": "Không có vị thế DeFi",
+    "noDefiPositionsDescription": "Các vị thế staking, LP và lending sẽ hiển thị tại đây",
+    "refresh": "Làm mới"
   },
   "budget": {
     "title": "Ngân sách",

@@ -558,7 +558,12 @@
     "confirmDeleteContract": "このコントラクトを削除してもよろしいですか？",
     "totalBalance": "暗号資産残高",
     "tokens": "トークン",
-    "noTokens": "トークンが見つかりません"
+    "noTokens": "トークンが見つかりません",
+    "defiPositions": "DeFiポジション",
+    "totalDefiValue": "DeFi総額",
+    "noDefiPositions": "DeFiポジションがありません",
+    "noDefiPositionsDescription": "ステーキング、LP、レンディングのポジションがここに表示されます",
+    "refresh": "更新"
   },
   "budget": {
     "title": "予算",

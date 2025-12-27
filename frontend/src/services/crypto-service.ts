@@ -9,6 +9,7 @@ import type {
   RewardContractUpdate,
   Portfolio,
   RewardClaim,
+  DefiPositionsResponse,
 } from '@/types'
 
 // ==================== Wallet APIs ====================
@@ -44,6 +45,11 @@ export async function syncWallet(id: number): Promise<Portfolio> {
 
 export async function fetchPortfolio(id: number): Promise<Portfolio> {
   const response = await apiClient.get<Portfolio>(`/api/crypto/wallets/${id}/portfolio`)
+  return response.data
+}
+
+export async function fetchDefiPositions(id: number): Promise<DefiPositionsResponse> {
+  const response = await apiClient.get<DefiPositionsResponse>(`/api/crypto/wallets/${id}/defi-positions`)
   return response.data
 }
 

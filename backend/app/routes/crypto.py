@@ -15,6 +15,7 @@ from ..schemas.crypto_wallet import (
     RewardContractResponse,
     RewardClaimResponse,
     PortfolioResponse,
+    DefiPositionsResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 
@@ -115,6 +116,24 @@ async def get_portfolio(
     if not portfolio:
         raise HTTPException(status_code=404, detail="Wallet not found or not synced")
     return portfolio
+
+
+@router.get("/wallets/{wallet_id}/defi-positions", response_model=DefiPositionsResponse)
+async def get_defi_positions(
+    wallet_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get DeFi/LP positions for a wallet."""
+    try:
+        positions = await CryptoWalletService.get_defi_positions(
+            db, current_user.id, wallet_id
+        )
+        if not positions:
+            raise HTTPException(status_code=404, detail="Wallet not found")
+        return positions
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch DeFi positions: {str(e)}")
 
 
 # ==================== Reward Contract Endpoints ====================

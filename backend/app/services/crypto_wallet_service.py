@@ -18,6 +18,8 @@ from ..schemas.crypto_wallet import (
     ChainBalance,
     TokenBalance,
     CryptoSyncStateResponse,
+    DefiPositionsResponse,
+    DefiPosition,
 )
 from .zerion_api_service import ZerionApiService
 
@@ -432,4 +434,60 @@ class CryptoWalletService:
                 total_balance_usd=total_balance,
                 chains=chains,
                 last_sync_at=last_sync,
+            )
+
+    @staticmethod
+    async def get_defi_positions(
+        db: Session, user_id: int, wallet_id: int
+    ) -> Optional[DefiPositionsResponse]:
+        """Get DeFi/LP positions for a wallet."""
+        wallet = CryptoWalletService.get_wallet(db, user_id, wallet_id)
+        if not wallet:
+            return None
+
+        try:
+            # Fetch DeFi positions from Zerion API
+            positions_data = await ZerionApiService.get_defi_positions(
+                wallet.wallet_address,
+                wallet.chains
+            )
+
+            # Convert to response format
+            positions = [
+                DefiPosition(
+                    id=p.get("id", ""),
+                    chain_id=p.get("chain_id", ""),
+                    protocol=p.get("protocol", ""),
+                    protocol_id=p.get("protocol_id", ""),
+                    protocol_module=p.get("protocol_module", ""),
+                    position_type=p.get("position_type", "deposit"),
+                    name=p.get("name", ""),
+                    symbol=p.get("symbol", ""),
+                    token_name=p.get("token_name", ""),
+                    balance=Decimal(str(p.get("balance", 0))),
+                    balance_usd=Decimal(str(p.get("balance_usd", 0))),
+                    price_usd=Decimal(str(p.get("price_usd", 0))) if p.get("price_usd") else None,
+                    logo_url=p.get("logo_url"),
+                )
+                for p in positions_data
+            ]
+
+            # Calculate total value
+            total_value = sum(p.balance_usd for p in positions)
+
+            return DefiPositionsResponse(
+                wallet_address=wallet.wallet_address,
+                total_value_usd=total_value,
+                positions=positions,
+                last_sync_at=datetime.utcnow(),
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to fetch DeFi positions for wallet {wallet_id}: {e}")
+            # Return empty response on error
+            return DefiPositionsResponse(
+                wallet_address=wallet.wallet_address,
+                total_value_usd=Decimal("0"),
+                positions=[],
+                last_sync_at=None,
             )
