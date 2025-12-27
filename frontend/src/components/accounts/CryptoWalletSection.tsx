@@ -131,7 +131,7 @@ export function CryptoWalletSection() {
 
   // Calculate total crypto balance
   const totalBalanceUsd = walletsWithBalance?.reduce(
-    (sum, w) => sum + (w.total_balance_usd || 0),
+    (sum, w) => sum + Number(w.total_balance_usd || 0),
     0
   ) || 0
 
