@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Card } from '@/components/ui/Card'
+import { Settings as SettingsIcon, DollarSign, FolderOpen, CreditCard, Tag, RefreshCw, Wallet } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection'
 import { RecurringTransactionsList } from '@/components/recurring/RecurringTransactionsList'
 import { CategoryRulesList } from '@/components/settings/CategoryRulesList'
 import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings'
@@ -73,10 +74,13 @@ export function Settings() {
         <p className="text-gray-600 dark:text-gray-400">{t('settings.subtitle')}</p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* General Settings */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.general')}</h3>
+        <CollapsibleSection
+          title={t('settings.general')}
+          icon={<SettingsIcon className="w-5 h-5" />}
+          defaultOpen={true}
+        >
           <div className="space-y-4">
             <Select
               label={t('settings.currency')}
@@ -102,11 +106,13 @@ export function Settings() {
               {updateMutation.isPending ? t('common.loading') : t('settings.saveSettings')}
             </Button>
           </div>
-        </Card>
+        </CollapsibleSection>
 
         {/* Budget Settings */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.budgetSettings')}</h3>
+        <CollapsibleSection
+          title={t('settings.budgetSettings')}
+          icon={<DollarSign className="w-5 h-5" />}
+        >
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -144,11 +150,20 @@ export function Settings() {
               {updateMutation.isPending ? t('common.loading') : t('settings.saveSettings')}
             </Button>
           </div>
-        </Card>
+        </CollapsibleSection>
 
         {/* Categories */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.categoryManagement')}</h3>
+        <CollapsibleSection
+          title={t('settings.categoryManagement')}
+          icon={<FolderOpen className="w-5 h-5" />}
+          badge={
+            settings?.categories?.length ? (
+              <span className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                {settings.categories.length}
+              </span>
+            ) : null
+          }
+        >
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.categories?.map((cat, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -160,11 +175,20 @@ export function Settings() {
           <div className="mt-4">
             <Button variant="outline">{t('settings.addCategory')}</Button>
           </div>
-        </Card>
+        </CollapsibleSection>
 
         {/* Payment Sources */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.paymentSourceManagement')}</h3>
+        <CollapsibleSection
+          title={t('settings.paymentSourceManagement')}
+          icon={<CreditCard className="w-5 h-5" />}
+          badge={
+            settings?.sources?.length ? (
+              <span className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+                {settings.sources.length}
+              </span>
+            ) : null
+          }
+        >
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.sources?.map((source, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -176,16 +200,16 @@ export function Settings() {
           <div className="mt-4">
             <Button variant="outline">{t('settings.addSource')}</Button>
           </div>
-        </Card>
+        </CollapsibleSection>
 
         {/* Category Rules */}
-        <CategoryRulesList />
+        <CategoryRulesList variant="collapsible" />
 
         {/* Recurring Transactions */}
-        <RecurringTransactionsList />
+        <RecurringTransactionsList variant="collapsible" />
 
         {/* Crypto Wallets */}
-        <CryptoWalletSettings />
+        <CryptoWalletSettings variant="collapsible" />
       </div>
     </div>
   )

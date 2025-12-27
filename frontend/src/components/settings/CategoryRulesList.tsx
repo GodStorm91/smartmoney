@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Tag, Trash2, Plus, Wand2, Play, Check } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Card } from '@/components/ui/Card'
+import { CollapsibleSection } from '@/components/ui/CollapsibleSection'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import {
@@ -32,7 +33,11 @@ const CATEGORIES = [
   'Transfer', 'Investment', 'Clothing', 'Other'
 ]
 
-export function CategoryRulesList() {
+interface CategoryRulesListProps {
+  variant?: 'card' | 'collapsible'
+}
+
+export function CategoryRulesList({ variant = 'card' }: CategoryRulesListProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -121,29 +126,75 @@ export function CategoryRulesList() {
     })
   }
 
+  // Wrapper component based on variant
+  const Container = variant === 'collapsible'
+    ? ({ children }: { children: React.ReactNode }) => (
+        <CollapsibleSection
+          title={t('categoryRules.title')}
+          icon={<Tag className="w-5 h-5 text-purple-500" />}
+          badge={rules?.length ? (
+            <span className="px-2 py-0.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+              {rules.length}
+            </span>
+          ) : undefined}
+        >
+          {children}
+        </CollapsibleSection>
+      )
+    : ({ children }: { children: React.ReactNode }) => <Card>{children}</Card>
+
   if (isLoading) {
     return (
-      <Card>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-          {t('categoryRules.title')}
-        </h3>
+      <Container>
+        {variant === 'card' && (
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
+            {t('categoryRules.title')}
+          </h3>
+        )}
         <div className="flex justify-center py-8">
           <LoadingSpinner size="md" />
         </div>
-      </Card>
+      </Container>
     )
   }
 
   return (
-    <Card>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Tag className="w-5 h-5 text-purple-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {t('categoryRules.title')}
-          </h3>
+    <Container>
+      {variant === 'card' && (
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Tag className="w-5 h-5 text-purple-500" />
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              {t('categoryRules.title')}
+            </h3>
+          </div>
+          <div className="flex gap-2">
+            {(!rules || rules.length === 0) && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => seedMutation.mutate()}
+                disabled={seedMutation.isPending}
+              >
+                <Wand2 className="w-4 h-4 mr-1" />
+                {seedMutation.isPending ? t('common.loading') : t('categoryRules.seedDefaults')}
+              </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAddForm(!showAddForm)}
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              {t('categoryRules.addRule')}
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
+      )}
+
+      {/* Action buttons for collapsible variant */}
+      {variant === 'collapsible' && (
+        <div className="flex gap-2 mb-4">
           {(!rules || rules.length === 0) && (
             <Button
               variant="outline"
@@ -164,7 +215,7 @@ export function CategoryRulesList() {
             {t('categoryRules.addRule')}
           </Button>
         </div>
-      </div>
+      )}
 
       {/* Add Rule Form */}
       {showAddForm && (
@@ -364,6 +415,6 @@ export function CategoryRulesList() {
           </div>
         )}
       </div>
-    </Card>
+    </Container>
   )
 }
