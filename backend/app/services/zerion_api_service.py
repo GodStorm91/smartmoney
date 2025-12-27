@@ -136,10 +136,10 @@ class ZerionApiService:
             quantity = attrs.get("quantity") or {}
             token = {
                 "chain_id": our_chain_id,
-                "token_address": first_impl.get("address", ""),
-                "symbol": fungible.get("symbol", ""),
-                "name": fungible.get("name", ""),
-                "decimals": first_impl.get("decimals", 18),
+                "token_address": first_impl.get("address") or "",  # None → ""
+                "symbol": fungible.get("symbol") or "",
+                "name": fungible.get("name") or "",
+                "decimals": first_impl.get("decimals") or 18,
                 "balance": Decimal(str(quantity.get("float", 0) or 0)),
                 "balance_usd": value,
                 "price_usd": Decimal(str(attrs.get("price", 0) or 0)),

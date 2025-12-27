@@ -161,13 +161,13 @@ class RewardClaimResponse(RewardClaimBase):
 class TokenBalance(BaseModel):
     """Token balance from Zerion API."""
 
-    chain_id: str
-    token_address: str
-    symbol: str
-    name: str
-    decimals: int
-    balance: Decimal
-    balance_usd: Decimal
+    chain_id: str = ""
+    token_address: str = ""  # Empty for native tokens (ETH, BNB, etc.)
+    symbol: str = ""
+    name: str = ""
+    decimals: int = 18
+    balance: Decimal = Decimal("0")
+    balance_usd: Decimal = Decimal("0")
     price_usd: Optional[Decimal] = None
     logo_url: Optional[str] = None
 
