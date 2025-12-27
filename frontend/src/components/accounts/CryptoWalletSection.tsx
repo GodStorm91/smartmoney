@@ -51,10 +51,10 @@ function TokenRow({ token }: { token: TokenBalance }) {
       </div>
       <div className="text-right">
         <p className="text-sm text-gray-900 dark:text-white">
-          {token.balance < 0.0001 ? '<0.0001' : token.balance.toFixed(4)}
+          {Number(token.balance) < 0.0001 ? '<0.0001' : Number(token.balance).toFixed(4)}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          ${token.balance_usd.toFixed(2)}
+          ${Number(token.balance_usd).toFixed(2)}
         </p>
       </div>
     </div>
@@ -285,7 +285,7 @@ export function CryptoWalletSection() {
                     <div className="space-y-4">
                       {expandedPortfolio.chains
                         .filter(chain => chain.tokens.length > 0 || chain.native_balance)
-                        .sort((a, b) => b.total_usd - a.total_usd)
+                        .sort((a, b) => Number(b.total_usd) - Number(a.total_usd))
                         .map(chain => (
                           <div key={chain.chain_id}>
                             <div className="flex items-center gap-2 mb-2">
@@ -293,18 +293,18 @@ export function CryptoWalletSection() {
                                 {chain.chain_name}
                               </span>
                               <span className="text-xs text-gray-400 dark:text-gray-500">
-                                ${chain.total_usd.toFixed(2)}
+                                ${Number(chain.total_usd).toFixed(2)}
                               </span>
                             </div>
                             <div className="space-y-1">
                               {/* Native token first */}
-                              {chain.native_balance && chain.native_balance.balance > 0 && (
+                              {chain.native_balance && Number(chain.native_balance.balance) > 0 && (
                                 <TokenRow token={chain.native_balance} />
                               )}
                               {/* Other tokens sorted by value */}
                               {chain.tokens
-                                .filter(t => t.balance > 0)
-                                .sort((a, b) => b.balance_usd - a.balance_usd)
+                                .filter(t => Number(t.balance) > 0)
+                                .sort((a, b) => Number(b.balance_usd) - Number(a.balance_usd))
                                 .map(token => (
                                   <TokenRow key={token.token_address} token={token} />
                                 ))}
