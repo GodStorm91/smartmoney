@@ -97,7 +97,8 @@ class ZerionApiService:
 
         for position in positions:
             attrs = position.get("attributes", {})
-            chain_id = attrs.get("chain")
+            # Chain is in relationships, not attributes
+            chain_id = position.get("relationships", {}).get("chain", {}).get("data", {}).get("id")
 
             # Map Zerion chain to our chain ID
             our_chain_id = None
