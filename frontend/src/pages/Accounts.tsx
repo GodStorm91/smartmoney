@@ -4,6 +4,7 @@ import { ArrowRightLeft } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { AccountCard } from '@/components/accounts/AccountCard'
 import { AccountFormModal } from '@/components/accounts/AccountFormModal'
+import { CryptoWalletSection } from '@/components/accounts/CryptoWalletSection'
 import { TransferFormModal } from '@/components/transfers'
 import type { AccountType } from '@/types'
 
@@ -49,8 +50,8 @@ export default function Accounts() {
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('account.accounts')}</h1>
-            <p className="text-gray-600 mt-1">{t('account.manageYourAccounts')}</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('account.accounts')}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('account.manageYourAccounts')}</p>
           </div>
           <div className="flex gap-3">
             <button
@@ -81,12 +82,12 @@ export default function Accounts() {
 
         {/* Filters */}
         <div className="mt-4 flex items-center gap-4">
-          <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
             <input
               type="checkbox"
               checked={includeInactive}
               onChange={(e) => setIncludeInactive(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500 dark:bg-gray-700"
             />
             {t('account.showInactive')}
           </label>
@@ -128,10 +129,10 @@ export default function Accounts() {
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             {t('account.noAccounts')}
           </h3>
-          <p className="text-gray-600 mb-6">{t('account.createFirstAccount')}</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{t('account.createFirstAccount')}</p>
           <button
             onClick={handleCreateAccount}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -160,9 +161,9 @@ export default function Accounts() {
 
             return (
               <div key={accountType}>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                   {t(`account.type.${accountType}`)}
-                  <span className="text-sm font-normal text-gray-500">
+                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     ({typeAccounts.length})
                   </span>
                 </h2>
@@ -178,6 +179,16 @@ export default function Accounts() {
               </div>
             )
           })}
+
+          {/* Crypto Wallets Section */}
+          <CryptoWalletSection />
+        </div>
+      )}
+
+      {/* Crypto Wallets (shown even when no traditional accounts) */}
+      {!isLoading && !error && (!accounts || accounts.length === 0) && (
+        <div className="mt-8">
+          <CryptoWalletSection />
         </div>
       )}
 
