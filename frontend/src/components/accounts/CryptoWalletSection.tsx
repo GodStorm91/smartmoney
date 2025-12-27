@@ -197,7 +197,7 @@ export function CryptoWalletSection() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-gray-900 dark:text-white">
-                    ${wallet.total_balance_usd?.toFixed(2) || '0.00'}
+                    ${Number(wallet.total_balance_usd || 0).toFixed(2)}
                   </p>
                   <div className="flex gap-1 mt-1">
                     {wallet.chains?.map((chain: ChainId) => (
