@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
+import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
@@ -147,8 +148,10 @@ export function Settings() {
         </Card>
 
         {/* Categories */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.categoryManagement')}</h3>
+        <CollapsibleCard
+          title={t('settings.categoryManagement')}
+          badge={settings?.categories?.length || 0}
+        >
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.categories?.map((cat, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -160,11 +163,13 @@ export function Settings() {
           <div className="mt-4">
             <Button variant="outline">{t('settings.addCategory')}</Button>
           </div>
-        </Card>
+        </CollapsibleCard>
 
         {/* Payment Sources */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('settings.paymentSourceManagement')}</h3>
+        <CollapsibleCard
+          title={t('settings.paymentSourceManagement')}
+          badge={settings?.sources?.length || 0}
+        >
           <div className="space-y-2 max-h-64 overflow-y-auto">
             {settings?.sources?.map((source, idx) => (
               <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -176,7 +181,7 @@ export function Settings() {
           <div className="mt-4">
             <Button variant="outline">{t('settings.addSource')}</Button>
           </div>
-        </Card>
+        </CollapsibleCard>
 
         {/* Category Rules */}
         <CategoryRulesList />
