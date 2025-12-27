@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { Tag, Trash2, Plus, Wand2, Play, Check } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Card } from '@/components/ui/Card'
+import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import {
@@ -124,9 +125,12 @@ export function CategoryRulesList() {
   if (isLoading) {
     return (
       <Card>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-          {t('categoryRules.title')}
-        </h3>
+        <div className="flex items-center gap-2">
+          <Tag className="w-5 h-5 text-purple-500" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            {t('categoryRules.title')}
+          </h3>
+        </div>
         <div className="flex justify-center py-8">
           <LoadingSpinner size="md" />
         </div>
@@ -135,35 +139,30 @@ export function CategoryRulesList() {
   }
 
   return (
-    <Card>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Tag className="w-5 h-5 text-purple-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {t('categoryRules.title')}
-          </h3>
-        </div>
-        <div className="flex gap-2">
-          {(!rules || rules.length === 0) && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => seedMutation.mutate()}
-              disabled={seedMutation.isPending}
-            >
-              <Wand2 className="w-4 h-4 mr-1" />
-              {seedMutation.isPending ? t('common.loading') : t('categoryRules.seedDefaults')}
-            </Button>
-          )}
+    <CollapsibleCard
+      title={t('categoryRules.title')}
+      badge={rules?.length || 0}
+    >
+      <div className="flex items-center justify-end gap-2 mb-4">
+        {(!rules || rules.length === 0) && (
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setShowAddForm(!showAddForm)}
+            onClick={() => seedMutation.mutate()}
+            disabled={seedMutation.isPending}
           >
-            <Plus className="w-4 h-4 mr-1" />
-            {t('categoryRules.addRule')}
+            <Wand2 className="w-4 h-4 mr-1" />
+            {seedMutation.isPending ? t('common.loading') : t('categoryRules.seedDefaults')}
           </Button>
-        </div>
+        )}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowAddForm(!showAddForm)}
+        >
+          <Plus className="w-4 h-4 mr-1" />
+          {t('categoryRules.addRule')}
+        </Button>
       </div>
 
       {/* Add Rule Form */}
@@ -364,6 +363,6 @@ export function CategoryRulesList() {
           </div>
         )}
       </div>
-    </Card>
+    </CollapsibleCard>
   )
 }
