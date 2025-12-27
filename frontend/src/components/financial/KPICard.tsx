@@ -42,7 +42,7 @@ export function KPICard({ title, amount, change, icon, type, ...props }: KPICard
     <Card hover role="region" {...props}>
       <div className="flex items-start justify-between mb-4">
         <div className={cn('p-3 rounded-lg', colors.bg)}>{icon}</div>
-        {change !== undefined && (
+        {change != null && (
           <span
             className={cn(
               'inline-flex items-center gap-1 text-sm font-medium px-2 py-1 rounded-full',

@@ -84,7 +84,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
           <div className="mt-4 w-full max-w-xs">
             <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
               <span>{t('analytics.savingsGoal')}</span>
-              <span>{goalProgress?.toFixed(0)}%</span>
+              <span>{(goalProgress ?? 0).toFixed(0)}%</span>
             </div>
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div

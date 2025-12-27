@@ -32,7 +32,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { t } = useTranslation()
-  const progress = goal.progress_percentage
+  const progress = goal.progress_percentage ?? 0
   const config = statusConfig[goal.status as keyof typeof statusConfig] || statusConfig.on_track
 
   if (compact) {
