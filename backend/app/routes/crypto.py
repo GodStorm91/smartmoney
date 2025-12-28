@@ -16,8 +16,12 @@ from ..schemas.crypto_wallet import (
     RewardClaimResponse,
     PortfolioResponse,
     DefiPositionsResponse,
+    PositionHistoryResponse,
+    WalletPerformanceResponse,
+    BackfillResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
+from ..services.defi_snapshot_service import DefiSnapshotService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -212,3 +216,64 @@ async def detect_claims(
         return {"detected": len(new_claims), "claims": new_claims}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Detection failed: {str(e)}")
+
+
+# ==================== DeFi Position Snapshot Endpoints ====================
+
+@router.get("/positions/{position_id}/history", response_model=PositionHistoryResponse)
+async def get_position_history(
+    position_id: str,
+    days: int = 30,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get historical snapshots for a DeFi position."""
+    if days not in [7, 30, 90, 365]:
+        days = 30  # Default to 30 days
+
+    history = DefiSnapshotService.get_position_history(
+        db, current_user.id, position_id, days
+    )
+    if not history:
+        raise HTTPException(status_code=404, detail="Position history not found")
+    return history
+
+
+@router.get("/wallets/{wallet_id}/performance", response_model=WalletPerformanceResponse)
+async def get_wallet_performance(
+    wallet_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get aggregated performance metrics for a wallet's DeFi positions."""
+    performance = DefiSnapshotService.get_wallet_performance(
+        db, current_user.id, wallet_id
+    )
+    if not performance:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    return performance
+
+
+@router.post("/wallets/{wallet_id}/backfill", response_model=BackfillResponse)
+async def backfill_wallet_snapshots(
+    wallet_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Manually backfill snapshots for a wallet (captures current state)."""
+    stats = await DefiSnapshotService.backfill_snapshots(
+        db, current_user.id, wallet_id
+    )
+    if "error" in stats:
+        raise HTTPException(status_code=400, detail=stats["error"])
+    return BackfillResponse(message="Backfill completed", stats=stats)
+
+
+@router.post("/snapshots/capture")
+async def capture_snapshots_manual(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Manually trigger snapshot capture for all wallets (admin/testing)."""
+    stats = await DefiSnapshotService.capture_all_snapshots(db)
+    return {"message": "Snapshots captured", "stats": stats}

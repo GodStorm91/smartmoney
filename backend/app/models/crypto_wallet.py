@@ -131,3 +131,36 @@ class RewardClaim(Base):
     __table_args__ = (
         Index("ix_reward_claims_tx_chain", "tx_hash", "chain_id", unique=True),
     )
+
+
+class DefiPositionSnapshot(Base):
+    """Daily snapshots of DeFi position values for historical tracking."""
+
+    __tablename__ = "defi_position_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    position_id: Mapped[str] = mapped_column(String(255), nullable=False)  # Zerion position ID
+    protocol: Mapped[str] = mapped_column(String(100), nullable=False)
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+    position_type: Mapped[str] = mapped_column(String(50), nullable=False)  # deposit, stake, liquidity
+    symbol: Mapped[str] = mapped_column(String(50), nullable=False)
+    token_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    balance: Mapped[Decimal] = mapped_column(Numeric(36, 18), nullable=False)
+    balance_usd: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
+    price_usd: Mapped[Decimal | None] = mapped_column(Numeric(20, 8), nullable=True)
+    protocol_apy: Mapped[Decimal | None] = mapped_column(Numeric(10, 4), nullable=True)  # e.g., 12.5% = 12.5000
+    snapshot_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", lazy="select")
+
+    __table_args__ = (
+        Index("ix_defi_snapshots_user_date", "user_id", "snapshot_date"),
+        Index("ix_defi_snapshots_position", "position_id"),
+        Index("ix_defi_snapshots_unique", "user_id", "position_id", "snapshot_date", unique=True),
+    )

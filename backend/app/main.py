@@ -12,6 +12,7 @@ from .database import SessionLocal, init_db
 from .routes import accounts, ai_categorization, analytics, auth, budgets, categories, category_rules, chat, credits, crypto, dashboard, goals, receipts, recurring, settings, tags, transactions, transfers, upload, exchange_rates, user_categories
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
+from .services.defi_snapshot_service import DefiSnapshotService
 
 logger = logging.getLogger(__name__)
 scheduler = BackgroundScheduler()
@@ -78,6 +79,34 @@ def scheduled_recurring_transactions():
         db.close()
 
 
+def scheduled_defi_snapshots():
+    """Background job to capture DeFi position snapshots daily."""
+    import asyncio
+    db = SessionLocal()
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        stats = loop.run_until_complete(DefiSnapshotService.capture_all_snapshots(db))
+        loop.close()
+        logger.info(f"DeFi snapshots captured: {stats}")
+    except Exception as e:
+        logger.error(f"DeFi snapshot capture failed: {e}")
+    finally:
+        db.close()
+
+
+def scheduled_snapshot_cleanup():
+    """Weekly cleanup of old DeFi snapshots (>365 days)."""
+    db = SessionLocal()
+    try:
+        deleted = DefiSnapshotService.cleanup_old_snapshots(db, retention_days=365)
+        logger.info(f"Snapshot cleanup: deleted {deleted} old records")
+    except Exception as e:
+        logger.error(f"Snapshot cleanup failed: {e}")
+    finally:
+        db.close()
+
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
@@ -104,8 +133,29 @@ async def startup_event():
         replace_existing=True,
     )
 
+    # Schedule daily DeFi position snapshots at 00:30 UTC
+    scheduler.add_job(
+        scheduled_defi_snapshots,
+        trigger="cron",
+        hour=0,
+        minute=30,
+        id="defi_snapshots",
+        replace_existing=True,
+    )
+
+    # Weekly cleanup of old snapshots (Sundays at 3 AM UTC)
+    scheduler.add_job(
+        scheduled_snapshot_cleanup,
+        trigger="cron",
+        day_of_week="sun",
+        hour=3,
+        minute=0,
+        id="snapshot_cleanup",
+        replace_existing=True,
+    )
+
     scheduler.start()
-    logger.info("Schedulers started (exchange rates: 4 AM UTC, recurring: 00:05 JST)")
+    logger.info("Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)")
 
 
 @app.on_event("shutdown")

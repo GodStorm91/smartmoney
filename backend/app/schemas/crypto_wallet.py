@@ -222,5 +222,61 @@ class DefiPositionsResponse(BaseModel):
     last_sync_at: Optional[datetime] = None
 
 
+# DeFi Position Snapshot schemas (for historical tracking)
+class DefiPositionSnapshotResponse(BaseModel):
+    """Schema for position snapshot response."""
+
+    id: int
+    position_id: str
+    protocol: str
+    chain_id: str
+    position_type: str
+    symbol: str
+    token_name: Optional[str] = None
+    balance: Decimal
+    balance_usd: Decimal
+    price_usd: Optional[Decimal] = None
+    protocol_apy: Optional[Decimal] = None
+    snapshot_date: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PositionHistoryResponse(BaseModel):
+    """Schema for position history with performance metrics."""
+
+    position_id: str
+    protocol: str
+    symbol: str
+    current_value_usd: Decimal
+    snapshots: list[DefiPositionSnapshotResponse] = []
+
+    # Calculated performance fields
+    change_7d_usd: Optional[Decimal] = None
+    change_7d_pct: Optional[float] = None
+    change_30d_usd: Optional[Decimal] = None
+    change_30d_pct: Optional[float] = None
+
+
+class WalletPerformanceResponse(BaseModel):
+    """Schema for wallet-level performance summary."""
+
+    wallet_address: str
+    total_value_usd: Decimal
+    total_change_7d_usd: Optional[Decimal] = None
+    total_change_30d_usd: Optional[Decimal] = None
+    positions: list[PositionHistoryResponse] = []
+    snapshot_count: int = 0
+    first_snapshot_date: Optional[datetime] = None
+
+
+class BackfillResponse(BaseModel):
+    """Schema for backfill operation response."""
+
+    message: str
+    stats: dict
+
+
 # Update forward reference
 CryptoWalletWithBalanceResponse.model_rebuild()
