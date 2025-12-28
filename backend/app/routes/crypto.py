@@ -227,7 +227,7 @@ async def detect_claims(
 
 # ==================== DeFi Position Snapshot Endpoints ====================
 
-@router.get("/positions/{position_id}/history", response_model=PositionHistoryResponse)
+@router.get("/positions/{position_id:path}/history", response_model=PositionHistoryResponse)
 async def get_position_history(
     position_id: str,
     days: int = 30,
@@ -302,7 +302,7 @@ async def get_protocol_apy(
 
 # ==================== Impermanent Loss Endpoints ====================
 
-@router.get("/positions/{position_id}/performance", response_model=PositionPerformanceResponse)
+@router.get("/positions/{position_id:path}/performance", response_model=PositionPerformanceResponse)
 async def get_position_performance(
     position_id: str,
     db: Session = Depends(get_db),
@@ -351,7 +351,7 @@ async def get_il_scenarios(
 
 # ==================== AI Insights Endpoints ====================
 
-@router.get("/positions/{position_id}/insights", response_model=PositionInsightsResponse)
+@router.get("/positions/{position_id:path}/insights", response_model=PositionInsightsResponse)
 async def get_position_insights(
     position_id: str,
     language: str = "en",
