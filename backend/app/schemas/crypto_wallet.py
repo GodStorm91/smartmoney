@@ -278,5 +278,63 @@ class BackfillResponse(BaseModel):
     stats: dict
 
 
+class PositionPerformanceResponse(BaseModel):
+    """Schema for position performance with IL metrics."""
+
+    position_id: str
+    protocol: str
+    symbol: str
+    days_held: int
+    start_value_usd: Decimal
+    current_value_usd: Decimal
+    total_return_usd: Decimal
+    total_return_pct: float
+    annualized_return_pct: float
+    current_apy: Optional[float] = None
+    snapshot_count: int
+
+    # IL metrics (available if price data exists)
+    il_percentage: Optional[float] = None
+    il_usd: Optional[Decimal] = None
+    hodl_value_usd: Optional[Decimal] = None
+    lp_vs_hodl_usd: Optional[Decimal] = None
+    lp_outperformed_hodl: Optional[bool] = None
+
+    # Yield estimates
+    estimated_yield_usd: Optional[Decimal] = None
+    estimated_yield_pct: Optional[float] = None
+
+
+class ILScenarioResponse(BaseModel):
+    """Schema for IL scenario analysis."""
+
+    price_change: str
+    price_ratio: float
+    il_percentage: float
+    vs_hodl: str
+
+
+class PositionInsightsResponse(BaseModel):
+    """Schema for AI-generated position insights."""
+
+    summary: str
+    il_analysis: Optional[str] = None
+    observation: str
+    scenario_up: Optional[str] = None
+    scenario_down: Optional[str] = None
+    risk_level: str  # low, medium, high
+    recommendation: Optional[str] = None
+
+
+class PortfolioInsightsResponse(BaseModel):
+    """Schema for AI-generated portfolio insights."""
+
+    diversification_score: str  # well-diversified, moderate, concentrated
+    diversification_analysis: str
+    risk_observations: list[str] = []
+    considerations: list[str] = []
+    overall_assessment: str
+
+
 # Update forward reference
 CryptoWalletWithBalanceResponse.model_rebuild()

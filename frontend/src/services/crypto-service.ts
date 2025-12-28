@@ -10,6 +10,11 @@ import type {
   Portfolio,
   RewardClaim,
   DefiPositionsResponse,
+  PositionHistory,
+  PositionPerformance,
+  PositionInsights,
+  PortfolioInsights,
+  ILScenario,
 } from '@/types'
 
 // ==================== Wallet APIs ====================
@@ -88,5 +93,74 @@ export async function detectClaims(): Promise<{ detected: number; claims: Reward
   const response = await apiClient.post<{ detected: number; claims: RewardClaim[] }>(
     '/api/crypto/claims/detect'
   )
+  return response.data
+}
+
+// ==================== Position Analytics APIs ====================
+
+export async function fetchPositionHistory(
+  positionId: string,
+  days: number = 30
+): Promise<PositionHistory> {
+  const response = await apiClient.get<PositionHistory>(
+    `/api/crypto/positions/${positionId}/history`,
+    { params: { days } }
+  )
+  return response.data
+}
+
+export async function fetchPositionPerformance(positionId: string): Promise<PositionPerformance> {
+  const response = await apiClient.get<PositionPerformance>(
+    `/api/crypto/positions/${positionId}/performance`
+  )
+  return response.data
+}
+
+export async function fetchPositionInsights(
+  positionId: string,
+  language: string = 'en'
+): Promise<PositionInsights> {
+  const response = await apiClient.get<PositionInsights>(
+    `/api/crypto/positions/${positionId}/insights`,
+    { params: { language } }
+  )
+  return response.data
+}
+
+export async function fetchWalletPerformance(walletId: number): Promise<{
+  wallet_address: string
+  total_value_usd: number
+  total_change_7d_usd: number | null
+  total_change_30d_usd: number | null
+  positions: PositionHistory[]
+  snapshot_count: number
+  first_snapshot_date: string | null
+}> {
+  const response = await apiClient.get(`/api/crypto/wallets/${walletId}/performance`)
+  return response.data
+}
+
+export async function fetchPortfolioInsights(
+  walletId: number,
+  language: string = 'en'
+): Promise<PortfolioInsights> {
+  const response = await apiClient.get<PortfolioInsights>(
+    `/api/crypto/wallets/${walletId}/insights`,
+    { params: { language } }
+  )
+  return response.data
+}
+
+export async function fetchILScenarios(currentPriceRatio: number = 1.0): Promise<ILScenario[]> {
+  const response = await apiClient.get<ILScenario[]>('/api/crypto/il/scenarios', {
+    params: { current_price_ratio: currentPriceRatio },
+  })
+  return response.data
+}
+
+export async function backfillWalletSnapshots(
+  walletId: number
+): Promise<{ message: string; stats: { positions: number; skipped: number } }> {
+  const response = await apiClient.post(`/api/crypto/wallets/${walletId}/backfill`)
   return response.data
 }

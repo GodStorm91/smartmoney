@@ -137,6 +137,87 @@ export interface DefiPositionsResponse {
   last_sync_at: string | null
 }
 
+// Position snapshot for historical tracking
+export interface DefiPositionSnapshot {
+  id: number
+  position_id: string
+  protocol: string
+  chain_id: string
+  position_type: string
+  symbol: string
+  token_name: string | null
+  balance: number
+  balance_usd: number
+  price_usd: number | null
+  protocol_apy: number | null
+  snapshot_date: string
+}
+
+// Position history with performance metrics
+export interface PositionHistory {
+  position_id: string
+  protocol: string
+  symbol: string
+  current_value_usd: number
+  snapshots: DefiPositionSnapshot[]
+  change_7d_usd: number | null
+  change_7d_pct: number | null
+  change_30d_usd: number | null
+  change_30d_pct: number | null
+}
+
+// Position performance with IL metrics
+export interface PositionPerformance {
+  position_id: string
+  protocol: string
+  symbol: string
+  days_held: number
+  start_value_usd: number
+  current_value_usd: number
+  total_return_usd: number
+  total_return_pct: number
+  annualized_return_pct: number
+  current_apy: number | null
+  snapshot_count: number
+  // IL metrics
+  il_percentage: number | null
+  il_usd: number | null
+  hodl_value_usd: number | null
+  lp_vs_hodl_usd: number | null
+  lp_outperformed_hodl: boolean | null
+  // Yield estimates
+  estimated_yield_usd: number | null
+  estimated_yield_pct: number | null
+}
+
+// AI-generated position insights
+export interface PositionInsights {
+  summary: string
+  il_analysis: string | null
+  observation: string
+  scenario_up: string | null
+  scenario_down: string | null
+  risk_level: 'low' | 'medium' | 'high'
+  recommendation: string | null
+}
+
+// AI-generated portfolio insights
+export interface PortfolioInsights {
+  diversification_score: 'well-diversified' | 'moderate' | 'concentrated'
+  diversification_analysis: string
+  risk_observations: string[]
+  considerations: string[]
+  overall_assessment: string
+}
+
+// IL scenario for educational display
+export interface ILScenario {
+  price_change: string
+  price_ratio: number
+  il_percentage: number
+  vs_hodl: string
+}
+
 // Chain display info
 export const CHAIN_INFO: Record<ChainId, { name: string; icon: string; color: string }> = {
   eth: { name: 'Ethereum', icon: '⟠', color: '#627EEA' },

@@ -2,15 +2,17 @@
  * LPPositionsSection - Display DeFi/LP positions in Accounts page
  * Separate section showing staking, LP, and lending positions
  */
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Layers, RefreshCw } from 'lucide-react'
+import { Layers, RefreshCw, ChevronRight } from 'lucide-react'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { fetchWallets, fetchDefiPositions } from '@/services/crypto-service'
+import { PositionDetailModal } from '@/components/crypto/PositionDetailModal'
 import type { DefiPosition, ChainId } from '@/types'
 import { CHAIN_INFO } from '@/types/crypto'
 
@@ -33,12 +35,15 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 /** Single position row */
-function PositionRow({ position }: { position: DefiPosition }) {
+function PositionRow({ position, onClick }: { position: DefiPosition; onClick: () => void }) {
   const chainId = position.chain_id as ChainId
   const chainInfo = CHAIN_INFO[chainId]
 
   return (
-    <div className="flex items-center justify-between py-3 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between py-3 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-left group"
+    >
       <div className="flex items-center gap-3 min-w-0">
         {/* Position icon/logo */}
         {position.logo_url ? (
@@ -79,24 +84,28 @@ function PositionRow({ position }: { position: DefiPosition }) {
         </div>
       </div>
 
-      {/* Value */}
-      <div className="text-right">
-        <p className="font-semibold text-gray-900 dark:text-white">
-          ${Number(position.balance_usd).toFixed(2)}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          {Number(position.balance) < 0.0001
-            ? '<0.0001'
-            : Number(position.balance).toFixed(4)} {position.symbol}
-        </p>
+      {/* Value + Arrow */}
+      <div className="flex items-center gap-2">
+        <div className="text-right">
+          <p className="font-semibold text-gray-900 dark:text-white">
+            ${Number(position.balance_usd).toFixed(2)}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {Number(position.balance) < 0.0001
+              ? '<0.0001'
+              : Number(position.balance).toFixed(4)} {position.symbol}
+          </p>
+        </div>
+        <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-indigo-500 transition-colors" />
       </div>
-    </div>
+    </button>
   )
 }
 
 export function LPPositionsSection() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
+  const [selectedPosition, setSelectedPosition] = useState<DefiPosition | null>(null)
   const rates = useRatesMap()
 
   // Get all wallets first
@@ -216,7 +225,11 @@ export function LPPositionsSection() {
                   {protoPositions
                     .sort((a, b) => Number(b.balance_usd) - Number(a.balance_usd))
                     .map(position => (
-                      <PositionRow key={position.id} position={position} />
+                      <PositionRow
+                        key={position.id}
+                        position={position}
+                        onClick={() => setSelectedPosition(position)}
+                      />
                     ))}
                 </div>
               </div>
@@ -230,6 +243,14 @@ export function LPPositionsSection() {
             {t('crypto.noDefiPositionsDescription')}
           </p>
         </div>
+      )}
+
+      {/* Position Detail Modal */}
+      {selectedPosition && (
+        <PositionDetailModal
+          position={selectedPosition}
+          onClose={() => setSelectedPosition(null)}
+        />
       )}
     </CollapsibleCard>
   )

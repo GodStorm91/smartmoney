@@ -19,10 +19,16 @@ from ..schemas.crypto_wallet import (
     PositionHistoryResponse,
     WalletPerformanceResponse,
     BackfillResponse,
+    PositionPerformanceResponse,
+    ILScenarioResponse,
+    PositionInsightsResponse,
+    PortfolioInsightsResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
 from ..services.defillama_service import DeFiLlamaService
+from ..services.il_calculator_service import ILCalculatorService
+from ..services.defi_insights_service import DefiInsightsService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -292,3 +298,178 @@ async def get_protocol_apy(
     if not apy_data:
         raise HTTPException(status_code=404, detail="APY data not found for this position")
     return apy_data
+
+
+# ==================== Impermanent Loss Endpoints ====================
+
+@router.get("/positions/{position_id}/performance", response_model=PositionPerformanceResponse)
+async def get_position_performance(
+    position_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get performance metrics including IL for a DeFi position."""
+    from ..models.crypto_wallet import DefiPositionSnapshot
+    from sqlalchemy import and_
+
+    # Get all snapshots for this position
+    snapshots = db.query(DefiPositionSnapshot).filter(
+        and_(
+            DefiPositionSnapshot.user_id == current_user.id,
+            DefiPositionSnapshot.position_id == position_id
+        )
+    ).order_by(DefiPositionSnapshot.snapshot_date.desc()).all()
+
+    if not snapshots:
+        raise HTTPException(status_code=404, detail="Position not found or no snapshots available")
+
+    # Convert to response objects for IL calculator
+    from ..schemas.crypto_wallet import DefiPositionSnapshotResponse
+    snapshot_responses = [DefiPositionSnapshotResponse.model_validate(s) for s in snapshots]
+
+    # Calculate performance with IL
+    performance = ILCalculatorService.calculate_position_performance(snapshot_responses)
+    if not performance:
+        raise HTTPException(status_code=400, detail="Insufficient data for performance calculation (need at least 2 snapshots)")
+
+    return PositionPerformanceResponse(**performance)
+
+
+@router.get("/il/scenarios", response_model=list[ILScenarioResponse])
+async def get_il_scenarios(
+    current_price_ratio: float = 1.0,
+    current_user: User = Depends(get_current_user),
+):
+    """Get IL scenarios for educational purposes.
+
+    Shows how impermanent loss changes at various price ratios.
+    Useful for understanding IL risk before entering LP positions.
+    """
+    scenarios = ILCalculatorService.get_il_scenarios(current_price_ratio)
+    return [ILScenarioResponse(**s) for s in scenarios]
+
+
+# ==================== AI Insights Endpoints ====================
+
+@router.get("/positions/{position_id}/insights", response_model=PositionInsightsResponse)
+async def get_position_insights(
+    position_id: str,
+    language: str = "en",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get AI-generated insights for a DeFi position.
+
+    Provides educational analysis including:
+    - Performance summary
+    - Impermanent loss analysis
+    - Risk assessment
+    - Scenario projections
+    """
+    from ..models.crypto_wallet import DefiPositionSnapshot
+    from sqlalchemy import and_
+    from ..schemas.crypto_wallet import DefiPositionSnapshotResponse
+
+    # Get snapshots for this position
+    snapshots = db.query(DefiPositionSnapshot).filter(
+        and_(
+            DefiPositionSnapshot.user_id == current_user.id,
+            DefiPositionSnapshot.position_id == position_id
+        )
+    ).order_by(DefiPositionSnapshot.snapshot_date.desc()).all()
+
+    if not snapshots:
+        raise HTTPException(status_code=404, detail="Position not found or no snapshots available")
+
+    # Get latest snapshot for position data
+    latest = snapshots[0]
+    position_data = {
+        "protocol": latest.protocol,
+        "symbol": latest.symbol,
+        "chain_id": latest.chain_id,
+        "position_type": latest.position_type,
+    }
+
+    # Calculate performance metrics
+    snapshot_responses = [DefiPositionSnapshotResponse.model_validate(s) for s in snapshots]
+    performance_metrics = ILCalculatorService.calculate_position_performance(snapshot_responses)
+
+    if not performance_metrics:
+        raise HTTPException(status_code=400, detail="Insufficient data for insights (need at least 2 snapshots)")
+
+    # Try to get APY data
+    apy_data = None
+    try:
+        apy_data = await DeFiLlamaService.match_position_to_pool(
+            latest.protocol, latest.symbol, latest.chain_id
+        )
+    except Exception:
+        pass  # APY data is optional
+
+    # Generate AI insights
+    try:
+        insights_service = DefiInsightsService()
+        insights, usage = insights_service.generate_position_insights(
+            position_data=position_data,
+            performance_metrics=performance_metrics,
+            apy_data=apy_data,
+            language=language
+        )
+        return PositionInsightsResponse(**insights)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate insights: {str(e)}")
+
+
+@router.get("/wallets/{wallet_id}/insights", response_model=PortfolioInsightsResponse)
+async def get_portfolio_insights(
+    wallet_id: int,
+    language: str = "en",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get AI-generated insights for entire DeFi portfolio.
+
+    Provides portfolio-level analysis including:
+    - Diversification assessment
+    - Risk observations
+    - Allocation considerations
+    """
+    # Get wallet and verify ownership
+    wallet = CryptoWalletService.get_wallet(db, current_user.id, wallet_id)
+    if not wallet:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    # Get current DeFi positions
+    try:
+        positions_response = await CryptoWalletService.get_defi_positions(
+            db, current_user.id, wallet_id
+        )
+        if not positions_response or not positions_response.positions:
+            raise HTTPException(status_code=400, detail="No DeFi positions found for this wallet")
+
+        # Convert to dict format for insights service
+        positions = [
+            {
+                "protocol": p.protocol,
+                "symbol": p.symbol,
+                "chain_id": p.chain_id,
+                "position_type": p.position_type,
+                "balance_usd": p.balance_usd,
+            }
+            for p in positions_response.positions
+        ]
+        total_value = float(positions_response.total_value_usd)
+
+        # Generate AI insights
+        insights_service = DefiInsightsService()
+        insights, usage = insights_service.generate_portfolio_insights(
+            positions=positions,
+            total_value_usd=total_value,
+            language=language
+        )
+        return PortfolioInsightsResponse(**insights)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate portfolio insights: {str(e)}")
