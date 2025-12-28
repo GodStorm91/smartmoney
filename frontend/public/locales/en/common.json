@@ -599,7 +599,9 @@
     "priceUp20": "If price +20%",
     "priceDown20": "If price -20%",
     "insightsDisclaimer": "This is educational analysis, not financial advice.",
-    "valueHistory": "Value History"
+    "valueHistory": "Value History",
+    "noHistoricalDataTitle": "No Historical Data Yet",
+    "noHistoricalDataMessage": "Position snapshots are captured daily. Check back tomorrow for performance tracking and insights."
   },
   "budget": {
     "title": "Budget",

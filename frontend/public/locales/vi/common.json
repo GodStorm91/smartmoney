@@ -599,7 +599,9 @@
     "priceUp20": "Nếu giá +20%",
     "priceDown20": "Nếu giá -20%",
     "insightsDisclaimer": "Đây là phân tích giáo dục, không phải tư vấn tài chính.",
-    "valueHistory": "Lịch Sử Giá Trị"
+    "valueHistory": "Lịch Sử Giá Trị",
+    "noHistoricalDataTitle": "Chưa Có Dữ Liệu Lịch Sử",
+    "noHistoricalDataMessage": "Ảnh chụp vị thế được ghi nhận mỗi ngày. Quay lại vào ngày mai để theo dõi hiệu suất và xem phân tích."
   },
   "budget": {
     "title": "Ngân sách",

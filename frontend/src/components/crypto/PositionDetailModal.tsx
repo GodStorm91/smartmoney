@@ -302,26 +302,30 @@ export function PositionDetailModal({ position, onClose }: PositionDetailModalPr
   useSettings() // For potential future currency formatting
   const chainInfo = CHAIN_INFO[position.chain_id as ChainId]
 
-  // Fetch position history
-  const { data: history, isLoading: isLoadingHistory } = useQuery({
+  // Fetch position history - gracefully handle 404 (no snapshots yet)
+  const { data: history, isLoading: isLoadingHistory, isError: isHistoryError } = useQuery({
     queryKey: ['position-history', position.id],
     queryFn: () => fetchPositionHistory(position.id, 30),
+    retry: false, // Don't retry on 404
   })
 
-  // Fetch performance metrics
-  const { data: performance, isLoading: isLoadingPerformance } = useQuery({
+  // Fetch performance metrics - gracefully handle 404
+  const { data: performance, isLoading: isLoadingPerformance, isError: isPerformanceError } = useQuery({
     queryKey: ['position-performance', position.id],
     queryFn: () => fetchPositionPerformance(position.id),
+    retry: false,
   })
 
-  // Fetch AI insights
+  // Fetch AI insights - only if performance data exists
   const { data: insights, isLoading: isLoadingInsights } = useQuery({
     queryKey: ['position-insights', position.id, i18n.language],
     queryFn: () => fetchPositionInsights(position.id, i18n.language),
-    enabled: !!performance, // Only fetch after performance is loaded
+    enabled: !!performance && !isPerformanceError,
+    retry: false,
   })
 
   const isLoading = isLoadingHistory || isLoadingPerformance
+  const noDataYet = isHistoryError || isPerformanceError
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
@@ -380,6 +384,23 @@ export function PositionDetailModal({ position, onClose }: PositionDetailModalPr
                 </p>
               </div>
 
+              {/* No Historical Data Yet Message */}
+              {noDataYet && (
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="font-medium text-amber-800 dark:text-amber-300">
+                        {t('crypto.noHistoricalDataTitle')}
+                      </h4>
+                      <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                        {t('crypto.noHistoricalDataMessage')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Performance Chart */}
               {history && history.snapshots.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
@@ -398,8 +419,8 @@ export function PositionDetailModal({ position, onClose }: PositionDetailModalPr
               {/* Impermanent Loss */}
               {performance && <ILCard performance={performance} />}
 
-              {/* AI Insights */}
-              <InsightsCard insights={insights} isLoading={isLoadingInsights} />
+              {/* AI Insights - only show if we have performance data */}
+              {!noDataYet && <InsightsCard insights={insights} isLoading={isLoadingInsights} />}
             </>
           )}
         </div>

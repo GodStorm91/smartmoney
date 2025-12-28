@@ -586,7 +586,9 @@
     "priceUp20": "価格+20%の場合",
     "priceDown20": "価格-20%の場合",
     "insightsDisclaimer": "これは教育的な分析であり、投資アドバイスではありません。",
-    "valueHistory": "価値履歴"
+    "valueHistory": "価値履歴",
+    "noHistoricalDataTitle": "履歴データなし",
+    "noHistoricalDataMessage": "ポジションのスナップショットは毎日取得されます。パフォーマンス追跡とインサイトは明日以降にご確認ください。"
   },
   "budget": {
     "title": "予算",
