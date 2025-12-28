@@ -22,6 +22,7 @@ from ..schemas.crypto_wallet import (
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
+from ..services.defillama_service import DeFiLlamaService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -277,3 +278,17 @@ async def capture_snapshots_manual(
     """Manually trigger snapshot capture for all wallets (admin/testing)."""
     stats = await DefiSnapshotService.capture_all_snapshots(db)
     return {"message": "Snapshots captured", "stats": stats}
+
+
+@router.get("/apy/{protocol}/{symbol}")
+async def get_protocol_apy(
+    protocol: str,
+    symbol: str,
+    chain: str | None = None,
+    current_user: User = Depends(get_current_user),
+):
+    """Get current APY data for a protocol/symbol from DeFiLlama."""
+    apy_data = await DeFiLlamaService.match_position_to_pool(protocol, symbol, chain or "")
+    if not apy_data:
+        raise HTTPException(status_code=404, detail="APY data not found for this position")
+    return apy_data

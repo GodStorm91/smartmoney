@@ -16,6 +16,7 @@ from ..schemas.crypto_wallet import (
     WalletPerformanceResponse,
 )
 from .zerion_api_service import ZerionApiService
+from .defillama_service import DeFiLlamaService
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +51,19 @@ class DefiSnapshotService:
                 )
 
                 for pos in positions:
-                    # Use dialect-appropriate insert with ON CONFLICT DO NOTHING
+                    # Try to get APY from DeFiLlama
+                    protocol_apy = None
+                    try:
+                        apy_data = await DeFiLlamaService.match_position_to_pool(
+                            pos.get("protocol", ""),
+                            pos.get("symbol", ""),
+                            pos.get("chain_id", "")
+                        )
+                        if apy_data and apy_data.get("apy") is not None:
+                            protocol_apy = Decimal(str(apy_data["apy"]))
+                    except Exception as e:
+                        logger.debug(f"APY lookup failed for {pos.get('symbol')}: {e}")
+
                     snapshot_data = {
                         "user_id": wallet.user_id,
                         "wallet_address": wallet.wallet_address,
@@ -63,6 +76,7 @@ class DefiSnapshotService:
                         "balance": Decimal(str(pos.get("balance", 0))),
                         "balance_usd": Decimal(str(pos.get("balance_usd", 0))),
                         "price_usd": Decimal(str(pos.get("price_usd", 0))) if pos.get("price_usd") else None,
+                        "protocol_apy": protocol_apy,
                         "snapshot_date": today,
                     }
 
@@ -131,6 +145,19 @@ class DefiSnapshotService:
                     stats["skipped"] += 1
                     continue
 
+                # Try to get APY from DeFiLlama
+                protocol_apy = None
+                try:
+                    apy_data = await DeFiLlamaService.match_position_to_pool(
+                        pos.get("protocol", ""),
+                        pos.get("symbol", ""),
+                        pos.get("chain_id", "")
+                    )
+                    if apy_data and apy_data.get("apy") is not None:
+                        protocol_apy = Decimal(str(apy_data["apy"]))
+                except Exception as e:
+                    logger.debug(f"APY lookup failed for {pos.get('symbol')}: {e}")
+
                 snapshot = DefiPositionSnapshot(
                     user_id=user_id,
                     wallet_address=wallet.wallet_address,
@@ -143,6 +170,7 @@ class DefiSnapshotService:
                     balance=Decimal(str(pos.get("balance", 0))),
                     balance_usd=Decimal(str(pos.get("balance_usd", 0))),
                     price_usd=Decimal(str(pos.get("price_usd", 0))) if pos.get("price_usd") else None,
+                    protocol_apy=protocol_apy,
                     snapshot_date=today,
                 )
                 db.add(snapshot)
