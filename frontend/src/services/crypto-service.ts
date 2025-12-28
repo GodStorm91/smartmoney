@@ -103,7 +103,7 @@ export async function fetchPositionHistory(
   days: number = 30
 ): Promise<PositionHistory> {
   const response = await apiClient.get<PositionHistory>(
-    `/api/crypto/positions/${positionId}/history`,
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/history`,
     { params: { days } }
   )
   return response.data
@@ -111,7 +111,7 @@ export async function fetchPositionHistory(
 
 export async function fetchPositionPerformance(positionId: string): Promise<PositionPerformance> {
   const response = await apiClient.get<PositionPerformance>(
-    `/api/crypto/positions/${positionId}/performance`
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/performance`
   )
   return response.data
 }
@@ -121,7 +121,7 @@ export async function fetchPositionInsights(
   language: string = 'en'
 ): Promise<PositionInsights> {
   const response = await apiClient.get<PositionInsights>(
-    `/api/crypto/positions/${positionId}/insights`,
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/insights`,
     { params: { language } }
   )
   return response.data
