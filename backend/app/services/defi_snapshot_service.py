@@ -50,7 +50,18 @@ class DefiSnapshotService:
                     wallet.chains
                 )
 
+                # Deduplicate positions by ID - aggregate balances for same position
+                position_map: dict = {}
                 for pos in positions:
+                    pos_id = pos.get("id", "")
+                    if pos_id in position_map:
+                        # Aggregate balances for duplicate position IDs
+                        position_map[pos_id]["balance"] = float(position_map[pos_id].get("balance", 0)) + float(pos.get("balance", 0))
+                        position_map[pos_id]["balance_usd"] = float(position_map[pos_id].get("balance_usd", 0)) + float(pos.get("balance_usd", 0))
+                    else:
+                        position_map[pos_id] = pos.copy()
+
+                for pos in position_map.values():
                     # Try to get APY from DeFiLlama
                     protocol_apy = None
                     try:
