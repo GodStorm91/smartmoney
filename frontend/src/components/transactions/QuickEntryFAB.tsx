@@ -129,13 +129,15 @@ export function QuickEntryFAB() {
     if (isNaN(inputValue)) return null
 
     // Convert: input currency → account currency
-    // rates are relative to JPY (e.g., USD: 150 means 1 USD = 150 JPY)
+    // rates are relative to JPY (e.g., VND: 160 means 1 JPY = 160 VND)
     const inputRate = rates[inputCurrency] || 1 // JPY = 1
     const accountRate = rates[accountCurrency] || 1
 
-    // Convert input to JPY first, then to account currency
-    const inJPY = inputValue * inputRate
-    const converted = Math.round(inJPY / accountRate)
+    // Convert input to JPY first (divide by rate), then to account currency (multiply by rate)
+    // Example: 10,000,000 VND / 160 = 62,500 JPY
+    // Example: 62,500 JPY * 0.00667 = 417 USD
+    const inJPY = inputValue / inputRate
+    const converted = Math.round(inJPY * accountRate)
 
     return {
       value: converted,
