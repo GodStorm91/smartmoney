@@ -377,12 +377,12 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden min-w-0"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             {/* Stacked token logos */}
             <div className="relative flex -space-x-2">
               {group.tokens.slice(0, 3).map((token, i) =>
@@ -408,8 +408,8 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                 )
               )}
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white truncate">
                 {group.protocol} - {group.name}
               </h2>
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -424,14 +424,14 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg flex-shrink-0"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto max-h-[calc(90vh-80px)] space-y-4">
+        <div className="p-4 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-80px)] space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
