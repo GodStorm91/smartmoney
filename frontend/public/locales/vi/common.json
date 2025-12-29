@@ -100,19 +100,6 @@
     "sortAmountDesc": "Số tiền ↓",
     "sortAmountAsc": "Số tiền ↑"
   },
-  "transaction": {
-    "editTitle": "Chỉnh sửa giao dịch",
-    "date": "Ngày",
-    "description": "Mô tả",
-    "amount": "Số tiền",
-    "type": "Loại",
-    "typeIncome": "Thu nhập",
-    "typeExpense": "Chi tiêu",
-    "category": "Danh mục",
-    "source": "Nguồn",
-    "deleteTransaction": "Xóa giao dịch này",
-    "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?"
-  },
   "upload": {
     "title": "Tải lên CSV",
     "subtitle": "Tải lên tệp CSV được xuất từ ngân hàng hoặc ứng dụng",
@@ -354,16 +341,22 @@
     }
   },
   "transaction": {
+    "editTitle": "Chỉnh sửa giao dịch",
     "addTransaction": "Thêm giao dịch",
     "expense": "Chi tiêu",
     "income": "Thu nhập",
     "date": "Ngày",
     "amount": "Số tiền",
+    "type": "Loại",
+    "typeIncome": "Thu nhập",
+    "typeExpense": "Chi tiêu",
     "description": "Mô tả",
     "descriptionPlaceholder": "Giao dịch này là gì?",
     "category": "Danh mục",
     "source": "Tài khoản",
     "selectAccount": "Chọn tài khoản",
+    "deleteTransaction": "Xóa giao dịch này",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
       "descriptionRequired": "Mô tả là bắt buộc",

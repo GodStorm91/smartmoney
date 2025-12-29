@@ -29,10 +29,25 @@ export function TransactionEditModal({
   const [date, setDate] = useState('')
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
+  const [displayAmount, setDisplayAmount] = useState('')
   const [category, setCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Format number with thousand separators
+  const formatWithSeparators = (value: string): string => {
+    const num = value.replace(/[^\d]/g, '')
+    if (!num) return ''
+    return Number(num).toLocaleString()
+  }
+
+  // Handle amount input with formatting
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/[^\d]/g, '')
+    setAmount(raw)
+    setDisplayAmount(formatWithSeparators(raw))
+  }
 
   // Update mutation
   const updateMutation = useMutation({
@@ -62,7 +77,9 @@ export function TransactionEditModal({
     if (transaction && isOpen) {
       setDate(transaction.date)
       setDescription(transaction.description)
-      setAmount(Math.abs(transaction.amount).toString())
+      const absAmount = Math.abs(transaction.amount).toString()
+      setAmount(absAmount)
+      setDisplayAmount(formatWithSeparators(absAmount))
       setCategory(transaction.category)
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
@@ -157,11 +174,10 @@ export function TransactionEditModal({
 
               <Input
                 label={t('transaction.amount')}
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                min="0"
-                step="1"
+                type="text"
+                inputMode="numeric"
+                value={displayAmount}
+                onChange={handleAmountChange}
                 required
               />
 

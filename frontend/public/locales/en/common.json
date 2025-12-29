@@ -100,19 +100,6 @@
     "sortAmountDesc": "Amount ↓",
     "sortAmountAsc": "Amount ↑"
   },
-  "transaction": {
-    "editTitle": "Edit Transaction",
-    "date": "Date",
-    "description": "Description",
-    "amount": "Amount",
-    "type": "Type",
-    "typeIncome": "Income",
-    "typeExpense": "Expense",
-    "category": "Category",
-    "source": "Source",
-    "deleteTransaction": "Delete this transaction",
-    "deleteConfirm": "Are you sure you want to delete this transaction?"
-  },
   "upload": {
     "title": "CSV Upload",
     "subtitle": "Upload CSV file exported from your bank or app",
@@ -355,15 +342,21 @@
   },
   "transaction": {
     "addTransaction": "Add Transaction",
+    "editTitle": "Edit Transaction",
     "expense": "Expense",
     "income": "Income",
     "date": "Date",
     "amount": "Amount",
     "description": "Description",
     "descriptionPlaceholder": "What was this for?",
+    "type": "Type",
+    "typeIncome": "Income",
+    "typeExpense": "Expense",
     "category": "Category",
     "source": "Account",
     "selectAccount": "Select account",
+    "deleteTransaction": "Delete this transaction",
+    "deleteConfirm": "Are you sure you want to delete this transaction?",
     "errors": {
       "amountRequired": "Amount is required",
       "descriptionRequired": "Description is required",
@@ -453,6 +446,7 @@
   "account": {
     "account": "Account",
     "accounts": "Accounts",
+    "selectAccount": "Select account",
     "manageYourAccounts": "Manage your accounts",
     "createAccount": "Create Account",
     "editAccount": "Edit Account",
