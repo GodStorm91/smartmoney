@@ -289,7 +289,7 @@ class PositionPerformanceResponse(BaseModel):
     current_value_usd: Decimal
     total_return_usd: Decimal
     total_return_pct: float
-    annualized_return_pct: float
+    annualized_return_pct: Optional[float] = None
     current_apy: Optional[float] = None
     snapshot_count: int
 
