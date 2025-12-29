@@ -30,6 +30,7 @@ from ..schemas.crypto_wallet import (
     PositionROIResponse,
     PositionCostBasisCreate,
     PositionCostBasisResponse,
+    HodlScenariosResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
@@ -627,3 +628,40 @@ async def get_position_cost_basis(
     if not cost_basis:
         raise HTTPException(status_code=404, detail="Cost basis not found")
     return cost_basis
+
+
+# ==================== HODL Scenarios Endpoints ====================
+
+@router.post("/positions/scenarios", response_model=HodlScenariosResponse)
+async def get_hodl_scenarios(
+    position_ids: list[str],
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Calculate HODL scenarios for LP position tokens.
+
+    Compares different strategies:
+    - 100% Token A: What if all funds were in token A?
+    - 100% Token B: What if all funds were in token B?
+    - 50/50 HODL: What if tokens were held without LP?
+    - Current LP: Actual LP position value
+
+    Args:
+        position_ids: List of position IDs for tokens in the same LP pool
+    """
+    from ..services.hodl_scenario_service import HodlScenarioService
+
+    if not position_ids:
+        raise HTTPException(status_code=400, detail="No position IDs provided")
+
+    scenarios = HodlScenarioService.calculate_scenarios(
+        db, current_user.id, position_ids
+    )
+
+    if not scenarios:
+        raise HTTPException(
+            status_code=400,
+            detail="Insufficient data for scenario calculation (need at least 2 snapshots with 2+ tokens)"
+        )
+
+    return HodlScenariosResponse(**scenarios)

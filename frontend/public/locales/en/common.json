@@ -608,7 +608,18 @@
     "claimedRewards": "Claimed Rewards",
     "noRewards": "No rewards claimed for this position yet.",
     "scanRewards": "Scan for Rewards",
-    "scanComplete": "Found {{new}} new claims"
+    "scanComplete": "Found {{new}} new claims",
+    "hodlScenarios": {
+      "title": "HODL Scenarios",
+      "lpWinning": "LP winning ({{pct}})",
+      "alternativeBetter": "{{name}} would be +${{diff}} better",
+      "initialValue": "Initial",
+      "period": "Period",
+      "insight": "Holding {{name}} would have earned ${{diff}} more than LP",
+      "lpOptimal": "LP strategy is currently optimal"
+    },
+    "tokenBreakdown": "Token Breakdown",
+    "combinedValue": "Combined Value"
   },
   "budget": {
     "title": "Budget",

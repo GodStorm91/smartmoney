@@ -16,6 +16,7 @@ import {
 import type { DefiPosition, PositionPerformance, PositionInsights } from '@/types'
 import { CHAIN_INFO, ChainId } from '@/types/crypto'
 import { PositionPerformanceChart } from './PositionPerformanceChart'
+import { HodlScenariosCard } from './HodlScenariosCard'
 import type { GroupedPosition } from '@/components/accounts/LPPositionsSection'
 
 interface PositionDetailModalProps {
@@ -516,6 +517,11 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
               {/* Impermanent Loss */}
               {performance && <ILCard performance={performance} />}
+
+              {/* HODL Scenarios - only for multi-token positions */}
+              {group.tokens.length >= 2 && (
+                <HodlScenariosCard positionIds={group.tokens.map((t) => t.id)} />
+              )}
 
               {/* AI Insights - only show if we have performance data */}
               {!noDataYet && <InsightsCard insights={insights} isLoading={isLoadingInsights} />}

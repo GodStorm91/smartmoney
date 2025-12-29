@@ -285,6 +285,27 @@ export interface PositionCostBasis {
   created_at: string
 }
 
+// HODL Scenarios
+export interface HodlScenarioItem {
+  name: string
+  symbol: string
+  type: 'single_token' | 'hodl_balanced' | 'lp'
+  value_usd: number
+  return_pct: number
+  return_usd: number
+}
+
+export interface HodlScenariosResponse {
+  initial_date: string
+  current_date: string
+  days_held: number
+  initial_value_usd: number
+  tokens: string[]
+  scenarios: HodlScenarioItem[]
+  winner: string | null
+  winner_vs_lp_usd: number
+}
+
 // Chain display info
 export const CHAIN_INFO: Record<ChainId, { name: string; icon: string; color: string }> = {
   eth: { name: 'Ethereum', icon: '⟠', color: '#627EEA' },

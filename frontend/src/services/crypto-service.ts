@@ -20,6 +20,7 @@ import type {
   PositionROI,
   PositionCostBasis,
   PositionCostBasisCreate,
+  HodlScenariosResponse,
 } from '@/types'
 
 // ==================== Wallet APIs ====================
@@ -219,6 +220,16 @@ export async function createCostBasis(data: PositionCostBasisCreate): Promise<Po
 export async function fetchPositionCostBasis(positionId: string): Promise<PositionCostBasis> {
   const response = await apiClient.get<PositionCostBasis>(
     `/api/crypto/positions/${encodeURIComponent(positionId)}/cost-basis`
+  )
+  return response.data
+}
+
+// ==================== HODL Scenarios APIs ====================
+
+export async function fetchHodlScenarios(positionIds: string[]): Promise<HodlScenariosResponse> {
+  const response = await apiClient.post<HodlScenariosResponse>(
+    '/api/crypto/positions/scenarios',
+    positionIds
   )
   return response.data
 }

@@ -436,5 +436,31 @@ class PositionCostBasisResponse(BaseModel):
         from_attributes = True
 
 
+# ==================== HODL Scenarios ====================
+
+class HodlScenarioItem(BaseModel):
+    """Schema for individual HODL scenario."""
+
+    name: str  # e.g., "100% WETH", "50/50 HODL", "Current LP"
+    symbol: str
+    type: str  # single_token, hodl_balanced, lp
+    value_usd: Decimal
+    return_pct: float
+    return_usd: Decimal
+
+
+class HodlScenariosResponse(BaseModel):
+    """Schema for HODL scenarios comparison."""
+
+    initial_date: str
+    current_date: str
+    days_held: int
+    initial_value_usd: Decimal
+    tokens: list[str]
+    scenarios: list[HodlScenarioItem]
+    winner: Optional[str] = None
+    winner_vs_lp_usd: Decimal = Decimal(0)
+
+
 # Update forward reference
 CryptoWalletWithBalanceResponse.model_rebuild()

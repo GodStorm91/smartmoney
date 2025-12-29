@@ -608,7 +608,18 @@
     "claimedRewards": "獲得した報酬",
     "noRewards": "このポジションの報酬はまだありません。",
     "scanRewards": "報酬をスキャン",
-    "scanComplete": "{{new}}件の新規クレームを検出"
+    "scanComplete": "{{new}}件の新規クレームを検出",
+    "hodlScenarios": {
+      "title": "HODLシナリオ",
+      "lpWinning": "LP優勢 ({{pct}})",
+      "alternativeBetter": "{{name}}なら+${{diff}}良い結果",
+      "initialValue": "初期値",
+      "period": "期間",
+      "insight": "{{name}}を保有していれば、LPより${{diff}}多く稼げた",
+      "lpOptimal": "LP戦略が現在最適"
+    },
+    "tokenBreakdown": "トークン内訳",
+    "combinedValue": "合計価値"
   },
   "budget": {
     "title": "予算",

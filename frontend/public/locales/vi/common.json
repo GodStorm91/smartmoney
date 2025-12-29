@@ -607,7 +607,18 @@
     "claimedRewards": "Phần Thưởng Đã Nhận",
     "noRewards": "Chưa có phần thưởng nào cho vị thế này.",
     "scanRewards": "Quét Phần Thưởng",
-    "scanComplete": "Tìm thấy {{new}} lần nhận mới"
+    "scanComplete": "Tìm thấy {{new}} lần nhận mới",
+    "hodlScenarios": {
+      "title": "Kịch Bản HODL",
+      "lpWinning": "LP đang thắng ({{pct}})",
+      "alternativeBetter": "{{name}} sẽ tốt hơn +${{diff}}",
+      "initialValue": "Giá trị ban đầu",
+      "period": "Thời gian",
+      "insight": "Giữ {{name}} sẽ kiếm được ${{diff}} nhiều hơn LP",
+      "lpOptimal": "Chiến lược LP hiện đang tối ưu"
+    },
+    "tokenBreakdown": "Chi Tiết Token",
+    "combinedValue": "Giá Trị Kết Hợp"
   },
   "budget": {
     "title": "Ngân sách",
