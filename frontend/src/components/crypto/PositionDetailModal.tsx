@@ -22,10 +22,11 @@ interface PositionDetailModalProps {
   onClose: () => void
 }
 
-/** Format number with sign */
-function formatWithSign(value: number, decimals: number = 2): string {
-  const sign = value >= 0 ? '+' : ''
-  return `${sign}${value.toFixed(decimals)}`
+/** Format number with sign - handles string values from API */
+function formatWithSign(value: number | string, decimals: number = 2): string {
+  const num = Number(value)
+  const sign = num >= 0 ? '+' : ''
+  return `${sign}${num.toFixed(decimals)}`
 }
 
 /** Risk level badge component */
@@ -46,7 +47,7 @@ function RiskBadge({ level }: { level: string }) {
 /** Performance metrics card */
 function PerformanceCard({ performance }: { performance: PositionPerformance }) {
   const { t } = useTranslation('common')
-  const isPositive = performance.total_return_pct >= 0
+  const isPositive = Number(performance.total_return_pct) >= 0
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
@@ -69,7 +70,7 @@ function PerformanceCard({ performance }: { performance: PositionPerformance }) 
         {/* Annualized */}
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.annualized')}</p>
-          <p className={`text-lg font-bold ${performance.annualized_return_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className={`text-lg font-bold ${Number(performance.annualized_return_pct) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatWithSign(performance.annualized_return_pct)}%
           </p>
           <p className="text-xs text-gray-500">{performance.days_held} {t('crypto.days')}</p>
@@ -79,10 +80,10 @@ function PerformanceCard({ performance }: { performance: PositionPerformance }) 
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.currentValue')}</p>
           <p className="text-lg font-bold text-gray-900 dark:text-white">
-            ${performance.current_value_usd.toFixed(2)}
+            ${Number(performance.current_value_usd).toFixed(2)}
           </p>
           <p className="text-xs text-gray-500">
-            {t('crypto.from')} ${performance.start_value_usd.toFixed(2)}
+            {t('crypto.from')} ${Number(performance.start_value_usd).toFixed(2)}
           </p>
         </div>
 
@@ -90,7 +91,7 @@ function PerformanceCard({ performance }: { performance: PositionPerformance }) 
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.currentApy')}</p>
           <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-            {performance.current_apy != null ? `${performance.current_apy.toFixed(2)}%` : 'N/A'}
+            {performance.current_apy != null ? `${Number(performance.current_apy).toFixed(2)}%` : 'N/A'}
           </p>
           <p className="text-xs text-gray-500">{performance.snapshot_count} {t('crypto.snapshots')}</p>
         </div>
@@ -116,7 +117,7 @@ function ILCard({ performance }: { performance: PositionPerformance }) {
     )
   }
 
-  const ilIsNegative = performance.il_percentage < 0
+  const ilIsNegative = Number(performance.il_percentage) < 0
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
@@ -129,10 +130,10 @@ function ILCard({ performance }: { performance: PositionPerformance }) {
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.ilPercentage')}</p>
           <p className={`text-lg font-bold ${ilIsNegative ? 'text-red-600' : 'text-green-600'}`}>
-            {performance.il_percentage.toFixed(2)}%
+            {Number(performance.il_percentage).toFixed(2)}%
           </p>
           <p className="text-xs text-gray-500">
-            ${performance.il_usd?.toFixed(2) || '0.00'}
+            ${performance.il_usd != null ? Number(performance.il_usd).toFixed(2) : '0.00'}
           </p>
         </div>
 
@@ -140,7 +141,7 @@ function ILCard({ performance }: { performance: PositionPerformance }) {
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.hodlValue')}</p>
           <p className="text-lg font-bold text-gray-900 dark:text-white">
-            ${performance.hodl_value_usd?.toFixed(2) || 'N/A'}
+            ${performance.hodl_value_usd != null ? Number(performance.hodl_value_usd).toFixed(2) : 'N/A'}
           </p>
         </div>
 
@@ -160,7 +161,7 @@ function ILCard({ performance }: { performance: PositionPerformance }) {
               </>
             )}
             <span className="text-gray-500 text-sm">
-              (${Math.abs(performance.lp_vs_hodl_usd || 0).toFixed(2)})
+              (${Math.abs(Number(performance.lp_vs_hodl_usd) || 0).toFixed(2)})
             </span>
           </div>
         </div>
@@ -172,7 +173,7 @@ function ILCard({ performance }: { performance: PositionPerformance }) {
             <p className="text-green-600 font-bold">
               {formatWithSign(performance.estimated_yield_pct)}%
               <span className="text-gray-500 text-sm ml-2">
-                (${performance.estimated_yield_usd?.toFixed(2) || '0.00'})
+                (${performance.estimated_yield_usd != null ? Number(performance.estimated_yield_usd).toFixed(2) : '0.00'})
               </span>
             </p>
           </div>
