@@ -66,17 +66,17 @@ export function HodlScenariosCard({ positionIds }: HodlScenariosCardProps) {
   // Find winner and LP for comparison
   const lpScenario = scenarios.scenarios.find(s => s.type === 'lp')
   const winner = scenarios.scenarios[0] // Already sorted by value desc
-  const maxValue = winner?.value_usd || 0
+  const maxValue = Number(winner?.value_usd) || 0
 
   // Summary text for collapsed view
   const getSummaryText = () => {
     if (!winner || !lpScenario) return ''
 
     if (winner.type === 'lp') {
-      return t('crypto.hodlScenarios.lpWinning', { pct: formatReturn(winner.return_pct) })
+      return t('crypto.hodlScenarios.lpWinning', { pct: formatReturn(Number(winner.return_pct)) })
     }
 
-    const diff = winner.value_usd - lpScenario.value_usd
+    const diff = Number(winner.value_usd) - Number(lpScenario.value_usd)
     return t('crypto.hodlScenarios.alternativeBetter', {
       name: winner.name,
       diff: diff.toFixed(2),
@@ -129,7 +129,7 @@ export function HodlScenariosCard({ positionIds }: HodlScenariosCardProps) {
           <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
               <span>
-                {t('crypto.hodlScenarios.initialValue')}: ${scenarios.initial_value_usd.toFixed(2)}
+                {t('crypto.hodlScenarios.initialValue')}: ${Number(scenarios.initial_value_usd).toFixed(2)}
               </span>
               <span>
                 {t('crypto.hodlScenarios.period')}: {scenarios.days_held} {t('crypto.days')}
@@ -141,7 +141,7 @@ export function HodlScenariosCard({ positionIds }: HodlScenariosCardProps) {
               <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
                 💡 {t('crypto.hodlScenarios.insight', {
                   name: winner.name,
-                  diff: Math.abs(scenarios.winner_vs_lp_usd).toFixed(2),
+                  diff: Math.abs(Number(scenarios.winner_vs_lp_usd)).toFixed(2),
                 })}
               </p>
             )}
@@ -170,8 +170,8 @@ function ScenarioBar({
   isWinner: boolean
   isLp: boolean
 }) {
-  const barWidth = getBarWidth(scenario.value_usd, maxValue)
-  const returnColor = getReturnColor(scenario.return_pct)
+  const barWidth = getBarWidth(Number(scenario.value_usd), maxValue)
+  const returnColor = getReturnColor(Number(scenario.return_pct))
 
   // Bar color based on type
   const getBarColor = () => {
@@ -200,15 +200,15 @@ function ScenarioBar({
         </div>
         <div className="flex items-center gap-2">
           <span className="font-semibold text-gray-900 dark:text-white">
-            ${scenario.value_usd.toFixed(2)}
+            ${Number(scenario.value_usd).toFixed(2)}
           </span>
           <span className={`flex items-center gap-0.5 text-sm ${returnColor}`}>
-            {scenario.return_pct >= 0 ? (
+            {Number(scenario.return_pct) >= 0 ? (
               <TrendingUp className="w-3 h-3" />
             ) : (
               <TrendingDown className="w-3 h-3" />
             )}
-            {formatReturn(scenario.return_pct)}
+            {formatReturn(Number(scenario.return_pct))}
           </span>
         </div>
       </div>
