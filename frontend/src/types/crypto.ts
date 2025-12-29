@@ -218,6 +218,73 @@ export interface ILScenario {
   vs_hodl: string
 }
 
+// Position Reward types
+export interface PositionReward {
+  id: number
+  position_id: string | null
+  wallet_address: string
+  chain_id: string
+  reward_token_address: string
+  reward_token_symbol: string | null
+  reward_amount: number
+  reward_usd: number | null
+  claimed_at: string
+  tx_hash: string
+  block_number: number | null
+  source: 'merkl' | 'direct' | 'manual'
+  merkl_campaign_id: string | null
+  is_attributed: boolean
+  created_at: string
+}
+
+export interface RewardsScanResult {
+  scanned_claims: number
+  new_claims: number
+  matched: number
+  unmatched: number
+}
+
+export interface PositionROI {
+  position_id: string
+  current_value_usd: number
+  cost_basis_usd: number | null
+  total_rewards_usd: number
+  rewards_count: number
+  simple_roi_pct: number | null
+  annualized_roi_pct: number | null
+  days_held: number | null
+}
+
+export interface PositionCostBasisCreate {
+  position_id: string
+  wallet_address: string
+  chain_id?: string
+  vault_address: string
+  total_usd: number
+  deposited_at: string
+  tx_hash: string
+  token_a_symbol?: string
+  token_a_amount?: number
+  token_b_symbol?: string
+  token_b_amount?: number
+}
+
+export interface PositionCostBasis {
+  id: number
+  position_id: string
+  wallet_address: string
+  chain_id: string
+  vault_address: string
+  token_a_symbol: string | null
+  token_a_amount: number | null
+  token_b_symbol: string | null
+  token_b_amount: number | null
+  total_usd: number
+  deposited_at: string
+  tx_hash: string
+  created_at: string
+}
+
 // Chain display info
 export const CHAIN_INFO: Record<ChainId, { name: string; icon: string; color: string }> = {
   eth: { name: 'Ethereum', icon: '⟠', color: '#627EEA' },

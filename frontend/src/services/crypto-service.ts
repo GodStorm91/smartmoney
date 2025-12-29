@@ -15,6 +15,11 @@ import type {
   PositionInsights,
   PortfolioInsights,
   ILScenario,
+  PositionReward,
+  RewardsScanResult,
+  PositionROI,
+  PositionCostBasis,
+  PositionCostBasisCreate,
 } from '@/types'
 
 // ==================== Wallet APIs ====================
@@ -162,5 +167,58 @@ export async function backfillWalletSnapshots(
   walletId: number
 ): Promise<{ message: string; stats: { positions: number; skipped: number } }> {
   const response = await apiClient.post(`/api/crypto/wallets/${walletId}/backfill`)
+  return response.data
+}
+
+// ==================== Position Rewards APIs ====================
+
+export async function fetchPositionRewards(): Promise<PositionReward[]> {
+  const response = await apiClient.get<PositionReward[]>('/api/crypto/rewards')
+  return response.data
+}
+
+export async function fetchUnattributedRewards(): Promise<PositionReward[]> {
+  const response = await apiClient.get<PositionReward[]>('/api/crypto/rewards/unattributed')
+  return response.data
+}
+
+export async function attributeReward(rewardId: number, positionId: string): Promise<PositionReward> {
+  const response = await apiClient.post<PositionReward>(
+    `/api/crypto/rewards/${rewardId}/attribute`,
+    { position_id: positionId }
+  )
+  return response.data
+}
+
+export async function scanRewards(days: number = 90): Promise<RewardsScanResult> {
+  const response = await apiClient.post<RewardsScanResult>('/api/crypto/rewards/scan', { days })
+  return response.data
+}
+
+export async function fetchPositionROI(positionId: string): Promise<PositionROI> {
+  const response = await apiClient.get<PositionROI>(
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/roi`
+  )
+  return response.data
+}
+
+export async function fetchPositionRewardsList(positionId: string): Promise<PositionReward[]> {
+  const response = await apiClient.get<PositionReward[]>(
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/rewards`
+  )
+  return response.data
+}
+
+// ==================== Cost Basis APIs ====================
+
+export async function createCostBasis(data: PositionCostBasisCreate): Promise<PositionCostBasis> {
+  const response = await apiClient.post<PositionCostBasis>('/api/crypto/cost-basis', data)
+  return response.data
+}
+
+export async function fetchPositionCostBasis(positionId: string): Promise<PositionCostBasis> {
+  const response = await apiClient.get<PositionCostBasis>(
+    `/api/crypto/positions/${encodeURIComponent(positionId)}/cost-basis`
+  )
   return response.data
 }

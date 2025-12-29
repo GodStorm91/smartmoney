@@ -164,3 +164,72 @@ class DefiPositionSnapshot(Base):
         Index("ix_defi_snapshots_position", "position_id"),
         Index("ix_defi_snapshots_unique", "user_id", "position_id", "snapshot_date", unique=True),
     )
+
+
+class PositionReward(Base):
+    """Claimed rewards linked to LP positions."""
+
+    __tablename__ = "position_rewards"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    position_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    # Reward details
+    reward_token_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    reward_token_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    reward_amount: Mapped[Decimal] = mapped_column(Numeric(30, 18), nullable=False)
+    reward_usd: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+
+    # Claim info
+    claimed_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    tx_hash: Mapped[str] = mapped_column(String(66), nullable=False, unique=True)
+    block_number: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+
+    # Attribution
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default="merkl")
+    merkl_campaign_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    is_attributed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    # Timestamps
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    user: Mapped["User"] = relationship("User", lazy="select")
+
+
+class PositionCostBasis(Base):
+    """Track initial deposits for ROI calculation."""
+
+    __tablename__ = "position_cost_basis"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    position_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    wallet_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    chain_id: Mapped[str] = mapped_column(String(20), nullable=False)
+
+    # Deposit details
+    vault_address: Mapped[str] = mapped_column(String(42), nullable=False)
+    token_a_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    token_a_amount: Mapped[Decimal | None] = mapped_column(Numeric(30, 18), nullable=True)
+    token_b_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    token_b_amount: Mapped[Decimal | None] = mapped_column(Numeric(30, 18), nullable=True)
+    total_usd: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
+
+    # Transaction info
+    deposited_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    tx_hash: Mapped[str] = mapped_column(String(66), nullable=False)
+    block_number: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+
+    user: Mapped["User"] = relationship("User", lazy="select")

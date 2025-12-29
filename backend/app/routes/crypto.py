@@ -23,6 +23,13 @@ from ..schemas.crypto_wallet import (
     ILScenarioResponse,
     PositionInsightsResponse,
     PortfolioInsightsResponse,
+    PositionRewardResponse,
+    PositionRewardAttribute,
+    RewardsScanRequest,
+    RewardsScanResponse,
+    PositionROIResponse,
+    PositionCostBasisCreate,
+    PositionCostBasisResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
@@ -473,3 +480,150 @@ async def get_portfolio_insights(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to generate portfolio insights: {str(e)}")
+
+
+# ==================== Position Reward Endpoints ====================
+
+@router.get("/rewards", response_model=list[PositionRewardResponse])
+async def get_rewards(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all reward claims."""
+    from ..services.reward_service import RewardService
+    return RewardService.get_all_rewards(db, current_user.id)
+
+
+@router.get("/rewards/unattributed", response_model=list[PositionRewardResponse])
+async def get_unattributed_rewards(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get unattributed rewards that need manual assignment."""
+    from ..services.reward_service import RewardService
+    return RewardService.get_unattributed_rewards(db, current_user.id)
+
+
+@router.post("/rewards/{reward_id}/attribute", response_model=PositionRewardResponse)
+async def attribute_reward(
+    reward_id: int,
+    body: PositionRewardAttribute,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Manually attribute a reward to a position."""
+    from ..services.reward_matching_service import RewardMatchingService
+    from ..services.reward_service import RewardService
+
+    success = RewardMatchingService.manually_attribute_reward(
+        db, current_user.id, reward_id, body.position_id
+    )
+    if not success:
+        raise HTTPException(status_code=404, detail="Reward not found")
+
+    reward = RewardService.get_reward_by_id(db, current_user.id, reward_id)
+    return reward
+
+
+@router.post("/rewards/scan", response_model=RewardsScanResponse)
+async def scan_rewards(
+    body: RewardsScanRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Scan for historical Merkl claims."""
+    from ..services.reward_service import RewardService
+
+    wallets = CryptoWalletService.get_wallets(db, current_user.id)
+    if not wallets:
+        raise HTTPException(status_code=400, detail="No wallets registered")
+
+    total = {"scanned_claims": 0, "new_claims": 0, "matched": 0, "unmatched": 0}
+    for wallet in wallets:
+        if "polygon" in wallet.chains:
+            stats = await RewardService.scan_historical_claims(
+                db, current_user.id, wallet.wallet_address, days=body.days
+            )
+            total["scanned_claims"] += stats["scanned"]
+            total["new_claims"] += stats["new"]
+            total["matched"] += stats["matched"]
+            total["unmatched"] += stats["unmatched"]
+
+    return RewardsScanResponse(**total)
+
+
+@router.get("/positions/{position_id:path}/roi", response_model=PositionROIResponse)
+async def get_position_roi(
+    position_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get ROI including rewards for a position."""
+    from decimal import Decimal
+    from ..services.reward_service import RewardService
+    from ..services.zerion_api_service import ZerionApiService
+
+    # Get current position value from Zerion
+    wallets = CryptoWalletService.get_wallets(db, current_user.id)
+    current_value = Decimal(0)
+
+    for wallet in wallets:
+        positions_data = await ZerionApiService.get_defi_positions(
+            wallet.wallet_address, chains=["polygon"]
+        )
+        for pos in positions_data.get("positions", []):
+            if pos.get("id") == position_id:
+                current_value = Decimal(str(pos.get("balance_usd", 0)))
+                break
+
+    roi = await RewardService.calculate_position_roi(
+        db, current_user.id, position_id, current_value
+    )
+    if not roi:
+        raise HTTPException(status_code=404, detail="Position not found")
+
+    return PositionROIResponse(**roi)
+
+
+@router.get("/positions/{position_id:path}/rewards", response_model=list[PositionRewardResponse])
+async def get_position_rewards(
+    position_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all rewards for a specific position."""
+    from ..services.reward_service import RewardService
+    return RewardService.get_position_rewards(db, current_user.id, position_id)
+
+
+# ==================== Cost Basis Endpoints ====================
+
+@router.post("/cost-basis", response_model=PositionCostBasisResponse, status_code=201)
+async def create_cost_basis(
+    body: PositionCostBasisCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Add manual cost basis for a position."""
+    from ..services.cost_basis_service import CostBasisService
+
+    return CostBasisService.add_manual_cost_basis(
+        db=db,
+        user_id=current_user.id,
+        **body.model_dump()
+    )
+
+
+@router.get("/positions/{position_id:path}/cost-basis", response_model=PositionCostBasisResponse)
+async def get_position_cost_basis(
+    position_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get cost basis for a position."""
+    from ..services.cost_basis_service import CostBasisService
+
+    cost_basis = CostBasisService.get_position_cost_basis(db, current_user.id, position_id)
+    if not cost_basis:
+        raise HTTPException(status_code=404, detail="Cost basis not found")
+    return cost_basis

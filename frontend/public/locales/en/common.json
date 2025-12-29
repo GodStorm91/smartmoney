@@ -601,7 +601,20 @@
     "insightsDisclaimer": "This is educational analysis, not financial advice.",
     "valueHistory": "Value History",
     "noHistoricalDataTitle": "No Historical Data Yet",
-    "noHistoricalDataMessage": "Position snapshots are captured daily. Check back tomorrow for performance tracking and insights."
+    "noHistoricalDataMessage": "Position snapshots are captured daily. Check back tomorrow for performance tracking and insights.",
+    "unattributedRewards": "{{count}} Unassigned Rewards",
+    "unattributedRewardsDesc": "These rewards need to be assigned to a position for ROI tracking.",
+    "selectPosition": "Select position...",
+    "roiSummary": "ROI Summary",
+    "totalRewards": "Total Rewards",
+    "claims": "claims",
+    "roi": "ROI",
+    "daysHeld": "days",
+    "costBasis": "Cost Basis",
+    "claimedRewards": "Claimed Rewards",
+    "noRewards": "No rewards claimed for this position yet.",
+    "scanRewards": "Scan for Rewards",
+    "scanComplete": "Found {{new}} new claims"
   },
   "budget": {
     "title": "Budget",

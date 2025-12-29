@@ -4,7 +4,10 @@ from .budget import Budget, BudgetAllocation, BudgetFeedback
 from .category_rule import CategoryRule
 from .credit_purchase import CreditPurchase
 from .credit_transaction import CreditTransaction
-from .crypto_wallet import CryptoWallet, RewardContract, CryptoSyncState, RewardClaim, DefiPositionSnapshot
+from .crypto_wallet import (
+    CryptoWallet, RewardContract, CryptoSyncState, RewardClaim,
+    DefiPositionSnapshot, PositionReward, PositionCostBasis
+)
 from .exchange_rate import ExchangeRate
 from .goal import Goal
 from .recurring_transaction import RecurringTransaction
@@ -20,5 +23,5 @@ __all__ = [
     "Tag", "TransactionTag", "User", "Budget", "BudgetAllocation", "BudgetFeedback",
     "UserCredit", "CreditPurchase", "CreditTransaction", "CategoryRule",
     "CryptoWallet", "RewardContract", "CryptoSyncState", "RewardClaim",
-    "RecurringTransaction", "DefiPositionSnapshot"
+    "RecurringTransaction", "DefiPositionSnapshot", "PositionReward", "PositionCostBasis"
 ]

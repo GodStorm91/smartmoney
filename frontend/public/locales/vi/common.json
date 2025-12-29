@@ -601,7 +601,20 @@
     "insightsDisclaimer": "Đây là phân tích giáo dục, không phải tư vấn tài chính.",
     "valueHistory": "Lịch Sử Giá Trị",
     "noHistoricalDataTitle": "Chưa Có Dữ Liệu Lịch Sử",
-    "noHistoricalDataMessage": "Ảnh chụp vị thế được ghi nhận mỗi ngày. Quay lại vào ngày mai để theo dõi hiệu suất và xem phân tích."
+    "noHistoricalDataMessage": "Ảnh chụp vị thế được ghi nhận mỗi ngày. Quay lại vào ngày mai để theo dõi hiệu suất và xem phân tích.",
+    "unattributedRewards": "{{count}} Phần Thưởng Chưa Phân Bổ",
+    "unattributedRewardsDesc": "Các phần thưởng này cần được gán cho vị thế để theo dõi ROI.",
+    "selectPosition": "Chọn vị thế...",
+    "roiSummary": "Tóm Tắt ROI",
+    "totalRewards": "Tổng Phần Thưởng",
+    "claims": "lần nhận",
+    "roi": "ROI",
+    "daysHeld": "ngày",
+    "costBasis": "Giá Vốn",
+    "claimedRewards": "Phần Thưởng Đã Nhận",
+    "noRewards": "Chưa có phần thưởng nào cho vị thế này.",
+    "scanRewards": "Quét Phần Thưởng",
+    "scanComplete": "Tìm thấy {{new}} lần nhận mới"
   },
   "budget": {
     "title": "Ngân sách",

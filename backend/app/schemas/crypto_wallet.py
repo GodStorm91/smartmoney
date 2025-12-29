@@ -336,5 +336,105 @@ class PortfolioInsightsResponse(BaseModel):
     overall_assessment: str
 
 
+# Position Reward schemas
+class PositionRewardResponse(BaseModel):
+    """Schema for position reward response."""
+
+    id: int
+    position_id: Optional[str] = None
+    wallet_address: str
+    chain_id: str
+    reward_token_address: str
+    reward_token_symbol: Optional[str] = None
+    reward_amount: Decimal
+    reward_usd: Optional[Decimal] = None
+    claimed_at: datetime
+    tx_hash: str
+    block_number: Optional[int] = None
+    source: str
+    merkl_campaign_id: Optional[str] = None
+    is_attributed: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PositionRewardAttribute(BaseModel):
+    """Schema for manually attributing a reward to a position."""
+
+    position_id: str
+
+
+class RewardsScanRequest(BaseModel):
+    """Schema for reward scan request."""
+
+    days: int = Field(default=90, ge=1, le=365)
+
+
+class RewardsScanResponse(BaseModel):
+    """Schema for reward scan result."""
+
+    scanned_claims: int
+    new_claims: int
+    matched: int
+    unmatched: int
+
+
+class PositionROIResponse(BaseModel):
+    """Schema for position ROI including rewards."""
+
+    position_id: str
+    current_value_usd: Decimal
+    cost_basis_usd: Optional[Decimal] = None
+    total_rewards_usd: Decimal
+    rewards_count: int
+    simple_roi_pct: Optional[float] = None
+    annualized_roi_pct: Optional[float] = None
+    days_held: Optional[int] = None
+
+
+class PositionCostBasisCreate(BaseModel):
+    """Schema for creating a cost basis entry."""
+
+    position_id: str
+    wallet_address: str = Field(..., min_length=42, max_length=42, pattern=r"^0x[a-fA-F0-9]{40}$")
+    chain_id: str = "polygon"
+    vault_address: str = Field(..., min_length=42, max_length=42, pattern=r"^0x[a-fA-F0-9]{40}$")
+    total_usd: Decimal
+    deposited_at: datetime
+    tx_hash: str = Field(..., min_length=66, max_length=66)
+    token_a_symbol: Optional[str] = None
+    token_a_amount: Optional[Decimal] = None
+    token_b_symbol: Optional[str] = None
+    token_b_amount: Optional[Decimal] = None
+
+    @field_validator("wallet_address", "vault_address")
+    @classmethod
+    def lowercase_address(cls, v: str) -> str:
+        return v.lower()
+
+
+class PositionCostBasisResponse(BaseModel):
+    """Schema for cost basis response."""
+
+    id: int
+    position_id: str
+    wallet_address: str
+    chain_id: str
+    vault_address: str
+    token_a_symbol: Optional[str] = None
+    token_a_amount: Optional[Decimal] = None
+    token_b_symbol: Optional[str] = None
+    token_b_amount: Optional[Decimal] = None
+    total_usd: Decimal
+    deposited_at: datetime
+    tx_hash: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # Update forward reference
 CryptoWalletWithBalanceResponse.model_rebuild()
