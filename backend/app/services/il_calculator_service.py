@@ -125,8 +125,15 @@ class ILCalculatorService:
         total_return_usd = end_value - start_value
         total_return_pct = (total_return_usd / start_value) * 100
 
-        # Annualized return
-        annualized_return = ((end_value / start_value) ** (365 / days_held) - 1) * 100 if days_held > 0 else 0
+        # Annualized return - cap to reasonable bounds to avoid astronomical values
+        # When days_held is very small, compounding produces unrealistic numbers
+        if days_held >= 7:  # Only annualize if we have at least 7 days of data
+            annualized_return = ((end_value / start_value) ** (365 / days_held) - 1) * 100
+            # Cap to ±9999% to avoid display issues
+            annualized_return = max(-9999, min(9999, annualized_return))
+        else:
+            # For short periods, return None to indicate insufficient data
+            annualized_return = None
 
         # Calculate IL if price data available
         il_metrics = ILCalculatorService.calculate_il_from_snapshots(earliest, latest)
@@ -153,7 +160,7 @@ class ILCalculatorService:
             "current_value_usd": round(end_value, 2),
             "total_return_usd": round(total_return_usd, 2),
             "total_return_pct": round(total_return_pct, 2),
-            "annualized_return_pct": round(annualized_return, 2),
+            "annualized_return_pct": round(annualized_return, 2) if annualized_return is not None else None,
             "current_apy": round(current_apy, 2) if current_apy else None,
             "snapshot_count": len(snapshots),
         }

@@ -72,9 +72,13 @@ function PerformanceCard({ performance }: { performance: PositionPerformance }) 
         {/* Annualized */}
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('crypto.annualized')}</p>
-          <p className={`text-lg font-bold ${Number(performance.annualized_return_pct) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-            {formatWithSign(performance.annualized_return_pct)}%
-          </p>
+          {performance.annualized_return_pct !== null ? (
+            <p className={`text-lg font-bold ${Number(performance.annualized_return_pct) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              {formatWithSign(performance.annualized_return_pct)}%
+            </p>
+          ) : (
+            <p className="text-lg font-bold text-gray-400">N/A</p>
+          )}
           <p className="text-xs text-gray-500">{performance.days_held} {t('crypto.days')}</p>
         </div>
 
