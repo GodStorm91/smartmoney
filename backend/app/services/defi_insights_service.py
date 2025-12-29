@@ -83,7 +83,7 @@ class DefiInsightsService:
         start_value = performance_metrics.get("start_value_usd", 0)
         current_value = performance_metrics.get("current_value_usd", 0)
         total_return_pct = performance_metrics.get("total_return_pct", 0)
-        annualized_return = performance_metrics.get("annualized_return_pct", 0)
+        annualized_return = performance_metrics.get("annualized_return_pct")  # Can be None for short periods
 
         # IL metrics (may be None)
         il_pct = performance_metrics.get("il_percentage")
@@ -136,7 +136,7 @@ PERFORMANCE METRICS:
 - Starting Value: ${start_value:.2f}
 - Current Value: ${current_value:.2f}
 - Total Return: {total_return_pct:.2f}%
-- Annualized Return: {annualized_return:.2f}%
+- Annualized Return: {f"{annualized_return:.2f}%" if annualized_return is not None else "N/A (insufficient data)"}
 {il_section}
 {yield_section}
 {apy_section}
