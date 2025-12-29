@@ -2,8 +2,8 @@
  * PositionDetailModal - Display detailed DeFi position analytics
  * Shows performance metrics, IL analysis, charts, and AI insights
  */
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useState, useMemo } from 'react'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -304,15 +304,46 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   useSettings() // For potential future currency formatting
   const chainInfo = CHAIN_INFO[group.chain_id as ChainId]
 
-  // Primary token for API calls (use first token's ID)
+  // Primary token for API calls (use first token's ID for performance/insights)
   const primaryToken = group.tokens[0]
 
-  // Fetch position history - gracefully handle 404 (no snapshots yet)
-  const { data: history, isLoading: isLoadingHistory, isError: isHistoryError } = useQuery({
-    queryKey: ['position-history', primaryToken.id],
-    queryFn: () => fetchPositionHistory(primaryToken.id, 30),
-    retry: false, // Don't retry on 404
+  // Fetch position history for ALL tokens in the group (parallel queries)
+  const historyQueries = useQueries({
+    queries: group.tokens.map((token) => ({
+      queryKey: ['position-history', token.id],
+      queryFn: () => fetchPositionHistory(token.id, 30),
+      retry: false,
+    })),
   })
+
+  const isLoadingHistory = historyQueries.some((q) => q.isLoading)
+  const isHistoryError = historyQueries.every((q) => q.isError)
+
+  // Combine snapshots from all tokens by date, summing USD values
+  const combinedHistory = useMemo(() => {
+    const allSnapshots = historyQueries
+      .filter((q) => q.data?.snapshots)
+      .flatMap((q) => q.data!.snapshots)
+
+    if (allSnapshots.length === 0) return null
+
+    // Group snapshots by date and sum values
+    const byDate = new Map<string, number>()
+    for (const snap of allSnapshots) {
+      const existing = byDate.get(snap.snapshot_date) || 0
+      byDate.set(snap.snapshot_date, existing + Number(snap.balance_usd))
+    }
+
+    // Convert to snapshot-like objects for the chart
+    const combinedSnapshots = Array.from(byDate.entries()).map(([date, total]) => ({
+      snapshot_date: date,
+      balance_usd: total,
+    }))
+
+    return {
+      snapshots: combinedSnapshots,
+    }
+  }, [historyQueries])
 
   // Fetch performance metrics - gracefully handle 404
   const { data: performance, isLoading: isLoadingPerformance, isError: isPerformanceError } = useQuery({
@@ -468,14 +499,14 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                 </div>
               )}
 
-              {/* Performance Chart */}
-              {history && history.snapshots.length > 0 && (
+              {/* Performance Chart - Combined value of all tokens */}
+              {combinedHistory && combinedHistory.snapshots.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                   <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-                    {t('crypto.valueHistory')}
+                    {t('crypto.valueHistory')} ({t('crypto.combinedValue', 'Combined Value')})
                   </h3>
                   <div className="h-48">
-                    <PositionPerformanceChart snapshots={history.snapshots} />
+                    <PositionPerformanceChart snapshots={combinedHistory.snapshots as any} />
                   </div>
                 </div>
               )}
