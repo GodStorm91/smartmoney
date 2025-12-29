@@ -16,9 +16,10 @@ import {
 import type { DefiPosition, PositionPerformance, PositionInsights } from '@/types'
 import { CHAIN_INFO, ChainId } from '@/types/crypto'
 import { PositionPerformanceChart } from './PositionPerformanceChart'
+import type { GroupedPosition } from '@/components/accounts/LPPositionsSection'
 
 interface PositionDetailModalProps {
-  position: DefiPosition
+  group: GroupedPosition
   onClose: () => void
 }
 
@@ -298,35 +299,44 @@ function InsightsCard({ insights, isLoading }: { insights?: PositionInsights; is
   )
 }
 
-export function PositionDetailModal({ position, onClose }: PositionDetailModalProps) {
+export function PositionDetailModal({ group, onClose }: PositionDetailModalProps) {
   const { t, i18n } = useTranslation('common')
   useSettings() // For potential future currency formatting
-  const chainInfo = CHAIN_INFO[position.chain_id as ChainId]
+  const chainInfo = CHAIN_INFO[group.chain_id as ChainId]
+
+  // Primary token for API calls (use first token's ID)
+  const primaryToken = group.tokens[0]
 
   // Fetch position history - gracefully handle 404 (no snapshots yet)
   const { data: history, isLoading: isLoadingHistory, isError: isHistoryError } = useQuery({
-    queryKey: ['position-history', position.id],
-    queryFn: () => fetchPositionHistory(position.id, 30),
+    queryKey: ['position-history', primaryToken.id],
+    queryFn: () => fetchPositionHistory(primaryToken.id, 30),
     retry: false, // Don't retry on 404
   })
 
   // Fetch performance metrics - gracefully handle 404
   const { data: performance, isLoading: isLoadingPerformance, isError: isPerformanceError } = useQuery({
-    queryKey: ['position-performance', position.id],
-    queryFn: () => fetchPositionPerformance(position.id),
+    queryKey: ['position-performance', primaryToken.id],
+    queryFn: () => fetchPositionPerformance(primaryToken.id),
     retry: false,
   })
 
   // Fetch AI insights - only if performance data exists
   const { data: insights, isLoading: isLoadingInsights } = useQuery({
-    queryKey: ['position-insights', position.id, i18n.language],
-    queryFn: () => fetchPositionInsights(position.id, i18n.language),
+    queryKey: ['position-insights', primaryToken.id, i18n.language],
+    queryFn: () => fetchPositionInsights(primaryToken.id, i18n.language),
     enabled: !!performance && !isPerformanceError,
     retry: false,
   })
 
   const isLoading = isLoadingHistory || isLoadingPerformance
   const noDataYet = isHistoryError || isPerformanceError
+
+  // Format token amounts for display
+  const formatTokenAmount = (token: DefiPosition) => {
+    const amt = Number(token.balance)
+    return amt < 0.0001 ? '<0.0001' : amt < 1 ? amt.toFixed(4) : amt.toFixed(2)
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
@@ -337,24 +347,42 @@ export function PositionDetailModal({ position, onClose }: PositionDetailModalPr
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            {position.logo_url ? (
-              <img src={position.logo_url} alt={position.symbol} className="w-10 h-10 rounded-full" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                {position.symbol.slice(0, 2)}
-              </div>
-            )}
+            {/* Stacked token logos */}
+            <div className="relative flex -space-x-2">
+              {group.tokens.slice(0, 3).map((token, i) =>
+                token.logo_url ? (
+                  <img
+                    key={token.id}
+                    src={token.logo_url}
+                    alt={token.symbol}
+                    className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-900"
+                    style={{ zIndex: group.tokens.length - i }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                    }}
+                  />
+                ) : (
+                  <div
+                    key={token.id}
+                    className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs border-2 border-white dark:border-gray-900"
+                    style={{ zIndex: group.tokens.length - i }}
+                  >
+                    {token.symbol.slice(0, 2)}
+                  </div>
+                )
+              )}
+            </div>
             <div>
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-                {position.protocol} - {position.symbol}
+                {group.protocol} - {group.name}
               </h2>
               <div className="flex items-center gap-2 text-sm text-gray-500">
                 {chainInfo && (
                   <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">
-                    {chainInfo.icon} {position.chain_id.toUpperCase()}
+                    {chainInfo.icon} {group.chain_id.toUpperCase()}
                   </span>
                 )}
-                <span>{position.position_type}</span>
+                <span>{group.position_type}</span>
               </div>
             </div>
           </div>
@@ -378,12 +406,50 @@ export function PositionDetailModal({ position, onClose }: PositionDetailModalPr
               <div className="text-center py-4">
                 <p className="text-sm text-gray-500">{t('crypto.currentValue')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                  ${Number(position.balance_usd).toFixed(2)}
+                  ${group.total_usd.toFixed(2)}
                 </p>
-                <p className="text-sm text-gray-500">
-                  {Number(position.balance).toFixed(6)} {position.symbol}
-                </p>
+                <div className="text-sm text-gray-500 mt-1">
+                  {group.tokens.map((token, i) => (
+                    <span key={token.id}>
+                      {i > 0 && ' + '}
+                      {formatTokenAmount(token)} {token.symbol}
+                    </span>
+                  ))}
+                </div>
               </div>
+
+              {/* Token Breakdown Card */}
+              {group.tokens.length > 1 && (
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                    {t('crypto.tokenBreakdown', 'Token Breakdown')}
+                  </h3>
+                  <div className="space-y-2">
+                    {group.tokens.map((token) => (
+                      <div key={token.id} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {token.logo_url ? (
+                            <img src={token.logo_url} alt={token.symbol} className="w-6 h-6 rounded-full" />
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                              {token.symbol.slice(0, 2)}
+                            </div>
+                          )}
+                          <span className="font-medium text-gray-900 dark:text-white">{token.symbol}</span>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {formatTokenAmount(token)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            ${Number(token.balance_usd).toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* No Historical Data Yet Message */}
               {noDataYet && (

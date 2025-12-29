@@ -35,7 +35,7 @@ const MODULE_LABELS: Record<string, string> = {
 }
 
 /** Grouped position containing multiple tokens from same LP */
-interface GroupedPosition {
+export interface GroupedPosition {
   key: string // unique key for grouping
   name: string // LP pool name
   protocol: string
@@ -80,7 +80,7 @@ function PositionRow({
   onClick,
 }: {
   group: GroupedPosition
-  onClick: (position: DefiPosition) => void
+  onClick: (group: GroupedPosition) => void
 }) {
   const chainId = group.chain_id as ChainId
   const chainInfo = CHAIN_INFO[chainId]
@@ -97,7 +97,7 @@ function PositionRow({
 
   return (
     <button
-      onClick={() => onClick(primaryToken)}
+      onClick={() => onClick(group)}
       className="w-full flex items-center justify-between py-3 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors text-left group"
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -191,7 +191,7 @@ function PositionRow({
 export function LPPositionsSection() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
-  const [selectedPosition, setSelectedPosition] = useState<DefiPosition | null>(null)
+  const [selectedGroup, setSelectedGroup] = useState<GroupedPosition | null>(null)
   const rates = useRatesMap()
 
   // Get all wallets first
@@ -315,7 +315,7 @@ export function LPPositionsSection() {
                       <PositionRow
                         key={group.key}
                         group={group}
-                        onClick={setSelectedPosition}
+                        onClick={setSelectedGroup}
                       />
                     ))}
                 </div>
@@ -333,10 +333,10 @@ export function LPPositionsSection() {
       )}
 
       {/* Position Detail Modal */}
-      {selectedPosition && (
+      {selectedGroup && (
         <PositionDetailModal
-          position={selectedPosition}
-          onClose={() => setSelectedPosition(null)}
+          group={selectedGroup}
+          onClose={() => setSelectedGroup(null)}
         />
       )}
     </CollapsibleCard>
