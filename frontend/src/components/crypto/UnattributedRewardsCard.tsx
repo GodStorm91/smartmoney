@@ -37,7 +37,7 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
   const positions = positionsData?.positions || []
 
   const formatAmount = (reward: PositionReward) => {
-    const amount = reward.reward_amount.toLocaleString(undefined, {
+    const amount = Number(reward.reward_amount).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 6,
     })

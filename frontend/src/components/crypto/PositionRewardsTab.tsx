@@ -31,15 +31,17 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     )
   }
 
-  const formatCurrency = (value: number | null) => {
+  const formatCurrency = (value: number | string | null) => {
     if (value === null) return '-'
-    return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    const num = Number(value)
+    return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
-  const formatPercent = (value: number | null) => {
+  const formatPercent = (value: number | string | null) => {
     if (value === null) return '-'
-    const prefix = value >= 0 ? '+' : ''
-    return `${prefix}${value.toFixed(2)}%`
+    const num = Number(value)
+    const prefix = num >= 0 ? '+' : ''
+    return `${prefix}${num.toFixed(2)}%`
   }
 
   const formatDate = (dateStr: string) => {
@@ -136,7 +138,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               >
                 <div>
                   <div className="font-medium text-gray-900 dark:text-gray-100">
-                    {reward.reward_amount.toLocaleString(undefined, {
+                    {Number(reward.reward_amount).toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 6,
                     })}{' '}
