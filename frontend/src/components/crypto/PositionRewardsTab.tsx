@@ -116,11 +116,34 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               <div className="text-sm text-green-600 dark:text-green-400">
                 {t('crypto.totalRewards', 'Total Rewards')}
               </div>
-              <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                {formatCurrency(roi.total_rewards_usd)}
-              </div>
+              {roi.rewards_by_token && roi.rewards_by_token.length > 0 ? (
+                <div className="space-y-1">
+                  {roi.rewards_by_token.map((token) => (
+                    <div key={token.symbol} className="text-lg font-semibold text-green-800 dark:text-green-200">
+                      {Number(token.amount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}{' '}
+                      {token.symbol}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+                  {formatCurrency(roi.total_rewards_usd)}
+                </div>
+              )}
               <div className="text-xs text-green-600 dark:text-green-400">
                 {roi.rewards_count} {t('crypto.claims', 'claims')}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-sm text-green-600 dark:text-green-400">
+                {t('crypto.currentValue', 'Current Value')}
+              </div>
+              <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+                {formatCurrency(roi.current_value_usd)}
               </div>
             </div>
 
@@ -154,15 +177,6 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
                 </div>
               </div>
             )}
-
-            <div>
-              <div className="text-sm text-green-600 dark:text-green-400">
-                {t('crypto.currentValue', 'Current Value')}
-              </div>
-              <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                {formatCurrency(roi.current_value_usd)}
-              </div>
-            </div>
           </div>
         </div>
       )}

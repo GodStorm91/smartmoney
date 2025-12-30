@@ -157,12 +157,24 @@ class RewardService:
             r.reward_usd or Decimal(0) for r in rewards
         )
 
+        # Calculate token totals grouped by symbol
+        token_totals: dict[str, Decimal] = {}
+        for r in rewards:
+            symbol = r.reward_token_symbol or "UNKNOWN"
+            token_totals[symbol] = token_totals.get(symbol, Decimal(0)) + (r.reward_amount or Decimal(0))
+
+        rewards_by_token = [
+            {"symbol": symbol, "amount": amount}
+            for symbol, amount in sorted(token_totals.items())
+        ]
+
         result = {
             "position_id": position_id,
             "current_value_usd": current_value_usd,
             "cost_basis_usd": None,
             "total_rewards_usd": total_rewards_usd,
             "rewards_count": len(rewards),
+            "rewards_by_token": rewards_by_token,
             "simple_roi_pct": None,
             "annualized_roi_pct": None,
             "days_held": None,

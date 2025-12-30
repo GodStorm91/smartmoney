@@ -244,12 +244,18 @@ export interface RewardsScanResult {
   unmatched: number
 }
 
+export interface TokenTotal {
+  symbol: string
+  amount: number
+}
+
 export interface PositionROI {
   position_id: string
   current_value_usd: number
   cost_basis_usd: number | null
   total_rewards_usd: number
   rewards_count: number
+  rewards_by_token: TokenTotal[]
   simple_roi_pct: number | null
   annualized_roi_pct: number | null
   days_held: number | null

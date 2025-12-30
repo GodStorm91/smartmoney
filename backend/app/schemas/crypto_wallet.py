@@ -395,6 +395,13 @@ class RewardsScanResponse(BaseModel):
     unmatched: int
 
 
+class TokenTotal(BaseModel):
+    """Schema for token total amount."""
+
+    symbol: str
+    amount: Decimal
+
+
 class PositionROIResponse(BaseModel):
     """Schema for position ROI including rewards."""
 
@@ -403,6 +410,7 @@ class PositionROIResponse(BaseModel):
     cost_basis_usd: Optional[Decimal] = None
     total_rewards_usd: Decimal
     rewards_count: int
+    rewards_by_token: list[TokenTotal] = []
     simple_roi_pct: Optional[float] = None
     annualized_roi_pct: Optional[float] = None
     days_held: Optional[int] = None
