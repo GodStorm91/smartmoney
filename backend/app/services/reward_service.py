@@ -39,13 +39,21 @@ class RewardService:
         )
         stats["scanned"] = len(claims)
 
-        for claim in claims:
-            # Check if already exists
-            existing = db.query(PositionReward).filter(
-                PositionReward.tx_hash == claim["tx_hash"]
-            ).first()
+        # Get all existing tx_hashes for this user to avoid duplicates
+        existing_hashes = set(
+            row[0] for row in db.query(PositionReward.tx_hash).filter(
+                PositionReward.user_id == user_id
+            ).all()
+        )
 
-            if existing:
+        # Track tx_hashes we're adding in this batch to avoid duplicates within the batch
+        batch_hashes = set()
+
+        for claim in claims:
+            tx_hash = claim["tx_hash"]
+
+            # Skip if already in database or already in this batch
+            if tx_hash in existing_hashes or tx_hash in batch_hashes:
                 continue
 
             # Use token info from tokentx response, fallback to lookup
@@ -68,12 +76,13 @@ class RewardService:
                 reward_token_symbol=token_symbol,
                 reward_amount=amount,
                 claimed_at=claim["timestamp"],
-                tx_hash=claim["tx_hash"],
+                tx_hash=tx_hash,
                 block_number=claim["block_number"],
                 source="merkl",
                 is_attributed=False,
             )
             db.add(reward)
+            batch_hashes.add(tx_hash)
             stats["new"] += 1
 
         db.commit()
