@@ -607,8 +607,12 @@
     "costBasis": "取得原価",
     "claimedRewards": "獲得した報酬",
     "noRewards": "このポジションの報酬はまだありません。",
+    "overview": "概要",
+    "rewards": "報酬",
     "scanRewards": "報酬をスキャン",
-    "scanComplete": "{{new}}件の新規クレームを検出",
+    "scanRewardsHint": "ブロックチェーンから獲得した報酬をスキャン",
+    "scanning": "スキャン中...",
+    "scanComplete": "{{scanned}}件をスキャン、{{new}}件の新規を検出",
     "hodlScenarios": {
       "title": "HODLシナリオ",
       "lpWinning": "LP優勢 ({{pct}})",

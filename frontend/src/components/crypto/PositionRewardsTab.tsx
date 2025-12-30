@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar } from 'lucide-react'
-import { fetchPositionROI, fetchPositionRewardsList } from '@/services/crypto-service'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check } from 'lucide-react'
+import { fetchPositionROI, fetchPositionRewardsList, scanRewards } from '@/services/crypto-service'
 
 interface PositionRewardsTabProps {
   positionId: string
@@ -9,6 +10,8 @@ interface PositionRewardsTabProps {
 
 export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [scanResult, setScanResult] = useState<{ scanned: number; new: number } | null>(null)
 
   const { data: roi, isLoading: roiLoading } = useQuery({
     queryKey: ['position-roi', positionId],
@@ -21,6 +24,20 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   })
 
   const isLoading = roiLoading || rewardsLoading
+
+  // Scan mutation
+  const scanMutation = useMutation({
+    mutationFn: () => scanRewards(90),
+    onSuccess: (result) => {
+      setScanResult({ scanned: result.scanned_claims, new: result.new_claims })
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['position-roi'] })
+      queryClient.invalidateQueries({ queryKey: ['position-rewards'] })
+      queryClient.invalidateQueries({ queryKey: ['unattributed-rewards'] })
+      // Clear result after 5 seconds
+      setTimeout(() => setScanResult(null), 5000)
+    },
+  })
 
   if (isLoading) {
     return (
@@ -54,6 +71,38 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
 
   return (
     <div className="space-y-4">
+      {/* Scan Button */}
+      <div className="flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+        <div className="text-sm text-indigo-700 dark:text-indigo-300">
+          {t('crypto.scanRewardsHint', 'Scan blockchain for claimed rewards')}
+        </div>
+        <button
+          onClick={() => scanMutation.mutate()}
+          disabled={scanMutation.isPending}
+          className="flex items-center gap-2 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white text-sm font-medium rounded-lg transition-colors"
+        >
+          {scanMutation.isPending ? (
+            <>
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              {t('crypto.scanning', 'Scanning...')}
+            </>
+          ) : (
+            <>
+              <RefreshCw className="h-4 w-4" />
+              {t('crypto.scanRewards', 'Scan Rewards')}
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Scan Result */}
+      {scanResult && (
+        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300">
+          <Check className="h-4 w-4" />
+          {t('crypto.scanComplete', 'Scanned {{scanned}} claims, found {{new}} new', scanResult)}
+        </div>
+      )}
+
       {/* ROI Summary Card */}
       {roi && (
         <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">

@@ -5,7 +5,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { X, TrendingUp, TrendingDown, AlertTriangle, Sparkles, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, TrendingUp, TrendingDown, AlertTriangle, Sparkles, ChevronDown, ChevronUp, Gift } from 'lucide-react'
 import { useSettings } from '@/contexts/SettingsContext'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import {
@@ -17,7 +17,10 @@ import type { DefiPosition, PositionPerformance, PositionInsights } from '@/type
 import { CHAIN_INFO, ChainId } from '@/types/crypto'
 import { PositionPerformanceChart } from './PositionPerformanceChart'
 import { HodlScenariosCard } from './HodlScenariosCard'
+import { PositionRewardsTab } from './PositionRewardsTab'
 import type { GroupedPosition } from '@/components/accounts/LPPositionsSection'
+
+type TabType = 'overview' | 'rewards'
 
 interface PositionDetailModalProps {
   group: GroupedPosition
@@ -308,6 +311,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   const { t, i18n } = useTranslation('common')
   useSettings() // For potential future currency formatting
   const chainInfo = CHAIN_INFO[group.chain_id as ChainId]
+  const [activeTab, setActiveTab] = useState<TabType>('overview')
 
   // Primary token for API calls (use first token's ID for performance/insights)
   const primaryToken = group.tokens[0]
@@ -430,16 +434,44 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
           </button>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              activeTab === 'overview'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            {t('crypto.overview', 'Overview')}
+          </button>
+          <button
+            onClick={() => setActiveTab('rewards')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+              activeTab === 'rewards'
+                ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            <Gift className="w-4 h-4" />
+            {t('crypto.rewards', 'Rewards')}
+          </button>
+        </div>
+
         {/* Content */}
-        <div className="p-4 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-80px)] space-y-4">
+        <div className="p-4 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-120px)] space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
             </div>
           ) : (
             <>
-              {/* Current Value */}
-              <div className="text-center py-4">
+              {/* Overview Tab */}
+              {activeTab === 'overview' && (
+                <>
+                  {/* Current Value */}
+                  <div className="text-center py-4">
                 <p className="text-sm text-gray-500">{t('crypto.currentValue')}</p>
                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
                   ${group.total_usd.toFixed(2)}
@@ -487,48 +519,55 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                 </div>
               )}
 
-              {/* No Historical Data Yet Message */}
-              {noDataYet && (
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <h4 className="font-medium text-amber-800 dark:text-amber-300">
-                        {t('crypto.noHistoricalDataTitle')}
-                      </h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-                        {t('crypto.noHistoricalDataMessage')}
-                      </p>
+                  {/* No Historical Data Yet Message */}
+                  {noDataYet && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="font-medium text-amber-800 dark:text-amber-300">
+                            {t('crypto.noHistoricalDataTitle')}
+                          </h4>
+                          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                            {t('crypto.noHistoricalDataMessage')}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+
+                  {/* Performance Chart - Combined value of all tokens */}
+                  {combinedHistory && combinedHistory.snapshots.length > 0 && (
+                    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+                      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                        {t('crypto.valueHistory')} ({t('crypto.combinedValue', 'Combined Value')})
+                      </h3>
+                      <div className="h-48">
+                        <PositionPerformanceChart snapshots={combinedHistory.snapshots as any} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Performance Metrics */}
+                  {performance && <PerformanceCard performance={performance} />}
+
+                  {/* Impermanent Loss */}
+                  {performance && <ILCard performance={performance} />}
+
+                  {/* HODL Scenarios - only for multi-token positions */}
+                  {group.tokens.length >= 2 && (
+                    <HodlScenariosCard positionIds={group.tokens.map((t) => t.id)} />
+                  )}
+
+                  {/* AI Insights - only show if we have performance data */}
+                  {!noDataYet && <InsightsCard insights={insights} isLoading={isLoadingInsights} />}
+                </>
               )}
 
-              {/* Performance Chart - Combined value of all tokens */}
-              {combinedHistory && combinedHistory.snapshots.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
-                    {t('crypto.valueHistory')} ({t('crypto.combinedValue', 'Combined Value')})
-                  </h3>
-                  <div className="h-48">
-                    <PositionPerformanceChart snapshots={combinedHistory.snapshots as any} />
-                  </div>
-                </div>
+              {/* Rewards Tab */}
+              {activeTab === 'rewards' && (
+                <PositionRewardsTab positionId={primaryToken.id} />
               )}
-
-              {/* Performance Metrics */}
-              {performance && <PerformanceCard performance={performance} />}
-
-              {/* Impermanent Loss */}
-              {performance && <ILCard performance={performance} />}
-
-              {/* HODL Scenarios - only for multi-token positions */}
-              {group.tokens.length >= 2 && (
-                <HodlScenariosCard positionIds={group.tokens.map((t) => t.id)} />
-              )}
-
-              {/* AI Insights - only show if we have performance data */}
-              {!noDataYet && <InsightsCard insights={insights} isLoading={isLoadingInsights} />}
             </>
           )}
         </div>

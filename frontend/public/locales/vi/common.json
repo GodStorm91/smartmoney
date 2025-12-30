@@ -606,8 +606,12 @@
     "costBasis": "Giá Vốn",
     "claimedRewards": "Phần Thưởng Đã Nhận",
     "noRewards": "Chưa có phần thưởng nào cho vị thế này.",
+    "overview": "Tổng Quan",
+    "rewards": "Phần Thưởng",
     "scanRewards": "Quét Phần Thưởng",
-    "scanComplete": "Tìm thấy {{new}} lần nhận mới",
+    "scanRewardsHint": "Quét blockchain để tìm phần thưởng đã nhận",
+    "scanning": "Đang quét...",
+    "scanComplete": "Đã quét {{scanned}} lần nhận, tìm thấy {{new}} mới",
     "hodlScenarios": {
       "title": "Kịch Bản HODL",
       "lpWinning": "LP đang thắng ({{pct}})",

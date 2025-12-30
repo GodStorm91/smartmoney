@@ -11,8 +11,9 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { formatCurrency } from '@/utils/formatCurrency'
-import { fetchWallets, fetchDefiPositions } from '@/services/crypto-service'
+import { fetchWallets, fetchDefiPositions, fetchUnattributedRewards } from '@/services/crypto-service'
 import { PositionDetailModal } from '@/components/crypto/PositionDetailModal'
+import { UnattributedRewardsCard } from '@/components/crypto/UnattributedRewardsCard'
 import type { DefiPosition, ChainId } from '@/types'
 import { CHAIN_INFO } from '@/types/crypto'
 
@@ -200,6 +201,12 @@ export function LPPositionsSection() {
     queryFn: fetchWallets,
   })
 
+  // Fetch unattributed rewards count for badge
+  const { data: unattributedRewards = [] } = useQuery({
+    queryKey: ['unattributed-rewards'],
+    queryFn: fetchUnattributedRewards,
+  })
+
   // Fetch DeFi positions for all wallets
   const { data: allPositions, isLoading: isLoadingPositions, refetch } = useQuery({
     queryKey: ['crypto-defi-positions', wallets?.map(w => w.id)],
@@ -254,10 +261,15 @@ export function LPPositionsSection() {
     return null
   }
 
+  // Build badge text with unattributed count
+  const badgeText = unattributedRewards.length > 0
+    ? `${groupedPositions.length} · ${unattributedRewards.length} ⚠`
+    : groupedPositions.length
+
   return (
     <CollapsibleCard
       title={t('crypto.defiPositions')}
-      badge={groupedPositions.length}
+      badge={badgeText}
       defaultOpen={groupedPositions.length > 0}
     >
       {/* Total Value Header */}
@@ -278,6 +290,13 @@ export function LPPositionsSection() {
               <RefreshCw className="w-5 h-5" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Unattributed Rewards Card */}
+      {wallets[0] && (
+        <div className="mb-4">
+          <UnattributedRewardsCard walletId={wallets[0].id} />
         </div>
       )}
 
