@@ -402,6 +402,15 @@ class TokenTotal(BaseModel):
     amount: Decimal
 
 
+class MonthlyRewardTotal(BaseModel):
+    """Schema for monthly reward breakdown."""
+
+    month: str  # YYYY-MM format
+    symbol: str
+    amount: Decimal
+    count: int
+
+
 class PositionROIResponse(BaseModel):
     """Schema for position ROI including rewards."""
 
@@ -411,6 +420,7 @@ class PositionROIResponse(BaseModel):
     total_rewards_usd: Decimal
     rewards_count: int
     rewards_by_token: list[TokenTotal] = []
+    rewards_by_month: list[MonthlyRewardTotal] = []
     simple_roi_pct: Optional[float] = None
     annualized_roi_pct: Optional[float] = None
     days_held: Optional[int] = None

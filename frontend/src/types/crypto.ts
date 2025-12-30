@@ -249,6 +249,13 @@ export interface TokenTotal {
   amount: number
 }
 
+export interface MonthlyRewardTotal {
+  month: string // YYYY-MM format
+  symbol: string
+  amount: number
+  count: number
+}
+
 export interface PositionROI {
   position_id: string
   current_value_usd: number
@@ -256,6 +263,7 @@ export interface PositionROI {
   total_rewards_usd: number
   rewards_count: number
   rewards_by_token: TokenTotal[]
+  rewards_by_month: MonthlyRewardTotal[]
   simple_roi_pct: number | null
   annualized_roi_pct: number | null
   days_held: number | null

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar, RefreshCw, Check } from 'lucide-react'
-import { fetchPositionROI, fetchPositionRewardsList, scanRewards } from '@/services/crypto-service'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import { fetchPositionROI, scanRewards } from '@/services/crypto-service'
 
 interface PositionRewardsTabProps {
   positionId: string
@@ -12,29 +12,19 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [scanResult, setScanResult] = useState<{ scanned: number; new: number } | null>(null)
+  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set())
 
-  const { data: roi, isLoading: roiLoading } = useQuery({
+  const { data: roi, isLoading } = useQuery({
     queryKey: ['position-roi', positionId],
     queryFn: () => fetchPositionROI(positionId),
   })
 
-  const { data: rewards = [], isLoading: rewardsLoading } = useQuery({
-    queryKey: ['position-rewards', positionId],
-    queryFn: () => fetchPositionRewardsList(positionId),
-  })
-
-  const isLoading = roiLoading || rewardsLoading
-
-  // Scan mutation
   const scanMutation = useMutation({
     mutationFn: () => scanRewards(90),
     onSuccess: (result) => {
       setScanResult({ scanned: result.scanned_claims, new: result.new_claims })
-      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['position-roi'] })
-      queryClient.invalidateQueries({ queryKey: ['position-rewards'] })
       queryClient.invalidateQueries({ queryKey: ['unattributed-rewards'] })
-      // Clear result after 5 seconds
       setTimeout(() => setScanResult(null), 5000)
     },
   })
@@ -61,12 +51,27 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     return `${prefix}${num.toFixed(2)}%`
   }
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(undefined, {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+  const formatMonth = (monthStr: string) => {
+    const [year, month] = monthStr.split('-')
+    const date = new Date(Number(year), Number(month) - 1)
+    return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+  }
+
+  const formatAmount = (amount: number) => {
+    return Number(amount).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     })
+  }
+
+  const toggleMonth = (month: string) => {
+    const newExpanded = new Set(expandedMonths)
+    if (newExpanded.has(month)) {
+      newExpanded.delete(month)
+    } else {
+      newExpanded.add(month)
+    }
+    setExpandedMonths(newExpanded)
   }
 
   return (
@@ -120,11 +125,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
                 <div className="space-y-1">
                   {roi.rewards_by_token.map((token) => (
                     <div key={token.symbol} className="text-lg font-semibold text-green-800 dark:text-green-200">
-                      {Number(token.amount).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}{' '}
-                      {token.symbol}
+                      {formatAmount(token.amount)} {token.symbol}
                     </div>
                   ))}
                 </div>
@@ -181,52 +182,52 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
         </div>
       )}
 
-      {/* Rewards List */}
-      <div>
-        <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          <Gift className="h-4 w-4" />
-          {t('crypto.claimedRewards', 'Claimed Rewards')}
-        </h4>
+      {/* Monthly Breakdown */}
+      {roi && roi.rewards_by_month && roi.rewards_by_month.length > 0 && (
+        <div>
+          <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            {t('crypto.monthlyBreakdown', 'Monthly Breakdown')}
+          </h4>
 
-        {rewards.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            {t('crypto.noRewards', 'No rewards claimed for this position yet.')}
-          </div>
-        ) : (
           <div className="space-y-2">
-            {rewards.map((reward) => (
-              <div
-                key={reward.id}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+            {roi.rewards_by_month.map((monthly) => (
+              <button
+                key={`${monthly.month}-${monthly.symbol}`}
+                onClick={() => toggleMonth(monthly.month)}
+                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-left"
               >
-                <div>
-                  <div className="font-medium text-gray-900 dark:text-gray-100">
-                    {Number(reward.reward_amount).toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 6,
-                    })}{' '}
-                    {reward.reward_token_symbol || 'tokens'}
+                <div className="flex items-center gap-2">
+                  {expandedMonths.has(monthly.month) ? (
+                    <ChevronDown className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-gray-400" />
+                  )}
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {formatMonth(monthly.month)}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold text-gray-900 dark:text-gray-100">
+                    {formatAmount(monthly.amount)} {monthly.symbol}
                   </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(reward.claimed_at)}
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {monthly.count} {t('crypto.claims', 'claims')}
                   </div>
                 </div>
-                {reward.reward_usd !== null && (
-                  <div className="text-right">
-                    <div className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatCurrency(reward.reward_usd)}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      via {reward.source}
-                    </div>
-                  </div>
-                )}
-              </div>
+              </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {roi && roi.rewards_count === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Gift className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          {t('crypto.noRewards', 'No rewards claimed for this position yet.')}
+        </div>
+      )}
     </div>
   )
 }

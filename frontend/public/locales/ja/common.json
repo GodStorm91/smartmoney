@@ -626,7 +626,8 @@
       "lpOptimal": "LP戦略が現在最適"
     },
     "tokenBreakdown": "トークン内訳",
-    "combinedValue": "合計価値"
+    "combinedValue": "合計価値",
+    "monthlyBreakdown": "月別内訳"
   },
   "budget": {
     "title": "予算",

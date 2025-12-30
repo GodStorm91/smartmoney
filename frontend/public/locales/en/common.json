@@ -626,7 +626,8 @@
       "lpOptimal": "LP strategy is currently optimal"
     },
     "tokenBreakdown": "Token Breakdown",
-    "combinedValue": "Combined Value"
+    "combinedValue": "Combined Value",
+    "monthlyBreakdown": "Monthly Breakdown"
   },
   "budget": {
     "title": "Budget",

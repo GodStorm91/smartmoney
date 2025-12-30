@@ -168,6 +168,24 @@ class RewardService:
             for symbol, amount in sorted(token_totals.items())
         ]
 
+        # Calculate monthly breakdown (grouped by month + symbol)
+        monthly_totals: dict[tuple[str, str], dict] = {}
+        for r in rewards:
+            month_key = r.claimed_at.strftime("%Y-%m") if r.claimed_at else "unknown"
+            symbol = r.reward_token_symbol or "UNKNOWN"
+            key = (month_key, symbol)
+            if key not in monthly_totals:
+                monthly_totals[key] = {"month": month_key, "symbol": symbol, "amount": Decimal(0), "count": 0}
+            monthly_totals[key]["amount"] += r.reward_amount or Decimal(0)
+            monthly_totals[key]["count"] += 1
+
+        # Sort by month descending (newest first)
+        rewards_by_month = sorted(
+            monthly_totals.values(),
+            key=lambda x: x["month"],
+            reverse=True
+        )
+
         result = {
             "position_id": position_id,
             "current_value_usd": current_value_usd,
@@ -175,6 +193,7 @@ class RewardService:
             "total_rewards_usd": total_rewards_usd,
             "rewards_count": len(rewards),
             "rewards_by_token": rewards_by_token,
+            "rewards_by_month": rewards_by_month,
             "simple_roi_pct": None,
             "annualized_roi_pct": None,
             "days_held": None,
