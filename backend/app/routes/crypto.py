@@ -569,10 +569,10 @@ async def get_position_roi(
     current_value = Decimal(0)
 
     for wallet in wallets:
-        positions_data = await ZerionApiService.get_defi_positions(
+        positions_list = await ZerionApiService.get_defi_positions(
             wallet.wallet_address, chains=["polygon"]
         )
-        for pos in positions_data.get("positions", []):
+        for pos in positions_list:
             if pos.get("id") == position_id:
                 current_value = Decimal(str(pos.get("balance_usd", 0)))
                 break
