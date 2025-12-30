@@ -627,7 +627,9 @@
     },
     "tokenBreakdown": "Token Breakdown",
     "combinedValue": "Combined Value",
-    "monthlyBreakdown": "Monthly Breakdown"
+    "monthlyBreakdown": "Monthly Breakdown",
+    "stakingRewardsNotSupported": "Staking rewards tracking not yet supported",
+    "stakingRewardsHint": "Points and rewards from staking protocols like Symbiotic are tracked separately by each protocol."
   },
   "budget": {
     "title": "Budget",

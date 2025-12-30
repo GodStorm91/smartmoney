@@ -33,6 +33,7 @@ from ..schemas.crypto_wallet import (
     PositionCostBasisCreate,
     PositionCostBasisResponse,
     HodlScenariosResponse,
+    StakingRewardsResponse,
 )
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
@@ -558,7 +559,7 @@ async def scan_rewards(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Scan for historical Merkl claims."""
+    """Scan for historical reward claims (Merkl on Polygon, Symbiotic on Ethereum)."""
     from ..services.reward_service import RewardService
 
     wallets = CryptoWalletService.get_wallets(db, current_user.id)
@@ -567,6 +568,7 @@ async def scan_rewards(
 
     total = {"scanned_claims": 0, "new_claims": 0, "matched": 0, "unmatched": 0}
     for wallet in wallets:
+        # Scan Merkl claims on Polygon
         if "polygon" in wallet.chains:
             stats = await RewardService.scan_historical_claims(
                 db, current_user.id, wallet.wallet_address, days=body.days
@@ -576,7 +578,28 @@ async def scan_rewards(
             total["matched"] += stats["matched"]
             total["unmatched"] += stats["unmatched"]
 
+        # Scan Symbiotic claims on Ethereum
+        if "eth" in wallet.chains:
+            stats = await RewardService.scan_symbiotic_claims(
+                db, current_user.id, wallet.wallet_address, days=body.days
+            )
+            total["scanned_claims"] += stats["scanned"]
+            total["new_claims"] += stats["new"]
+
     return RewardsScanResponse(**total)
+
+
+@router.get("/rewards/staking", response_model=StakingRewardsResponse)
+async def get_staking_rewards(
+    source: str = "symbiotic",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get staking rewards summary (grouped by month)."""
+    from ..services.reward_service import RewardService
+
+    result = await RewardService.calculate_staking_roi(db, current_user.id, source)
+    return StakingRewardsResponse(**result)
 
 
 @router.get("/positions/{position_id:path}/roi", response_model=PositionROIResponse)

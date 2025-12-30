@@ -21,6 +21,7 @@ import type {
   PositionCostBasis,
   PositionCostBasisCreate,
   HodlScenariosResponse,
+  StakingRewardsResponse,
 } from '@/types'
 
 // ==================== Wallet APIs ====================
@@ -242,5 +243,14 @@ export async function fetchHodlScenarios(positionIds: string[]): Promise<HodlSce
     '/api/crypto/positions/scenarios',
     positionIds
   )
+  return response.data
+}
+
+// ==================== Staking Rewards APIs ====================
+
+export async function fetchStakingRewards(source: string = 'symbiotic'): Promise<StakingRewardsResponse> {
+  const response = await apiClient.get<StakingRewardsResponse>('/api/crypto/rewards/staking', {
+    params: { source },
+  })
   return response.data
 }

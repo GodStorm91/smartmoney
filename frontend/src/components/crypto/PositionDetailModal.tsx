@@ -18,6 +18,7 @@ import { CHAIN_INFO, ChainId } from '@/types/crypto'
 import { PositionPerformanceChart } from './PositionPerformanceChart'
 import { HodlScenariosCard } from './HodlScenariosCard'
 import { PositionRewardsTab } from './PositionRewardsTab'
+import { StakingRewardsTab } from './StakingRewardsTab'
 import type { GroupedPosition } from '@/components/accounts/LPPositionsSection'
 
 type TabType = 'overview' | 'rewards'
@@ -566,7 +567,11 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
               {/* Rewards Tab */}
               {activeTab === 'rewards' && (
-                <PositionRewardsTab positionId={primaryToken.id} />
+                group.protocol_module === 'staked' ? (
+                  <StakingRewardsTab source="symbiotic" />
+                ) : (
+                  <PositionRewardsTab positionId={primaryToken.id} />
+                )
               )}
             </>
           )}

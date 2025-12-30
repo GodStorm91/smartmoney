@@ -22,6 +22,7 @@ TOKEN_COINGECKO_IDS = {
     "USDT": "tether",
     "WETH": "weth",
     "ETH": "ethereum",
+    "MANTA": "manta-network",
 }
 
 
@@ -151,6 +152,79 @@ class RewardService:
         return stats
 
     @staticmethod
+    async def scan_symbiotic_claims(
+        db: Session,
+        user_id: int,
+        wallet_address: str,
+        days: int = 90
+    ) -> dict:
+        """Scan for historical Symbiotic staking claims on Ethereum.
+
+        Returns:
+            dict with scanned, new counts
+        """
+        stats = {"scanned": 0, "new": 0}
+
+        # Calculate start block from days ago
+        start_timestamp = int((datetime.utcnow() - timedelta(days=days)).timestamp())
+        from_block = await PolygonscanService.get_block_by_timestamp_eth(start_timestamp)
+
+        # Fetch claim events from Ethereum
+        claims = await PolygonscanService.get_symbiotic_claims(
+            wallet_address, from_block=from_block
+        )
+        stats["scanned"] = len(claims)
+
+        # Get all existing tx_hashes for this user to avoid duplicates
+        existing_hashes = set(
+            row[0] for row in db.query(PositionReward.tx_hash).filter(
+                PositionReward.user_id == user_id
+            ).all()
+        )
+
+        # Track tx_hashes we're adding in this batch
+        batch_hashes = set()
+
+        for claim in claims:
+            tx_hash = claim["tx_hash"]
+
+            # Skip if already in database or already in this batch
+            if tx_hash in existing_hashes or tx_hash in batch_hashes:
+                continue
+
+            # Use token info from tokentx response
+            token_symbol = claim.get("token_symbol")
+            decimals = claim.get("token_decimals", 18)
+            if not token_symbol:
+                token_info = await PolygonscanService.get_token_info(claim["token_address"])
+                token_symbol = token_info.get("symbol")
+                decimals = token_info.get("decimals", 18)
+
+            # Calculate human-readable amount
+            amount = Decimal(claim["amount_raw"]) / (Decimal(10) ** decimals)
+
+            # Create reward record - auto-attribute to wallet (staking rewards)
+            reward = PositionReward(
+                user_id=user_id,
+                wallet_address=wallet_address.lower(),
+                chain_id="eth",
+                reward_token_address=claim["token_address"],
+                reward_token_symbol=token_symbol,
+                reward_amount=amount,
+                claimed_at=claim["timestamp"],
+                tx_hash=tx_hash,
+                block_number=claim["block_number"],
+                source="symbiotic",
+                is_attributed=True,  # Auto-attribute staking rewards
+            )
+            db.add(reward)
+            batch_hashes.add(tx_hash)
+            stats["new"] += 1
+
+        db.commit()
+        return stats
+
+    @staticmethod
     def get_all_rewards(db: Session, user_id: int) -> list[PositionReward]:
         """Get all rewards for a user."""
         return db.query(PositionReward).filter(
@@ -181,6 +255,82 @@ class RewardService:
             PositionReward.position_id == position_id,
             PositionReward.is_attributed == True  # noqa: E712
         ).order_by(PositionReward.claimed_at.desc()).all()
+
+    @staticmethod
+    def get_staking_rewards(db: Session, user_id: int, source: str = "symbiotic") -> list[PositionReward]:
+        """Get all staking rewards by source (e.g., symbiotic)."""
+        return db.query(PositionReward).filter(
+            PositionReward.user_id == user_id,
+            PositionReward.source == source
+        ).order_by(PositionReward.claimed_at.desc()).all()
+
+    @staticmethod
+    async def calculate_staking_roi(
+        db: Session,
+        user_id: int,
+        source: str = "symbiotic"
+    ) -> dict:
+        """Calculate staking rewards summary (grouped by month).
+
+        Returns:
+            dict with rewards summary by token and month
+        """
+        rewards = RewardService.get_staking_rewards(db, user_id, source)
+
+        # Calculate token totals grouped by symbol
+        token_totals: dict[str, Decimal] = {}
+        for r in rewards:
+            symbol = r.reward_token_symbol or "UNKNOWN"
+            token_totals[symbol] = token_totals.get(symbol, Decimal(0)) + (r.reward_amount or Decimal(0))
+
+        # Fetch current token prices
+        token_prices = await get_token_prices(list(token_totals.keys()))
+
+        # Build rewards_by_token with USD values
+        rewards_by_token = []
+        total_rewards_usd = Decimal(0)
+        for symbol, amount in sorted(token_totals.items()):
+            price = token_prices.get(symbol)
+            amount_usd = (amount * price) if price else None
+            if amount_usd:
+                total_rewards_usd += amount_usd
+            rewards_by_token.append({
+                "symbol": symbol,
+                "amount": amount,
+                "amount_usd": amount_usd
+            })
+
+        # Calculate monthly breakdown (grouped by month + symbol)
+        monthly_totals: dict[tuple[str, str], dict] = {}
+        for r in rewards:
+            month_key = r.claimed_at.strftime("%Y-%m") if r.claimed_at else "unknown"
+            symbol = r.reward_token_symbol or "UNKNOWN"
+            key = (month_key, symbol)
+            if key not in monthly_totals:
+                monthly_totals[key] = {"month": month_key, "symbol": symbol, "amount": Decimal(0), "count": 0}
+            monthly_totals[key]["amount"] += r.reward_amount or Decimal(0)
+            monthly_totals[key]["count"] += 1
+
+        # Add USD values to monthly breakdown
+        rewards_by_month = []
+        for data in sorted(monthly_totals.values(), key=lambda x: x["month"], reverse=True):
+            price = token_prices.get(data["symbol"])
+            amount_usd = (data["amount"] * price) if price else None
+            rewards_by_month.append({
+                "month": data["month"],
+                "symbol": data["symbol"],
+                "amount": data["amount"],
+                "amount_usd": amount_usd,
+                "count": data["count"]
+            })
+
+        return {
+            "source": source,
+            "total_rewards_usd": total_rewards_usd,
+            "rewards_count": len(rewards),
+            "rewards_by_token": rewards_by_token,
+            "rewards_by_month": rewards_by_month,
+        }
 
     @staticmethod
     async def calculate_position_roi(

@@ -322,6 +322,15 @@ export interface HodlScenariosResponse {
   winner_vs_lp_usd: number
 }
 
+// Staking Rewards (Symbiotic, etc.)
+export interface StakingRewardsResponse {
+  source: string
+  total_rewards_usd: number
+  rewards_count: number
+  rewards_by_token: TokenTotal[]
+  rewards_by_month: MonthlyRewardTotal[]
+}
+
 // Chain display info
 export const CHAIN_INFO: Record<ChainId, { name: string; icon: string; color: string }> = {
   eth: { name: 'Ethereum', icon: '⟠', color: '#627EEA' },

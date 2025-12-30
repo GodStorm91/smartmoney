@@ -626,7 +626,9 @@
     },
     "tokenBreakdown": "Chi Tiết Token",
     "combinedValue": "Giá Trị Kết Hợp",
-    "monthlyBreakdown": "Chi Tiết Theo Tháng"
+    "monthlyBreakdown": "Chi Tiết Theo Tháng",
+    "stakingRewardsNotSupported": "Theo dõi phần thưởng staking chưa được hỗ trợ",
+    "stakingRewardsHint": "Điểm và phần thưởng từ các giao thức staking như Symbiotic được theo dõi riêng bởi từng giao thức."
   },
   "budget": {
     "title": "Ngân sách",

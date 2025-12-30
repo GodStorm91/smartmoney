@@ -428,6 +428,16 @@ class PositionROIResponse(BaseModel):
     days_held: Optional[int] = None
 
 
+class StakingRewardsResponse(BaseModel):
+    """Schema for staking rewards summary (e.g., Symbiotic)."""
+
+    source: str
+    total_rewards_usd: Decimal
+    rewards_count: int
+    rewards_by_token: list[TokenTotal] = []
+    rewards_by_month: list[MonthlyRewardTotal] = []
+
+
 class PositionCostBasisCreate(BaseModel):
     """Schema for creating a cost basis entry."""
 
