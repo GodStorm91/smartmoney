@@ -26,8 +26,7 @@ class RewardMatchingService:
         db: Session, user_id: int, wallet_address: str, chain: str = "polygon"
     ) -> dict:
         """Match unattributed rewards to user's positions."""
-        positions_data = await ZerionApiService.get_defi_positions(wallet_address, chains=[chain])
-        positions = positions_data.get("positions", [])
+        positions = await ZerionApiService.get_defi_positions(wallet_address, chains=[chain])
 
         unattributed = db.query(PositionReward).filter(
             PositionReward.user_id == user_id,
