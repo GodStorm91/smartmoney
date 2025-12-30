@@ -366,6 +366,20 @@ class PositionRewardAttribute(BaseModel):
     position_id: str
 
 
+class BatchRewardAttribute(BaseModel):
+    """Schema for batch attributing multiple rewards to a position."""
+
+    reward_ids: list[int] = Field(..., min_length=1)
+    position_id: str
+
+
+class BatchAttributeResponse(BaseModel):
+    """Schema for batch attribution result."""
+
+    attributed: int
+    failed: int
+
+
 class RewardsScanRequest(BaseModel):
     """Schema for reward scan request."""
 

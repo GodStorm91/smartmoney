@@ -191,6 +191,17 @@ export async function attributeReward(rewardId: number, positionId: string): Pro
   return response.data
 }
 
+export async function batchAttributeRewards(
+  rewardIds: number[],
+  positionId: string
+): Promise<{ attributed: number; failed: number }> {
+  const response = await apiClient.post<{ attributed: number; failed: number }>(
+    '/api/crypto/rewards/batch-attribute',
+    { reward_ids: rewardIds, position_id: positionId }
+  )
+  return response.data
+}
+
 export async function scanRewards(days: number = 90): Promise<RewardsScanResult> {
   const response = await apiClient.post<RewardsScanResult>('/api/crypto/rewards/scan', { days })
   return response.data

@@ -25,6 +25,8 @@ from ..schemas.crypto_wallet import (
     PortfolioInsightsResponse,
     PositionRewardResponse,
     PositionRewardAttribute,
+    BatchRewardAttribute,
+    BatchAttributeResponse,
     RewardsScanRequest,
     RewardsScanResponse,
     PositionROIResponse,
@@ -524,6 +526,30 @@ async def attribute_reward(
 
     reward = RewardService.get_reward_by_id(db, current_user.id, reward_id)
     return reward
+
+
+@router.post("/rewards/batch-attribute", response_model=BatchAttributeResponse)
+async def batch_attribute_rewards(
+    body: BatchRewardAttribute,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Batch attribute multiple rewards to a single position."""
+    from ..services.reward_matching_service import RewardMatchingService
+
+    attributed = 0
+    failed = 0
+
+    for reward_id in body.reward_ids:
+        success = RewardMatchingService.manually_attribute_reward(
+            db, current_user.id, reward_id, body.position_id
+        )
+        if success:
+            attributed += 1
+        else:
+            failed += 1
+
+    return BatchAttributeResponse(attributed=attributed, failed=failed)
 
 
 @router.post("/rewards/scan", response_model=RewardsScanResponse)
