@@ -37,9 +37,10 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     )
   }
 
-  const formatCurrency = (value: number | string | null) => {
-    if (value === null) return '-'
+  const formatCurrency = (value: number | string | null | undefined) => {
+    if (value === null || value === undefined) return null
     const num = Number(value)
+    if (isNaN(num)) return null
     return `$${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
   }
 
@@ -113,22 +114,25 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               </div>
               {roi.rewards_by_token && roi.rewards_by_token.length > 0 ? (
                 <div className="space-y-1">
-                  {roi.rewards_by_token.map((token) => (
-                    <div key={token.symbol}>
-                      <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                        {formatAmount(token.amount)} {token.symbol}
-                      </div>
-                      {token.amount_usd !== null && (
-                        <div className="text-sm text-green-600 dark:text-green-400">
-                          ≈ {formatCurrency(token.amount_usd)}
+                  {roi.rewards_by_token.map((token) => {
+                    const usdValue = formatCurrency(token.amount_usd)
+                    return (
+                      <div key={token.symbol}>
+                        <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+                          {formatAmount(token.amount)} {token.symbol}
                         </div>
-                      )}
-                    </div>
-                  ))}
+                        {usdValue && (
+                          <div className="text-sm text-green-600 dark:text-green-400">
+                            ≈ {usdValue}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               ) : (
                 <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                  {formatCurrency(roi.total_rewards_usd)}
+                  {formatCurrency(roi.total_rewards_usd) || '-'}
                 </div>
               )}
               <div className="text-xs text-green-600 dark:text-green-400">
@@ -179,31 +183,34 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
           </h4>
 
           <div className="space-y-2">
-            {roi.rewards_by_month.map((monthly) => (
-              <div
-                key={`${monthly.month}-${monthly.symbol}`}
-                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-              >
-                <div>
-                  <span className="font-medium text-gray-900 dark:text-gray-100">
-                    {formatMonth(monthly.month)}
-                  </span>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {monthly.count} {t('crypto.claims', 'claims')}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold text-gray-900 dark:text-gray-100">
-                    {formatAmount(monthly.amount)} {monthly.symbol}
-                  </div>
-                  {monthly.amount_usd !== null && (
+            {roi.rewards_by_month.map((monthly) => {
+              const usdValue = formatCurrency(monthly.amount_usd)
+              return (
+                <div
+                  key={`${monthly.month}-${monthly.symbol}`}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                >
+                  <div>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                      {formatMonth(monthly.month)}
+                    </span>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
-                      ≈ {formatCurrency(monthly.amount_usd)}
+                      {monthly.count} {t('crypto.claims', 'claims')}
                     </div>
-                  )}
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold text-gray-900 dark:text-gray-100">
+                      {formatAmount(monthly.amount)} {monthly.symbol}
+                    </div>
+                    {usdValue && (
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        ≈ {usdValue}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}
