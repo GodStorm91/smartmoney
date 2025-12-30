@@ -11,8 +11,9 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import {
   fetchWallets,
   fetchWallet,
@@ -27,7 +28,7 @@ import { CHAIN_INFO } from '@/types/crypto'
 const SUPPORTED_CHAINS: ChainId[] = ['eth', 'bsc', 'polygon']
 
 /** Compact token row for token list */
-function TokenRow({ token }: { token: TokenBalance }) {
+function TokenRow({ token, isPrivacyMode }: { token: TokenBalance; isPrivacyMode: boolean }) {
   return (
     <div className="flex items-center justify-between py-1.5 px-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700/50">
       <div className="flex items-center gap-2 min-w-0">
@@ -51,10 +52,10 @@ function TokenRow({ token }: { token: TokenBalance }) {
       </div>
       <div className="text-right">
         <p className="text-sm text-gray-900 dark:text-white">
-          {Number(token.balance) < 0.0001 ? '<0.0001' : Number(token.balance).toFixed(4)}
+          {isPrivacyMode ? '***' : (Number(token.balance) < 0.0001 ? '<0.0001' : Number(token.balance).toFixed(4))}
         </p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          ${Number(token.balance_usd).toFixed(2)}
+          {isPrivacyMode ? '$***' : `$${Number(token.balance_usd).toFixed(2)}`}
         </p>
       </div>
     </div>
@@ -65,6 +66,7 @@ export function CryptoWalletSection() {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
   const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
   const rates = useRatesMap()
 
   // Form state
@@ -209,7 +211,7 @@ export function CryptoWalletSection() {
         <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg">
           <p className="text-sm text-gray-600 dark:text-gray-400">{t('crypto.totalBalance')}</p>
           <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {formatCurrency(totalBalanceJpy, currency, rates)}
+            {formatCurrencyPrivacy(totalBalanceJpy, currency, rates, false, isPrivacyMode)}
           </p>
         </div>
       )}
@@ -246,7 +248,7 @@ export function CryptoWalletSection() {
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-gray-900 dark:text-white">
-                    ${Number(wallet.total_balance_usd || 0).toFixed(2)}
+                    {isPrivacyMode ? '$***' : `$${Number(wallet.total_balance_usd || 0).toFixed(2)}`}
                   </p>
                   <div className="flex gap-1 mt-1">
                     {wallet.chains?.map((chain: ChainId) => (
@@ -294,20 +296,20 @@ export function CryptoWalletSection() {
                                 {chain.chain_name}
                               </span>
                               <span className="text-xs text-gray-400 dark:text-gray-500">
-                                ${Number(chain.total_usd).toFixed(2)}
+                                {isPrivacyMode ? '$***' : `$${Number(chain.total_usd).toFixed(2)}`}
                               </span>
                             </div>
                             <div className="space-y-1">
                               {/* Native token first */}
                               {chain.native_balance && Number(chain.native_balance.balance) > 0 && (
-                                <TokenRow token={chain.native_balance} />
+                                <TokenRow token={chain.native_balance} isPrivacyMode={isPrivacyMode} />
                               )}
                               {/* Other tokens sorted by value (hide < $1) */}
                               {chain.tokens
                                 .filter(t => Number(t.balance_usd) >= 1)
                                 .sort((a, b) => Number(b.balance_usd) - Number(a.balance_usd))
                                 .map(token => (
-                                  <TokenRow key={token.token_address} token={token} />
+                                  <TokenRow key={token.token_address} token={token} isPrivacyMode={isPrivacyMode} />
                                 ))}
                             </div>
                           </div>

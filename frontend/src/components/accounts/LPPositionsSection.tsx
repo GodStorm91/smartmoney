@@ -9,8 +9,9 @@ import { Layers, RefreshCw, ChevronRight } from 'lucide-react'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { fetchWallets, fetchDefiPositions, fetchUnattributedRewards } from '@/services/crypto-service'
 import { PositionDetailModal } from '@/components/crypto/PositionDetailModal'
 import { UnattributedRewardsCard } from '@/components/crypto/UnattributedRewardsCard'
@@ -79,22 +80,26 @@ function groupPositionsByPool(positions: DefiPosition[]): GroupedPosition[] {
 function PositionRow({
   group,
   onClick,
+  isPrivacyMode,
 }: {
   group: GroupedPosition
   onClick: (group: GroupedPosition) => void
+  isPrivacyMode: boolean
 }) {
   const chainId = group.chain_id as ChainId
   const chainInfo = CHAIN_INFO[chainId]
   const primaryToken = group.tokens[0]
 
   // Format tokens display - e.g., "WETH + USDC" or "0.0012 WETH + 1.5 USDC"
-  const tokensDisplay = group.tokens
-    .map((t) => {
-      const amt = Number(t.balance)
-      const formatted = amt < 0.0001 ? '<0.0001' : amt < 1 ? amt.toFixed(4) : amt.toFixed(2)
-      return `${formatted} ${t.symbol}`
-    })
-    .join(' + ')
+  const tokensDisplay = isPrivacyMode
+    ? group.tokens.map((t) => `*** ${t.symbol}`).join(' + ')
+    : group.tokens
+        .map((t) => {
+          const amt = Number(t.balance)
+          const formatted = amt < 0.0001 ? '<0.0001' : amt < 1 ? amt.toFixed(4) : amt.toFixed(2)
+          return `${formatted} ${t.symbol}`
+        })
+        .join(' + ')
 
   return (
     <button
@@ -177,7 +182,7 @@ function PositionRow({
       <div className="flex items-center gap-2">
         <div className="text-right">
           <p className="font-semibold text-gray-900 dark:text-white">
-            ${group.total_usd.toFixed(2)}
+            {isPrivacyMode ? '$***' : `$${group.total_usd.toFixed(2)}`}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 max-w-[180px] truncate">
             {tokensDisplay}
@@ -192,6 +197,7 @@ function PositionRow({
 export function LPPositionsSection() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
   const [selectedGroup, setSelectedGroup] = useState<GroupedPosition | null>(null)
   const rates = useRatesMap()
 
@@ -279,7 +285,7 @@ export function LPPositionsSection() {
             <div>
               <p className="text-sm text-gray-600 dark:text-gray-400">{t('crypto.totalDefiValue')}</p>
               <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
-                {formatCurrency(totalValueJpy, currency, rates)}
+                {formatCurrencyPrivacy(totalValueJpy, currency, rates, false, isPrivacyMode)}
               </p>
             </div>
             <button
@@ -321,7 +327,7 @@ export function LPPositionsSection() {
                       {protocol}
                     </span>
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      ${groups.reduce((sum, g) => sum + g.total_usd, 0).toFixed(2)}
+                      {isPrivacyMode ? '$***' : `$${groups.reduce((sum, g) => sum + g.total_usd, 0).toFixed(2)}`}
                     </span>
                   </div>
                 </div>
@@ -335,6 +341,7 @@ export function LPPositionsSection() {
                         key={group.key}
                         group={group}
                         onClick={setSelectedGroup}
+                        isPrivacyMode={isPrivacyMode}
                       />
                     ))}
                 </div>

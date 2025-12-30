@@ -8,7 +8,7 @@ import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
-import { fetchWallets, fetchWallet } from '@/services/crypto-service'
+import { fetchWallets, fetchWallet, fetchDefiPositions } from '@/services/crypto-service'
 
 const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
 
@@ -26,7 +26,7 @@ export function NetWorthCard() {
     queryFn: fetchWallets,
   })
 
-  // Fetch balance for each wallet
+  // Fetch balance for each wallet (token holdings)
   const { data: walletsWithBalance } = useQuery({
     queryKey: ['crypto-wallets-balance', wallets?.map(w => w.id)],
     queryFn: async () => {
@@ -36,11 +36,36 @@ export function NetWorthCard() {
     enabled: !!wallets && wallets.length > 0,
   })
 
-  // Calculate crypto balance in USD (then convert to display currency)
-  const cryptoBalanceUsd = walletsWithBalance?.reduce(
+  // Fetch DeFi positions for each wallet (LP positions, staking, etc.)
+  const { data: defiPositions } = useQuery({
+    queryKey: ['crypto-defi-positions', wallets?.map(w => w.id)],
+    queryFn: async () => {
+      if (!wallets || wallets.length === 0) return []
+      return Promise.all(
+        wallets.map(w =>
+          fetchDefiPositions(w.id).catch(() => ({
+            wallet_address: '',
+            total_value_usd: 0,
+            positions: [],
+          }))
+        )
+      )
+    },
+    enabled: !!wallets && wallets.length > 0,
+  })
+
+  // Calculate crypto balance: wallet tokens + DeFi positions
+  const walletBalanceUsd = walletsWithBalance?.reduce(
     (sum, w) => sum + (w.total_balance_usd || 0),
     0
   ) || 0
+
+  const defiBalanceUsd = defiPositions?.reduce(
+    (sum, d) => sum + (d.total_value_usd || 0),
+    0
+  ) || 0
+
+  const cryptoBalanceUsd = walletBalanceUsd + defiBalanceUsd
 
   // Convert USD to JPY for internal calculation (stored amounts are in JPY cents)
   // Crypto is already in USD, so we convert to JPY base for consistency
