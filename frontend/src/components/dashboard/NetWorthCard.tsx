@@ -68,10 +68,10 @@ export function NetWorthCard() {
 
   const cryptoBalanceUsd = walletBalanceUsd + defiBalanceUsd
 
-  // Convert USD to JPY for internal calculation (stored amounts are in JPY cents)
+  // Convert USD to JPY for display
   // rates.USD is the JPY-to-USD rate (~0.00667), so we need 1/rate to get USD-to-JPY (~150)
   const usdToJpyRate = 1 / (Number(rates?.USD) || 0.00667)
-  const cryptoBalanceJpy = Math.round(cryptoBalanceUsd * usdToJpyRate * 100) || 0 // Convert to cents
+  const cryptoBalanceJpy = Math.round(cryptoBalanceUsd * usdToJpyRate) || 0
 
   // Calculate totals
   const assets = accounts?.filter(a => ASSET_TYPES.includes(a.type))
