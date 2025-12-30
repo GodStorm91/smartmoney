@@ -247,12 +247,14 @@ export interface RewardsScanResult {
 export interface TokenTotal {
   symbol: string
   amount: number
+  amount_usd: number | null
 }
 
 export interface MonthlyRewardTotal {
   month: string // YYYY-MM format
   symbol: string
   amount: number
+  amount_usd: number | null
   count: number
 }
 

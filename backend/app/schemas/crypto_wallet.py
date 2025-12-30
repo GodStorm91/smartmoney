@@ -400,6 +400,7 @@ class TokenTotal(BaseModel):
 
     symbol: str
     amount: Decimal
+    amount_usd: Optional[Decimal] = None
 
 
 class MonthlyRewardTotal(BaseModel):
@@ -408,6 +409,7 @@ class MonthlyRewardTotal(BaseModel):
     month: str  # YYYY-MM format
     symbol: str
     amount: Decimal
+    amount_usd: Optional[Decimal] = None
     count: int
 
 

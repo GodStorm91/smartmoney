@@ -4,12 +4,63 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Optional
 
+import httpx
 from sqlalchemy.orm import Session
 
 from ..models.crypto_wallet import PositionReward, PositionCostBasis
 from .polygonscan_service import PolygonscanService
 
 logger = logging.getLogger(__name__)
+
+# CoinGecko token ID mapping for common reward tokens
+TOKEN_COINGECKO_IDS = {
+    "QUICK": "quickswap",
+    "OSHI": "oshi-token",
+    "WMATIC": "wmatic",
+    "MATIC": "matic-network",
+    "USDC": "usd-coin",
+    "USDT": "tether",
+    "WETH": "weth",
+    "ETH": "ethereum",
+}
+
+
+async def get_token_prices(symbols: list[str]) -> dict[str, Decimal]:
+    """Fetch current USD prices for tokens from CoinGecko."""
+    prices = {}
+
+    # Map symbols to CoinGecko IDs
+    ids_to_fetch = []
+    symbol_to_id = {}
+    for symbol in symbols:
+        cg_id = TOKEN_COINGECKO_IDS.get(symbol.upper())
+        if cg_id:
+            ids_to_fetch.append(cg_id)
+            symbol_to_id[cg_id] = symbol
+
+    if not ids_to_fetch:
+        return prices
+
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.coingecko.com/api/v3/simple/price",
+                params={
+                    "ids": ",".join(ids_to_fetch),
+                    "vs_currencies": "usd"
+                },
+                timeout=10.0
+            )
+            if response.status_code == 200:
+                data = response.json()
+                for cg_id, price_data in data.items():
+                    symbol = symbol_to_id.get(cg_id)
+                    if symbol and "usd" in price_data:
+                        prices[symbol] = Decimal(str(price_data["usd"]))
+    except Exception as e:
+        logger.warning(f"Failed to fetch token prices: {e}")
+
+    return prices
 
 
 class RewardService:
@@ -153,9 +204,6 @@ class RewardService:
 
         # Get rewards
         rewards = RewardService.get_position_rewards(db, user_id, position_id)
-        total_rewards_usd = sum(
-            r.reward_usd or Decimal(0) for r in rewards
-        )
 
         # Calculate token totals grouped by symbol
         token_totals: dict[str, Decimal] = {}
@@ -163,10 +211,24 @@ class RewardService:
             symbol = r.reward_token_symbol or "UNKNOWN"
             token_totals[symbol] = token_totals.get(symbol, Decimal(0)) + (r.reward_amount or Decimal(0))
 
-        rewards_by_token = [
-            {"symbol": symbol, "amount": amount}
-            for symbol, amount in sorted(token_totals.items())
-        ]
+        # Fetch current token prices
+        token_prices = await get_token_prices(list(token_totals.keys()))
+
+        # Build rewards_by_token with USD values, filter out < $1
+        rewards_by_token = []
+        total_rewards_usd = Decimal(0)
+        for symbol, amount in sorted(token_totals.items()):
+            price = token_prices.get(symbol)
+            amount_usd = (amount * price) if price else None
+            if amount_usd:
+                total_rewards_usd += amount_usd
+            # Filter out tokens with < $1 USD value
+            if amount_usd is None or amount_usd >= Decimal(1):
+                rewards_by_token.append({
+                    "symbol": symbol,
+                    "amount": amount,
+                    "amount_usd": amount_usd
+                })
 
         # Calculate monthly breakdown (grouped by month + symbol)
         monthly_totals: dict[tuple[str, str], dict] = {}
@@ -179,12 +241,20 @@ class RewardService:
             monthly_totals[key]["amount"] += r.reward_amount or Decimal(0)
             monthly_totals[key]["count"] += 1
 
-        # Sort by month descending (newest first)
-        rewards_by_month = sorted(
-            monthly_totals.values(),
-            key=lambda x: x["month"],
-            reverse=True
-        )
+        # Add USD values to monthly breakdown, filter out < $1
+        rewards_by_month = []
+        for data in sorted(monthly_totals.values(), key=lambda x: x["month"], reverse=True):
+            price = token_prices.get(data["symbol"])
+            amount_usd = (data["amount"] * price) if price else None
+            # Filter out monthly entries with < $1 USD value
+            if amount_usd is None or amount_usd >= Decimal(1):
+                rewards_by_month.append({
+                    "month": data["month"],
+                    "symbol": data["symbol"],
+                    "amount": data["amount"],
+                    "amount_usd": amount_usd,
+                    "count": data["count"]
+                })
 
         result = {
             "position_id": position_id,

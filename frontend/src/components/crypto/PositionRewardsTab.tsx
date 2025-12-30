@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar, RefreshCw, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check } from 'lucide-react'
 import { fetchPositionROI, scanRewards } from '@/services/crypto-service'
 
 interface PositionRewardsTabProps {
@@ -12,7 +12,6 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [scanResult, setScanResult] = useState<{ scanned: number; new: number } | null>(null)
-  const [expandedMonths, setExpandedMonths] = useState<Set<string>>(new Set())
 
   const { data: roi, isLoading } = useQuery({
     queryKey: ['position-roi', positionId],
@@ -64,16 +63,6 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     })
   }
 
-  const toggleMonth = (month: string) => {
-    const newExpanded = new Set(expandedMonths)
-    if (newExpanded.has(month)) {
-      newExpanded.delete(month)
-    } else {
-      newExpanded.add(month)
-    }
-    setExpandedMonths(newExpanded)
-  }
-
   return (
     <div className="space-y-4">
       {/* Scan Button */}
@@ -116,7 +105,8 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
             {t('crypto.roiSummary', 'ROI Summary')}
           </h4>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-3">
+            {/* Total Rewards */}
             <div>
               <div className="text-sm text-green-600 dark:text-green-400">
                 {t('crypto.totalRewards', 'Total Rewards')}
@@ -124,8 +114,15 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               {roi.rewards_by_token && roi.rewards_by_token.length > 0 ? (
                 <div className="space-y-1">
                   {roi.rewards_by_token.map((token) => (
-                    <div key={token.symbol} className="text-lg font-semibold text-green-800 dark:text-green-200">
-                      {formatAmount(token.amount)} {token.symbol}
+                    <div key={token.symbol}>
+                      <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+                        {formatAmount(token.amount)} {token.symbol}
+                      </div>
+                      {token.amount_usd !== null && (
+                        <div className="text-sm text-green-600 dark:text-green-400">
+                          ≈ {formatCurrency(token.amount_usd)}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -139,42 +136,33 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               </div>
             </div>
 
-            <div>
-              <div className="text-sm text-green-600 dark:text-green-400">
-                {t('crypto.currentValue', 'Current Value')}
-              </div>
-              <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                {formatCurrency(roi.current_value_usd)}
-              </div>
-            </div>
-
-            {roi.simple_roi_pct !== null && (
-              <div>
-                <div className="text-sm text-green-600 dark:text-green-400">
-                  {t('crypto.roi', 'ROI')}
-                </div>
-                <div className={`text-lg font-semibold ${
-                  roi.simple_roi_pct >= 0
-                    ? 'text-green-800 dark:text-green-200'
-                    : 'text-red-600 dark:text-red-400'
-                }`}>
-                  {formatPercent(roi.simple_roi_pct)}
-                </div>
-                {roi.days_held && (
-                  <div className="text-xs text-green-600 dark:text-green-400">
-                    {roi.days_held} {t('crypto.daysHeld', 'days')}
+            {/* ROI Section - only show if cost basis exists */}
+            {roi.cost_basis_usd !== null && roi.simple_roi_pct !== null && (
+              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-green-200 dark:border-green-800">
+                <div>
+                  <div className="text-sm text-green-600 dark:text-green-400">
+                    {t('crypto.costBasis', 'Cost Basis')}
                   </div>
-                )}
-              </div>
-            )}
-
-            {roi.cost_basis_usd !== null && (
-              <div>
-                <div className="text-sm text-green-600 dark:text-green-400">
-                  {t('crypto.costBasis', 'Cost Basis')}
+                  <div className="text-lg font-semibold text-green-800 dark:text-green-200">
+                    {formatCurrency(roi.cost_basis_usd)}
+                  </div>
                 </div>
-                <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                  {formatCurrency(roi.cost_basis_usd)}
+                <div>
+                  <div className="text-sm text-green-600 dark:text-green-400">
+                    {t('crypto.roi', 'ROI')}
+                  </div>
+                  <div className={`text-lg font-semibold ${
+                    roi.simple_roi_pct >= 0
+                      ? 'text-green-800 dark:text-green-200'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {formatPercent(roi.simple_roi_pct)}
+                  </div>
+                  {roi.days_held && (
+                    <div className="text-xs text-green-600 dark:text-green-400">
+                      {roi.days_held} {t('crypto.daysHeld', 'days')}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -192,30 +180,29 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
 
           <div className="space-y-2">
             {roi.rewards_by_month.map((monthly) => (
-              <button
+              <div
                 key={`${monthly.month}-${monthly.symbol}`}
-                onClick={() => toggleMonth(monthly.month)}
-                className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-750 transition-colors text-left"
+                className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
               >
-                <div className="flex items-center gap-2">
-                  {expandedMonths.has(monthly.month) ? (
-                    <ChevronDown className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="h-4 w-4 text-gray-400" />
-                  )}
+                <div>
                   <span className="font-medium text-gray-900 dark:text-gray-100">
                     {formatMonth(monthly.month)}
                   </span>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {monthly.count} {t('crypto.claims', 'claims')}
+                  </div>
                 </div>
                 <div className="text-right">
                   <div className="font-semibold text-gray-900 dark:text-gray-100">
                     {formatAmount(monthly.amount)} {monthly.symbol}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    {monthly.count} {t('crypto.claims', 'claims')}
-                  </div>
+                  {monthly.amount_usd !== null && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      ≈ {formatCurrency(monthly.amount_usd)}
+                    </div>
+                  )}
                 </div>
-              </button>
+              </div>
             ))}
           </div>
         </div>
