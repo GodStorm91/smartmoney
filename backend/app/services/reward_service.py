@@ -48,11 +48,15 @@ class RewardService:
             if existing:
                 continue
 
-            # Get token info
-            token_info = await PolygonscanService.get_token_info(claim["token_address"])
+            # Use token info from tokentx response, fallback to lookup
+            token_symbol = claim.get("token_symbol")
+            decimals = claim.get("token_decimals", 18)
+            if not token_symbol:
+                token_info = await PolygonscanService.get_token_info(claim["token_address"])
+                token_symbol = token_info.get("symbol")
+                decimals = token_info.get("decimals", 18)
 
             # Calculate human-readable amount
-            decimals = token_info.get("decimals", 18)
             amount = Decimal(claim["amount_raw"]) / (Decimal(10) ** decimals)
 
             # Create reward record
@@ -61,7 +65,7 @@ class RewardService:
                 wallet_address=wallet_address.lower(),
                 chain_id="polygon",
                 reward_token_address=claim["token_address"],
-                reward_token_symbol=token_info.get("symbol"),
+                reward_token_symbol=token_symbol,
                 reward_amount=amount,
                 claimed_at=claim["timestamp"],
                 tx_hash=claim["tx_hash"],

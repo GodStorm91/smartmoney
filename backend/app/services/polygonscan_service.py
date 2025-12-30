@@ -18,9 +18,11 @@ CLAIMED_TOPIC = "0x4ec90e965519d92681267467f775ada5bd214aa92c0dc93d90a5e880ce9ed
 
 
 class PolygonscanService:
-    """Service for scanning Polygon blockchain via Polygonscan API."""
+    """Service for scanning Polygon blockchain via Etherscan V2 API."""
 
-    BASE_URL = "https://api.polygonscan.com/api"
+    # Use Etherscan V2 unified API
+    BASE_URL = "https://api.etherscan.io/v2/api"
+    POLYGON_CHAIN_ID = "137"
 
     @staticmethod
     def _get_api_key() -> str:
@@ -35,7 +37,10 @@ class PolygonscanService:
         from_block: int = 0,
         to_block: str = "latest"
     ) -> list[dict]:
-        """Fetch Merkl claim events for a wallet.
+        """Fetch Merkl claim events for a wallet using token transfers.
+
+        Uses the tokentx endpoint to find token transfers from Merkl Distributor,
+        which is more reliable than getLogs after Etherscan API V2 migration.
 
         Args:
             wallet_address: The wallet to scan
@@ -47,17 +52,14 @@ class PolygonscanService:
         """
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                # Pad address to 32 bytes for topic matching
-                padded_address = "0x" + wallet_address[2:].lower().zfill(64)
-
                 params = {
-                    "module": "logs",
-                    "action": "getLogs",
-                    "fromBlock": from_block,
-                    "toBlock": to_block,
-                    "address": MERKL_DISTRIBUTOR,
-                    "topic0": CLAIMED_TOPIC,
-                    "topic1": padded_address,
+                    "chainid": PolygonscanService.POLYGON_CHAIN_ID,
+                    "module": "account",
+                    "action": "tokentx",
+                    "address": wallet_address.lower(),
+                    "startblock": from_block,
+                    "endblock": 99999999 if to_block == "latest" else to_block,
+                    "sort": "desc",
                     "apikey": PolygonscanService._get_api_key(),
                 }
 
@@ -74,44 +76,45 @@ class PolygonscanService:
                     logger.warning(f"Polygonscan: {data.get('message')}")
                     return []
 
-                return PolygonscanService._parse_claim_logs(data.get("result", []))
+                # Filter for transfers FROM Merkl Distributor
+                return PolygonscanService._parse_token_transfers(
+                    data.get("result", []),
+                    wallet_address.lower()
+                )
 
         except Exception as e:
             logger.error(f"Polygonscan API error: {e}")
             raise
 
     @staticmethod
-    def _parse_claim_logs(logs: list) -> list[dict]:
-        """Parse Polygonscan log entries into claim records."""
+    def _parse_token_transfers(transfers: list, wallet_address: str) -> list[dict]:
+        """Parse token transfers from Merkl Distributor into claim records."""
         claims = []
+        merkl_lower = MERKL_DISTRIBUTOR.lower()
 
-        for log in logs:
+        for tx in transfers:
             try:
-                topics = log.get("topics", [])
-                if len(topics) < 3:
+                # Only include transfers FROM Merkl Distributor TO our wallet
+                if tx.get("from", "").lower() != merkl_lower:
+                    continue
+                if tx.get("to", "").lower() != wallet_address:
                     continue
 
-                # Topic 2 is token address (indexed)
-                token_address = "0x" + topics[2][-40:]
-
-                # Data contains amount (uint256)
-                data = log.get("data", "0x")
-                amount_raw = int(data, 16) if data and data != "0x" else 0
-
-                # Parse timestamp
-                timestamp_hex = log.get("timeStamp", "0x0")
-                timestamp = int(timestamp_hex, 16) if timestamp_hex.startswith("0x") else int(timestamp_hex)
+                timestamp = int(tx.get("timeStamp", 0))
 
                 claims.append({
-                    "tx_hash": log.get("transactionHash"),
-                    "block_number": int(log.get("blockNumber", "0x0"), 16),
+                    "tx_hash": tx.get("hash"),
+                    "block_number": int(tx.get("blockNumber", 0)),
                     "timestamp": datetime.fromtimestamp(timestamp),
-                    "token_address": token_address.lower(),
-                    "amount_raw": amount_raw,
+                    "token_address": tx.get("contractAddress", "").lower(),
+                    "amount_raw": int(tx.get("value", 0)),
+                    # Include token info from response
+                    "token_symbol": tx.get("tokenSymbol"),
+                    "token_decimals": int(tx.get("tokenDecimal", 18)),
                 })
 
             except Exception as e:
-                logger.warning(f"Failed to parse claim log: {e}")
+                logger.warning(f"Failed to parse token transfer: {e}")
                 continue
 
         return claims
@@ -122,6 +125,7 @@ class PolygonscanService:
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 params = {
+                    "chainid": PolygonscanService.POLYGON_CHAIN_ID,
                     "module": "block",
                     "action": "getblocknobytime",
                     "timestamp": timestamp,
