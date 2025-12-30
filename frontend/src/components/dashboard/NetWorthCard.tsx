@@ -55,13 +55,14 @@ export function NetWorthCard() {
   })
 
   // Calculate crypto balance: wallet tokens + DeFi positions
+  // Use Number() to ensure proper parsing and fallback to 0 for NaN
   const walletBalanceUsd = walletsWithBalance?.reduce(
-    (sum, w) => sum + (w.total_balance_usd || 0),
+    (sum, w) => sum + (Number(w.total_balance_usd) || 0),
     0
   ) || 0
 
   const defiBalanceUsd = defiPositions?.reduce(
-    (sum, d) => sum + (d.total_value_usd || 0),
+    (sum, d) => sum + (Number(d.total_value_usd) || 0),
     0
   ) || 0
 
@@ -69,8 +70,8 @@ export function NetWorthCard() {
 
   // Convert USD to JPY for internal calculation (stored amounts are in JPY cents)
   // Crypto is already in USD, so we convert to JPY base for consistency
-  const usdToJpyRate = rates?.USD || 150
-  const cryptoBalanceJpy = Math.round(cryptoBalanceUsd * usdToJpyRate * 100) // Convert to cents
+  const usdToJpyRate = Number(rates?.USD) || 150
+  const cryptoBalanceJpy = Math.round(cryptoBalanceUsd * usdToJpyRate * 100) || 0 // Convert to cents, fallback to 0
 
   // Calculate totals
   const assets = accounts?.filter(a => ASSET_TYPES.includes(a.type))
