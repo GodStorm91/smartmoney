@@ -248,13 +248,30 @@ export function Transactions() {
   const summaryCurrency = selectedAccount?.currency || currency
 
   // Calculate summary from filtered transactions (respects account filter)
-  // When filtering by account, amounts are already in the account's currency
+  // When filtering by account: amounts are in account's currency (no conversion)
+  // When viewing all: convert each transaction to JPY base currency
   const { income, expense, net } = useMemo(() => {
     const txList = accountFilteredTransactions
-    const inc = txList.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
-    const exp = txList.filter(t => t.type === 'expense').reduce((sum, t) => sum + Math.abs(t.amount), 0)
+
+    // Helper to convert amount to JPY base currency
+    const toJpy = (amount: number, txCurrency: string) => {
+      if (selectedAccount) {
+        // Filtering by account - amounts are native, no conversion needed
+        return amount
+      }
+      // Convert to JPY: divide by rate (rate = JPY to currency)
+      const rate = rates[txCurrency] || 1
+      return amount / rate
+    }
+
+    const inc = txList
+      .filter(t => t.type === 'income')
+      .reduce((sum, t) => sum + toJpy(t.amount, t.currency || 'JPY'), 0)
+    const exp = txList
+      .filter(t => t.type === 'expense')
+      .reduce((sum, t) => sum + toJpy(Math.abs(t.amount), t.currency || 'JPY'), 0)
     return { income: inc, expense: exp, net: inc - exp }
-  }, [accountFilteredTransactions])
+  }, [accountFilteredTransactions, selectedAccount, rates])
 
   // Sort transactions
   const sortedTransactions = useMemo(() => {

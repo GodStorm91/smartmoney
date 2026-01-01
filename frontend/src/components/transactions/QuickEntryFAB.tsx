@@ -459,7 +459,7 @@ export function QuickEntryFAB() {
 
         {/* Account Selection */}
         {step === 'account' && (
-          <div className="p-4">
+          <div className="p-4 overflow-x-hidden">
             {/* Amount + Category reminder with conversion */}
             <div className="text-center py-2 mb-4">
               <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
@@ -495,7 +495,7 @@ export function QuickEntryFAB() {
             </div>
 
             {/* Account List */}
-            <div className="space-y-2 max-h-64 overflow-y-auto">
+            <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden">
               {filteredAccounts.map((account) => (
                 <button
                   key={account.id}
