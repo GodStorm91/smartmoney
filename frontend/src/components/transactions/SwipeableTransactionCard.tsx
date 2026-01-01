@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
 import { formatDate } from '@/utils/formatDate'
 import { formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
-import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import type { Transaction } from '@/types'
@@ -19,7 +18,6 @@ export function SwipeableTransactionCard({
   onEdit,
   onDelete,
 }: SwipeableTransactionCardProps) {
-  const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const rates = useRatesMap()
 
@@ -149,9 +147,9 @@ export function SwipeableTransactionCard({
               {formatCurrencySignedPrivacy(
                 transaction.amount,
                 transaction.type,
-                currency,
+                transaction.currency || 'JPY',
                 rates,
-                false,
+                true,
                 isPrivacyMode
               )}
             </p>
