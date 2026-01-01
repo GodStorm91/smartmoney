@@ -247,6 +247,9 @@ export function Transactions() {
   // Summary currency: use account's currency if filtering by account, else user's display currency
   const summaryCurrency = selectedAccount?.currency || currency
 
+  // Default rates for fallback when API hasn't loaded
+  const DEFAULT_RATES: Record<string, number> = { JPY: 1, USD: 0.00667, VND: 167 }
+
   // Calculate summary from filtered transactions (respects account filter)
   // When filtering by account: amounts are in account's currency (no conversion)
   // When viewing all: convert each transaction to JPY base currency
@@ -260,7 +263,8 @@ export function Transactions() {
         return amount
       }
       // Convert to JPY: divide by rate (rate = JPY to currency)
-      const rate = rates[txCurrency] || 1
+      // Use default rates as fallback when API hasn't loaded
+      const rate = rates[txCurrency] ?? DEFAULT_RATES[txCurrency] ?? 1
       return amount / rate
     }
 
