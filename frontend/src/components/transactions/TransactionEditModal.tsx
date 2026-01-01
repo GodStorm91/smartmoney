@@ -30,10 +30,18 @@ export function TransactionEditModal({
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [displayAmount, setDisplayAmount] = useState('')
+  const [currency, setCurrency] = useState('JPY')
   const [category, setCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+  // Currency options
+  const currencyOptions = [
+    { value: 'JPY', label: '¥ JPY' },
+    { value: 'USD', label: '$ USD' },
+    { value: 'VND', label: '₫ VND' },
+  ]
 
   // Format number with thousand separators
   const formatWithSeparators = (value: string): string => {
@@ -80,12 +88,23 @@ export function TransactionEditModal({
       const absAmount = Math.abs(transaction.amount).toString()
       setAmount(absAmount)
       setDisplayAmount(formatWithSeparators(absAmount))
+      setCurrency(transaction.currency || 'JPY')
       setCategory(transaction.category)
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
       setShowDeleteConfirm(false)
     }
   }, [transaction?.id, isOpen])
+
+  // Update currency when account changes
+  useEffect(() => {
+    if (accountId) {
+      const selectedAccount = accounts.find(a => a.id === accountId)
+      if (selectedAccount?.currency) {
+        setCurrency(selectedAccount.currency)
+      }
+    }
+  }, [accountId, accounts])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,6 +120,7 @@ export function TransactionEditModal({
       date,
       description,
       amount: Math.round(type === 'expense' ? -Math.abs(amountValue) : Math.abs(amountValue)),
+      currency,
       category: category || 'Other',
       source,
       type,
@@ -172,14 +192,26 @@ export function TransactionEditModal({
                 required
               />
 
-              <Input
-                label={t('transaction.amount')}
-                type="text"
-                inputMode="numeric"
-                value={displayAmount}
-                onChange={handleAmountChange}
-                required
-              />
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <Input
+                    label={t('transaction.amount')}
+                    type="text"
+                    inputMode="numeric"
+                    value={displayAmount}
+                    onChange={handleAmountChange}
+                    required
+                  />
+                </div>
+                <div className="w-28">
+                  <Select
+                    label={t('transaction.currency', 'Currency')}
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    options={currencyOptions}
+                  />
+                </div>
+              </div>
 
               <Select
                 label={t('transaction.type')}

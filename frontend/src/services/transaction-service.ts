@@ -6,6 +6,7 @@ interface BackendTransaction {
   date: string
   description: string
   amount: number
+  currency: string
   category: string
   source: string
   is_income: boolean
@@ -31,6 +32,7 @@ function transformTransaction(tx: BackendTransaction): Transaction {
     date: tx.date,
     description: tx.description,
     amount: tx.amount,
+    currency: tx.currency || 'JPY',
     category: tx.category,
     source: tx.source,
     type: tx.is_income ? 'income' : 'expense',

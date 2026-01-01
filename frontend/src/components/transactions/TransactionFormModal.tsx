@@ -212,6 +212,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           date,
           description: description.trim(),
           amount: isIncome ? amountValue : -amountValue,
+          currency: selectedAccount?.currency || 'JPY',
           category: categoryValue,
           source: selectedAccount?.name || '',
           type: isIncome ? 'income' : 'expense',

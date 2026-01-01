@@ -33,6 +33,7 @@ function fromDBTransaction(tx: DBTransaction): Transaction {
     date: tx.date,
     description: tx.description,
     amount: tx.amount,
+    currency: (tx as DBTransaction & { currency?: string }).currency || 'JPY',
     category: tx.category,
     source: tx.source,
     type: tx.type,

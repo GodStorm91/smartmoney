@@ -206,6 +206,7 @@ export function QuickEntryFAB() {
         date: new Date().toISOString().split('T')[0],
         description: voiceDescription || selectedCategory.value, // Use voice description if available
         amount: -finalAmount, // Negative for expense
+        currency: account.currency || 'JPY',
         category: selectedCategory.value,
         source: account.name,
         type: 'expense',

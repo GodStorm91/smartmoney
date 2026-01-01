@@ -4,6 +4,7 @@ export interface Transaction {
   date: string
   description: string
   amount: number
+  currency: string  // ISO currency code (JPY, USD, VND)
   category: string
   source: string
   type: 'income' | 'expense'
