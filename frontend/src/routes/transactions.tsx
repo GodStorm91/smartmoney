@@ -7,6 +7,7 @@ type TransactionsSearch = {
   month?: string
   accountId?: number   // Filter by account ID
   fromAccounts?: boolean  // Show back to accounts button
+  type?: 'income' | 'expense'  // Filter by transaction type
 }
 
 export const Route = createFileRoute('/transactions')({
@@ -17,5 +18,6 @@ export const Route = createFileRoute('/transactions')({
     accountId: typeof search.accountId === 'number' ? search.accountId :
                (typeof search.accountId === 'string' && !isNaN(Number(search.accountId)) ? Number(search.accountId) : undefined),
     fromAccounts: search.fromAccounts === true || search.fromAccounts === 'true',
+    type: search.type === 'income' || search.type === 'expense' ? search.type : undefined,
   }),
 })

@@ -50,7 +50,7 @@ export function Transactions() {
   const { data: accounts } = useAccounts()
 
   // Read URL search params from TanStack Router
-  const { categories: categoriesParam, month: monthParam, accountId, fromAccounts } = useSearch({
+  const { categories: categoriesParam, month: monthParam, accountId, fromAccounts, type: typeParam } = useSearch({
     from: '/transactions',
   })
 
@@ -66,7 +66,7 @@ export function Transactions() {
     end_date: initialDateRange.end,
     categories: parsedCategories,
     source: '',
-    type: 'all',
+    type: typeParam || 'all',
   })
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebouncedValue(searchInput, 300)
@@ -112,7 +112,7 @@ export function Transactions() {
 
   // Update filters when URL params change (browser back/forward)
   useEffect(() => {
-    if (categoriesParam || monthParam) {
+    if (categoriesParam || monthParam || typeParam !== undefined) {
       const dateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
       const categories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : []
       setFilters(prev => ({
@@ -120,9 +120,22 @@ export function Transactions() {
         categories: categories.length > 0 ? categories : prev.categories,
         start_date: dateRange.start,
         end_date: dateRange.end,
+        type: typeParam || 'all',
       }))
     }
-  }, [categoriesParam, monthParam])
+  }, [categoriesParam, monthParam, typeParam])
+
+  // Handle summary card click to toggle type filter
+  const handleTypeFilter = (type: 'income' | 'expense') => {
+    const newType = typeParam === type ? undefined : type
+    navigate({
+      to: '/transactions',
+      search: (prev) => ({
+        ...prev,
+        type: newType,
+      }),
+    })
+  }
 
   // Modal state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
@@ -403,15 +416,29 @@ export function Transactions() {
         </div>
       </Card>
 
-      {/* Summary */}
+      {/* Summary - clickable to filter by type */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
+        <Card
+          onClick={() => handleTypeFilter('income')}
+          className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+            typeParam === 'income'
+              ? 'ring-2 ring-green-500 dark:ring-green-400 bg-green-50/50 dark:bg-green-900/20'
+              : ''
+          }`}
+        >
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
           <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
             {formatCurrencyPrivacy(income, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
           </p>
         </Card>
-        <Card>
+        <Card
+          onClick={() => handleTypeFilter('expense')}
+          className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+            typeParam === 'expense'
+              ? 'ring-2 ring-red-500 dark:ring-red-400 bg-red-50/50 dark:bg-red-900/20'
+              : ''
+          }`}
+        >
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
           <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
             {formatCurrencyPrivacy(expense, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}

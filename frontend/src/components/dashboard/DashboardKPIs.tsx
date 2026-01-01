@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { KPICard } from '@/components/financial/KPICard'
 
@@ -17,31 +18,37 @@ export function DashboardKPIs({ summary }: DashboardKPIsProps) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-      <KPICard
-        title={t('chart.income')}
-        amount={summary?.income || 0}
-        change={summary?.income_change}
-        type="income"
-        aria-label={t('kpi.thisMonthIncome')}
-        icon={
-          <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-        }
-      />
+      <Link to="/transactions" search={{ type: 'income' }} className="block">
+        <KPICard
+          title={t('chart.income')}
+          amount={summary?.income || 0}
+          change={summary?.income_change}
+          type="income"
+          aria-label={t('kpi.thisMonthIncome')}
+          clickable
+          icon={
+            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          }
+        />
+      </Link>
 
-      <KPICard
-        title={t('chart.expense')}
-        amount={summary?.expense || 0}
-        change={summary?.expense_change}
-        type="expense"
-        aria-label={t('kpi.thisMonthExpense')}
-        icon={
-          <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-          </svg>
-        }
-      />
+      <Link to="/transactions" search={{ type: 'expense' }} className="block">
+        <KPICard
+          title={t('chart.expense')}
+          amount={summary?.expense || 0}
+          change={summary?.expense_change}
+          type="expense"
+          aria-label={t('kpi.thisMonthExpense')}
+          clickable
+          icon={
+            <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+            </svg>
+          }
+        />
+      </Link>
 
       <KPICard
         title={t('chart.net')}

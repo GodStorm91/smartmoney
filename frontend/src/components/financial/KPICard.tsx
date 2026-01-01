@@ -11,10 +11,11 @@ interface KPICardProps {
   change?: number
   icon: React.ReactNode
   type?: 'income' | 'expense' | 'net'
+  clickable?: boolean
   'aria-label'?: string
 }
 
-export function KPICard({ title, amount, change, icon, type, ...props }: KPICardProps) {
+export function KPICard({ title, amount, change, icon, type, clickable, ...props }: KPICardProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
@@ -39,7 +40,12 @@ export function KPICard({ title, amount, change, icon, type, ...props }: KPICard
   const colors = type ? colorClasses[type] : { bg: 'bg-gray-50 dark:bg-gray-700', text: 'text-gray-600 dark:text-gray-400', badge: 'text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-700' }
 
   return (
-    <Card hover role="region" {...props}>
+    <Card
+      hover
+      role="region"
+      className={clickable ? 'cursor-pointer transition-all hover:shadow-md hover:scale-[1.01]' : undefined}
+      {...props}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className={cn('p-3 rounded-lg', colors.bg)}>{icon}</div>
         {change != null && (
