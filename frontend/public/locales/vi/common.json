@@ -661,6 +661,11 @@
     "overBudget": "Vượt Ngân Sách",
     "overBy": "Vượt {{amount}}",
     "carryOver": "Số Dư Chuyển Tiếp",
+    "previousBudgetFound": "Bạn có ngân sách từ {{month}}",
+    "clonePreviousMonth": "Sử Dụng Ngân Sách Tháng Trước",
+    "cloneDescription": "Nhanh chóng tạo ngân sách tháng này dựa trên cài đặt trước đó",
+    "orCreateNew": "Hoặc tạo mới",
+    "previousIncome": "Tháng trước",
     "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại.",
     "projection": {
       "title": "Dự Báo Chi Tiêu",

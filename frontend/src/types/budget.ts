@@ -49,3 +49,16 @@ export interface BudgetTracking {
   effective_budget?: number
   categories: BudgetTrackingItem[]
 }
+
+export interface BudgetAllocationSuggestion {
+  category: string
+  amount: number
+}
+
+export interface BudgetSuggestions {
+  has_previous: boolean
+  previous_month: string | null
+  previous_income: number | null
+  previous_allocations: BudgetAllocationSuggestion[] | null
+  carry_over: number
+}

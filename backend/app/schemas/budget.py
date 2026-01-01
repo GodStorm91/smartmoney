@@ -58,3 +58,18 @@ class BudgetTrackingResponse(BaseModel):
     total_spent: int
     savings_target: int | None = None
     categories: list[BudgetTrackingItem]
+
+
+class BudgetAllocationSuggestion(BaseModel):
+    """Allocation suggestion from previous budget."""
+    category: str
+    amount: int
+
+
+class BudgetSuggestionsResponse(BaseModel):
+    """Budget suggestions based on previous month."""
+    has_previous: bool
+    previous_month: str | None = None
+    previous_income: int | None = None
+    previous_allocations: list[BudgetAllocationSuggestion] | None = None
+    carry_over: int = 0

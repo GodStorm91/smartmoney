@@ -662,6 +662,11 @@
     "overBudget": "予算オーバー",
     "overBy": "{{amount}} オーバー",
     "carryOver": "繰越額",
+    "previousBudgetFound": "{{month}}の予算があります",
+    "clonePreviousMonth": "先月の予算を使用",
+    "cloneDescription": "前月の設定を使って今月の予算をすばやく生成",
+    "orCreateNew": "または新規作成",
+    "previousIncome": "前月",
     "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。",
     "projection": {
       "title": "支出予測",

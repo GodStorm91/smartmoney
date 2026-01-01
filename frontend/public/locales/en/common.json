@@ -662,6 +662,11 @@
     "overBudget": "Over Budget",
     "overBy": "Over by {{amount}}",
     "carryOver": "Carry Over",
+    "previousBudgetFound": "You have a budget from {{month}}",
+    "clonePreviousMonth": "Use Last Month's Budget",
+    "cloneDescription": "Quickly generate this month's budget using your previous settings",
+    "orCreateNew": "Or create a new budget",
+    "previousIncome": "Previous",
     "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language.",
     "projection": {
       "title": "Spending Projection",

@@ -8,7 +8,7 @@ import { BudgetSummaryCard } from '@/components/budget/budget-summary-card'
 import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { BudgetProjectionCard } from '@/components/budget/budget-projection-card'
 import { BudgetAllocationList } from '@/components/budget/budget-allocation-list'
-import { getCurrentBudget, generateBudget, regenerateBudget, getBudgetTracking } from '@/services/budget-service'
+import { getCurrentBudget, generateBudget, regenerateBudget, getBudgetTracking, getBudgetSuggestions } from '@/services/budget-service'
 import type { Budget } from '@/types'
 
 export function BudgetPage() {
@@ -51,6 +51,13 @@ export function BudgetPage() {
     },
     retry: false,
     enabled: !!savedBudget, // Only fetch if budget exists
+  })
+
+  // Fetch suggestions from previous month (only when no current budget)
+  const { data: suggestions } = useQuery({
+    queryKey: ['budget', 'suggestions'],
+    queryFn: getBudgetSuggestions,
+    enabled: !savedBudget && !isLoading, // Only fetch when no current budget
   })
 
   // Generate budget mutation (creates draft, doesn't save)
@@ -116,6 +123,7 @@ export function BudgetPage() {
           onGenerate={(income) => generateMutation.mutate(income)}
           isLoading={generateMutation.isPending}
           error={generateMutation.isError}
+          suggestions={suggestions}
         />
       )}
 

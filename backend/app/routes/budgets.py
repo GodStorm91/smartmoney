@@ -14,7 +14,8 @@ from ..schemas.budget import (
     BudgetGenerateRequest,
     BudgetRegenerateRequest,
     BudgetResponse,
-    BudgetTrackingResponse
+    BudgetTrackingResponse,
+    BudgetSuggestionsResponse
 )
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
@@ -143,6 +144,45 @@ def get_current_budget(
         )
 
     return budget
+
+
+@router.get("/suggestions", response_model=BudgetSuggestionsResponse)
+def get_budget_suggestions(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get budget suggestions based on previous month.
+
+    Returns previous month's budget data for cloning/pre-fill.
+    """
+    current_month = date.today().strftime("%Y-%m")
+    previous_month = BudgetService.get_previous_month(current_month)
+
+    # Get previous month budget
+    prev_budget = BudgetService.get_budget_by_month(db, current_user.id, previous_month)
+
+    if not prev_budget:
+        return BudgetSuggestionsResponse(
+            has_previous=False,
+            previous_month=None,
+            previous_income=None,
+            previous_allocations=None,
+            carry_over=0
+        )
+
+    # Calculate carry-over for current month
+    carry_over = BudgetService.calculate_carry_over(db, current_user.id, current_month)
+
+    return BudgetSuggestionsResponse(
+        has_previous=True,
+        previous_month=previous_month,
+        previous_income=prev_budget.monthly_income,
+        previous_allocations=[
+            {"category": a.category, "amount": a.amount}
+            for a in prev_budget.allocations
+        ],
+        carry_over=carry_over
+    )
 
 
 @router.post("/{budget_id}/regenerate", response_model=BudgetResponse)
