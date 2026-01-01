@@ -27,6 +27,7 @@ import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
+import { useAccounts } from '@/hooks/useAccounts'
 import type { Transaction, TransactionFilters } from '@/types'
 
 // Helper to get month date range from YYYY-MM format
@@ -46,6 +47,7 @@ export function Transactions() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const monthRange = getCurrentMonthRange()
+  const { data: accounts } = useAccounts()
 
   // Read URL search params from TanStack Router
   const { categories: categoriesParam, month: monthParam, accountId, fromAccounts } = useSearch({
@@ -236,7 +238,17 @@ export function Transactions() {
     return transactions.filter(tx => tx.account_id != null && Number(tx.account_id) === targetAccountId)
   }, [transactions, accountId])
 
+  // Get selected account for currency display
+  const selectedAccount = useMemo(() => {
+    if (!accountId || !accounts) return null
+    return accounts.find(a => a.id === Number(accountId)) || null
+  }, [accountId, accounts])
+
+  // Summary currency: use account's currency if filtering by account, else user's display currency
+  const summaryCurrency = selectedAccount?.currency || currency
+
   // Calculate summary from filtered transactions (respects account filter)
+  // When filtering by account, amounts are already in the account's currency
   const { income, expense, net } = useMemo(() => {
     const txList = accountFilteredTransactions
     const inc = txList.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0)
@@ -375,19 +387,19 @@ export function Transactions() {
         <Card>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
           <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
-            {formatCurrencyPrivacy(income, currency, rates, false, isPrivacyMode)}
+            {formatCurrencyPrivacy(income, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
           </p>
         </Card>
         <Card>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
           <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
-            {formatCurrencyPrivacy(expense, currency, rates, false, isPrivacyMode)}
+            {formatCurrencyPrivacy(expense, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
           </p>
         </Card>
         <Card>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
           <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
-            {formatCurrencyPrivacy(net, currency, rates, false, isPrivacyMode)}
+            {formatCurrencyPrivacy(net, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
           </p>
         </Card>
       </div>
