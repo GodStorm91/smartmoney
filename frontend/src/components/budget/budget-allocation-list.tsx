@@ -13,6 +13,7 @@ interface BudgetAllocationListProps {
   totalBudget: number
   tracking?: BudgetTracking
   month?: string  // Budget month in YYYY-MM format
+  isDraft?: boolean  // When true, disable navigation to transactions
   onAllocationChange?: (updatedAllocations: BudgetAllocation[]) => void
 }
 
@@ -21,6 +22,7 @@ export function BudgetAllocationList({
   totalBudget,
   tracking,
   month,
+  isDraft,
   onAllocationChange
 }: BudgetAllocationListProps) {
   const { t } = useTranslation('common')
@@ -84,6 +86,7 @@ export function BudgetAllocationList({
             totalBudget={totalBudget}
             trackingItem={trackingMap.get(allocation.category)}
             editable={!!onAllocationChange}
+            isDraft={isDraft}
             onAmountChange={(newAmount) => {
               if (onAllocationChange) {
                 const updated = [...allocations]
@@ -104,6 +107,7 @@ interface AllocationCardProps {
   totalBudget: number
   trackingItem?: BudgetTrackingItem
   editable: boolean
+  isDraft?: boolean
   onAmountChange: (newAmount: number) => void
   onCategoryClick: () => void
 }
@@ -113,6 +117,7 @@ function AllocationCard({
   totalBudget,
   trackingItem,
   editable,
+  isDraft,
   onAmountChange,
   onCategoryClick
 }: AllocationCardProps) {
@@ -163,10 +168,23 @@ function AllocationCard({
     return 'bg-green-500'
   }
 
+  // In draft mode: clicking card does nothing (user edits amounts)
+  // In saved mode: clicking card navigates to transactions
+  const handleCardClick = () => {
+    if (!isDraft) {
+      onCategoryClick()
+    }
+  }
+
   return (
     <Card
-      className="p-4 cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600 transition-all"
-      onClick={onCategoryClick}
+      className={cn(
+        "p-4 transition-all",
+        isDraft
+          ? "border-dashed border-blue-300 dark:border-blue-700"  // Draft: dashed border, no nav
+          : "cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600"  // Saved: clickable
+      )}
+      onClick={handleCardClick}
     >
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2">
