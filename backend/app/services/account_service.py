@@ -119,6 +119,7 @@ class AccountService:
                     date=today,
                     description="Balance Adjustment",
                     amount=abs(adjustment_amount),
+                    currency=account.currency or "JPY",
                     is_income=adjustment_amount > 0,
                     is_adjustment=True,
                     is_transfer=False,

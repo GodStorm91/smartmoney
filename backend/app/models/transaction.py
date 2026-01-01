@@ -19,7 +19,8 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     description: Mapped[str] = mapped_column(String(500), nullable=False)
-    amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # Amount in account's native currency (cents). Currently JPY only via CSV upload.
+    amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # Amount in account's native currency
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")  # ISO currency code (JPY, USD, VND)
     category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     subcategory: Mapped[str | None] = mapped_column(String(100), nullable=True)
     source: Mapped[str] = mapped_column(String(100), nullable=False)

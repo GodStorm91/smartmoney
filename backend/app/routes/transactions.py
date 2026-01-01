@@ -17,6 +17,7 @@ from ..schemas.transaction import (
     TransactionSuggestion,
 )
 from ..services.transaction_service import TransactionService
+from ..services.account_service import AccountService
 from ..utils.transaction_hasher import generate_tx_hash
 
 router = APIRouter(prefix="/api/transactions", tags=["transactions"])
@@ -40,6 +41,12 @@ async def create_transaction(
             transaction.description,
             transaction.source,
         )
+
+        # Inherit currency from linked account if not explicitly set
+        if tx_data.get("account_id") and tx_data.get("currency") == "JPY":
+            account = AccountService.get_account(db, current_user.id, tx_data["account_id"])
+            if account and account.currency:
+                tx_data["currency"] = account.currency
 
         created = TransactionService.create_transaction(db, tx_data)
         return created

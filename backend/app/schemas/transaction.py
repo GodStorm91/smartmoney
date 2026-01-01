@@ -10,7 +10,8 @@ class TransactionBase(BaseModel):
 
     date: datetime.date
     description: str = Field(..., max_length=500)
-    amount: int = Field(..., description="Amount in JPY as integer")
+    amount: int = Field(..., description="Amount in account's native currency")
+    currency: str = Field(default="JPY", max_length=3, description="ISO currency code (JPY, USD, VND)")
     category: str = Field(..., max_length=100)
     subcategory: Union[str, None] = Field(None, max_length=100)
     source: str = Field(..., max_length=100)
@@ -32,7 +33,8 @@ class TransactionUpdate(BaseModel):
 
     date: Union[datetime.date, None] = None
     description: Union[str, None] = Field(None, max_length=500)
-    amount: Union[int, None] = Field(None, description="Amount in JPY as integer")
+    amount: Union[int, None] = Field(None, description="Amount in account's native currency")
+    currency: Union[str, None] = Field(None, max_length=3, description="ISO currency code (JPY, USD, VND)")
     category: Union[str, None] = Field(None, max_length=100)
     subcategory: Union[str, None] = Field(None, max_length=100)
     source: Union[str, None] = Field(None, max_length=100)

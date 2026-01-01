@@ -263,6 +263,7 @@ class RecurringTransactionService:
                     date=recurring.next_run_date,
                     description=recurring.description,
                     amount=recurring.amount if recurring.is_income else -recurring.amount,
+                    currency=recurring.account.currency if recurring.account else "JPY",
                     category=recurring.category,
                     source=source,
                     is_income=recurring.is_income,
