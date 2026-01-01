@@ -57,7 +57,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
             <span className="text-2xl">{typeConfig.icon}</span>
           </div>
           <div>
-            <h3 className="font-semibold text-lg text-gray-900">{account.name}</h3>
+            <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{account.name}</h3>
             <p className={cn('text-sm', typeConfig.color)}>
               {t(`account.type.${account.type}`)}
             </p>
@@ -69,7 +69,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(account.id) }}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               aria-label={t('account.edit')}
             >
               <svg
@@ -78,7 +78,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5 text-gray-600"
+                className="w-5 h-5 text-gray-600 dark:text-gray-400"
               >
                 <path
                   strokeLinecap="round"
@@ -89,7 +89,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
             </button>
           )}
           {!account.is_active && (
-            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
+            <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
               {t('account.inactive')}
             </span>
           )}
@@ -98,7 +98,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
 
       {/* Balance */}
       <div className="mb-4">
-        <p className="text-sm text-gray-500 mb-1">{t('account.currentBalance')}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('account.currentBalance')}</p>
         <p
           className={cn(
             'text-3xl font-bold font-mono',
@@ -110,16 +110,16 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         <div>
-          <p className="text-xs text-gray-500">{t('account.initialBalance')}</p>
-          <p className="text-sm font-mono text-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('account.initialBalance')}</p>
+          <p className="text-sm font-mono text-gray-700 dark:text-gray-300">
             {formatCurrencyPrivacy(account.initial_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">{t('account.transactions')}</p>
-          <p className="text-sm font-semibold text-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t('account.transactions')}</p>
+          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
             {account.transaction_count}
           </p>
         </div>
@@ -127,9 +127,9 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
 
       {/* Notes (if present) */}
       {account.notes && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <p className="text-xs text-gray-500 mb-1">{t('account.notes')}</p>
-          <p className="text-sm text-gray-600">{account.notes}</p>
+        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('account.notes')}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{account.notes}</p>
         </div>
       )}
     </Card>

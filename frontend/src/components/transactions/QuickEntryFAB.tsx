@@ -11,7 +11,7 @@
  */
 import { useState, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Plus, X, Delete, Mic } from 'lucide-react'
+import { Plus, X, Delete, Mic, Search } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -53,6 +53,7 @@ export function QuickEntryFAB() {
   const [accountId, setAccountId] = useState<number | null>(null)
   const [inputCurrency, setInputCurrency] = useState<SupportedCurrency>('JPY')
   const [voiceDescription, setVoiceDescription] = useState('')
+  const [accountSearch, setAccountSearch] = useState('')
 
   // Voice input hook
   const {
@@ -92,6 +93,14 @@ export function QuickEntryFAB() {
 
   // Get selected account
   const selectedAccount = accounts?.find(a => a.id === accountId)
+
+  // Filter accounts by search term
+  const filteredAccounts = useMemo(() => {
+    if (!accounts) return []
+    if (!accountSearch.trim()) return accounts
+    const search = accountSearch.toLowerCase()
+    return accounts.filter(a => a.name.toLowerCase().includes(search))
+  }, [accounts, accountSearch])
 
   // Set default account and currency when accounts load
   useEffect(() => {
@@ -225,6 +234,7 @@ export function QuickEntryFAB() {
     setAmount('')
     setCategoryId('')
     setVoiceDescription('')
+    setAccountSearch('')
     // Reset currency to default (will be set by account effect)
   }
 
@@ -233,6 +243,7 @@ export function QuickEntryFAB() {
     setStep('amount')
     setAmount('')
     setCategoryId('')
+    setAccountSearch('')
   }
 
   // Close quick entry
@@ -464,9 +475,28 @@ export function QuickEntryFAB() {
               </span>
             </div>
 
+            {/* Account Search */}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={accountSearch}
+                onChange={(e) => setAccountSearch(e.target.value)}
+                placeholder={t('account.searchPlaceholder', 'Search accounts...')}
+                className={cn(
+                  'w-full h-10 pl-9 pr-4 rounded-lg text-sm',
+                  'bg-gray-100 dark:bg-gray-700 border-0',
+                  'text-gray-900 dark:text-gray-100',
+                  'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                )}
+                autoFocus
+              />
+            </div>
+
             {/* Account List */}
-            <div className="space-y-2">
-              {accounts?.map((account) => (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {filteredAccounts.map((account) => (
                 <button
                   key={account.id}
                   onClick={() => handleAccountSelect(account.id)}
@@ -484,6 +514,11 @@ export function QuickEntryFAB() {
                   </span>
                 </button>
               ))}
+              {filteredAccounts.length === 0 && (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                  {t('account.noResults', 'No accounts found')}
+                </p>
+              )}
             </div>
 
             {/* Saving indicator */}
