@@ -40,6 +40,7 @@ async def create_transaction(
             transaction.amount,
             transaction.description,
             transaction.source,
+            unique=True,  # Manual entry - allow similar transactions
         )
 
         # Inherit currency from linked account if not explicitly set
