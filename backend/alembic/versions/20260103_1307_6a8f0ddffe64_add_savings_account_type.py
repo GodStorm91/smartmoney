@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import text
 
 
 # revision identifiers, used by Alembic.
@@ -19,20 +20,41 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # For SQLite, we use batch mode to modify constraints
-    # This recreates the table with the new constraint
-    with op.batch_alter_table('accounts', recreate='always') as batch_op:
-        batch_op.drop_constraint('valid_account_type', type_='check')
-        batch_op.create_check_constraint(
-            'valid_account_type',
-            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'savings', 'other')"
-        )
+    # Get the database dialect
+    bind = op.get_bind()
+    dialect = bind.dialect.name
+
+    if dialect == 'postgresql':
+        # PostgreSQL: directly drop and create check constraint
+        op.execute(text('ALTER TABLE accounts DROP CONSTRAINT IF EXISTS valid_account_type'))
+        op.execute(text("""
+            ALTER TABLE accounts ADD CONSTRAINT valid_account_type
+            CHECK (type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'savings', 'other'))
+        """))
+    else:
+        # SQLite: use batch mode to modify constraints
+        with op.batch_alter_table('accounts', recreate='always') as batch_op:
+            batch_op.drop_constraint('valid_account_type', type_='check')
+            batch_op.create_check_constraint(
+                'valid_account_type',
+                "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'savings', 'other')"
+            )
 
 
 def downgrade() -> None:
-    with op.batch_alter_table('accounts', recreate='always') as batch_op:
-        batch_op.drop_constraint('valid_account_type', type_='check')
-        batch_op.create_check_constraint(
-            'valid_account_type',
-            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'other')"
-        )
+    bind = op.get_bind()
+    dialect = bind.dialect.name
+
+    if dialect == 'postgresql':
+        op.execute(text('ALTER TABLE accounts DROP CONSTRAINT IF EXISTS valid_account_type'))
+        op.execute(text("""
+            ALTER TABLE accounts ADD CONSTRAINT valid_account_type
+            CHECK (type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'other'))
+        """))
+    else:
+        with op.batch_alter_table('accounts', recreate='always') as batch_op:
+            batch_op.drop_constraint('valid_account_type', type_='check')
+            batch_op.create_check_constraint(
+                'valid_account_type',
+                "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'other')"
+            )
