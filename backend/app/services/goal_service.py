@@ -456,10 +456,19 @@ class GoalService:
             else 0
         )
 
-        # Calculate required monthly savings
-        total_saved = GoalService._calculate_net_savings(db, user_id, start_date)
+        # Calculate required monthly savings based on current progress
+        # Use linked account balance if available, otherwise use net cashflow
+        if goal.account_id:
+            try:
+                account_balance = AccountService.calculate_balance(db, user_id, goal.account_id)
+                total_saved = max(account_balance, 0)
+            except ValueError:
+                total_saved = 0
+        else:
+            total_saved = max(GoalService._calculate_net_savings(db, user_id, start_date), 0)
+
         needed_remaining = float(goal.target_amount) - float(total_saved)
-        required_monthly = needed_remaining / months_remaining
+        required_monthly = needed_remaining / months_remaining if months_remaining > 0 else needed_remaining
 
         # Calculate monthly gap
         monthly_gap = required_monthly - float(current_monthly_net)
