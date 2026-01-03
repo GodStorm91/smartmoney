@@ -43,7 +43,7 @@ export default function Accounts() {
     return groups
   }, {} as Record<AccountType, typeof accounts>)
 
-  const accountTypeOrder: AccountType[] = ['bank', 'cash', 'credit_card', 'investment', 'receivable', 'other']
+  const accountTypeOrder: AccountType[] = ['bank', 'savings', 'cash', 'credit_card', 'investment', 'receivable', 'other']
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
