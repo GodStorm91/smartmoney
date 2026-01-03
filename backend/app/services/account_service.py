@@ -228,3 +228,36 @@ class AccountService:
             Transaction.account_id == account_id,
             Transaction.user_id == user_id
         ).scalar() or 0
+
+    @staticmethod
+    def create_savings_account_for_goal(
+        db: Session,
+        user_id: int,
+        goal_name: str,
+        currency: str = "JPY"
+    ) -> Account:
+        """Create a dedicated savings account for a financial goal.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            goal_name: Name of the goal (used to generate account name)
+            currency: Currency code (default JPY)
+
+        Returns:
+            Created Account object
+        """
+        account = Account(
+            user_id=user_id,
+            name=f"{goal_name} Savings",
+            type="savings",
+            initial_balance=0,
+            initial_balance_date=date.today(),
+            currency=currency,
+            is_active=True,
+            notes=f"Auto-created for goal: {goal_name}"
+        )
+        db.add(account)
+        db.commit()
+        db.refresh(account)
+        return account

@@ -250,10 +250,13 @@
     "monthlyNeeded": "月々{{amount}}の貯蓄が必要です",
     "achievedMessage": "おめでとうございます！{{years}}年目標を達成しました！",
     "status": {
+      "completed": "達成",
       "ahead": "順調",
       "on_track": "目標通り",
       "behind": "注意"
     },
+    "remaining": "残り",
+    "month": "月",
     "types": {
       "emergency_fund": "緊急予備資金",
       "home_down_payment": "住宅頭金",
@@ -472,6 +475,7 @@
       "credit_card": "クレジットカード",
       "investment": "投資",
       "receivable": "売掛金",
+      "savings": "貯金",
       "other": "その他"
     },
     "desiredCurrentBalance": "希望する現在残高",

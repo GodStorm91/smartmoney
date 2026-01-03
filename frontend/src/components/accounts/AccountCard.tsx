@@ -23,6 +23,7 @@ const ACCOUNT_TYPE_CONFIG: Record<
   credit_card: { icon: '💳', color: 'text-purple-600', bgColor: 'bg-purple-50' },
   investment: { icon: '📈', color: 'text-orange-600', bgColor: 'bg-orange-50' },
   receivable: { icon: '💰', color: 'text-teal-600', bgColor: 'bg-teal-50' },
+  savings: { icon: '🐷', color: 'text-pink-600', bgColor: 'bg-pink-50' },
   other: { icon: '📁', color: 'text-gray-600', bgColor: 'bg-gray-50' },
 }
 

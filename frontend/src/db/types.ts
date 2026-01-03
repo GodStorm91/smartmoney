@@ -28,7 +28,7 @@ export interface DBTransaction extends OfflineMetadata {
 export interface DBAccount extends OfflineMetadata {
   id: number
   name: string
-  type: 'bank' | 'cash' | 'credit_card' | 'investment' | 'receivable' | 'other'
+  type: 'bank' | 'cash' | 'credit_card' | 'investment' | 'receivable' | 'savings' | 'other'
   initial_balance: number
   initial_balance_date: string
   is_active: boolean

@@ -60,7 +60,7 @@ export function AccountFormModal({
   const [showConfirmation, setShowConfirmation] = useState(false)
 
   // Account types
-  const accountTypes: AccountType[] = ['bank', 'cash', 'credit_card', 'investment', 'receivable', 'other']
+  const accountTypes: AccountType[] = ['bank', 'cash', 'credit_card', 'investment', 'receivable', 'savings', 'other']
 
   // Determine if account has transactions
   const hasTransactions = existingAccount && (existingAccount as AccountWithBalance).transaction_count > 0

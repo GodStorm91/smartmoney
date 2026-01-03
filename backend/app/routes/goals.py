@@ -14,6 +14,7 @@ from ..schemas.goal import (
     GoalUpdate,
 )
 from ..services.goal_service import GoalService
+from ..services.account_service import AccountService
 from ..services.claude_ai_service import ClaudeAIService
 from ..models.goal_type import GoalType
 
@@ -42,6 +43,18 @@ async def create_goal(
         else:
             # Assign next available priority
             goal_data["priority"] = GoalService.get_next_priority(db, current_user.id)
+
+        # Auto-create savings account if no account_id provided
+        if not goal_data.get("account_id"):
+            goal_name = goal_data.get("name") or GoalType(goal_data["goal_type"]).value.replace("_", " ").title()
+            currency = goal_data.get("currency", "JPY")
+            savings_account = AccountService.create_savings_account_for_goal(
+                db=db,
+                user_id=current_user.id,
+                goal_name=goal_name,
+                currency=currency
+            )
+            goal_data["account_id"] = savings_account.id
 
         created = GoalService.create_goal(db, goal_data)
         return created

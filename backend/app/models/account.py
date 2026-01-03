@@ -54,7 +54,7 @@ class Account(Base):
 
     __table_args__ = (
         CheckConstraint(
-            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'other')",
+            "type IN ('bank', 'cash', 'credit_card', 'investment', 'receivable', 'crypto', 'savings', 'other')",
             name="valid_account_type",
         ),
         Index("ix_accounts_type_active", "type", "is_active"),

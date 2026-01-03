@@ -101,6 +101,7 @@ class GoalProgressResponse(BaseModel):
     priority: int = 0
     account_id: Optional[int] = None
     account_name: Optional[str] = None
+    account_balance: Optional[int] = None
     milestone_25_at: Optional[datetime] = None
     milestone_50_at: Optional[datetime] = None
     milestone_75_at: Optional[datetime] = None

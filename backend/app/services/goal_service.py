@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from ..models.goal import Goal
 from ..models.transaction import Transaction
 from ..models.account import Account
+from .account_service import AccountService
 
 
 class GoalService:
@@ -226,6 +227,9 @@ class GoalService:
     def calculate_goal_progress(db: Session, user_id: int, goal: Goal) -> dict:
         """Calculate progress towards a financial goal.
 
+        Uses linked account balance for progress tracking. Falls back to
+        net cashflow calculation only if no account is linked.
+
         Args:
             db: Database session
             user_id: User ID
@@ -238,19 +242,7 @@ class GoalService:
         if goal.start_date:
             start_date = goal.start_date
         else:
-            # Use earliest transaction date
-            first_tx = (
-                db.query(func.min(Transaction.date))
-                .filter(
-                    Transaction.user_id == user_id,
-                    ~Transaction.is_transfer
-                )
-                .scalar()
-            )
-            start_date = first_tx or date.today()
-
-        # Calculate total net savings so far
-        net_so_far = GoalService._calculate_net_savings(db, user_id, start_date)
+            start_date = date.today()
 
         # Calculate time metrics
         now = date.today()
@@ -262,29 +254,51 @@ class GoalService:
         )
         months_remaining = max(months_total - months_elapsed, 1)
 
+        # Get linked account info and calculate progress from account balance
+        account_name = None
+        account_balance = 0
+        total_saved = 0
+
+        if goal.account_id:
+            try:
+                # Use account balance for progress tracking
+                account_balance = AccountService.calculate_balance(db, user_id, goal.account_id)
+                total_saved = max(account_balance, 0)  # Don't show negative progress
+
+                # Get account name
+                account = db.query(Account).filter(
+                    Account.id == goal.account_id,
+                    Account.user_id == user_id
+                ).first()
+                if account:
+                    account_name = account.name
+            except ValueError:
+                # Account not found, fall back to zero
+                total_saved = 0
+        else:
+            # Fallback: no linked account, use net cashflow (legacy behavior)
+            total_saved = max(GoalService._calculate_net_savings(db, user_id, start_date), 0)
+
         # Calculate required savings
-        needed_remaining = max(goal.target_amount - net_so_far, 0)
-        needed_per_month = needed_remaining / months_remaining
+        needed_remaining = max(goal.target_amount - total_saved, 0)
+        needed_per_month = needed_remaining / months_remaining if months_remaining > 0 else 0
 
-        # Calculate average monthly net
-        avg_monthly_net = net_so_far / max(months_elapsed, 1) if months_elapsed > 0 else 0
+        # Calculate average monthly contribution (based on elapsed time)
+        avg_monthly_net = total_saved / max(months_elapsed, 1) if months_elapsed > 0 else 0
 
-        # Calculate progress percentage
-        progress_pct = (net_so_far / goal.target_amount * 100) if goal.target_amount > 0 else 0
+        # Calculate progress percentage (capped at 0-100 for display)
+        progress_pct = (total_saved / goal.target_amount * 100) if goal.target_amount > 0 else 0
 
         # Determine status
-        projected_total = net_so_far + (months_remaining * avg_monthly_net)
-        if projected_total > goal.target_amount * 1.05:
+        projected_total = total_saved + (months_remaining * avg_monthly_net)
+        if progress_pct >= 100:
+            status = "completed"
+        elif projected_total > goal.target_amount * 1.05:
             status = "ahead"
         elif projected_total >= goal.target_amount * 0.95:
             status = "on_track"
         else:
             status = "behind"
-
-        # Get linked account info if available
-        account_name = None
-        if goal.account_id and goal.account:
-            account_name = goal.account.name
 
         return {
             "goal_id": goal.id,
@@ -296,7 +310,7 @@ class GoalService:
             "start_date": start_date.isoformat(),
             "target_date": target_date.isoformat(),
             "current_date": now.isoformat(),
-            "total_saved": net_so_far,
+            "total_saved": total_saved,
             "progress_percentage": round(progress_pct, 2),
             "months_total": months_total,
             "months_elapsed": months_elapsed,
@@ -309,6 +323,7 @@ class GoalService:
             "priority": goal.priority,
             "account_id": goal.account_id,
             "account_name": account_name,
+            "account_balance": account_balance,
             "milestone_25_at": goal.milestone_25_at,
             "milestone_50_at": goal.milestone_50_at,
             "milestone_75_at": goal.milestone_75_at,

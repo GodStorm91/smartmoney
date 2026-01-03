@@ -1,5 +1,5 @@
 // Account types
-export type AccountType = 'bank' | 'cash' | 'credit_card' | 'investment' | 'receivable' | 'other'
+export type AccountType = 'bank' | 'cash' | 'credit_card' | 'investment' | 'receivable' | 'savings' | 'other'
 
 export interface Account {
   id: number

@@ -24,13 +24,15 @@ def upgrade() -> None:
 
     # Update transactions to inherit currency from their linked account
     # This handles multi-currency accounts (VND, USD, etc.)
+    # Using SQLite-compatible subquery syntax
     op.execute("""
-        UPDATE transactions t
-        SET currency = a.currency
-        FROM accounts a
-        WHERE t.account_id = a.id
-        AND a.currency IS NOT NULL
-        AND a.currency != 'JPY'
+        UPDATE transactions
+        SET currency = (
+            SELECT a.currency FROM accounts a WHERE a.id = transactions.account_id
+        )
+        WHERE account_id IN (
+            SELECT id FROM accounts WHERE currency IS NOT NULL AND currency != 'JPY'
+        )
     """)
 
 

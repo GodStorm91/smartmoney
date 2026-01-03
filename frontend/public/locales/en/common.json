@@ -225,10 +225,13 @@
     "monthlyNeeded": "You need to save {{amount}} monthly",
     "achievedMessage": "Congratulations! You achieved your {{years}}-year goal!",
     "status": {
+      "completed": "Completed",
       "ahead": "Ahead",
       "on_track": "On Track",
       "behind": "Behind"
     },
+    "remaining": "Remaining",
+    "month": "month",
     "types": {
       "emergency_fund": "Emergency Fund",
       "home_down_payment": "Home Down Payment",
@@ -472,6 +475,7 @@
       "credit_card": "Credit Card",
       "investment": "Investment",
       "receivable": "Receivable",
+      "savings": "Savings",
       "other": "Other"
     },
     "desiredCurrentBalance": "Desired Current Balance",

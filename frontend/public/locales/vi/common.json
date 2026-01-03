@@ -225,10 +225,13 @@
     "monthlyNeeded": "Bạn cần tiết kiệm {{amount}} mỗi tháng",
     "achievedMessage": "Chúc mừng! Bạn đã đạt được mục tiêu {{years}} năm!",
     "status": {
+      "completed": "Hoàn thành",
       "ahead": "Vượt tiến độ",
       "on_track": "Đúng tiến độ",
       "behind": "Chậm tiến độ"
     },
+    "remaining": "Còn lại",
+    "month": "tháng",
     "types": {
       "emergency_fund": "Quỹ dự phòng",
       "home_down_payment": "Tiền đặt cọc nhà",
@@ -471,6 +474,7 @@
       "credit_card": "Thẻ tín dụng",
       "investment": "Đầu tư",
       "receivable": "Khoản phải thu",
+      "savings": "Tiết kiệm",
       "other": "Khác"
     },
     "desiredCurrentBalance": "Số dư hiện tại mong muốn",

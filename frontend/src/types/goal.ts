@@ -88,10 +88,11 @@ export interface GoalProgress {
   needed_per_month: number
   needed_remaining: number
   projected_total: number
-  status: string
+  status: 'completed' | 'ahead' | 'on_track' | 'behind'
   priority: number
   account_id?: number
   account_name?: string
+  account_balance?: number
   milestone_25_at?: string
   milestone_50_at?: string
   milestone_75_at?: string
