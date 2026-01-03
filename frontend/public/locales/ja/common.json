@@ -296,7 +296,10 @@
       "startDateNextMonth": "来月1日",
       "startDateNextMonthAria": "来月1日から開始",
       "startDateCustom": "カスタム",
-      "startDateCustomAria": "カスタム日付を選択"
+      "startDateCustomAria": "カスタム日付を選択",
+      "linkedAccount": "連携口座",
+      "autoCreateAccount": "貯金口座を自動作成",
+      "linkedAccountHint": "この口座の残高で進捗を追跡します"
     },
     "errors": {
       "createFailed": "目標の作成に失敗しました。もう一度お試しください。",

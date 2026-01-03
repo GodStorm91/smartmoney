@@ -271,7 +271,10 @@
       "startDateNextMonth": "Ngày 1 tháng sau",
       "startDateNextMonthAria": "Bắt đầu từ ngày 1 tháng sau",
       "startDateCustom": "Tùy chỉnh",
-      "startDateCustomAria": "Chọn ngày tùy chỉnh"
+      "startDateCustomAria": "Chọn ngày tùy chỉnh",
+      "linkedAccount": "Tài khoản liên kết",
+      "autoCreateAccount": "Tự động tạo tài khoản tiết kiệm",
+      "linkedAccountHint": "Tiến độ sẽ được theo dõi dựa trên số dư tài khoản này"
     },
     "errors": {
       "createFailed": "Không thể tạo mục tiêu. Vui lòng thử lại.",

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { createGoal, updateGoal, fetchGoal, hasEmergencyFund } from '@/services/goal-service'
+import { useAccounts } from '@/hooks/useAccounts'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { StartDateSelector } from './StartDateSelector'
@@ -42,8 +43,12 @@ export function GoalCreateModal({
   const [startDateOption, setStartDateOption] = useState<StartDateOption>('today')
   const [customDate, setCustomDate] = useState<string>('')
   const [currency, setCurrency] = useState<GoalCurrency>('JPY')
+  const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<GoalFormErrors>({})
   const [serverError, setServerError] = useState<string>('')
+
+  // Fetch accounts for linking
+  const { data: accounts = [] } = useAccounts()
 
   // Check if user has emergency fund
   const { data: hasEF = true } = useQuery({
@@ -74,6 +79,7 @@ export function GoalCreateModal({
           setStartDateOption('custom')
           setCustomDate(existingGoal.start_date)
         }
+        setAccountId(existingGoal.account_id || null)
       } else {
         setStep(1)
         setGoalType(null)
@@ -83,6 +89,7 @@ export function GoalCreateModal({
         setStartDateOption('today')
         setCustomDate('')
         setCurrency('JPY')
+        setAccountId(null)
       }
       setErrors({})
       setServerError('')
@@ -101,6 +108,7 @@ export function GoalCreateModal({
       queryClient.invalidateQueries({ queryKey: ['goals'] })
       queryClient.invalidateQueries({ queryKey: ['goals-progress-full'] })
       queryClient.invalidateQueries({ queryKey: ['has-emergency-fund'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] }) // Refresh if new account created
       onClose()
     },
     onError: () => {
@@ -156,7 +164,12 @@ export function GoalCreateModal({
     const startDate = calculateStartDate(startDateOption, customDate)
 
     if (editingGoalId) {
-      goalMutation.mutate({ name: name || undefined, target_amount: amount, start_date: startDate || undefined })
+      goalMutation.mutate({
+        name: name || undefined,
+        target_amount: amount,
+        start_date: startDate || undefined,
+        account_id: accountId || undefined,
+      })
     } else {
       goalMutation.mutate({
         goal_type: goalType || 'custom',
@@ -256,6 +269,30 @@ export function GoalCreateModal({
                 onOptionChange={setStartDateOption}
                 onCustomDateChange={setCustomDate}
               />
+
+              {/* Account Selector - show when editing or accounts exist */}
+              {(editingGoalId || accounts.length > 0) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('goals.form.linkedAccount')}
+                  </label>
+                  <select
+                    value={accountId || ''}
+                    onChange={(e) => setAccountId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  >
+                    <option value="">{t('goals.form.autoCreateAccount')}</option>
+                    {accounts.map((account) => (
+                      <option key={account.id} value={account.id}>
+                        {account.name} ({t(`account.type.${account.type}`)})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    {t('goals.form.linkedAccountHint')}
+                  </p>
+                </div>
+              )}
 
               {serverError && (
                 <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-300">{serverError}</div>

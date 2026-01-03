@@ -271,7 +271,10 @@
       "startDateNextMonth": "1st of next month",
       "startDateNextMonthAria": "Start from 1st of next month",
       "startDateCustom": "Custom",
-      "startDateCustomAria": "Select custom date"
+      "startDateCustomAria": "Select custom date",
+      "linkedAccount": "Linked Account",
+      "autoCreateAccount": "Auto-create savings account",
+      "linkedAccountHint": "Progress will be tracked based on this account's balance"
     },
     "errors": {
       "createFailed": "Failed to create goal. Please try again.",
