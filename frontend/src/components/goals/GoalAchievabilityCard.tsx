@@ -16,6 +16,10 @@ interface GoalAchievabilityCardProps {
   targetAmount: number
   currentAmount: number
   onEdit?: (goalId: number) => void
+  topExpenseCategory?: {
+    name: string
+    monthlyAmount: number
+  }
 }
 
 // Simplified status config - focus on pace
@@ -64,6 +68,7 @@ export function GoalAchievabilityCard({
   targetAmount,
   currentAmount,
   onEdit,
+  topExpenseCategory,
 }: GoalAchievabilityCardProps) {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
@@ -103,27 +108,47 @@ export function GoalAchievabilityCard({
   const currentMilestone = getCurrentMilestone()
   const nextMilestone = MILESTONES.find(m => m > progressPercentage) || 100
 
-  // Generate simple, actionable insight
-  const getInsight = (): string => {
+  // Generate simple, actionable insight with optional category tip
+  const getInsight = (): { main: string; tip?: string } => {
     // Goal achieved
     if (progressPercentage >= 100) {
-      return t('goal.insight.achieved')
+      return { main: t('goal.insight.achieved') }
     }
 
     // On pace
     if (isOnPace) {
-      return t('goal.insight.keepGoing', { months: achievability.months_remaining })
+      return { main: t('goal.insight.keepGoing', { months: achievability.months_remaining }) }
     }
 
     // Calculate how much more needed per month
     const gap = achievability.monthly_gap
     if (gap > 0) {
       const formattedGap = formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
-      return t('goal.insight.saveMore', { amount: formattedGap })
+      const main = t('goal.insight.saveMore', { amount: formattedGap })
+
+      // Add category tip if available and meaningful
+      let tip: string | undefined
+      if (topExpenseCategory && topExpenseCategory.monthlyAmount > 0) {
+        const formattedAmount = formatCurrencyPrivacy(
+          topExpenseCategory.monthlyAmount,
+          currency,
+          exchangeRates?.rates || {},
+          false,
+          isPrivacyMode
+        )
+        tip = t('goal.insight.topExpenseTip', {
+          category: t(`categories.${topExpenseCategory.name}`, { defaultValue: topExpenseCategory.name }),
+          amount: formattedAmount
+        })
+      }
+
+      return { main, tip }
     }
 
-    return t('goal.insight.everyBitCounts')
+    return { main: t('goal.insight.everyBitCounts') }
   }
+
+  const insight = getInsight()
 
   const handleCardClick = () => {
     if (isMobile && onEdit) {
@@ -279,8 +304,13 @@ export function GoalAchievabilityCard({
           isOnPace ? 'border-emerald-200 dark:border-emerald-800' : 'border-gray-200 dark:border-gray-700'
         )}>
           <div className={cn('text-sm', status.textColor, 'dark:text-gray-200')}>
-            💡 {getInsight()}
+            💡 {insight.main}
           </div>
+          {insight.tip && (
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 pl-5">
+              💰 {insight.tip}
+            </div>
+          )}
         </div>
 
         {/* Footer */}

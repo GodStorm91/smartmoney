@@ -443,7 +443,8 @@
       "everyBitCounts": "Every bit of savings counts!",
       "smallGap": "Just {{gap}}/month more to achieve",
       "mediumGap": "Need to increase by {{gap}}/month",
-      "largeGap": "Need additional savings of {{gap}}/month"
+      "largeGap": "Need additional savings of {{gap}}/month",
+      "topExpenseTip": "Tip: Your top expense is \"{{category}}\" ({{amount}}/month)"
     },
     "monthlySavings": "Monthly Savings Status",
     "monthsRemaining": "{{months}} months remaining",

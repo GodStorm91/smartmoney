@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
@@ -7,6 +7,7 @@ import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { GoalCreateEmptyState } from '@/components/goals/GoalCreateEmptyState'
 import { GoalCreateModal } from '@/components/goals/GoalCreateModal'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
+import { fetchCategoryBreakdown } from '@/services/analytics-service'
 
 const MAX_GOALS = 4
 
@@ -33,6 +34,32 @@ export function Goals() {
     },
     enabled: !!goals && goals.length > 0,
   })
+
+  // Fetch category breakdown for the trend period to show spending tips
+  const endDate = new Date()
+  const startDate = new Date()
+  startDate.setMonth(startDate.getMonth() - trendMonths)
+  const { data: categoryBreakdown } = useQuery({
+    queryKey: ['category-breakdown-goals', trendMonths],
+    queryFn: () => fetchCategoryBreakdown({
+      start: startDate.toISOString().split('T')[0],
+      end: endDate.toISOString().split('T')[0],
+    }),
+    enabled: !!goals && goals.length > 0,
+  })
+
+  // Calculate top expense category (monthly average, excluding transfers)
+  const topExpenseCategory = useMemo(() => {
+    if (!categoryBreakdown?.length) return undefined
+    const sorted = [...categoryBreakdown]
+      .filter(c => c.category.toLowerCase() !== 'transfer')
+      .sort((a, b) => b.amount - a.amount)
+    if (!sorted[0]) return undefined
+    return {
+      name: sorted[0].category,
+      monthlyAmount: sorted[0].amount / trendMonths,
+    }
+  }, [categoryBreakdown, trendMonths])
 
   const isLoading = goalsLoading || goalsProgressLoading
   const existingGoalYears = goals?.map(g => g.years) || []
@@ -98,6 +125,7 @@ export function Goals() {
                   targetAmount={progress.target_amount}
                   currentAmount={progress.total_saved}
                   onEdit={handleEdit}
+                  topExpenseCategory={topExpenseCategory}
                 />
               )
             ))}

@@ -443,7 +443,8 @@
       "everyBitCounts": "Mỗi đồng tiết kiệm đều có giá trị!",
       "smallGap": "Chỉ cần thêm {{gap}}/tháng để đạt mục tiêu",
       "mediumGap": "Cần tăng {{gap}}/tháng",
-      "largeGap": "Cần tiết kiệm thêm {{gap}}/tháng"
+      "largeGap": "Cần tiết kiệm thêm {{gap}}/tháng",
+      "topExpenseTip": "Gợi ý: Chi tiêu lớn nhất là \"{{category}}\" ({{amount}}/tháng)"
     },
     "monthlySavings": "Tình trạng tiết kiệm hàng tháng",
     "monthsRemaining": "Còn lại {{months}} tháng",

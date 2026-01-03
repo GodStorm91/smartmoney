@@ -443,7 +443,8 @@
       "everyBitCounts": "少しずつの貯蓄が大切です！",
       "smallGap": "あと{{gap}}/月で達成可能",
       "mediumGap": "月{{gap}}増やす必要があります",
-      "largeGap": "月{{gap}}の追加貯蓄が必要です"
+      "largeGap": "月{{gap}}の追加貯蓄が必要です",
+      "topExpenseTip": "ヒント: 最大の支出は「{{category}}」({{amount}}/月)"
     },
     "monthlySavings": "月次貯蓄状況",
     "monthsRemaining": "残り {{months}} ヶ月",
