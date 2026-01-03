@@ -179,10 +179,10 @@ export function GoalCreateModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-white rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-4">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
             {editingGoalId ? t('goals.modal.editTitle') : step === 1 ? t('goals.modal.createTitle') : t(`goals.types.${goalType}`)}
           </h2>
           {!editingGoalId && step === 2 && (
@@ -222,13 +222,13 @@ export function GoalCreateModal({
               {/* Currency and Amount row */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     {t('goals.form.currency')}
                   </label>
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value as GoalCurrency)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     disabled={!!editingGoalId}
                   >
                     <option value="JPY">{t('currency.JPY')}</option>
@@ -258,14 +258,14 @@ export function GoalCreateModal({
               />
 
               {serverError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">{serverError}</div>
+                <div className="p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-300">{serverError}</div>
               )}
             </form>
           )}
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 px-6 py-4 flex gap-3 justify-end">
+        <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4 flex gap-3 justify-end">
           <Button variant="outline" onClick={onClose} disabled={goalMutation.isPending}>
             {t('common.cancel')}
           </Button>

@@ -30,7 +30,7 @@ export function StartDateSelector({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-3">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
         {t('goals.form.startDate')}
       </label>
       <div className="space-y-3">
@@ -46,8 +46,8 @@ export function StartDateSelector({
             aria-label={t('goals.form.startDateTodayAria')}
           />
           <div>
-            <div className="text-sm font-medium text-gray-900">{t('goals.form.startDateToday')}</div>
-            <div className="text-xs text-gray-600">
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('goals.form.startDateToday')}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
               {new Date().toLocaleDateString(dateLocale)}
             </div>
           </div>
@@ -65,8 +65,8 @@ export function StartDateSelector({
             aria-label={t('goals.form.startDateNextMonthAria')}
           />
           <div>
-            <div className="text-sm font-medium text-gray-900">{t('goals.form.startDateNextMonth')}</div>
-            <div className="text-xs text-gray-600">
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{t('goals.form.startDateNextMonth')}</div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
               {nextMonthDate.toLocaleDateString(dateLocale)}
             </div>
           </div>
@@ -84,7 +84,7 @@ export function StartDateSelector({
             aria-label={t('goals.form.startDateCustomAria')}
           />
           <div className="flex-1">
-            <div className="text-sm font-medium text-gray-900 mb-2">{t('goals.form.startDateCustom')}</div>
+            <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">{t('goals.form.startDateCustom')}</div>
             {selectedOption === 'custom' && (
               <Input
                 type="date"
