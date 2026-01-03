@@ -10,6 +10,7 @@ export interface Transaction {
   type: 'income' | 'expense'
   created_at: string
   account_id?: number | null
+  is_transfer?: boolean  // True for transfer transactions between accounts
 }
 
 // Filter types

@@ -282,10 +282,10 @@ export function Transactions() {
     }
 
     const inc = txList
-      .filter(t => t.type === 'income')
+      .filter(t => t.type === 'income' && !t.is_transfer)  // Exclude transfers
       .reduce((sum, t) => sum + toJpy(t.amount, t.currency || 'JPY'), 0)
     const exp = txList
-      .filter(t => t.type === 'expense')
+      .filter(t => t.type === 'expense' && !t.is_transfer)  // Exclude transfers
       .reduce((sum, t) => sum + toJpy(Math.abs(t.amount), t.currency || 'JPY'), 0)
     return { income: inc, expense: exp, net: inc - exp }
   }, [accountFilteredTransactions, selectedAccount, rates])
