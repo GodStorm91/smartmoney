@@ -1,4 +1,5 @@
 """Analytics service for cashflow analysis and category breakdown."""
+from collections import defaultdict
 from datetime import date, datetime, timedelta
 from typing import Optional
 
@@ -7,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..models.transaction import Transaction
 from ..models.budget import Budget
+from .exchange_rate_service import ExchangeRateService
 
 
 class AnalyticsService:
@@ -72,6 +74,27 @@ class AnalyticsService:
         return monthly_data
 
     @staticmethod
+    def _convert_to_jpy(amount: int, currency: str, rates: dict[str, float]) -> int:
+        """Convert amount to JPY using exchange rates.
+
+        Args:
+            amount: Amount in original currency
+            currency: Currency code (JPY, USD, VND)
+            rates: Exchange rates dict {currency: rate_to_jpy}
+
+        Returns:
+            Amount converted to JPY
+        """
+        if currency == "JPY" or currency not in rates:
+            return amount
+        rate = rates.get(currency, 1.0)
+        if rate == 0:
+            return amount
+        # rate_to_jpy means "how many units of currency per 1 JPY"
+        # So to convert to JPY: amount / rate
+        return int(amount / rate)
+
+    @staticmethod
     def get_category_breakdown(
         db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> list[dict]:
@@ -84,21 +107,23 @@ class AnalyticsService:
             end_date: Filter by end date
 
         Returns:
-            List of category breakdown dictionaries
+            List of category breakdown dictionaries (amounts normalized to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query transactions with amount and currency for proper conversion
         query = (
             db.query(
                 Transaction.category,
-                func.sum(Transaction.amount).label("total"),
-                func.count(Transaction.id).label("count"),
+                Transaction.amount,
+                Transaction.currency,
             )
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer,
                 ~Transaction.is_income
             )
-            .group_by(Transaction.category)
-            .order_by(func.sum(Transaction.amount).asc())  # Most negative first
         )
 
         if start_date:
@@ -108,15 +133,25 @@ class AnalyticsService:
 
         results = query.all()
 
-        categories = []
+        # Aggregate by category with currency conversion
+        category_totals: dict[str, int] = defaultdict(int)
+        category_counts: dict[str, int] = defaultdict(int)
+
         for row in results:
-            categories.append(
-                {
-                    "category": row.category,
-                    "amount": abs(row.total),  # Convert to positive
-                    "count": row.count,
-                }
+            amount_jpy = AnalyticsService._convert_to_jpy(
+                abs(row.amount), row.currency, rates
             )
+            category_totals[row.category] += amount_jpy
+            category_counts[row.category] += 1
+
+        # Build result list sorted by amount descending
+        categories = []
+        for category, total in sorted(category_totals.items(), key=lambda x: -x[1]):
+            categories.append({
+                "category": category,
+                "amount": total,
+                "count": category_counts[category],
+            })
 
         return categories
 
@@ -500,11 +535,14 @@ class AnalyticsService:
     def _get_category_spending(
         db: Session, user_id: int, start_date: date, end_date: date
     ) -> dict:
-        """Get spending totals by category for a date range."""
+        """Get spending totals by category for a date range (normalized to JPY)."""
+        rates = ExchangeRateService.get_cached_rates(db)
+
         results = (
             db.query(
                 Transaction.category,
-                func.sum(Transaction.amount).label("total"),
+                Transaction.amount,
+                Transaction.currency,
             )
             .filter(
                 Transaction.user_id == user_id,
@@ -513,7 +551,14 @@ class AnalyticsService:
                 ~Transaction.is_transfer,
                 ~Transaction.is_income,
             )
-            .group_by(Transaction.category)
             .all()
         )
-        return {row.category: abs(row.total) for row in results}
+
+        category_totals: dict[str, int] = defaultdict(int)
+        for row in results:
+            amount_jpy = AnalyticsService._convert_to_jpy(
+                abs(row.amount), row.currency, rates
+            )
+            category_totals[row.category] += amount_jpy
+
+        return dict(category_totals)
