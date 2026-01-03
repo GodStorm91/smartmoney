@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeft, ChevronDown } from 'lucide-react'
 import { useAccounts } from '@/hooks/useAccounts'
 import { AccountCard } from '@/components/accounts/AccountCard'
 import { AccountFormModal } from '@/components/accounts/AccountFormModal'
@@ -9,12 +9,50 @@ import { LPPositionsSection } from '@/components/accounts/LPPositionsSection'
 import { TransferFormModal } from '@/components/transfers'
 import type { AccountType } from '@/types'
 
+const COLLAPSED_SECTIONS_KEY = 'accounts_collapsed_sections'
+
+// Load collapsed sections from localStorage
+function loadCollapsedSections(): Set<AccountType> {
+  try {
+    const stored = localStorage.getItem(COLLAPSED_SECTIONS_KEY)
+    if (stored) {
+      return new Set(JSON.parse(stored) as AccountType[])
+    }
+  } catch {
+    // Ignore parse errors
+  }
+  return new Set()
+}
+
+// Save collapsed sections to localStorage
+function saveCollapsedSections(collapsed: Set<AccountType>): void {
+  localStorage.setItem(COLLAPSED_SECTIONS_KEY, JSON.stringify([...collapsed]))
+}
+
 export default function Accounts() {
   const { t } = useTranslation('common')
   const [includeInactive, setIncludeInactive] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null)
+  const [collapsedSections, setCollapsedSections] = useState<Set<AccountType>>(() => loadCollapsedSections())
+
+  // Persist collapsed state to localStorage
+  useEffect(() => {
+    saveCollapsedSections(collapsedSections)
+  }, [collapsedSections])
+
+  const toggleSection = useCallback((accountType: AccountType) => {
+    setCollapsedSections(prev => {
+      const next = new Set(prev)
+      if (next.has(accountType)) {
+        next.delete(accountType)
+      } else {
+        next.add(accountType)
+      }
+      return next
+    })
+  }, [])
 
   const { data: accounts, isLoading, error } = useAccounts(includeInactive)
 
@@ -160,15 +198,32 @@ export default function Accounts() {
             const typeAccounts = groupedAccounts?.[accountType]
             if (!typeAccounts || typeAccounts.length === 0) return null
 
+            const isCollapsed = collapsedSections.has(accountType)
+
             return (
               <div key={accountType}>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                  {t(`account.type.${accountType}`)}
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                    ({typeAccounts.length})
-                  </span>
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(accountType)}
+                  className="w-full flex items-center justify-between mb-4 group cursor-pointer"
+                >
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    {t(`account.type.${accountType}`)}
+                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                      ({typeAccounts.length})
+                    </span>
+                  </h2>
+                  <ChevronDown
+                    className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${
+                      isCollapsed ? '-rotate-90' : ''
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-200 ease-in-out ${
+                    isCollapsed ? 'max-h-0 opacity-0 overflow-hidden' : 'max-h-[2000px] opacity-100'
+                  }`}
+                >
                   {typeAccounts.map((account) => (
                     <AccountCard
                       key={account.id}
