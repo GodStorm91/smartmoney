@@ -372,22 +372,44 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
   // Aggregate performance from all tokens
   const performance = useMemo((): PositionPerformance | null => {
+    // Debug: log ALL query states FIRST
+    console.log('=== LP Performance Debug ===')
+    console.log('Total tokens in group:', group.tokens.length)
+    console.log('Token IDs:', group.tokens.map(t => ({ symbol: t.symbol, id: t.id.substring(0, 50) })))
+    console.log('All queries settled:', allQueriesSettled)
+    console.log('Query states:', performanceQueries.map((q, i) => ({
+      index: i,
+      symbol: group.tokens[i]?.symbol,
+      isLoading: q.isLoading,
+      isError: q.isError,
+      hasData: !!q.data,
+      dataValue: q.data?.current_value_usd,
+      error: q.error?.message
+    })))
+
     // Don't aggregate until all queries have settled
-    if (!allQueriesSettled) return null
+    if (!allQueriesSettled) {
+      console.log('Still loading, returning null')
+      return null
+    }
 
     const successfulQueries = performanceQueries.filter((q) => q.data)
-    if (successfulQueries.length === 0) return null
+    console.log('Successful queries count:', successfulQueries.length)
 
-    // Debug: log query states
-    console.log('[LP Perf] Tokens:', group.tokens.length, 'Successful:', successfulQueries.length)
+    if (successfulQueries.length === 0) {
+      console.log('No successful queries, returning null')
+      return null
+    }
 
     // Use first query's data as base
     const firstData = successfulQueries[0].data!
     if (successfulQueries.length === 1) {
-      console.log('[LP Perf] Only 1 query succeeded')
+      console.log('Only 1 query succeeded, returning:', firstData.current_value_usd)
       return firstData
     }
-    console.log('[LP Perf] Aggregating', successfulQueries.length, 'queries')
+
+    console.log('Aggregating', successfulQueries.length, 'queries')
+    console.log('Values to aggregate:', successfulQueries.map(q => q.data?.current_value_usd))
 
     // Aggregate values from all tokens
     let totalStartValue = 0
