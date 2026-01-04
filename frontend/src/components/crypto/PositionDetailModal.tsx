@@ -355,12 +355,92 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
     }
   }, [historyQueries])
 
-  // Fetch performance metrics - gracefully handle 404
-  const { data: performance, isLoading: isLoadingPerformance, isError: isPerformanceError } = useQuery({
-    queryKey: ['position-performance', primaryToken.id],
-    queryFn: () => fetchPositionPerformance(primaryToken.id),
-    retry: false,
+  // Fetch performance metrics for ALL tokens in the group (parallel queries)
+  const performanceQueries = useQueries({
+    queries: group.tokens.map((token) => ({
+      queryKey: ['position-performance', token.id],
+      queryFn: () => fetchPositionPerformance(token.id),
+      retry: false,
+    })),
   })
+
+  const isLoadingPerformance = performanceQueries.some((q) => q.isLoading)
+  const isPerformanceError = performanceQueries.every((q) => q.isError)
+
+  // Aggregate performance from all tokens
+  const performance = useMemo((): PositionPerformance | null => {
+    const successfulQueries = performanceQueries.filter((q) => q.data)
+    if (successfulQueries.length === 0) return null
+
+    // Use first query's data as base
+    const firstData = successfulQueries[0].data!
+    if (successfulQueries.length === 1) return firstData
+
+    // Aggregate values from all tokens
+    let totalStartValue = 0
+    let totalCurrentValue = 0
+    let totalReturnUsd = 0
+    let maxDaysHeld = 0
+    let totalSnapshotCount = 0
+    let hasILData = false
+    let totalILUsd = 0
+    let totalHodlValue = 0
+
+    for (const q of successfulQueries) {
+      const data = q.data!
+      totalStartValue += Number(data.start_value_usd)
+      totalCurrentValue += Number(data.current_value_usd)
+      totalReturnUsd += Number(data.total_return_usd)
+      maxDaysHeld = Math.max(maxDaysHeld, data.days_held)
+      totalSnapshotCount += data.snapshot_count
+
+      if (data.il_usd != null) {
+        hasILData = true
+        totalILUsd += Number(data.il_usd)
+      }
+      if (data.hodl_value_usd != null) {
+        totalHodlValue += Number(data.hodl_value_usd)
+      }
+    }
+
+    // Recalculate percentages based on totals
+    const totalReturnPct = totalStartValue > 0
+      ? (totalReturnUsd / totalStartValue) * 100
+      : 0
+
+    // Calculate annualized return - cap unrealistic values
+    let annualizedReturnPct: number | null = null
+    if (maxDaysHeld >= 7 && totalStartValue > 0) {
+      const rawAnnualized = ((totalCurrentValue / totalStartValue) ** (365 / maxDaysHeld) - 1) * 100
+      // Cap at ±500% - anything above is unrealistic for display
+      if (Math.abs(rawAnnualized) <= 500) {
+        annualizedReturnPct = rawAnnualized
+      }
+      // If > 500%, leave as null (shows N/A)
+    }
+
+    return {
+      position_id: firstData.position_id,
+      protocol: firstData.protocol,
+      symbol: group.name, // Use group name for multi-token
+      days_held: maxDaysHeld,
+      start_value_usd: totalStartValue,
+      current_value_usd: totalCurrentValue,
+      total_return_usd: totalReturnUsd,
+      total_return_pct: totalReturnPct,
+      annualized_return_pct: annualizedReturnPct,
+      current_apy: firstData.current_apy,
+      snapshot_count: totalSnapshotCount,
+      // IL metrics (aggregated if available)
+      il_percentage: hasILData && totalStartValue > 0
+        ? (totalILUsd / totalStartValue) * 100
+        : null,
+      il_usd: hasILData ? totalILUsd : null,
+      hodl_value_usd: hasILData ? totalHodlValue : null,
+      lp_vs_hodl_usd: hasILData ? totalCurrentValue - totalHodlValue : null,
+      lp_outperformed_hodl: hasILData ? totalCurrentValue > totalHodlValue : undefined,
+    } as PositionPerformance
+  }, [performanceQueries, group.name])
 
   // Fetch AI insights - only if performance data exists
   const { data: insights, isLoading: isLoadingInsights } = useQuery({
