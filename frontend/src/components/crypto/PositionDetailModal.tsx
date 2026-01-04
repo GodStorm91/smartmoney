@@ -369,12 +369,28 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
   // Aggregate performance from all tokens
   const performance = useMemo((): PositionPerformance | null => {
+    // Debug: log query states
+    console.log('[LP Perf] Total tokens:', group.tokens.length)
+    console.log('[LP Perf] Query states:', performanceQueries.map((q, i) => ({
+      token: group.tokens[i]?.symbol,
+      isLoading: q.isLoading,
+      isError: q.isError,
+      hasData: !!q.data,
+      error: q.error?.message,
+    })))
+
     const successfulQueries = performanceQueries.filter((q) => q.data)
+    console.log('[LP Perf] Successful queries:', successfulQueries.length)
+
     if (successfulQueries.length === 0) return null
 
     // Use first query's data as base
     const firstData = successfulQueries[0].data!
-    if (successfulQueries.length === 1) return firstData
+    if (successfulQueries.length === 1) {
+      console.log('[LP Perf] Only 1 query succeeded, returning first data')
+      return firstData
+    }
+    console.log('[LP Perf] Aggregating', successfulQueries.length, 'queries')
 
     // Aggregate values from all tokens
     let totalStartValue = 0
