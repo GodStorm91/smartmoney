@@ -421,6 +421,8 @@
   "goal": {
     "status": {
       "onTrack": "Đúng hướng",
+      "behind": "Chậm",
+      "completed": "Hoàn thành!",
       "achievable": "Có thể đạt được",
       "challenging": "Thử thách",
       "severe": "Khó khăn"
@@ -438,6 +440,7 @@
     "insight": {
       "onPace": "Bạn đang đi đúng hướng để đạt được mục tiêu!",
       "achieved": "Chúc mừng! Bạn đã đạt được mục tiêu!",
+      "onTrackMonths": "Còn {{months}} tháng nữa là đạt mục tiêu!",
       "keepGoing": "Tiếp tục cố gắng! Còn {{months}} tháng.",
       "saveMore": "Hãy tiết kiệm thêm {{amount}}/tháng.",
       "everyBitCounts": "Mỗi đồng tiết kiệm đều có giá trị!",
@@ -449,6 +452,8 @@
     "monthlySavings": "Tình trạng tiết kiệm hàng tháng",
     "monthsRemaining": "Còn lại {{months}} tháng",
     "editGoal": "Chỉnh sửa mục tiêu",
+    "deleteGoal": "Xóa mục tiêu",
+    "deleteConfirm": "Bạn có chắc muốn xóa mục tiêu này?",
     "basedOnPeriod": "Trung bình {{months}} tháng"
   },
   "account": {

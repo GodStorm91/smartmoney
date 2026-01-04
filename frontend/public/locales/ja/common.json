@@ -421,6 +421,8 @@
   "goal": {
     "status": {
       "onTrack": "順調",
+      "behind": "遅れ",
+      "completed": "達成!",
       "achievable": "達成可能",
       "challenging": "挑戦的",
       "severe": "厳しい"
@@ -438,6 +440,7 @@
     "insight": {
       "onPace": "このペースで達成できます！",
       "achieved": "おめでとうございます！目標を達成しました！",
+      "onTrackMonths": "あと{{months}}ヶ月で目標達成！",
       "keepGoing": "この調子で！残り{{months}}ヶ月",
       "saveMore": "月{{amount}}多く貯蓄してみましょう",
       "everyBitCounts": "少しずつの貯蓄が大切です！",
@@ -449,6 +452,8 @@
     "monthlySavings": "月次貯蓄状況",
     "monthsRemaining": "残り {{months}} ヶ月",
     "editGoal": "目標を編集",
+    "deleteGoal": "目標を削除",
+    "deleteConfirm": "この目標を削除してもよろしいですか？",
     "basedOnPeriod": "{{months}}ヶ月平均"
   },
   "account": {

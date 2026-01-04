@@ -421,6 +421,8 @@
   "goal": {
     "status": {
       "onTrack": "On Track",
+      "behind": "Behind",
+      "completed": "Done!",
       "achievable": "Achievable",
       "challenging": "Challenging",
       "severe": "Severe"
@@ -438,6 +440,7 @@
     "insight": {
       "onPace": "You're on pace to achieve this!",
       "achieved": "Congratulations! You've reached your goal!",
+      "onTrackMonths": "You'll reach your goal in {{months}} months!",
       "keepGoing": "Keep going! {{months}} months to go.",
       "saveMore": "Try to save {{amount}} more per month.",
       "everyBitCounts": "Every bit of savings counts!",
@@ -449,6 +452,8 @@
     "monthlySavings": "Monthly Savings Status",
     "monthsRemaining": "{{months}} months remaining",
     "editGoal": "Edit goal",
+    "deleteGoal": "Delete Goal",
+    "deleteConfirm": "Are you sure you want to delete this goal?",
     "basedOnPeriod": "{{months}}-month avg"
   },
   "account": {

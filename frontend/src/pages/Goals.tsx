@@ -1,22 +1,22 @@
 import { useState, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { GoalCreateEmptyState } from '@/components/goals/GoalCreateEmptyState'
 import { GoalCreateModal } from '@/components/goals/GoalCreateModal'
-import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
+import { fetchGoals, fetchGoalProgress, deleteGoal } from '@/services/goal-service'
 import { fetchCategoryBreakdown } from '@/services/analytics-service'
 
 const MAX_GOALS = 4
+const DEFAULT_TREND_MONTHS = 3
 
 export function Goals() {
   const { t } = useTranslation('common')
+  const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedYears, setSelectedYears] = useState<number | undefined>()
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null)
-  const [trendMonths, setTrendMonths] = useState<1 | 3 | 6 | 12>(3)
 
   const { data: goals, isLoading: goalsLoading } = useQuery({
     queryKey: ['goals'],
@@ -25,22 +25,22 @@ export function Goals() {
 
   // Fetch goal progress with achievability for each goal
   const { data: goalsProgress, isLoading: goalsProgressLoading } = useQuery({
-    queryKey: ['goals-progress-full', goals?.map(g => g.id), trendMonths],
+    queryKey: ['goals-progress-full', goals?.map(g => g.id), DEFAULT_TREND_MONTHS],
     queryFn: async () => {
       if (!goals || goals.length === 0) return []
       return Promise.all(
-        goals.map(goal => fetchGoalProgress(goal.id, true, trendMonths))
+        goals.map(goal => fetchGoalProgress(goal.id, true, DEFAULT_TREND_MONTHS))
       )
     },
     enabled: !!goals && goals.length > 0,
   })
 
-  // Fetch category breakdown for the trend period to show spending tips
+  // Fetch category breakdown for spending tips
   const endDate = new Date()
   const startDate = new Date()
-  startDate.setMonth(startDate.getMonth() - trendMonths)
+  startDate.setMonth(startDate.getMonth() - DEFAULT_TREND_MONTHS)
   const { data: categoryBreakdown } = useQuery({
-    queryKey: ['category-breakdown-goals', trendMonths],
+    queryKey: ['category-breakdown-goals', DEFAULT_TREND_MONTHS],
     queryFn: () => fetchCategoryBreakdown({
       start: startDate.toISOString().split('T')[0],
       end: endDate.toISOString().split('T')[0],
@@ -57,9 +57,19 @@ export function Goals() {
     if (!sorted[0]) return undefined
     return {
       name: sorted[0].category,
-      monthlyAmount: sorted[0].amount / trendMonths,
+      monthlyAmount: sorted[0].amount / DEFAULT_TREND_MONTHS,
     }
-  }, [categoryBreakdown, trendMonths])
+  }, [categoryBreakdown])
+
+  // Delete goal mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteGoal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] })
+      queryClient.invalidateQueries({ queryKey: ['goals-progress-full'] })
+      queryClient.invalidateQueries({ queryKey: ['has-emergency-fund'] })
+    },
+  })
 
   const isLoading = goalsLoading || goalsProgressLoading
   const existingGoalYears = goals?.map(g => g.years) || []
@@ -77,6 +87,10 @@ export function Goals() {
     setIsModalOpen(true)
   }
 
+  const handleDelete = (goalId: number) => {
+    deleteMutation.mutate(goalId)
+  }
+
   const handleModalClose = () => {
     setIsModalOpen(false)
     setSelectedYears(undefined)
@@ -84,31 +98,11 @@ export function Goals() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('goals.title')}</h2>
-        <p className="text-gray-600">{t('goals.subtitle')}</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('goals.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('goals.subtitle')}</p>
       </div>
-
-      {/* Period selector for rolling average */}
-      {goals && goals.length > 0 && (
-        <div className="mb-6">
-          <div className="flex gap-2">
-            {([1, 3, 6, 12] as const).map((months) => (
-              <Button
-                key={months}
-                variant={trendMonths === months ? 'primary' : 'outline'}
-                onClick={() => setTrendMonths(months)}
-              >
-                {t('goals.trendPeriod', { months })}
-              </Button>
-            ))}
-          </div>
-          <p className="text-sm text-gray-500 mt-2">
-            {t('goals.trendPeriodHint')}
-          </p>
-        </div>
-      )}
 
       {isLoading ? (
         <div className="flex justify-center py-12"><LoadingSpinner size="lg" /></div>
@@ -125,6 +119,7 @@ export function Goals() {
                   targetAmount={progress.target_amount}
                   currentAmount={progress.total_saved}
                   onEdit={handleEdit}
+                  onDelete={handleDelete}
                   topExpenseCategory={topExpenseCategory}
                 />
               )
