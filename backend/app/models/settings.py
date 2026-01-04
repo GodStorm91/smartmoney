@@ -30,6 +30,11 @@ class AppSettings(Base):
     budget_carry_over: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     budget_email_alerts: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
+    # Goal calculation settings
+    # Exclude transactions larger than this amount from goal achievability calculations
+    # Default 1,000,000 JPY (large one-time expenses like medical bills)
+    large_transaction_threshold: Mapped[int] = mapped_column(BigInteger, default=1000000, nullable=False)
+
     __table_args__ = (
         CheckConstraint("base_date >= 1 AND base_date <= 31", name="valid_base_date"),
     )

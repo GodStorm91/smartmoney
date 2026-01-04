@@ -546,6 +546,9 @@
     "budgetCarryOverDescription": "Chuyển ngân sách chưa sử dụng sang tháng tiếp theo",
     "budgetEmailAlerts": "Cảnh Báo Email Ngân Sách",
     "budgetEmailAlertsDescription": "Nhận thông báo email khi đạt 80% hoặc 100% ngân sách",
+    "largeTransactionThreshold": "Ngưỡng Giao Dịch Lớn",
+    "largeTransactionThresholdDescription": "Loại trừ giao dịch vượt số tiền này khỏi tính toán khả năng đạt mục tiêu",
+    "largeTransactionThresholdHint": "Đặt 0 để tắt. Chi phí lớn một lần (y tế, v.v.) có thể làm sai lệch trung bình tháng.",
     "saveFailed": "Không thể lưu cài đặt"
   },
   "crypto": {

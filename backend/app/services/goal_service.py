@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from ..models.goal import Goal
 from ..models.transaction import Transaction
 from ..models.account import Account
+from ..models.settings import AppSettings
 from .account_service import AccountService
 from .exchange_rate_service import ExchangeRateService
 
@@ -423,6 +424,10 @@ class GoalService:
         # Get exchange rates for currency conversion
         rates = ExchangeRateService.get_cached_rates(db)
 
+        # Get user's large transaction threshold setting (default 1,000,000 JPY)
+        user_settings = db.query(AppSettings).filter(AppSettings.user_id == user_id).first()
+        large_tx_threshold = user_settings.large_transaction_threshold if user_settings else 1000000
+
         # Query transactions individually to handle currency conversion
         transactions = db.query(
             Transaction.month_key,
@@ -436,14 +441,19 @@ class GoalService:
             Transaction.date <= last_complete_month
         ).all()
 
-        # Aggregate by month with currency conversion
+        # Aggregate by month with currency conversion, excluding large transactions
         monthly_income: dict[str, int] = defaultdict(int)
         monthly_expenses: dict[str, int] = defaultdict(int)
+        excluded_count = 0
 
         for txn in transactions:
             amount_jpy = GoalService._convert_to_jpy(
                 abs(txn.amount), txn.currency or "JPY", rates
             )
+            # Skip large one-time transactions if threshold is set (0 = disabled)
+            if large_tx_threshold > 0 and amount_jpy > large_tx_threshold:
+                excluded_count += 1
+                continue
             if txn.is_income:
                 monthly_income[txn.month_key] += amount_jpy
             else:
@@ -530,6 +540,8 @@ class GoalService:
             "months_remaining": months_remaining,
             "trend_months_requested": trend_months,
             "trend_months_actual": actual_months_used,
+            "large_tx_excluded": excluded_count,
+            "large_tx_threshold": large_tx_threshold,
         }
 
     @staticmethod

@@ -547,6 +547,9 @@
     "budgetCarryOverDescription": "未使用の予算を翌月に繰り越す",
     "budgetEmailAlerts": "予算アラートメール",
     "budgetEmailAlertsDescription": "予算の80%または100%に達したときにメール通知を受け取る",
+    "largeTransactionThreshold": "大型取引の除外しきい値",
+    "largeTransactionThresholdDescription": "目標達成計算から除外する取引の金額しきい値",
+    "largeTransactionThresholdHint": "0に設定すると無効。大きな一時的支出（医療費など）が月平均を歪める場合に有効。",
     "saveFailed": "設定の保存に失敗しました"
   },
   "crypto": {

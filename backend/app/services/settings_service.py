@@ -68,6 +68,7 @@ class SettingsService:
             "base_date": base_date,
             "budget_carry_over": settings.budget_carry_over,
             "budget_email_alerts": settings.budget_email_alerts,
+            "large_transaction_threshold": settings.large_transaction_threshold,
             "categories": categories,
             "sources": sources,
         }
@@ -108,6 +109,8 @@ class SettingsService:
             settings.budget_carry_over = updates["budget_carry_over"]
         if "budget_email_alerts" in updates and updates["budget_email_alerts"] is not None:
             settings.budget_email_alerts = updates["budget_email_alerts"]
+        if "large_transaction_threshold" in updates and updates["large_transaction_threshold"] is not None:
+            settings.large_transaction_threshold = updates["large_transaction_threshold"]
 
         db.commit()
         db.refresh(settings)

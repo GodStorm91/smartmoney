@@ -547,6 +547,9 @@
     "budgetCarryOverDescription": "Roll over unused budget to the next month",
     "budgetEmailAlerts": "Email Budget Alerts",
     "budgetEmailAlertsDescription": "Receive email notifications when reaching 80% or 100% of budget",
+    "largeTransactionThreshold": "Large Transaction Threshold",
+    "largeTransactionThresholdDescription": "Exclude transactions above this amount from goal achievability calculations",
+    "largeTransactionThresholdHint": "Set to 0 to disable. Large one-time expenses (medical, etc.) can skew monthly averages.",
     "saveFailed": "Failed to save settings"
   },
   "crypto": {

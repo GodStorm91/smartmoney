@@ -25,6 +25,7 @@ export function Settings() {
   const [baseDate, setBaseDate] = useState<number>(25)
   const [budgetCarryOver, setBudgetCarryOver] = useState<boolean>(false)
   const [budgetEmailAlerts, setBudgetEmailAlerts] = useState<boolean>(true)
+  const [largeTransactionThreshold, setLargeTransactionThreshold] = useState<number>(1000000)
 
   // Sync state with fetched settings
   useEffect(() => {
@@ -33,6 +34,7 @@ export function Settings() {
       setBaseDate(settings.base_date)
       setBudgetCarryOver(settings.budget_carry_over)
       setBudgetEmailAlerts(settings.budget_email_alerts)
+      setLargeTransactionThreshold(settings.large_transaction_threshold)
     }
   }, [settings])
 
@@ -58,6 +60,7 @@ export function Settings() {
       base_date: baseDate,
       budget_carry_over: budgetCarryOver,
       budget_email_alerts: budgetEmailAlerts,
+      large_transaction_threshold: largeTransactionThreshold,
     })
   }
 
@@ -138,6 +141,19 @@ export function Settings() {
                 />
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
+            </div>
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <label className="font-medium text-gray-900 dark:text-white">{t('settings.largeTransactionThreshold')}</label>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{t('settings.largeTransactionThresholdDescription')}</p>
+              <Input
+                type="number"
+                value={largeTransactionThreshold}
+                onChange={(e) => setLargeTransactionThreshold(parseInt(e.target.value, 10) || 0)}
+                min={0}
+                step={100000}
+                placeholder="1000000"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{t('settings.largeTransactionThresholdHint')}</p>
             </div>
           </div>
           <div className="mt-6">
