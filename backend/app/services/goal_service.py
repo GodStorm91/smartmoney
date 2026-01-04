@@ -1,4 +1,5 @@
 """Goal service for financial goal tracking and progress calculations."""
+from collections import defaultdict
 from datetime import date, datetime
 from typing import Optional
 
@@ -10,10 +11,21 @@ from ..models.goal import Goal
 from ..models.transaction import Transaction
 from ..models.account import Account
 from .account_service import AccountService
+from .exchange_rate_service import ExchangeRateService
 
 
 class GoalService:
     """Service for goal operations."""
+
+    @staticmethod
+    def _convert_to_jpy(amount: int, currency: str, rates: dict[str, float]) -> int:
+        """Convert amount to JPY using exchange rates."""
+        if currency == "JPY" or currency not in rates:
+            return amount
+        rate = rates.get(currency, 1.0)
+        if rate == 0:
+            return amount
+        return int(amount / rate)
 
     @staticmethod
     def create_goal(db: Session, goal_data: dict) -> Goal:
@@ -408,34 +420,46 @@ class GoalService:
         last_complete_month = (now.replace(day=1) - relativedelta(days=1))
         trend_start = (last_complete_month.replace(day=1) - relativedelta(months=trend_months - 1))
 
-        # Query monthly cashflows for trend period (grouped by month_key)
-        monthly_data = db.query(
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query transactions individually to handle currency conversion
+        transactions = db.query(
             Transaction.month_key,
-            func.sum(
-                case(
-                    (Transaction.is_income, Transaction.amount), else_=0
-                )
-            ).label("income"),
-            func.sum(
-                case(
-                    (~Transaction.is_income, Transaction.amount), else_=0
-                )
-            ).label("expenses"),
+            Transaction.amount,
+            Transaction.currency,
+            Transaction.is_income,
         ).filter(
             Transaction.user_id == user_id,
             ~Transaction.is_transfer,
             Transaction.date >= trend_start,
             Transaction.date <= last_complete_month
-        ).group_by(Transaction.month_key).all()
+        ).all()
+
+        # Aggregate by month with currency conversion
+        monthly_income: dict[str, int] = defaultdict(int)
+        monthly_expenses: dict[str, int] = defaultdict(int)
+
+        for txn in transactions:
+            amount_jpy = GoalService._convert_to_jpy(
+                abs(txn.amount), txn.currency or "JPY", rates
+            )
+            if txn.is_income:
+                monthly_income[txn.month_key] += amount_jpy
+            else:
+                monthly_expenses[txn.month_key] += amount_jpy
 
         # Calculate average monthly net from period data
-        if monthly_data:
-            monthly_nets = [float(income) - abs(float(expenses)) for _, income, expenses in monthly_data]
+        all_months = set(monthly_income.keys()) | set(monthly_expenses.keys())
+        if all_months:
+            monthly_nets = [
+                monthly_income[m] - monthly_expenses[m] for m in all_months
+            ]
             current_monthly_net = sum(monthly_nets) / len(monthly_nets)
-            actual_months_used = len(monthly_nets)
+            actual_months_used = len(all_months)
 
             # Format period display
-            month_keys = sorted([row.month_key for row in monthly_data])
+            month_keys = sorted(all_months)
             if len(month_keys) > 1:
                 period_display = f"{month_keys[0]} to {month_keys[-1]} ({actual_months_used} months avg)"
             else:
