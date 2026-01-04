@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar, RefreshCw, Check, Receipt, ExternalLink, Loader2, X, ChevronDown, ChevronUp } from 'lucide-react'
-import { fetchPositionROI, scanRewards, fetchPositionRewardsList, createTransactionFromReward } from '@/services/crypto-service'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check, Receipt, ExternalLink, Loader2, X, ChevronDown, ChevronUp, Plus } from 'lucide-react'
+import { fetchPositionROI, scanRewards, fetchPositionRewardsList, createTransactionFromReward, batchCreateTransactions } from '@/services/crypto-service'
 import type { PositionReward } from '@/types'
 
 interface PositionRewardsTabProps {
@@ -54,6 +54,30 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
       setTimeout(() => setErrorMessage(null), 5000)
     },
   })
+
+  const batchCreateMutation = useMutation({
+    mutationFn: (rewardIds: number[]) => batchCreateTransactions(rewardIds),
+    onSuccess: (result) => {
+      const msg = t('crypto.batchTransactionsCreated', 'Created {{created}} transactions (${{total}}). Skipped: {{skipped}}', {
+        created: result.created,
+        total: result.total_usd.toFixed(2),
+        skipped: result.skipped,
+      })
+      setSuccessMessage(msg)
+      queryClient.invalidateQueries({ queryKey: ['position-rewards-list'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      setTimeout(() => setSuccessMessage(null), 8000)
+    },
+    onError: (error: Error) => {
+      setErrorMessage(error.message || t('crypto.batchTransactionError', 'Failed to create transactions'))
+      setTimeout(() => setErrorMessage(null), 5000)
+    },
+  })
+
+  // Filter rewards eligible for transaction creation (has USD value, not linked)
+  const eligibleRewards = rewards.filter(
+    (r: PositionReward) => r.reward_usd && Number(r.reward_usd) > 0 && !r.transaction_id
+  )
 
   if (isLoading) {
     return (
@@ -245,14 +269,33 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
       {/* Individual Rewards List */}
       {rewards.length > 0 && (
         <div>
-          <button
-            onClick={() => setShowAllRewards(!showAllRewards)}
-            className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 mb-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
-          >
-            <Receipt className="h-4 w-4" />
-            {t('crypto.allRewards', 'All Rewards')} ({rewards.length})
-            {showAllRewards ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+          <div className="flex items-center justify-between mb-3">
+            <button
+              onClick={() => setShowAllRewards(!showAllRewards)}
+              className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+            >
+              <Receipt className="h-4 w-4" />
+              {t('crypto.allRewards', 'All Rewards')} ({rewards.length})
+              {showAllRewards ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {/* Batch Create Button */}
+            {eligibleRewards.length > 0 && (
+              <button
+                type="button"
+                onClick={() => batchCreateMutation.mutate(eligibleRewards.map((r: PositionReward) => r.id))}
+                disabled={batchCreateMutation.isPending}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 rounded-lg transition-colors"
+              >
+                {batchCreateMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Plus className="h-3.5 w-3.5" />
+                )}
+                {t('crypto.createAllTransactions', 'Create All Txns')} ({eligibleRewards.length})
+              </button>
+            )}
+          </div>
 
           {showAllRewards && (
             <>

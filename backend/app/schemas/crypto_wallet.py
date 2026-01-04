@@ -381,6 +381,21 @@ class BatchAttributeResponse(BaseModel):
     failed: int
 
 
+class BatchCreateTransactionsRequest(BaseModel):
+    """Schema for batch creating transactions from rewards."""
+
+    reward_ids: list[int] = Field(..., min_length=1)
+
+
+class BatchCreateTransactionsResponse(BaseModel):
+    """Schema for batch transaction creation result."""
+
+    created: int
+    skipped: int
+    failed: int
+    total_usd: float
+
+
 class RewardsScanRequest(BaseModel):
     """Schema for reward scan request."""
 

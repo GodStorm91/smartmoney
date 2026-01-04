@@ -219,6 +219,18 @@ export async function createTransactionFromReward(
   return response.data
 }
 
+export async function batchCreateTransactions(
+  rewardIds: number[]
+): Promise<{ created: number; skipped: number; failed: number; total_usd: number }> {
+  const response = await apiClient.post<{
+    created: number
+    skipped: number
+    failed: number
+    total_usd: number
+  }>('/api/crypto/rewards/batch-create-transactions', { reward_ids: rewardIds })
+  return response.data
+}
+
 export async function fetchPositionROI(positionId: string): Promise<PositionROI> {
   const response = await apiClient.get<PositionROI>(
     `/api/crypto/positions/${encodeURIComponent(positionId)}/roi`

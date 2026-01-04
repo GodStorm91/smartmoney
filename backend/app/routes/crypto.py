@@ -27,6 +27,8 @@ from ..schemas.crypto_wallet import (
     PositionRewardAttribute,
     BatchRewardAttribute,
     BatchAttributeResponse,
+    BatchCreateTransactionsRequest,
+    BatchCreateTransactionsResponse,
     RewardsScanRequest,
     RewardsScanResponse,
     PositionROIResponse,
@@ -555,6 +557,58 @@ async def create_transaction_from_reward(
             status_code=500,
             detail="Failed to create transaction"
         )
+
+
+@router.post("/rewards/batch-create-transactions", response_model=BatchCreateTransactionsResponse)
+async def batch_create_transactions(
+    body: BatchCreateTransactionsRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Batch create income transactions from multiple LP rewards.
+
+    Creates transactions for all rewards that have USD values and aren't already linked.
+    Skips rewards without USD values or already linked to transactions.
+
+    Returns:
+        BatchCreateTransactionsResponse: {created, skipped, failed, total_usd}
+    """
+    from ..services.reward_service import RewardService
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    created = 0
+    skipped = 0
+    failed = 0
+    total_usd = 0.0
+
+    for reward_id in body.reward_ids:
+        try:
+            result = RewardService.create_transaction_from_reward(
+                db=db,
+                user_id=current_user.id,
+                reward_id=reward_id
+            )
+            created += 1
+            total_usd += result["amount_usd"]
+        except ValueError as e:
+            error_msg = str(e)
+            if "already linked" in error_msg or "no USD value" in error_msg:
+                skipped += 1
+            else:
+                failed += 1
+                logger.warning(f"Skipped reward {reward_id}: {error_msg}")
+        except Exception as e:
+            failed += 1
+            logger.error(f"Failed to create transaction for reward {reward_id}: {e}")
+
+    return BatchCreateTransactionsResponse(
+        created=created,
+        skipped=skipped,
+        failed=failed,
+        total_usd=total_usd
+    )
 
 
 @router.post("/rewards/{reward_id}/attribute", response_model=PositionRewardResponse)
