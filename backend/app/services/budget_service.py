@@ -210,6 +210,17 @@ class BudgetService:
         ).order_by(Budget.month.desc()).limit(limit).all()
 
     @staticmethod
+    def _recalculate_savings_target(db: Session, budget: Budget) -> None:
+        """Recalculate savings_target based on income - allocations.
+
+        Args:
+            db: Database session
+            budget: Budget to update
+        """
+        total_allocated = sum(alloc.amount for alloc in budget.allocations)
+        budget.savings_target = budget.monthly_income - total_allocated
+
+    @staticmethod
     def update_allocation(
         db: Session,
         budget_id: int,
@@ -236,9 +247,10 @@ class BudgetService:
             return None
 
         allocation.amount = amount
-        db.commit()
 
         budget = db.query(Budget).filter(Budget.id == budget_id).first()
+        BudgetService._recalculate_savings_target(db, budget)
+        db.commit()
         db.refresh(budget)
         return budget
 
@@ -267,8 +279,11 @@ class BudgetService:
             return None
 
         db.delete(allocation)
-        db.commit()
 
         budget = db.query(Budget).filter(Budget.id == budget_id).first()
+        db.flush()  # Ensure allocation is deleted before recalculating
+        db.refresh(budget)  # Refresh to get updated allocations list
+        BudgetService._recalculate_savings_target(db, budget)
+        db.commit()
         db.refresh(budget)
         return budget
