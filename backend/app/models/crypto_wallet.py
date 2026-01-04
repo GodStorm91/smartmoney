@@ -195,6 +195,11 @@ class PositionReward(Base):
     merkl_campaign_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     is_attributed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
+    # Transaction link (for creating income transaction from reward)
+    transaction_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("transactions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
@@ -202,6 +207,7 @@ class PositionReward(Base):
     )
 
     user: Mapped["User"] = relationship("User", lazy="select")
+    transaction: Mapped["Transaction | None"] = relationship("Transaction", lazy="select")
 
 
 class PositionCostBasis(Base):

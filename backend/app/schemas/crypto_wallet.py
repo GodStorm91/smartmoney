@@ -354,6 +354,7 @@ class PositionRewardResponse(BaseModel):
     source: str
     merkl_campaign_id: Optional[str] = None
     is_attributed: bool
+    transaction_id: Optional[int] = None  # Linked transaction ID (if created)
     created_at: datetime
 
     class Config:

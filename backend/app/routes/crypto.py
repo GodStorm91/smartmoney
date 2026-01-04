@@ -508,6 +508,55 @@ async def get_unattributed_rewards(
     return RewardService.get_unattributed_rewards(db, current_user.id)
 
 
+@router.post("/rewards/{reward_id}/create-transaction")
+async def create_transaction_from_reward(
+    reward_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create income transaction from LP reward claim.
+
+    Creates a USD transaction with crypto details in notes.
+    Auto-creates "Crypto Income" account and "Crypto Rewards" category if needed.
+
+    Returns:
+        dict: {transaction_id, amount_usd, message}
+
+    Raises:
+        400: Reward already linked or missing USD value
+        404: Reward not found
+        500: Database error
+    """
+    from ..services.reward_service import RewardService
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    try:
+        result = RewardService.create_transaction_from_reward(
+            db=db,
+            user_id=current_user.id,
+            reward_id=reward_id
+        )
+        return result
+
+    except ValueError as e:
+        error_msg = str(e)
+
+        # Determine appropriate status code
+        if "not found" in error_msg:
+            raise HTTPException(status_code=404, detail=error_msg)
+        else:
+            raise HTTPException(status_code=400, detail=error_msg)
+
+    except Exception as e:
+        logger.error(f"Error creating transaction from reward {reward_id}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to create transaction"
+        )
+
+
 @router.post("/rewards/{reward_id}/attribute", response_model=PositionRewardResponse)
 async def attribute_reward(
     reward_id: int,

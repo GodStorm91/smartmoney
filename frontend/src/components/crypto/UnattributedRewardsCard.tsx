@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, CheckSquare, Square, CheckCircle2 } from 'lucide-react'
-import { fetchUnattributedRewards, batchAttributeRewards, fetchDefiPositions } from '@/services/crypto-service'
+import { AlertTriangle, CheckSquare, Square, CheckCircle2, Receipt, ExternalLink, Loader2, Check, X } from 'lucide-react'
+import { fetchUnattributedRewards, batchAttributeRewards, fetchDefiPositions, createTransactionFromReward } from '@/services/crypto-service'
 import type { PositionReward, DefiPosition } from '@/types'
 
 interface UnattributedRewardsCardProps {
@@ -34,6 +34,26 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
       queryClient.invalidateQueries({ queryKey: ['position-rewards'] })
       setSelectedIds(new Set())
       setBatchPositionId('')
+    },
+  })
+
+  const [creatingTxForId, setCreatingTxForId] = useState<number | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const createTxMutation = useMutation({
+    mutationFn: (rewardId: number) => createTransactionFromReward(rewardId),
+    onSuccess: (result) => {
+      setSuccessMessage(t('crypto.transactionCreated', 'Transaction created: ${{amount}}', { amount: result.amount_usd.toFixed(2) }))
+      queryClient.invalidateQueries({ queryKey: ['unattributed-rewards'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      setCreatingTxForId(null)
+      setTimeout(() => setSuccessMessage(null), 5000)
+    },
+    onError: (error: Error) => {
+      setErrorMessage(error.message || t('crypto.transactionCreateError', 'Failed to create transaction'))
+      setCreatingTxForId(null)
+      setTimeout(() => setErrorMessage(null), 5000)
     },
   })
 
@@ -143,6 +163,20 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
         </div>
       </div>
 
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300">
+          <Check className="h-4 w-4" />
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-300">
+          <X className="h-4 w-4" />
+          {errorMessage}
+        </div>
+      )}
+
       {/* Rewards List with Checkboxes */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {rewards.map((reward) => (
@@ -169,8 +203,45 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
                 {formatDate(reward.claimed_at)} via {reward.source}
+                {reward.reward_usd && (
+                  <span className="ml-2 text-green-600 dark:text-green-400">
+                    ≈ ${Number(reward.reward_usd).toFixed(2)}
+                  </span>
+                )}
               </div>
             </div>
+
+            {/* Create Transaction Button */}
+            {reward.reward_usd && reward.reward_usd > 0 && (
+              <div className="flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                {reward.transaction_id ? (
+                  <a
+                    href={`/transactions?id=${reward.transaction_id}`}
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 rounded hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {t('crypto.viewTransaction', 'View Txn')}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCreatingTxForId(reward.id)
+                      createTxMutation.mutate(reward.id)
+                    }}
+                    disabled={creatingTxForId === reward.id}
+                    className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-100 dark:bg-primary-900/30 rounded hover:bg-primary-200 dark:hover:bg-primary-900/50 disabled:opacity-50 transition-colors"
+                  >
+                    {creatingTxForId === reward.id ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Receipt className="h-3 w-3" />
+                    )}
+                    {t('crypto.createTransaction', 'Create Txn')}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

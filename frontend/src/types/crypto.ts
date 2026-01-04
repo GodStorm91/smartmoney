@@ -231,9 +231,10 @@ export interface PositionReward {
   claimed_at: string
   tx_hash: string
   block_number: number | null
-  source: 'merkl' | 'direct' | 'manual'
+  source: 'merkl' | 'direct' | 'manual' | 'symbiotic'
   merkl_campaign_id: string | null
   is_attributed: boolean
+  transaction_id: number | null  // Linked transaction ID (if created)
   created_at: string
 }
 

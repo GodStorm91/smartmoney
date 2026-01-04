@@ -8,6 +8,7 @@ import httpx
 from sqlalchemy.orm import Session
 
 from ..models.crypto_wallet import PositionReward, PositionCostBasis
+from ..models.transaction import Transaction
 from .polygonscan_service import PolygonscanService
 
 logger = logging.getLogger(__name__)
@@ -439,3 +440,96 @@ class RewardService:
                     result["annualized_roi_pct"] = round(annualized, 2)
 
         return result
+
+    @staticmethod
+    def create_transaction_from_reward(
+        db: Session,
+        user_id: int,
+        reward_id: int
+    ) -> dict:
+        """Create income transaction from position reward.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            reward_id: PositionReward ID
+
+        Returns:
+            dict with transaction_id, amount_usd, message
+
+        Raises:
+            ValueError: If reward not found, already linked, or missing USD value
+        """
+        from .account_service import AccountService
+        from .category_service import CategoryService
+
+        # Fetch reward
+        reward = db.query(PositionReward).filter(
+            PositionReward.id == reward_id,
+            PositionReward.user_id == user_id
+        ).first()
+
+        if not reward:
+            raise ValueError(f"Reward {reward_id} not found")
+
+        # Check if already linked
+        if reward.transaction_id is not None:
+            raise ValueError(f"Reward {reward_id} already linked to transaction {reward.transaction_id}")
+
+        # Validate USD value exists
+        if reward.reward_usd is None or reward.reward_usd <= 0:
+            raise ValueError(f"Reward {reward_id} has no USD value")
+
+        # Get or create account and category
+        account = AccountService.get_or_create_crypto_income_account(db, user_id)
+        category = CategoryService.get_or_create_crypto_rewards_category(db, user_id)
+
+        # Format transaction notes
+        price_per_token = (
+            float(reward.reward_usd) / float(reward.reward_amount)
+            if reward.reward_amount > 0
+            else 0
+        )
+
+        notes = (
+            f"{float(reward.reward_amount):.4f} {reward.reward_token_symbol or 'TOKEN'} "
+            f"@ ${price_per_token:.6f} | "
+            f"tx: {reward.tx_hash[:10]}...{reward.tx_hash[-6:]}"
+        )
+
+        # Create transaction - amount in cents (USD * 100)
+        transaction = Transaction(
+            user_id=user_id,
+            account_id=account.id,
+            date=reward.claimed_at.date() if reward.claimed_at else datetime.utcnow().date(),
+            description=f"LP Reward: {reward.reward_token_symbol or 'Token'}",
+            amount=int(float(reward.reward_usd) * 100),  # Convert to cents
+            currency="USD",
+            category=category.name,
+            subcategory=None,
+            source=reward.source,  # 'merkl', 'symbiotic', etc.
+            payment_method=None,
+            notes=notes,
+            is_income=True,
+            is_transfer=False,
+            is_adjustment=False,
+            # Crypto fields
+            token_symbol=reward.reward_token_symbol,
+            token_amount=reward.reward_amount,
+            chain_id=reward.chain_id
+        )
+
+        db.add(transaction)
+        db.flush()  # Get transaction.id before commit
+
+        # Link reward to transaction
+        reward.transaction_id = transaction.id
+
+        db.commit()
+        db.refresh(transaction)
+
+        return {
+            "transaction_id": transaction.id,
+            "amount_usd": float(reward.reward_usd),
+            "message": "Transaction created successfully"
+        }

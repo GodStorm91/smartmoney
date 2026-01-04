@@ -230,6 +230,44 @@ class AccountService:
         ).scalar() or 0
 
     @staticmethod
+    def get_or_create_crypto_income_account(db: Session, user_id: int) -> Account:
+        """Get or create dedicated Crypto Income account for user.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Account instance
+        """
+        # Try to find existing account
+        account = db.query(Account).filter(
+            Account.user_id == user_id,
+            Account.name == "Crypto Income",
+            Account.type == "crypto"
+        ).first()
+
+        if account:
+            return account
+
+        # Create new account
+        account = Account(
+            user_id=user_id,
+            name="Crypto Income",
+            type="crypto",
+            currency="USD",
+            initial_balance=0,
+            is_active=True,
+            notes="Auto-created for LP reward tracking"
+        )
+
+        db.add(account)
+        db.commit()
+        db.refresh(account)
+
+        return account
+
+    @staticmethod
     def create_savings_account_for_goal(
         db: Session,
         user_id: int,

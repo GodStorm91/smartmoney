@@ -208,6 +208,17 @@ export async function scanRewards(days: number = 90): Promise<RewardsScanResult>
   return response.data
 }
 
+export async function createTransactionFromReward(
+  rewardId: number
+): Promise<{ transaction_id: number; amount_usd: number; message: string }> {
+  const response = await apiClient.post<{
+    transaction_id: number
+    amount_usd: number
+    message: string
+  }>(`/api/crypto/rewards/${rewardId}/create-transaction`)
+  return response.data
+}
+
 export async function fetchPositionROI(positionId: string): Promise<PositionROI> {
   const response = await apiClient.get<PositionROI>(
     `/api/crypto/positions/${encodeURIComponent(positionId)}/roi`
