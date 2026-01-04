@@ -74,9 +74,9 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     },
   })
 
-  // Filter rewards eligible for transaction creation (has USD value, not linked)
-  const eligibleRewards = rewards.filter(
-    (r: PositionReward) => r.reward_usd && Number(r.reward_usd) > 0 && !r.transaction_id
+  // Filter rewards not yet linked to transactions (backend will skip those without USD)
+  const unlinkedRewards = rewards.filter(
+    (r: PositionReward) => !r.transaction_id
   )
 
   if (isLoading) {
@@ -279,11 +279,11 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               {showAllRewards ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
 
-            {/* Batch Create Button */}
-            {eligibleRewards.length > 0 && (
+            {/* Batch Create Button - always show when unlinked rewards exist */}
+            {unlinkedRewards.length > 0 && (
               <button
                 type="button"
-                onClick={() => batchCreateMutation.mutate(eligibleRewards.map((r: PositionReward) => r.id))}
+                onClick={() => batchCreateMutation.mutate(unlinkedRewards.map((r: PositionReward) => r.id))}
                 disabled={batchCreateMutation.isPending}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-primary-600 hover:bg-primary-700 disabled:bg-primary-400 rounded-lg transition-colors"
               >
@@ -292,7 +292,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
                 ) : (
                   <Plus className="h-3.5 w-3.5" />
                 )}
-                {t('crypto.createAllTransactions', 'Create All Txns')} ({eligibleRewards.length})
+                {t('crypto.createAllTransactions', 'Create All Txns')} ({unlinkedRewards.length})
               </button>
             )}
           </div>
