@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar, RefreshCw, Check } from 'lucide-react'
-import { fetchPositionROI, scanRewards } from '@/services/crypto-service'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check, Receipt, ExternalLink, Loader2, X, ChevronDown, ChevronUp } from 'lucide-react'
+import { fetchPositionROI, scanRewards, fetchPositionRewardsList, createTransactionFromReward } from '@/services/crypto-service'
+import type { PositionReward } from '@/types'
 
 interface PositionRewardsTabProps {
   positionId: string
@@ -12,10 +13,19 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [scanResult, setScanResult] = useState<{ scanned: number; new: number } | null>(null)
+  const [showAllRewards, setShowAllRewards] = useState(false)
+  const [creatingTxForId, setCreatingTxForId] = useState<number | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { data: roi, isLoading } = useQuery({
     queryKey: ['position-roi', positionId],
     queryFn: () => fetchPositionROI(positionId),
+  })
+
+  const { data: rewards = [] } = useQuery({
+    queryKey: ['position-rewards-list', positionId],
+    queryFn: () => fetchPositionRewardsList(positionId),
   })
 
   const scanMutation = useMutation({
@@ -23,8 +33,25 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     onSuccess: (result) => {
       setScanResult({ scanned: result.scanned_claims, new: result.new_claims })
       queryClient.invalidateQueries({ queryKey: ['position-roi'] })
+      queryClient.invalidateQueries({ queryKey: ['position-rewards-list'] })
       queryClient.invalidateQueries({ queryKey: ['unattributed-rewards'] })
       setTimeout(() => setScanResult(null), 5000)
+    },
+  })
+
+  const createTxMutation = useMutation({
+    mutationFn: (rewardId: number) => createTransactionFromReward(rewardId),
+    onSuccess: (result) => {
+      setSuccessMessage(t('crypto.transactionCreated', 'Transaction created: ${{amount}}', { amount: result.amount_usd.toFixed(2) }))
+      queryClient.invalidateQueries({ queryKey: ['position-rewards-list'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      setCreatingTxForId(null)
+      setTimeout(() => setSuccessMessage(null), 5000)
+    },
+    onError: (error: Error) => {
+      setErrorMessage(error.message || t('crypto.transactionCreateError', 'Failed to create transaction'))
+      setCreatingTxForId(null)
+      setTimeout(() => setErrorMessage(null), 5000)
     },
   })
 
@@ -212,6 +239,93 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               )
             })}
           </div>
+        </div>
+      )}
+
+      {/* Individual Rewards List */}
+      {rewards.length > 0 && (
+        <div>
+          <button
+            onClick={() => setShowAllRewards(!showAllRewards)}
+            className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 mb-3 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+          >
+            <Receipt className="h-4 w-4" />
+            {t('crypto.allRewards', 'All Rewards')} ({rewards.length})
+            {showAllRewards ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+
+          {showAllRewards && (
+            <>
+              {/* Success/Error Messages */}
+              {successMessage && (
+                <div className="flex items-center gap-2 p-3 mb-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300">
+                  <Check className="h-4 w-4" />
+                  {successMessage}
+                </div>
+              )}
+              {errorMessage && (
+                <div className="flex items-center gap-2 p-3 mb-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-300">
+                  <X className="h-4 w-4" />
+                  {errorMessage}
+                </div>
+              )}
+
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {rewards.map((reward: PositionReward) => (
+                  <div
+                    key={reward.id}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-gray-900 dark:text-gray-100">
+                        {Number(reward.reward_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {reward.reward_token_symbol || 'tokens'}
+                      </div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(reward.claimed_at).toLocaleDateString()} via {reward.source}
+                        {reward.reward_usd && (
+                          <span className="ml-2 text-green-600 dark:text-green-400">
+                            ≈ ${Number(reward.reward_usd).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Create Transaction Button */}
+                    {reward.reward_usd && Number(reward.reward_usd) > 0 && (
+                      <div className="flex-shrink-0 ml-3">
+                        {reward.transaction_id ? (
+                          <a
+                            href={`/transactions?id=${reward.transaction_id}`}
+                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30 rounded hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            {t('crypto.viewTransaction', 'View Txn')}
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCreatingTxForId(reward.id)
+                              createTxMutation.mutate(reward.id)
+                            }}
+                            disabled={creatingTxForId === reward.id}
+                            className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-100 dark:bg-primary-900/30 rounded hover:bg-primary-200 dark:hover:bg-primary-900/50 disabled:opacity-50 transition-colors"
+                          >
+                            {creatingTxForId === reward.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Receipt className="h-3 w-3" />
+                            )}
+                            {t('crypto.createTransaction', 'Create Txn')}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
 
