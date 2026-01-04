@@ -367,27 +367,24 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   const isLoadingPerformance = performanceQueries.some((q) => q.isLoading)
   const isPerformanceError = performanceQueries.every((q) => q.isError)
 
+  // Wait for all queries to finish loading
+  const allQueriesSettled = performanceQueries.every((q) => !q.isLoading)
+
   // Aggregate performance from all tokens
   const performance = useMemo((): PositionPerformance | null => {
-    // Debug: log query states
-    console.log('[LP Perf] Total tokens:', group.tokens.length)
-    console.log('[LP Perf] Query states:', performanceQueries.map((q, i) => ({
-      token: group.tokens[i]?.symbol,
-      isLoading: q.isLoading,
-      isError: q.isError,
-      hasData: !!q.data,
-      error: q.error?.message,
-    })))
+    // Don't aggregate until all queries have settled
+    if (!allQueriesSettled) return null
 
     const successfulQueries = performanceQueries.filter((q) => q.data)
-    console.log('[LP Perf] Successful queries:', successfulQueries.length)
-
     if (successfulQueries.length === 0) return null
+
+    // Debug: log query states
+    console.log('[LP Perf] Tokens:', group.tokens.length, 'Successful:', successfulQueries.length)
 
     // Use first query's data as base
     const firstData = successfulQueries[0].data!
     if (successfulQueries.length === 1) {
-      console.log('[LP Perf] Only 1 query succeeded, returning first data')
+      console.log('[LP Perf] Only 1 query succeeded')
       return firstData
     }
     console.log('[LP Perf] Aggregating', successfulQueries.length, 'queries')
@@ -456,7 +453,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
       lp_vs_hodl_usd: hasILData ? totalCurrentValue - totalHodlValue : null,
       lp_outperformed_hodl: hasILData ? totalCurrentValue > totalHodlValue : undefined,
     } as PositionPerformance
-  }, [performanceQueries, group.name])
+  }, [performanceQueries, group.name, allQueriesSettled])
 
   // Fetch AI insights - only if performance data exists
   const { data: insights, isLoading: isLoadingInsights } = useQuery({
