@@ -664,8 +664,27 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                     </div>
                   )}
 
-                  {/* Performance Metrics */}
-                  {performance && <PerformanceCard performance={performance} />}
+                  {/* Performance Metrics - override current_value with group.total_usd which is always correct */}
+                  {performance && (() => {
+                    const currentValue = group.total_usd
+                    const startValue = Number(performance.start_value_usd)
+                    const totalReturnUsd = currentValue - startValue
+                    const totalReturnPct = startValue > 0 ? (totalReturnUsd / startValue) * 100 : 0
+                    // Calculate annualized, cap at ±500% to avoid unrealistic values
+                    const daysHeld = performance.days_held || 1
+                    let annualizedPct: number | null = null
+                    if (daysHeld >= 7 && startValue > 0) {
+                      const raw = ((currentValue / startValue) ** (365 / daysHeld) - 1) * 100
+                      annualizedPct = Math.abs(raw) <= 500 ? raw : null
+                    }
+                    return <PerformanceCard performance={{
+                      ...performance,
+                      current_value_usd: currentValue,
+                      total_return_usd: totalReturnUsd,
+                      total_return_pct: totalReturnPct,
+                      annualized_return_pct: annualizedPct,
+                    }} />
+                  })()}
 
                   {/* Impermanent Loss */}
                   {performance && <ILCard performance={performance} />}

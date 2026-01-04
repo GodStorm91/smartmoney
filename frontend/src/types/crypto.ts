@@ -176,7 +176,7 @@ export interface PositionPerformance {
   current_value_usd: number
   total_return_usd: number
   total_return_pct: number
-  annualized_return_pct: number
+  annualized_return_pct: number | null
   current_apy: number | null
   snapshot_count: number
   // IL metrics
