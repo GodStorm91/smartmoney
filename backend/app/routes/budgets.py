@@ -11,6 +11,7 @@ from ..database import get_db
 from ..models.budget import Budget
 from ..models.user import User
 from ..schemas.budget import (
+    AllocationUpdateRequest,
     BudgetGenerateRequest,
     BudgetRegenerateRequest,
     BudgetResponse,
@@ -391,3 +392,95 @@ def check_budget_alerts(
         current_user.email
     )
     return result
+
+
+@router.patch("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
+def update_allocation(
+    budget_id: int,
+    category: str,
+    request: AllocationUpdateRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Update a single budget allocation amount.
+
+    Args:
+        budget_id: Budget ID
+        category: Category name to update
+        request: New amount
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Updated budget
+
+    Raises:
+        HTTPException: If budget or allocation not found
+    """
+    # Verify budget belongs to user
+    budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.user_id == current_user.id
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Budget not found"
+        )
+
+    updated = BudgetService.update_allocation(
+        db, budget_id, category, request.amount
+    )
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Allocation for category '{category}' not found"
+        )
+
+    return updated
+
+
+@router.delete("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
+def delete_allocation(
+    budget_id: int,
+    category: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Delete a budget allocation.
+
+    Args:
+        budget_id: Budget ID
+        category: Category name to delete
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Updated budget
+
+    Raises:
+        HTTPException: If budget or allocation not found
+    """
+    # Verify budget belongs to user
+    budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.user_id == current_user.id
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Budget not found"
+        )
+
+    updated = BudgetService.delete_allocation(db, budget_id, category)
+
+    if not updated:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Allocation for category '{category}' not found"
+        )
+
+    return updated

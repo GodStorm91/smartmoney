@@ -23,6 +23,11 @@ class BudgetRegenerateRequest(BaseModel):
     language: str = Field(default="ja", pattern="^(ja|en|vi)$")
 
 
+class AllocationUpdateRequest(BaseModel):
+    """Request to update a single allocation amount."""
+    amount: int = Field(..., ge=0)
+
+
 class BudgetResponse(BaseModel):
     """Budget response."""
     id: int

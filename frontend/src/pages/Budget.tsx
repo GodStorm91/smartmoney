@@ -156,6 +156,7 @@ export function BudgetPage() {
           )}
 
           <BudgetAllocationList
+            budgetId={displayBudget.id}
             allocations={displayBudget.allocations}
             totalBudget={totalBudget}
             tracking={tracking || undefined}

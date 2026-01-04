@@ -61,3 +61,31 @@ export async function getBudgetSuggestions(): Promise<BudgetSuggestions> {
   const response = await apiClient.get<BudgetSuggestions>('/api/budgets/suggestions')
   return response.data
 }
+
+/**
+ * Update a single allocation amount
+ */
+export async function updateAllocation(
+  budgetId: number,
+  category: string,
+  amount: number
+): Promise<Budget> {
+  const response = await apiClient.patch<Budget>(
+    `/api/budgets/${budgetId}/allocations/${encodeURIComponent(category)}`,
+    { amount }
+  )
+  return response.data
+}
+
+/**
+ * Delete a single allocation
+ */
+export async function deleteAllocation(
+  budgetId: number,
+  category: string
+): Promise<Budget> {
+  const response = await apiClient.delete<Budget>(
+    `/api/budgets/${budgetId}/allocations/${encodeURIComponent(category)}`
+  )
+  return response.data
+}

@@ -208,3 +208,67 @@ class BudgetService:
         return db.query(Budget).filter(
             Budget.user_id == user_id
         ).order_by(Budget.month.desc()).limit(limit).all()
+
+    @staticmethod
+    def update_allocation(
+        db: Session,
+        budget_id: int,
+        category: str,
+        amount: int
+    ) -> Optional[Budget]:
+        """Update a single allocation amount.
+
+        Args:
+            db: Database session
+            budget_id: Budget ID
+            category: Category name to update
+            amount: New amount
+
+        Returns:
+            Updated budget or None if not found
+        """
+        allocation = db.query(BudgetAllocation).filter(
+            BudgetAllocation.budget_id == budget_id,
+            BudgetAllocation.category == category
+        ).first()
+
+        if not allocation:
+            return None
+
+        allocation.amount = amount
+        db.commit()
+
+        budget = db.query(Budget).filter(Budget.id == budget_id).first()
+        db.refresh(budget)
+        return budget
+
+    @staticmethod
+    def delete_allocation(
+        db: Session,
+        budget_id: int,
+        category: str
+    ) -> Optional[Budget]:
+        """Delete a single allocation.
+
+        Args:
+            db: Database session
+            budget_id: Budget ID
+            category: Category name to delete
+
+        Returns:
+            Updated budget or None if not found
+        """
+        allocation = db.query(BudgetAllocation).filter(
+            BudgetAllocation.budget_id == budget_id,
+            BudgetAllocation.category == category
+        ).first()
+
+        if not allocation:
+            return None
+
+        db.delete(allocation)
+        db.commit()
+
+        budget = db.query(Budget).filter(Budget.id == budget_id).first()
+        db.refresh(budget)
+        return budget
