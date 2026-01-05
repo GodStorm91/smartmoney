@@ -257,6 +257,7 @@ class AccountService:
             type="crypto",
             currency="USD",
             initial_balance=0,
+            initial_balance_date=date.today(),
             is_active=True,
             notes="Auto-created for LP reward tracking"
         )
