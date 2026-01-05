@@ -13,6 +13,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { formatMonth } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
+import { ProxyReceivablesWidget } from '@/components/proxy'
 
 export function Dashboard() {
   const { t } = useTranslation('common')
@@ -138,6 +139,11 @@ export function Dashboard() {
             <p className="text-center text-gray-400 dark:text-gray-500 py-8">{t('dashboard.noGoals')}</p>
           )}
         </Card>
+      </div>
+
+      {/* Proxy Receivables Widget */}
+      <div className="mt-6">
+        <ProxyReceivablesWidget />
       </div>
     </div>
   )
