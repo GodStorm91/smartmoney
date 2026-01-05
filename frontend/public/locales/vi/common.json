@@ -484,6 +484,7 @@
       "investment": "Đầu tư",
       "receivable": "Khoản phải thu",
       "savings": "Tiết kiệm",
+      "crypto": "Tiền điện tử",
       "other": "Khác"
     },
     "desiredCurrentBalance": "Số dư hiện tại mong muốn",

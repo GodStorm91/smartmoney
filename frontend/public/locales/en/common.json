@@ -485,6 +485,7 @@
       "investment": "Investment",
       "receivable": "Receivable",
       "savings": "Savings",
+      "crypto": "Crypto",
       "other": "Other"
     },
     "desiredCurrentBalance": "Desired Current Balance",

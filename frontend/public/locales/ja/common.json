@@ -485,6 +485,7 @@
       "investment": "投資",
       "receivable": "売掛金",
       "savings": "貯金",
+      "crypto": "暗号資産",
       "other": "その他"
     },
     "desiredCurrentBalance": "希望する現在残高",
