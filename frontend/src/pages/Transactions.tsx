@@ -261,23 +261,37 @@ export function Transactions() {
   const summaryCurrency = selectedAccount?.currency || currency
 
   // Default rates for fallback when API hasn't loaded
+  // These represent "1 JPY = X foreign currency"
   const DEFAULT_RATES: Record<string, number> = { JPY: 1, USD: 0.00667, VND: 167 }
 
   // Calculate summary from filtered transactions (respects account filter)
   // When filtering by account: amounts are in account's currency (no conversion)
-  // When viewing all: convert each transaction to JPY base currency
+  // When viewing all: convert each transaction to JPY base currency for aggregation
   const { income, expense, net } = useMemo(() => {
     const txList = accountFilteredTransactions
 
     // Helper to convert amount to JPY base currency
+    // Transaction amounts are stored in their native currency (from account)
+    // To convert to JPY: amount / rate (since rate = "1 JPY = X foreign currency")
     const toJpy = (amount: number, txCurrency: string) => {
       if (selectedAccount) {
-        // Filtering by account - amounts are native, no conversion needed
+        // Filtering by account - amounts are native to account currency, no conversion needed
         return amount
       }
-      // Convert to JPY: divide by rate (rate = JPY to currency)
-      // Use default rates as fallback when API hasn't loaded
-      const rate = rates[txCurrency] ?? DEFAULT_RATES[txCurrency] ?? 1
+
+      // JPY transactions: no conversion needed
+      if (txCurrency === 'JPY') {
+        return amount
+      }
+
+      // Convert foreign currency to JPY: divide by rate
+      // rate represents "1 JPY = X foreign currency", so foreign/rate = JPY
+      const rate = rates[txCurrency] ?? DEFAULT_RATES[txCurrency]
+      if (!rate || rate === 0) {
+        // Fallback: treat as JPY if no rate available (shouldn't happen)
+        console.warn(`No exchange rate found for currency: ${txCurrency}, treating as JPY`)
+        return amount
+      }
       return amount / rate
     }
 
@@ -417,6 +431,8 @@ export function Transactions() {
       </Card>
 
       {/* Summary - clickable to filter by type */}
+      {/* When filtering by account: amounts are in account's native currency */}
+      {/* When viewing all: amounts are aggregated in JPY (base currency) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Card
           onClick={() => handleTypeFilter('income')}
@@ -428,7 +444,7 @@ export function Transactions() {
         >
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
           <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
-            {formatCurrencyPrivacy(income, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
+            {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
           </p>
         </Card>
         <Card
@@ -441,13 +457,13 @@ export function Transactions() {
         >
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
           <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
-            {formatCurrencyPrivacy(expense, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
+            {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
           </p>
         </Card>
         <Card>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
           <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
-            {formatCurrencyPrivacy(net, summaryCurrency, rates, !!selectedAccount, isPrivacyMode)}
+            {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
           </p>
         </Card>
       </div>
