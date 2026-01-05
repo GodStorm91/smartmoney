@@ -141,7 +141,11 @@ export function SwipeableTransactionCard({
             </div>
             <p
               className={`text-lg font-bold font-numbers ${
-                transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                transaction.is_transfer
+                  ? 'text-blue-500 dark:text-blue-400'
+                  : transaction.type === 'income'
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-600 dark:text-red-400'
               }`}
             >
               {formatCurrencySignedPrivacy(

@@ -387,6 +387,8 @@
     "investment": "Investment",
     "freelance": "Freelance",
     "refund": "Refund",
+    "proxy_purchase": "Proxy Purchase",
+    "proxy_income": "Proxy Income",
     "addCustom": "Add",
     "createTitle": "Create Category",
     "name": "Category Name",
