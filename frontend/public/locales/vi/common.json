@@ -647,7 +647,18 @@
     "combinedValue": "Giá Trị Kết Hợp",
     "monthlyBreakdown": "Chi Tiết Theo Tháng",
     "stakingRewardsNotSupported": "Theo dõi phần thưởng staking chưa được hỗ trợ",
-    "stakingRewardsHint": "Điểm và phần thưởng từ các giao thức staking như Symbiotic được theo dõi riêng bởi từng giao thức."
+    "stakingRewardsHint": "Điểm và phần thưởng từ các giao thức staking như Symbiotic được theo dõi riêng bởi từng giao thức.",
+    "closePosition": "Đóng Vị Thế",
+    "closedPositions": "Vị Thế Đã Đóng",
+    "exitDate": "Ngày Thoát",
+    "exitValue": "Giá Trị Thoát",
+    "destinationAccount": "Tài Khoản Nhận",
+    "realizedPnl": "Lãi/Lỗ Thực Hiện",
+    "totalPnl": "Tổng Lãi/Lỗ",
+    "confirmClose": "Xác Nhận Đóng",
+    "pnlPreview": "Xem Trước Lãi/Lỗ",
+    "positions": "vị thế",
+    "selectAccount": "Chọn tài khoản nhận"
   },
   "budget": {
     "title": "Ngân sách",

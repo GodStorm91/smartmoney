@@ -37,6 +37,11 @@ from ..schemas.crypto_wallet import (
     HodlScenariosResponse,
     StakingRewardsResponse,
 )
+from ..schemas.position_closure import (
+    ClosePositionRequest,
+    PositionClosureResponse,
+    ClosedPositionsSummary,
+)
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
 from ..services.defillama_service import DeFiLlamaService
@@ -845,3 +850,83 @@ async def get_hodl_scenarios(
         )
 
     return HodlScenariosResponse(**scenarios)
+
+
+# ==================== Position Closure Endpoints ====================
+
+@router.post("/positions/{position_id:path}/close", response_model=PositionClosureResponse, status_code=201)
+async def close_position(
+    position_id: str,
+    body: ClosePositionRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Close a DeFi position and record P&L.
+
+    Creates income transaction to destination bank account.
+    Calculates realized P&L from cost basis and rewards.
+    """
+    from ..services.position_closure_service import PositionClosureService
+
+    try:
+        closure = PositionClosureService.close_position(
+            db=db,
+            user_id=current_user.id,
+            position_id=position_id,
+            request=body,
+        )
+        # Calculate P&L percentage
+        response = PositionClosureResponse.model_validate(closure)
+        if closure.cost_basis_usd and closure.realized_pnl_usd:
+            response.realized_pnl_pct = float(
+                closure.realized_pnl_usd / closure.cost_basis_usd * 100
+            )
+        return response
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.get("/positions/closed", response_model=ClosedPositionsSummary)
+async def get_closed_positions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all closed positions with summary."""
+    from ..services.position_closure_service import PositionClosureService
+
+    closures = PositionClosureService.get_closed_positions(db, current_user.id)
+
+    # Build responses with P&L percentage
+    positions = []
+    for c in closures:
+        resp = PositionClosureResponse.model_validate(c)
+        if c.cost_basis_usd and c.realized_pnl_usd:
+            resp.realized_pnl_pct = float(c.realized_pnl_usd / c.cost_basis_usd * 100)
+        positions.append(resp)
+
+    # Calculate summary
+    total_exit_jpy = sum(c.exit_value_jpy for c in closures)
+    total_pnl_jpy = sum(c.realized_pnl_jpy or 0 for c in closures)
+
+    return ClosedPositionsSummary(
+        total_closed=len(closures),
+        total_exit_value_jpy=total_exit_jpy,
+        total_realized_pnl_jpy=total_pnl_jpy if total_pnl_jpy else None,
+        positions=positions,
+    )
+
+
+@router.get("/positions/{position_id:path}/is-closed")
+async def is_position_closed(
+    position_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Check if a position is already closed."""
+    from ..services.position_closure_service import PositionClosureService
+
+    is_closed = PositionClosureService.is_position_closed(
+        db, current_user.id, position_id
+    )
+    return {"is_closed": is_closed}

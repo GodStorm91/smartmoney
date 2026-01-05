@@ -19,6 +19,8 @@ import { PositionPerformanceChart } from './PositionPerformanceChart'
 import { HodlScenariosCard } from './HodlScenariosCard'
 import { PositionRewardsTab } from './PositionRewardsTab'
 import { StakingRewardsTab } from './StakingRewardsTab'
+import { ClosePositionModal } from './ClosePositionModal'
+import { fetchPositionROI } from '@/services/crypto-service'
 import type { GroupedPosition } from '@/components/accounts/LPPositionsSection'
 
 type TabType = 'overview' | 'rewards'
@@ -313,6 +315,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   useSettings() // For potential future currency formatting
   const chainInfo = CHAIN_INFO[group.chain_id as ChainId]
   const [activeTab, setActiveTab] = useState<TabType>('overview')
+  const [showCloseModal, setShowCloseModal] = useState(false)
 
   // Primary token for API calls (use first token's ID for performance/insights)
   const primaryToken = group.tokens[0]
@@ -485,6 +488,13 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
     retry: false,
   })
 
+  // Fetch ROI data for close position modal (includes total_rewards_usd)
+  const { data: roiData } = useQuery({
+    queryKey: ['position-roi', primaryToken.id],
+    queryFn: () => fetchPositionROI(primaryToken.id),
+    retry: false,
+  })
+
   const isLoading = isLoadingHistory || isLoadingPerformance
   const noDataYet = isHistoryError || isPerformanceError
 
@@ -542,12 +552,20 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
               </div>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg flex-shrink-0"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={() => setShowCloseModal(true)}
+              className="px-3 py-1.5 text-sm bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50"
+            >
+              {t('crypto.closePosition', 'Close Position')}
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -711,6 +729,21 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
           )}
         </div>
       </div>
+
+      {/* Close Position Modal */}
+      {showCloseModal && (
+        <ClosePositionModal
+          group={group}
+          lastSnapshotValueUsd={group.total_usd}
+          costBasisUsd={roiData?.cost_basis_usd ?? null}
+          totalRewardsUsd={roiData?.total_rewards_usd ?? null}
+          onClose={() => setShowCloseModal(false)}
+          onSuccess={() => {
+            setShowCloseModal(false)
+            onClose()
+          }}
+        />
+      )}
     </div>
   )
 }

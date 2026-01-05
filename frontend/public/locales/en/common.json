@@ -648,7 +648,18 @@
     "combinedValue": "Combined Value",
     "monthlyBreakdown": "Monthly Breakdown",
     "stakingRewardsNotSupported": "Staking rewards tracking not yet supported",
-    "stakingRewardsHint": "Points and rewards from staking protocols like Symbiotic are tracked separately by each protocol."
+    "stakingRewardsHint": "Points and rewards from staking protocols like Symbiotic are tracked separately by each protocol.",
+    "closePosition": "Close Position",
+    "closedPositions": "Closed Positions",
+    "exitDate": "Exit Date",
+    "exitValue": "Exit Value",
+    "destinationAccount": "Destination Account",
+    "realizedPnl": "Realized P&L",
+    "totalPnl": "Total P&L",
+    "confirmClose": "Confirm Close",
+    "pnlPreview": "P&L Preview",
+    "positions": "positions",
+    "selectAccount": "Select destination account"
   },
   "budget": {
     "title": "Budget",

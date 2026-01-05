@@ -6,6 +6,7 @@ import { AccountCard } from '@/components/accounts/AccountCard'
 import { AccountFormModal } from '@/components/accounts/AccountFormModal'
 import { CryptoWalletSection } from '@/components/accounts/CryptoWalletSection'
 import { LPPositionsSection } from '@/components/accounts/LPPositionsSection'
+import { ClosedPositionsSection } from '@/components/crypto/ClosedPositionsSection'
 import { TransferFormModal } from '@/components/transfers'
 import type { AccountType } from '@/types'
 
@@ -241,6 +242,9 @@ export default function Accounts() {
 
           {/* DeFi/LP Positions Section */}
           <LPPositionsSection />
+
+          {/* Closed Positions Section */}
+          <ClosedPositionsSection />
         </div>
       )}
 
@@ -249,6 +253,7 @@ export default function Accounts() {
         <div className="mt-8 space-y-6">
           <CryptoWalletSection />
           <LPPositionsSection />
+          <ClosedPositionsSection />
         </div>
       )}
 

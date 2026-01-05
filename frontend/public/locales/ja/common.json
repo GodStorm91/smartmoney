@@ -648,7 +648,18 @@
     "combinedValue": "合計価値",
     "monthlyBreakdown": "月別内訳",
     "stakingRewardsNotSupported": "ステーキング報酬の追跡はまだサポートされていません",
-    "stakingRewardsHint": "Symbioticなどのステーキングプロトコルのポイントや報酬は、各プロトコルで個別に追跡されています。"
+    "stakingRewardsHint": "Symbioticなどのステーキングプロトコルのポイントや報酬は、各プロトコルで個別に追跡されています。",
+    "closePosition": "ポジションをクローズ",
+    "closedPositions": "クローズ済みポジション",
+    "exitDate": "決済日",
+    "exitValue": "決済額",
+    "destinationAccount": "入金先口座",
+    "realizedPnl": "実現損益",
+    "totalPnl": "合計損益",
+    "confirmClose": "クローズを確認",
+    "pnlPreview": "損益プレビュー",
+    "positions": "件",
+    "selectAccount": "入金先口座を選択"
   },
   "budget": {
     "title": "予算",
