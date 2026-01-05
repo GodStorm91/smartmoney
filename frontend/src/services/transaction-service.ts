@@ -38,6 +38,7 @@ function transformTransaction(tx: BackendTransaction): Transaction {
     type: tx.is_income ? 'income' : 'expense',
     created_at: tx.date, // Use date as created_at fallback
     account_id: tx.account_id,
+    is_transfer: tx.is_transfer,
   }
 }
 
