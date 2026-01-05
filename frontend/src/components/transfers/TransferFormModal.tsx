@@ -6,6 +6,7 @@ import { cn } from '@/utils/cn'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { createTransfer } from '@/services/transfer-service'
+import { toStorageAmount } from '@/utils/formatCurrency'
 import type { TransferCreate } from '@/types/transfer'
 
 interface TransferFormModalProps {
@@ -143,12 +144,16 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
     e.preventDefault()
     if (!validate()) return
 
+    // Convert amounts to storage format (cents for decimal currencies like USD)
+    const fromCurrency = fromAccount?.currency || 'JPY'
+    const toCurrency = toAccount?.currency || 'JPY'
+
     const data: TransferCreate = {
       from_account_id: fromAccountId!,
       to_account_id: toAccountId!,
-      from_amount: parseNumber(fromAmount),
-      to_amount: parseNumber(toAmount),
-      fee_amount: parseNumber(feeAmount) || 0,
+      from_amount: toStorageAmount(parseNumber(fromAmount), fromCurrency),
+      to_amount: toStorageAmount(parseNumber(toAmount), toCurrency),
+      fee_amount: toStorageAmount(parseNumber(feeAmount) || 0, fromCurrency),
       date,
       description: description.trim() || undefined,
     }

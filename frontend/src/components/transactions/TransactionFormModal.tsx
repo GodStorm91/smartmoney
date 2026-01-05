@@ -7,6 +7,7 @@ import { createTransaction, type TransactionSuggestion } from '@/services/transa
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
+import { toStorageAmount } from '@/utils/formatCurrency'
 import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
@@ -189,7 +190,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
     // Category is now directly the child category name
     const categoryValue = category || 'Other'
-    const amountValue = parseInt(amount)
+    const currency = selectedAccount?.currency || 'JPY'
+    // Convert to storage format (cents for decimal currencies like USD)
+    const amountValue = toStorageAmount(parseInt(amount), currency)
 
     try {
       if (isRecurring) {
@@ -212,7 +215,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           date,
           description: description.trim(),
           amount: isIncome ? amountValue : -amountValue,
-          currency: selectedAccount?.currency || 'JPY',
+          currency,
           category: categoryValue,
           source: selectedAccount?.name || '',
           type: isIncome ? 'income' : 'expense',

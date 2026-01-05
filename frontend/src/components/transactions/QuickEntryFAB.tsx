@@ -19,6 +19,7 @@ import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { useVoiceInput } from '@/hooks/useVoiceInput'
 import { parseVoiceTransaction } from '@/utils/parseVoiceTransaction'
+import { toStorageAmount } from '@/utils/formatCurrency'
 import { EXPENSE_CATEGORIES } from './constants/categories'
 
 // Currency symbols map
@@ -207,15 +208,18 @@ export function QuickEntryFAB() {
 
     if (!amount || !selectedCategory || !account) return
 
+    const currency = account.currency || 'JPY'
     // Use converted amount if currencies differ, otherwise use input amount
-    const finalAmount = convertedAmount?.value ?? parseInt(amount)
+    // Then convert to storage format (cents for decimal currencies like USD)
+    const rawAmount = convertedAmount?.value ?? parseInt(amount)
+    const finalAmount = toStorageAmount(rawAmount, currency)
 
     try {
       await createMutation.mutateAsync({
         date: new Date().toISOString().split('T')[0],
         description: voiceDescription || selectedCategory.value, // Use voice description if available
         amount: -finalAmount, // Negative for expense
-        currency: account.currency || 'JPY',
+        currency,
         category: selectedCategory.value,
         source: account.name,
         type: 'expense',

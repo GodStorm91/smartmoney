@@ -13,12 +13,34 @@ const DEFAULT_RATES: Record<string, number> = {
  * Zero-decimal currencies (JPY, VND, KRW) have no sub-units
  * Decimal currencies (USD, EUR) have cents/sub-units
  */
-const CURRENCY_DECIMALS: Record<string, number> = {
+export const CURRENCY_DECIMALS: Record<string, number> = {
   JPY: 0,  // Japanese Yen - no sen/rin in modern use
   VND: 0,  // Vietnamese Dong - no decimal places
   KRW: 0,  // Korean Won - no decimal places
   USD: 2,  // US Dollar - cents (1/100)
   EUR: 2,  // Euro - cents (1/100)
+}
+
+/**
+ * Convert user input amount to internal storage format (cents for decimal currencies)
+ * @param amount - User input amount (e.g., 199 for $199)
+ * @param currency - Currency code
+ * @returns Amount in internal format (e.g., 19900 cents for $199 USD)
+ */
+export function toStorageAmount(amount: number, currency: string): number {
+  const decimals = CURRENCY_DECIMALS[currency] ?? 0
+  return Math.round(amount * Math.pow(10, decimals))
+}
+
+/**
+ * Convert internal storage amount to display amount
+ * @param amount - Amount in internal format (cents for decimal currencies)
+ * @param currency - Currency code
+ * @returns Display amount (e.g., 199 for 19900 cents USD)
+ */
+export function fromStorageAmount(amount: number, currency: string): number {
+  const decimals = CURRENCY_DECIMALS[currency] ?? 0
+  return amount / Math.pow(10, decimals)
 }
 
 /**
