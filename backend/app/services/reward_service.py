@@ -1,4 +1,5 @@
 """Reward scanning and management service."""
+import hashlib
 import logging
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -498,10 +499,17 @@ class RewardService:
         )
 
         # Create transaction - amount in cents (USD * 100)
+        tx_date = reward.claimed_at.date() if reward.claimed_at else datetime.utcnow().date()
+        month_key = tx_date.strftime("%Y-%m")
+
+        # Generate unique tx_hash from reward data
+        hash_input = f"reward|{reward_id}|{reward.tx_hash}|{user_id}|{datetime.utcnow().timestamp()}"
+        tx_hash = hashlib.sha256(hash_input.encode()).hexdigest()
+
         transaction = Transaction(
             user_id=user_id,
             account_id=account.id,
-            date=reward.claimed_at.date() if reward.claimed_at else datetime.utcnow().date(),
+            date=tx_date,
             description=f"LP Reward: {reward.reward_token_symbol or 'Token'}",
             amount=int(float(reward.reward_usd) * 100),  # Convert to cents
             currency="USD",
@@ -513,6 +521,8 @@ class RewardService:
             is_income=True,
             is_transfer=False,
             is_adjustment=False,
+            month_key=month_key,
+            tx_hash=tx_hash,
             # Crypto fields
             token_symbol=reward.reward_token_symbol,
             token_amount=reward.reward_amount,
