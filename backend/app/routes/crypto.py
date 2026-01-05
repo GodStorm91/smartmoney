@@ -567,17 +567,45 @@ async def batch_create_transactions(
 ):
     """Batch create income transactions from multiple LP rewards.
 
-    Creates transactions for all rewards that have USD values and aren't already linked.
-    Skips rewards without USD values or already linked to transactions.
+    First fetches current token prices and updates reward_usd values,
+    then creates transactions for rewards with USD values.
 
     Returns:
         BatchCreateTransactionsResponse: {created, skipped, failed, total_usd}
     """
-    from ..services.reward_service import RewardService
+    from ..services.reward_service import RewardService, get_token_prices
+    from ..models.position_reward import PositionReward
+    from decimal import Decimal
     import logging
 
     logger = logging.getLogger(__name__)
 
+    # Step 1: Fetch all rewards and update their USD values
+    rewards = db.query(PositionReward).filter(
+        PositionReward.id.in_(body.reward_ids),
+        PositionReward.user_id == current_user.id,
+        PositionReward.transaction_id.is_(None)  # Not yet linked
+    ).all()
+
+    if rewards:
+        # Get unique token symbols
+        token_symbols = list(set(r.reward_token_symbol for r in rewards if r.reward_token_symbol))
+
+        # Fetch current prices
+        token_prices = await get_token_prices(token_symbols)
+        logger.info(f"Fetched prices for {len(token_prices)} tokens: {token_prices}")
+
+        # Update reward_usd for all rewards
+        for reward in rewards:
+            if reward.reward_token_symbol and reward.reward_amount:
+                price = token_prices.get(reward.reward_token_symbol)
+                if price:
+                    reward.reward_usd = reward.reward_amount * price
+                    logger.info(f"Updated reward {reward.id}: {reward.reward_amount} {reward.reward_token_symbol} = ${reward.reward_usd}")
+
+        db.commit()
+
+    # Step 2: Create transactions
     created = 0
     skipped = 0
     failed = 0
