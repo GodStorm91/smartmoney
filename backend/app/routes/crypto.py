@@ -574,7 +574,7 @@ async def batch_create_transactions(
         BatchCreateTransactionsResponse: {created, skipped, failed, total_usd}
     """
     from ..services.reward_service import RewardService, get_token_prices
-    from ..models.position_reward import PositionReward
+    from ..models.crypto_wallet import PositionReward
     from decimal import Decimal
     import logging
 
