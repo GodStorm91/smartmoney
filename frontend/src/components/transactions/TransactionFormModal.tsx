@@ -195,8 +195,20 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const amountValue = toStorageAmount(parseInt(amount), currency)
 
     try {
+      // Always create the current transaction first
+      await createMutation.mutateAsync({
+        date,
+        description: description.trim(),
+        amount: isIncome ? amountValue : -amountValue,
+        currency,
+        category: categoryValue,
+        source: selectedAccount?.name || '',
+        type: isIncome ? 'income' : 'expense',
+        account_id: accountId,
+      })
+
+      // If recurring is checked, also set up recurring for future transactions
       if (isRecurring) {
-        // Create recurring transaction
         await recurringMutation.mutateAsync({
           description: description.trim(),
           amount: amountValue,
@@ -208,18 +220,6 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           day_of_month: frequency === 'monthly' ? dayOfMonth : null,
           interval_days: frequency === 'custom' ? intervalDays : null,
           start_date: date,
-        })
-      } else {
-        // Create one-time transaction
-        await createMutation.mutateAsync({
-          date,
-          description: description.trim(),
-          amount: isIncome ? amountValue : -amountValue,
-          currency,
-          category: categoryValue,
-          source: selectedAccount?.name || '',
-          type: isIncome ? 'income' : 'expense',
-          account_id: accountId,
         })
       }
       onClose()
