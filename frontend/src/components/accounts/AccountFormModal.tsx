@@ -189,15 +189,15 @@ export function AccountFormModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
             {editingAccountId ? t('account.editAccount') : t('account.createAccount')}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -216,7 +216,7 @@ export function AccountFormModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Account Name */}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('account.name')} <span className="text-red-500">*</span>
             </label>
             <input
@@ -226,7 +226,8 @@ export function AccountFormModal({
               onChange={(e) => setName(e.target.value)}
               className={cn(
                 'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                errors.name ? 'border-red-500' : 'border-gray-300'
+                'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+                errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               )}
               placeholder={t('account.namePlaceholder')}
             />
@@ -235,14 +236,14 @@ export function AccountFormModal({
 
           {/* Account Type */}
           <div>
-            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('account.accountType')} <span className="text-red-500">*</span>
             </label>
             <select
               id="type"
               value={type}
               onChange={(e) => setType(e.target.value as AccountType)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               {accountTypes.map((accountType) => (
                 <option key={accountType} value={accountType}>
@@ -258,7 +259,7 @@ export function AccountFormModal({
           {!editingAccountId && (
             <>
               <div>
-                <label htmlFor="initialBalance" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="initialBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('account.initialBalance')}
                 </label>
                 <input
@@ -267,13 +268,13 @@ export function AccountFormModal({
                   id="initialBalance"
                   value={formatWithCommas(initialBalance)}
                   onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="0"
                 />
               </div>
 
               <div>
-                <label htmlFor="initialBalanceDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="initialBalanceDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('account.initialBalanceDate')} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -283,7 +284,8 @@ export function AccountFormModal({
                   onChange={(e) => setInitialBalanceDate(e.target.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                    errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300'
+                    'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+                    errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   )}
                 />
                 {errors.initialBalanceDate && (
@@ -292,14 +294,14 @@ export function AccountFormModal({
               </div>
 
               <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="currency" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('account.currency')}
                 </label>
                 <select
                   id="currency"
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="JPY">JPY (¥)</option>
                   <option value="USD">USD ($)</option>
@@ -313,7 +315,7 @@ export function AccountFormModal({
           {editingAccountId && !hasTransactions && (
             <>
               <div>
-                <label htmlFor="initialBalance" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="initialBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('account.initialBalance')}
                 </label>
                 <input
@@ -322,13 +324,13 @@ export function AccountFormModal({
                   id="initialBalance"
                   value={formatWithCommas(initialBalance)}
                   onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="0"
                 />
               </div>
 
               <div>
-                <label htmlFor="initialBalanceDate" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="initialBalanceDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   {t('account.initialBalanceDate')} <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -338,7 +340,8 @@ export function AccountFormModal({
                   onChange={(e) => setInitialBalanceDate(e.target.value)}
                   className={cn(
                     'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
-                    errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300'
+                    'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+                    errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   )}
                 />
                 {errors.initialBalanceDate && (
@@ -352,10 +355,10 @@ export function AccountFormModal({
           {editingAccountId && hasTransactions && existingAccount && (
             <>
               {/* Current Balance Display */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-900">Current Balance</span>
-                  <span className="text-lg font-bold text-blue-900">
+                  <span className="text-sm font-medium text-blue-900 dark:text-blue-200">Current Balance</span>
+                  <span className="text-lg font-bold text-blue-900 dark:text-blue-200">
                     {formatCurrencyPrivacy(
                       (existingAccount as AccountWithBalance).current_balance,
                       existingAccount.currency,
@@ -365,14 +368,14 @@ export function AccountFormModal({
                     )}
                   </span>
                 </div>
-                <p className="text-xs text-blue-700 mt-1">
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                   {(existingAccount as AccountWithBalance).transaction_count} transactions
                 </p>
               </div>
 
               {/* Desired Balance Input */}
               <div>
-                <label htmlFor="desiredBalance" className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="desiredBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Desired Current Balance
                 </label>
                 <input
@@ -384,10 +387,10 @@ export function AccountFormModal({
                     setDesiredCurrentBalance(parseFormattedNumber(e.target.value))
                     setShowConfirmation(false) // Reset confirmation when value changes
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="Enter the actual balance"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Enter the actual balance from your bank/wallet to reconcile
                 </p>
               </div>
@@ -468,14 +471,14 @@ export function AccountFormModal({
 
           {/* Notes */}
           <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('account.notes')}
             </label>
             <textarea
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               rows={3}
               placeholder={t('account.notesPlaceholder')}
             />
@@ -483,8 +486,8 @@ export function AccountFormModal({
 
           {/* Error message */}
           {errors.submit && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p className="text-red-700 text-sm">{errors.submit}</p>
+            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-red-700 dark:text-red-300 text-sm">{errors.submit}</p>
             </div>
           )}
 
@@ -497,7 +500,7 @@ export function AccountFormModal({
                   setShowConfirmation(false)
                   setDesiredCurrentBalance('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 Cancel Adjustment
               </button>
@@ -506,7 +509,7 @@ export function AccountFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
                 {t('common.cancel')}
               </button>
