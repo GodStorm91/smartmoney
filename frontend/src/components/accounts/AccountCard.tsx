@@ -18,14 +18,14 @@ const ACCOUNT_TYPE_CONFIG: Record<
   AccountType,
   { icon: string; color: string; bgColor: string }
 > = {
-  bank: { icon: '🏦', color: 'text-blue-600', bgColor: 'bg-blue-50' },
-  cash: { icon: '💵', color: 'text-green-600', bgColor: 'bg-green-50' },
-  credit_card: { icon: '💳', color: 'text-purple-600', bgColor: 'bg-purple-50' },
-  investment: { icon: '📈', color: 'text-orange-600', bgColor: 'bg-orange-50' },
-  receivable: { icon: '💰', color: 'text-teal-600', bgColor: 'bg-teal-50' },
-  savings: { icon: '🐷', color: 'text-pink-600', bgColor: 'bg-pink-50' },
-  crypto: { icon: '₿', color: 'text-amber-600', bgColor: 'bg-amber-50' },
-  other: { icon: '📁', color: 'text-gray-600', bgColor: 'bg-gray-50' },
+  bank: { icon: '🏦', color: 'text-blue-600', bgColor: 'bg-blue-50 dark:bg-blue-900/30' },
+  cash: { icon: '💵', color: 'text-green-600', bgColor: 'bg-green-50 dark:bg-green-900/30' },
+  credit_card: { icon: '💳', color: 'text-purple-600', bgColor: 'bg-purple-50 dark:bg-purple-900/30' },
+  investment: { icon: '📈', color: 'text-orange-600', bgColor: 'bg-orange-50 dark:bg-orange-900/30' },
+  receivable: { icon: '💰', color: 'text-teal-600', bgColor: 'bg-teal-50 dark:bg-teal-900/30' },
+  savings: { icon: '🐷', color: 'text-pink-600', bgColor: 'bg-pink-50 dark:bg-pink-900/30' },
+  crypto: { icon: '₿', color: 'text-amber-600', bgColor: 'bg-amber-50 dark:bg-amber-900/30' },
+  other: { icon: '📁', color: 'text-gray-600', bgColor: 'bg-gray-50 dark:bg-gray-700' },
 }
 
 export function AccountCard({ account, onEdit }: AccountCardProps) {
