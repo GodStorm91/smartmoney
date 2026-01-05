@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, TrendingDown, Calendar } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { TrendingUp, TrendingDown, Calendar, CalendarClock } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
+import { fetchRecurringMonthlySummary } from '@/services/recurring-service'
 import type { Budget, BudgetTracking } from '@/types'
 
 interface BudgetProjectionCardProps {
@@ -14,11 +16,24 @@ interface BudgetProjectionCardProps {
 export function BudgetProjectionCard({ budget, tracking }: BudgetProjectionCardProps) {
   const { t } = useTranslation('common')
 
+  // Fetch recurring monthly summary for smarter projection
+  const { data: recurringSummary } = useQuery({
+    queryKey: ['recurring-monthly-summary', budget.month],
+    queryFn: () => fetchRecurringMonthlySummary(budget.month),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
   const projection = useMemo(() => {
     // Parse month from budget (format: "YYYY-MM")
     const [year, month] = budget.month.split('-').map(Number)
     const daysInMonth = new Date(year, month, 0).getDate()
     const daysElapsed = daysInMonth - tracking.days_remaining
+    const progressPercent = Math.round((daysElapsed / daysInMonth) * 100)
+
+    // Get recurring data (default to 0 if not loaded yet)
+    const paidRecurring = recurringSummary?.paid_this_month ?? 0
+    const upcomingBills = recurringSummary?.upcoming_this_month ?? 0
+    const upcomingCount = recurringSummary?.upcoming_count ?? 0
 
     // Avoid division by zero
     if (daysElapsed <= 0) {
@@ -27,27 +42,44 @@ export function BudgetProjectionCard({ budget, tracking }: BudgetProjectionCardP
         daysElapsed: 0,
         progressPercent: 0,
         dailyAvg: 0,
-        projectedSpending: 0,
-        projectedSavings: budget.monthly_income,
-        isOnTrack: true,
+        variableSpending: 0,
+        variableProjection: 0,
+        upcomingBills,
+        upcomingCount,
+        projectedSpending: upcomingBills,
+        projectedSavings: budget.monthly_income - upcomingBills,
+        isOnTrack: budget.monthly_income - upcomingBills >= (budget.savings_target || 0),
       }
     }
 
+    // Recurring-aware projection formula:
+    // Variable Spent = Total Spent - Paid Recurring
+    // Variable Daily = Variable Spent / Days Elapsed
+    // Variable Projection = Variable Spent + (Variable Daily × Remaining Days)
+    // Total Projected = Variable Projection + Upcoming Bills
+    const variableSpent = Math.max(0, tracking.total_spent - paidRecurring)
+    const variableDaily = variableSpent / daysElapsed
+    const variableRemaining = variableDaily * tracking.days_remaining
+    const variableProjection = variableSpent + variableRemaining
+    const projectedSpending = variableProjection + upcomingBills
+
     const dailyAvg = tracking.total_spent / daysElapsed
-    const projectedSpending = dailyAvg * daysInMonth
     const projectedSavings = budget.monthly_income - projectedSpending
-    const progressPercent = Math.round((daysElapsed / daysInMonth) * 100)
 
     return {
       daysInMonth,
       daysElapsed,
       progressPercent,
       dailyAvg: Math.round(dailyAvg),
+      variableSpending: Math.round(variableSpent),
+      variableProjection: Math.round(variableProjection),
+      upcomingBills,
+      upcomingCount,
       projectedSpending: Math.round(projectedSpending),
       projectedSavings: Math.round(projectedSavings),
       isOnTrack: projectedSavings >= (budget.savings_target || 0),
     }
-  }, [budget, tracking])
+  }, [budget, tracking, recurringSummary])
 
   return (
     <Card className="p-6">
@@ -104,9 +136,36 @@ export function BudgetProjectionCard({ budget, tracking }: BudgetProjectionCardP
         </p>
 
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="text-gray-600 dark:text-gray-400">
-              {t('budget.projection.projectedSpending', 'Projected spending')}
+          {/* Variable spending breakdown */}
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-gray-500 dark:text-gray-400">
+              {t('budget.projection.variableSpending', 'Variable spending')}
+            </span>
+            <span className="text-gray-700 dark:text-gray-300">
+              {formatCurrency(projection.variableProjection)}
+            </span>
+          </div>
+
+          {/* Upcoming bills */}
+          {projection.upcomingBills > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                <CalendarClock className="w-4 h-4" />
+                {t('budget.projection.upcomingBills', 'Upcoming bills')}
+                <span className="text-xs bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                  {projection.upcomingCount}
+                </span>
+              </span>
+              <span className="text-gray-700 dark:text-gray-300">
+                {formatCurrency(projection.upcomingBills)}
+              </span>
+            </div>
+          )}
+
+          {/* Total projected line */}
+          <div className="flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
+            <span className="text-gray-600 dark:text-gray-400 font-medium">
+              {t('budget.projection.totalProjected', 'Total projected')}
             </span>
             <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {formatCurrency(projection.projectedSpending)}

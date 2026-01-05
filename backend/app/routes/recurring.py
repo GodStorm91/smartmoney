@@ -1,15 +1,20 @@
 """Recurring transactions API routes."""
+from datetime import date
+from calendar import monthrange
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
 from ..models.user import User
+from ..models.recurring_transaction import RecurringTransaction
 from ..schemas.recurring import (
     RecurringTransactionCreate,
     RecurringTransactionUpdate,
     RecurringTransactionResponse,
     RecurringTransactionListResponse,
+    RecurringMonthlySummaryResponse,
 )
 from ..services.recurring_service import RecurringTransactionService
 
@@ -139,6 +144,81 @@ async def run_recurring(
     return {
         "message": f"Created {created} transaction(s)",
         "next_run_date": recurring.next_run_date.isoformat(),
+    }
+
+
+@router.get("/monthly-summary", response_model=RecurringMonthlySummaryResponse)
+async def get_monthly_summary(
+    month: str = Query(..., regex=r"^\d{4}-\d{2}$", description="Month in YYYY-MM format"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get recurring transactions summary for a specific month (for spending prediction).
+
+    Returns:
+        - paid_this_month: Sum of recurring transactions already executed this month
+        - upcoming_this_month: Sum of recurring transactions scheduled but not yet paid
+    """
+    # Parse month
+    year, month_num = map(int, month.split("-"))
+    month_start = date(year, month_num, 1)
+    _, last_day = monthrange(year, month_num)
+    month_end = date(year, month_num, last_day)
+    today = date.today()
+
+    # Get all active recurring transactions for this user
+    recurring_list = db.query(RecurringTransaction).filter(
+        RecurringTransaction.user_id == current_user.id,
+        RecurringTransaction.is_active == True,
+    ).all()
+
+    paid_transactions = []
+    upcoming_transactions = []
+    paid_total = 0
+    upcoming_total = 0
+
+    for r in recurring_list:
+        # Only count expenses (not income) for spending prediction
+        if r.is_income:
+            continue
+
+        amount = abs(r.amount)
+
+        # Check if this recurring was paid this month (last_run_date is in this month)
+        if r.last_run_date and month_start <= r.last_run_date <= month_end:
+            paid_transactions.append({
+                "id": r.id,
+                "description": r.description,
+                "amount": amount,
+                "category": r.category,
+                "is_income": r.is_income,
+                "scheduled_date": r.last_run_date,
+            })
+            paid_total += amount
+
+        # Check if this recurring is scheduled for this month but not yet paid
+        # next_run_date is in this month AND is in the future (or today)
+        if r.next_run_date and month_start <= r.next_run_date <= month_end:
+            # Only count as upcoming if it's today or in the future
+            if r.next_run_date >= today:
+                upcoming_transactions.append({
+                    "id": r.id,
+                    "description": r.description,
+                    "amount": amount,
+                    "category": r.category,
+                    "is_income": r.is_income,
+                    "scheduled_date": r.next_run_date,
+                })
+                upcoming_total += amount
+
+    return {
+        "month": month,
+        "paid_this_month": paid_total,
+        "upcoming_this_month": upcoming_total,
+        "paid_count": len(paid_transactions),
+        "upcoming_count": len(upcoming_transactions),
+        "paid_transactions": paid_transactions,
+        "upcoming_transactions": upcoming_transactions,
     }
 
 

@@ -95,3 +95,26 @@ class RecurringTransactionListResponse(BaseModel):
 
     recurring_transactions: list[RecurringTransactionResponse]
     total: int
+
+
+class RecurringMonthlySummaryItem(BaseModel):
+    """Schema for a single recurring transaction in summary."""
+
+    id: int
+    description: str
+    amount: int
+    category: str
+    is_income: bool
+    scheduled_date: date
+
+
+class RecurringMonthlySummaryResponse(BaseModel):
+    """Schema for recurring transactions monthly summary (for spending prediction)."""
+
+    month: str  # YYYY-MM
+    paid_this_month: int  # Sum of recurring already executed this month
+    upcoming_this_month: int  # Sum of recurring scheduled but not yet paid
+    paid_count: int
+    upcoming_count: int
+    paid_transactions: list[RecurringMonthlySummaryItem]
+    upcoming_transactions: list[RecurringMonthlySummaryItem]

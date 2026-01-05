@@ -121,3 +121,35 @@ export async function runRecurringTransaction(
   )
   return response.data
 }
+
+export interface RecurringMonthlySummaryItem {
+  id: number
+  description: string
+  amount: number
+  category: string
+  is_income: boolean
+  scheduled_date: string
+}
+
+export interface RecurringMonthlySummary {
+  month: string
+  paid_this_month: number
+  upcoming_this_month: number
+  paid_count: number
+  upcoming_count: number
+  paid_transactions: RecurringMonthlySummaryItem[]
+  upcoming_transactions: RecurringMonthlySummaryItem[]
+}
+
+/**
+ * Fetch recurring transactions monthly summary for spending prediction
+ * @param month - Month in YYYY-MM format
+ */
+export async function fetchRecurringMonthlySummary(
+  month: string
+): Promise<RecurringMonthlySummary> {
+  const response = await apiClient.get<RecurringMonthlySummary>(
+    `/api/recurring/monthly-summary?month=${month}`
+  )
+  return response.data
+}
