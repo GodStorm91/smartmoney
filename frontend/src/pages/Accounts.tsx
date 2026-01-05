@@ -142,8 +142,8 @@ export default function Accounts() {
 
       {/* Error state */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-red-700">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+          <p className="text-red-700 dark:text-red-400">
             {t('account.errors.loadFailed')}: {(error as Error).message}
           </p>
         </div>
@@ -152,7 +152,7 @@ export default function Accounts() {
       {/* Empty state */}
       {!isLoading && !error && (!accounts || accounts.length === 0) && (
         <div className="text-center py-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

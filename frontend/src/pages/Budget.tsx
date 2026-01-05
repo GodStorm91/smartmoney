@@ -113,8 +113,8 @@ export function BudgetPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('budget.title')}</h2>
-        <p className="text-gray-600">{t('budget.subtitle')}</p>
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('budget.title')}</h2>
+        <p className="text-gray-600 dark:text-gray-400">{t('budget.subtitle')}</p>
       </div>
 
       {/* No budget exists - show generation form */}
@@ -183,8 +183,8 @@ export function BudgetPage() {
 
       {/* Error state - only for real errors, not 404 */}
       {error && (
-        <Card className="p-6 border-red-200 bg-red-50">
-          <p className="text-red-600">
+        <Card className="p-6 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+          <p className="text-red-600 dark:text-red-400">
             {error instanceof Error ? error.message : t('budget.generateError')}
           </p>
         </Card>
