@@ -28,7 +28,7 @@ export function HierarchicalCategoryPicker({
   const [newCategoryIcon, setNewCategoryIcon] = useState('📁')
 
   if (isLoading || !tree) {
-    return <div className="animate-pulse h-48 bg-gray-100 rounded-lg" />
+    return <div className="animate-pulse h-48 bg-gray-100 dark:bg-gray-700 rounded-lg" />
   }
 
   const categories = isIncome ? tree.income : tree.expense
