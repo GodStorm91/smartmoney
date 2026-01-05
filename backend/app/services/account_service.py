@@ -251,13 +251,14 @@ class AccountService:
             return account
 
         # Create new account
+        # Use far past date to capture all historical reward transactions
         account = Account(
             user_id=user_id,
             name="Crypto Income",
             type="crypto",
             currency="USD",
             initial_balance=0,
-            initial_balance_date=date.today(),
+            initial_balance_date=date(2020, 1, 1),
             is_active=True,
             notes="Auto-created for LP reward tracking"
         )
