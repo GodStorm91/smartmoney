@@ -415,87 +415,82 @@ docker-compose up -d
 
 ## Backup & Restore
 
-### SQLite Backup
+### Docker PostgreSQL Backup (Production)
+
+SmartMoney includes automated backup scripts for the Docker deployment.
+
+**Backup location:** `/root/smartmoney/backups/`
+**Retention:** 7 days
+**Schedule:** Daily at 3:00 AM (UTC)
+
+#### Manual Backup
+
+```bash
+# Run backup script
+cd /root/smartmoney
+bash deploy/scripts/backup.sh
+
+# Output example:
+# [2026-01-06 12:47:50] Starting backup...
+# [2026-01-06 12:47:50] Backup successful: smartmoney_20260106_124750.sql.gz (532K)
+```
+
+#### List Available Backups
+
+```bash
+bash deploy/scripts/restore.sh
+# Shows all available backups with sizes
+```
+
+#### Restore from Backup
+
+```bash
+# Interactive restore (creates pre-restore backup automatically)
+bash deploy/scripts/restore.sh smartmoney_20260106_124750.sql.gz
+
+# Manual restore (advanced)
+gunzip -c /root/smartmoney/backups/smartmoney_20260106_124750.sql.gz | \
+  docker exec -i smartmoney-db psql -U smartmoney -d smartmoney
+```
+
+#### Verify Backup
+
+```bash
+# Check backup content
+zcat /root/smartmoney/backups/smartmoney_*.sql.gz | head -30
+
+# Check tables in backup
+zcat /root/smartmoney/backups/smartmoney_*.sql.gz | grep -c "COPY public"
+```
+
+#### Cron Configuration
+
+The backup cron job runs daily at 3:00 AM:
+```bash
+# View current cron
+crontab -l | grep smartmoney
+
+# Output:
+# 0 3 * * * /root/smartmoney/deploy/scripts/backup.sh >> /var/log/smartmoney-backup.log 2>&1
+```
+
+#### Backup Logs
+
+```bash
+# View backup logs
+tail -50 /var/log/smartmoney-backup.log
+```
+
+### SQLite Backup (Development)
 
 **Manual backup:**
 ```bash
-# Copy database file
 cp backend/smartmoney.db backend/smartmoney-backup-$(date +%Y%m%d).db
 ```
 
-**Automated backup (cron):**
-```bash
-# Add to crontab
-crontab -e
-
-# Daily backup at 2 AM
-0 2 * * * cp /home/smartmoney/smartmoney/backend/smartmoney.db /home/smartmoney/backups/smartmoney-$(date +\%Y\%m\%d).db
-```
-
 **Restore:**
 ```bash
-# Stop backend
-sudo systemctl stop smartmoney-backend
-
-# Restore backup
 cp backend/smartmoney-backup-20251117.db backend/smartmoney.db
-
-# Start backend
-sudo systemctl start smartmoney-backend
-```
-
-### PostgreSQL Backup
-
-**Manual backup:**
-```bash
-pg_dump -U smartmoney_user smartmoney > smartmoney-backup-$(date +%Y%m%d).sql
-```
-
-**Automated backup:**
-```bash
-#!/bin/bash
-# /home/smartmoney/scripts/backup.sh
-
-BACKUP_DIR="/home/smartmoney/backups"
-DATE=$(date +%Y%m%d)
-FILENAME="smartmoney-$DATE.sql"
-
-# Dump database
-pg_dump -U smartmoney_user smartmoney > "$BACKUP_DIR/$FILENAME"
-
-# Compress
-gzip "$BACKUP_DIR/$FILENAME"
-
-# Delete backups older than 30 days
-find "$BACKUP_DIR" -name "smartmoney-*.sql.gz" -mtime +30 -delete
-
-# Optional: Upload to remote storage
-# rclone copy "$BACKUP_DIR/$FILENAME.gz" remote:backups/
-```
-
-**Cron job:**
-```bash
-0 2 * * * /home/smartmoney/scripts/backup.sh
-```
-
-**Restore:**
-```bash
-# Stop backend
-sudo systemctl stop smartmoney-backend
-
-# Drop and recreate database
-sudo -u postgres psql
-DROP DATABASE smartmoney;
-CREATE DATABASE smartmoney;
-GRANT ALL PRIVILEGES ON DATABASE smartmoney TO smartmoney_user;
-\q
-
-# Restore backup
-gunzip smartmoney-20251117.sql.gz
-psql -U smartmoney_user smartmoney < smartmoney-20251117.sql
-
-# Start backend
-sudo systemctl start smartmoney-backend
 ```
 
 ---
