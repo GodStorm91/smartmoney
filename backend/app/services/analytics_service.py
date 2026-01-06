@@ -98,7 +98,7 @@ class AnalyticsService:
     def get_category_breakdown(
         db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
     ) -> list[dict]:
-        """Get expense breakdown by category for a specific user.
+        """Get expense breakdown by category for a specific user with comparison to previous period.
 
         Args:
             db: Database session
@@ -108,11 +108,49 @@ class AnalyticsService:
 
         Returns:
             List of category breakdown dictionaries (amounts normalized to JPY)
+            with previous_amount and change_percent for comparison
         """
         # Get exchange rates for currency conversion
         rates = ExchangeRateService.get_cached_rates(db)
 
-        # Query transactions with amount and currency for proper conversion
+        # Get current period totals
+        current_totals = AnalyticsService._get_category_totals(
+            db, user_id, start_date, end_date, rates
+        )
+
+        # Calculate previous period dates for comparison
+        previous_totals: dict[str, int] = {}
+        if start_date and end_date:
+            period_length = (end_date - start_date).days + 1
+            prev_end = start_date - timedelta(days=1)
+            prev_start = prev_end - timedelta(days=period_length - 1)
+            previous_totals = AnalyticsService._get_category_totals(
+                db, user_id, prev_start, prev_end, rates
+            )
+
+        # Build result list sorted by amount descending
+        categories = []
+        for category, data in sorted(current_totals.items(), key=lambda x: -x[1]["amount"]):
+            prev_amount = previous_totals.get(category, {}).get("amount")
+            change_pct = None
+            if prev_amount is not None and prev_amount > 0:
+                change_pct = round(((data["amount"] - prev_amount) / prev_amount) * 100, 1)
+
+            categories.append({
+                "category": category,
+                "amount": data["amount"],
+                "count": data["count"],
+                "previous_amount": prev_amount,
+                "change_percent": change_pct,
+            })
+
+        return categories
+
+    @staticmethod
+    def _get_category_totals(
+        db: Session, user_id: int, start_date: Optional[date], end_date: Optional[date], rates: dict
+    ) -> dict[str, dict]:
+        """Get category totals with amount and count for a date range."""
         query = (
             db.query(
                 Transaction.category,
@@ -134,26 +172,16 @@ class AnalyticsService:
         results = query.all()
 
         # Aggregate by category with currency conversion
-        category_totals: dict[str, int] = defaultdict(int)
-        category_counts: dict[str, int] = defaultdict(int)
+        category_data: dict[str, dict] = defaultdict(lambda: {"amount": 0, "count": 0})
 
         for row in results:
             amount_jpy = AnalyticsService._convert_to_jpy(
                 abs(row.amount), row.currency, rates
             )
-            category_totals[row.category] += amount_jpy
-            category_counts[row.category] += 1
+            category_data[row.category]["amount"] += amount_jpy
+            category_data[row.category]["count"] += 1
 
-        # Build result list sorted by amount descending
-        categories = []
-        for category, total in sorted(category_totals.items(), key=lambda x: -x[1]):
-            categories.append({
-                "category": category,
-                "amount": total,
-                "count": category_counts[category],
-            })
-
-        return categories
+        return dict(category_data)
 
     @staticmethod
     def get_monthly_trend(

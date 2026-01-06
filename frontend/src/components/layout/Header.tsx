@@ -44,6 +44,7 @@ export function Header() {
             <NavLink to="/">{t('header.dashboard')}</NavLink>
             <NavLink to="/upload">{t('header.upload')}</NavLink>
             <NavLink to="/transactions">{t('header.transactions')}</NavLink>
+            <NavLink to="/recurring">{t('header.recurring')}</NavLink>
             <NavLink to="/accounts">{t('header.accounts')}</NavLink>
             <NavLink to="/analytics">{t('header.analytics')}</NavLink>
             <NavLink to="/goals">{t('header.goals')}</NavLink>

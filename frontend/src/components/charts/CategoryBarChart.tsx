@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts'
 import { useTranslation } from 'react-i18next'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -30,6 +31,36 @@ interface ChartDataItem extends CategoryBreakdown {
   color: string
   isOther?: boolean
   otherCount?: number
+}
+
+// Comparison badge component
+function ComparisonBadge({ changePercent }: { changePercent: number | null | undefined }) {
+  if (changePercent === null || changePercent === undefined) return null
+
+  const isUp = changePercent > 0
+  const isSignificant = Math.abs(changePercent) >= 20
+
+  if (changePercent === 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-xs text-gray-500 dark:text-gray-400">
+        <Minus className="w-3 h-3" />
+        <span>0%</span>
+      </span>
+    )
+  }
+
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-0.5 text-xs font-medium',
+        isUp ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400',
+        isSignificant && 'font-bold'
+      )}
+    >
+      {isUp ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+      <span>{isUp ? '+' : ''}{changePercent.toFixed(0)}%</span>
+    </span>
+  )
 }
 
 export function CategoryBarChart({ data }: CategoryBarChartProps) {
@@ -135,14 +166,23 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
               fontSize: '14px',
               color: textColor,
             }}
-            formatter={(_value: number, _name: string, props: any) => {
-              const item = props.payload
-              return [
-                formatCurrency(item.amount, currency, exchangeRates?.rates || {}, false),
-                item.category
-              ]
+            content={({ active, payload }) => {
+              if (!active || !payload?.[0]) return null
+              const item = payload[0].payload as ChartDataItem
+              const hasChange = item.change_percent !== null && item.change_percent !== undefined
+              return (
+                <div className="p-3 rounded-lg shadow-lg" style={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}` }}>
+                  <p className="font-medium mb-1">{item.category}</p>
+                  <p className="text-sm">{formatCurrency(item.amount, currency, exchangeRates?.rates || {}, false)}</p>
+                  {hasChange && (
+                    <div className="mt-1 pt-1 border-t border-gray-200 dark:border-gray-600">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{t('analytics.vsPrevious')}: </span>
+                      <ComparisonBadge changePercent={item.change_percent} />
+                    </div>
+                  )}
+                </div>
+              )
             }}
-            labelFormatter={() => ''}
           />
           <Bar
             dataKey="percentage"

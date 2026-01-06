@@ -13,6 +13,7 @@ import { Route as UploadRouteImport } from './routes/upload'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as RecurringRouteImport } from './routes/recurring'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as GoalsRouteImport } from './routes/goals'
@@ -39,6 +40,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecurringRoute = RecurringRouteImport.update({
+  id: '/recurring',
+  path: '/recurring',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
+  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
+    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
+    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
+    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   GoalsRoute: typeof GoalsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
+  RecurringRoute: typeof RecurringRoute
   RegisterRoute: typeof RegisterRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
@@ -201,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recurring': {
+      id: '/recurring'
+      path: '/recurring'
+      fullPath: '/recurring'
+      preLoaderRoute: typeof RecurringRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoalsRoute: GoalsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
+  RecurringRoute: RecurringRoute,
   RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,

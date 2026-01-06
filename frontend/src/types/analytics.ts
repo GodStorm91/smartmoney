@@ -11,6 +11,8 @@ export interface CategoryBreakdown {
   amount: number
   percentage: number
   emoji?: string
+  previous_amount?: number | null  // Amount in previous period
+  change_percent?: number | null   // Percentage change vs previous
 }
 
 export interface ComparisonData {

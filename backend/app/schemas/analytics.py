@@ -37,6 +37,8 @@ class CategoryBreakdownResponse(BaseModel):
     category: str
     amount: int
     count: int
+    previous_amount: Optional[int] = None  # Amount in previous period
+    change_percent: Optional[float] = None  # Percentage change vs previous
 
 
 class SourceBreakdownResponse(BaseModel):
