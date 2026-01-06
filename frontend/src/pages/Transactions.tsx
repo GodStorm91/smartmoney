@@ -19,7 +19,7 @@ import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTra
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { BulkRecategorizeModal } from '@/components/transactions/BulkRecategorizeModal'
 import { BulkDeleteConfirmDialog } from '@/components/transactions/BulkDeleteConfirmDialog'
-import { formatCurrencyPrivacy, formatCurrencySignedPrivacy } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy, formatCurrencySignedPrivacy, CURRENCY_DECIMALS } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange, formatDateHeader } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
 import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory } from '@/services/transaction-service'
@@ -271,17 +271,22 @@ export function Transactions() {
     const txList = accountFilteredTransactions
 
     // Helper to convert amount to JPY base currency
-    // Transaction amounts are stored in their native currency (from account)
-    // To convert to JPY: amount / rate (since rate = "1 JPY = X foreign currency")
+    // Transaction amounts are stored in storage format (cents for USD, whole units for JPY/VND)
+    // To convert to JPY: first convert from storage format, then divide by rate
     const toJpy = (amount: number, txCurrency: string) => {
       if (selectedAccount) {
         // Filtering by account - amounts are native to account currency, no conversion needed
         return amount
       }
 
-      // JPY transactions: no conversion needed
+      // First convert from storage format to actual currency value
+      // USD stores in cents (1022 = $10.22), JPY/VND store as whole units
+      const decimals = CURRENCY_DECIMALS[txCurrency] ?? 0
+      const actualAmount = amount / Math.pow(10, decimals)
+
+      // JPY transactions: no currency conversion needed (already in JPY)
       if (txCurrency === 'JPY') {
-        return amount
+        return actualAmount
       }
 
       // Convert foreign currency to JPY: divide by rate
@@ -290,9 +295,9 @@ export function Transactions() {
       if (!rate || rate === 0) {
         // Fallback: treat as JPY if no rate available (shouldn't happen)
         console.warn(`No exchange rate found for currency: ${txCurrency}, treating as JPY`)
-        return amount
+        return actualAmount
       }
-      return amount / rate
+      return actualAmount / rate
     }
 
     const inc = txList
