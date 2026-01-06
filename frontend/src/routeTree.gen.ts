@@ -26,17 +26,17 @@ const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/upload.lazy').then((d) => d.Route))
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/transactions.lazy').then((d) => d.Route))
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -46,7 +46,7 @@ const RecurringRoute = RecurringRouteImport.update({
   id: '/recurring',
   path: '/recurring',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/recurring.lazy').then((d) => d.Route))
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -61,22 +61,22 @@ const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/goals.lazy').then((d) => d.Route))
 const BudgetRoute = BudgetRouteImport.update({
   id: '/budget',
   path: '/budget',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/budget.lazy').then((d) => d.Route))
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/analytics.lazy').then((d) => d.Route))
 const AccountsRoute = AccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any).lazy(() => import('./routes/accounts.lazy').then((d) => d.Route))
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
