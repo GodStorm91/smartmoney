@@ -20,6 +20,7 @@ class TransactionBase(BaseModel):
     is_income: bool = False
     is_transfer: bool = False
     account_id: Union[int, None] = Field(None, description="Account ID for balance tracking")
+    receipt_url: Union[str, None] = Field(None, max_length=500, description="Receipt image URL")
 
 
 class TransactionCreate(TransactionBase):
@@ -43,6 +44,7 @@ class TransactionUpdate(BaseModel):
     is_income: Union[bool, None] = None
     is_transfer: Union[bool, None] = None
     account_id: Union[int, None] = None
+    receipt_url: Union[str, None] = None
 
 
 class TransactionResponse(TransactionBase):

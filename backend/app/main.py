@@ -1,10 +1,12 @@
 """SmartMoney FastAPI application."""
 import logging
+import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
@@ -205,3 +207,9 @@ async def root():
 async def health_check():
     """API health check."""
     return {"status": "ok"}
+
+
+# Mount uploads directory for development (production uses nginx)
+uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+if os.path.exists(uploads_dir):
+    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")

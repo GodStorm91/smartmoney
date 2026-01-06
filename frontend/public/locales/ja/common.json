@@ -806,7 +806,11 @@
     "startingCamera": "カメラを起動中...",
     "invalidFile": "画像ファイルを選択してください",
     "processError": "画像の処理に失敗しました",
-    "processing": "処理中..."
+    "processing": "処理中...",
+    "receipt": "レシート",
+    "attachReceipt": "レシートを添付",
+    "viewReceipt": "レシートを表示",
+    "uploading": "アップロード中..."
   },
   "quickEntry": {
     "add": "クイック追加",

@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Receipt, RefreshCw } from 'lucide-react'
+import { Receipt, RefreshCw, Camera, X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
+import { uploadReceipt, type ReceiptData } from '@/services/receipt-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { toStorageAmount } from '@/utils/formatCurrency'
@@ -12,7 +13,6 @@ import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
-import type { ReceiptData } from '@/services/receipt-service'
 
 interface TransactionFormModalProps {
   isOpen: boolean
@@ -53,6 +53,10 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showScanner, setShowScanner] = useState(false)
+  const [receiptFile, setReceiptFile] = useState<File | null>(null)
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Recurring state
   const [isRecurring, setIsRecurring] = useState(false)
@@ -81,6 +85,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       setCategory('')
       setAccountId(accounts?.[0]?.id || null)
       setErrors({})
+      // Reset receipt state
+      setReceiptFile(null)
+      setReceiptPreview(null)
       // Reset recurring state
       setIsRecurring(false)
       setFrequency('monthly')
@@ -162,6 +169,33 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     setShowScanner(false)
   }
 
+  // Handle receipt file selection
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      return
+    }
+
+    setReceiptFile(file)
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file)
+    setReceiptPreview(previewUrl)
+  }
+
+  // Remove receipt
+  const handleRemoveReceipt = () => {
+    setReceiptFile(null)
+    if (receiptPreview) {
+      URL.revokeObjectURL(receiptPreview)
+      setReceiptPreview(null)
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
+
   // Validation
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -195,6 +229,17 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
     const amountValue = toStorageAmount(parseInt(amount), currency)
 
     try {
+      // Upload receipt if attached
+      let receipt_url: string | undefined
+      if (receiptFile) {
+        setIsUploadingReceipt(true)
+        try {
+          receipt_url = await uploadReceipt(receiptFile)
+        } finally {
+          setIsUploadingReceipt(false)
+        }
+      }
+
       // Always create the current transaction first
       await createMutation.mutateAsync({
         date,
@@ -205,6 +250,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
         source: selectedAccount?.name || '',
         type: isIncome ? 'income' : 'expense',
         account_id: accountId,
+        receipt_url,
       })
 
       // If recurring is checked, also set up recurring for future transactions
@@ -263,8 +309,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           </h2>
         </div>
 
-        {/* Scan Receipt Button */}
-        <div className="px-4 pb-4">
+        {/* Receipt Actions */}
+        <div className="px-4 pb-4 space-y-3">
+          {/* Scan Receipt Button (OCR) */}
           <button
             type="button"
             onClick={() => setShowScanner(true)}
@@ -273,6 +320,42 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             <Receipt size={20} />
             {t('receipt.scanReceipt', 'Scan Receipt')}
           </button>
+
+          {/* Attach Receipt (just image storage) */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handleReceiptSelect}
+            className="hidden"
+          />
+
+          {receiptPreview ? (
+            <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+              <img
+                src={receiptPreview}
+                alt="Receipt preview"
+                className="w-full h-24 object-cover"
+              />
+              <button
+                type="button"
+                onClick={handleRemoveReceipt}
+                className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full h-12 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-500 dark:text-gray-400 rounded-lg font-medium transition-colors"
+            >
+              <Camera size={20} />
+              {t('receipt.attachReceipt', 'Attach Receipt Photo')}
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="px-4 pb-8 space-y-4">
@@ -447,16 +530,18 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
             </button>
             <button
               type="submit"
-              disabled={createMutation.isPending || recurringMutation.isPending}
+              disabled={createMutation.isPending || recurringMutation.isPending || isUploadingReceipt}
               className={cn(
                 'flex-1 h-12 rounded-lg font-medium text-white',
                 isRecurring ? 'bg-blue-500' : (isIncome ? 'bg-green-500' : 'bg-red-500'),
-                (createMutation.isPending || recurringMutation.isPending) && 'opacity-50 cursor-not-allowed'
+                (createMutation.isPending || recurringMutation.isPending || isUploadingReceipt) && 'opacity-50 cursor-not-allowed'
               )}
             >
-              {(createMutation.isPending || recurringMutation.isPending)
-                ? t('common.saving', 'Saving...')
-                : t('common.save', 'Save')
+              {isUploadingReceipt
+                ? t('receipt.uploading', 'Uploading...')
+                : (createMutation.isPending || recurringMutation.isPending)
+                  ? t('common.saving', 'Saving...')
+                  : t('common.save', 'Save')
               }
             </button>
           </div>

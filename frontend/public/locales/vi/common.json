@@ -805,7 +805,11 @@
     "startingCamera": "Đang khởi động camera...",
     "invalidFile": "Vui lòng chọn file hình ảnh",
     "processError": "Không thể xử lý hình ảnh",
-    "processing": "Đang xử lý..."
+    "processing": "Đang xử lý...",
+    "receipt": "Hóa đơn",
+    "attachReceipt": "Đính kèm hóa đơn",
+    "viewReceipt": "Xem hóa đơn",
+    "uploading": "Đang tải lên..."
   },
   "quickEntry": {
     "add": "Thêm nhanh",

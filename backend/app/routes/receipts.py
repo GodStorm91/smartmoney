@@ -1,7 +1,12 @@
-"""Receipt scanning API routes."""
-from fastapi import APIRouter, HTTPException, Depends
+"""Receipt scanning and upload API routes."""
+import os
+import uuid
+from io import BytesIO
+
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File
 from pydantic import BaseModel
 from typing import Optional
+from PIL import Image
 
 from ..services.receipt_scanner import receipt_scanner, ReceiptData
 from ..auth.dependencies import get_current_user
@@ -9,6 +14,11 @@ from ..models.user import User
 
 
 router = APIRouter(prefix="/api/receipts", tags=["receipts"])
+
+# Upload configuration
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads/receipts")
+MAX_SIZE = 1920  # max width/height in pixels
+QUALITY = 80     # JPEG quality
 
 
 class ScanRequest(BaseModel):
@@ -78,4 +88,70 @@ async def scan_receipt(
         raise HTTPException(
             status_code=500,
             detail=f"Failed to scan receipt: {str(e)}"
+        )
+
+
+class UploadResponse(BaseModel):
+    """Response model for receipt upload."""
+    receipt_url: str
+
+
+@router.post("/upload", response_model=UploadResponse)
+async def upload_receipt(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload and compress receipt image.
+
+    Accepts an image file, compresses it to JPEG format with max 1920px dimension,
+    and stores it on the server.
+
+    Args:
+        file: Image file upload
+        current_user: Authenticated user
+
+    Returns:
+        UploadResponse with the URL path to the stored receipt
+
+    Raises:
+        HTTPException: If upload fails or file is not an image
+    """
+    # Validate file type
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="File must be an image")
+
+    try:
+        # Read and open image
+        contents = await file.read()
+        img = Image.open(BytesIO(contents))
+
+        # Convert to RGB (handle PNG with alpha, palette images)
+        if img.mode in ("RGBA", "P", "LA"):
+            img = img.convert("RGB")
+
+        # Resize if too large (maintain aspect ratio)
+        if max(img.size) > MAX_SIZE:
+            img.thumbnail((MAX_SIZE, MAX_SIZE), Image.Resampling.LANCZOS)
+
+        # Create user directory
+        user_dir = os.path.join(UPLOAD_DIR, str(current_user.id))
+        os.makedirs(user_dir, exist_ok=True)
+
+        # Generate unique filename
+        filename = f"{uuid.uuid4()}.jpg"
+        filepath = os.path.join(user_dir, filename)
+
+        # Save compressed JPEG
+        img.save(filepath, "JPEG", quality=QUALITY, optimize=True)
+
+        # Return URL path
+        receipt_url = f"/uploads/receipts/{current_user.id}/{filename}"
+        return UploadResponse(receipt_url=receipt_url)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to upload receipt: {str(e)}"
         )

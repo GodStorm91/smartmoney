@@ -40,6 +40,9 @@ class Transaction(Base):
     token_amount: Mapped[float | None] = mapped_column(Numeric(30, 18), nullable=True)
     chain_id: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
+    # Receipt attachment
+    receipt_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+
     # Foreign Keys
     user_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True

@@ -816,7 +816,11 @@
     "startingCamera": "Starting camera...",
     "invalidFile": "Please select an image file",
     "processError": "Failed to process image",
-    "processing": "Processing..."
+    "processing": "Processing...",
+    "receipt": "Receipt",
+    "attachReceipt": "Attach Receipt",
+    "viewReceipt": "View Receipt",
+    "uploading": "Uploading..."
   },
   "quickEntry": {
     "add": "Quick Add",

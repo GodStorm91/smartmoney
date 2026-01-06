@@ -1,12 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Camera, X } from 'lucide-react'
 import { updateTransaction, deleteTransaction } from '@/services/transaction-service'
+import { uploadReceipt, getReceiptUrl } from '@/services/receipt-service'
 import { useAccounts } from '@/hooks/useAccounts'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
+import { ReceiptViewer } from '../receipts/ReceiptViewer'
 import type { Transaction } from '@/types'
 import { cn } from '@/utils/cn'
 
@@ -35,6 +38,12 @@ export function TransactionEditModal({
   const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
+  const [newReceiptFile, setNewReceiptFile] = useState<File | null>(null)
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
+  const [showReceiptViewer, setShowReceiptViewer] = useState(false)
+  const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Currency options
   const currencyOptions = [
@@ -93,8 +102,31 @@ export function TransactionEditModal({
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
       setShowDeleteConfirm(false)
+      setReceiptUrl(transaction.receipt_url || null)
+      setNewReceiptFile(null)
+      setReceiptPreview(null)
     }
   }, [transaction?.id, isOpen])
+
+  // Handle receipt file selection
+  const handleReceiptSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+
+    setNewReceiptFile(file)
+    setReceiptPreview(URL.createObjectURL(file))
+  }
+
+  // Remove receipt
+  const handleRemoveReceipt = () => {
+    setNewReceiptFile(null)
+    if (receiptPreview) {
+      URL.revokeObjectURL(receiptPreview)
+      setReceiptPreview(null)
+    }
+    setReceiptUrl(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
 
   // Update currency when account changes
   useEffect(() => {
@@ -106,7 +138,7 @@ export function TransactionEditModal({
     }
   }, [accountId, accounts])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     const amountValue = parseFloat(amount)
@@ -115,6 +147,17 @@ export function TransactionEditModal({
     // Get account name for source field (backward compatibility)
     const selectedAccount = accounts.find(a => a.id === accountId)
     const source = selectedAccount?.name || transaction?.source || ''
+
+    // Upload new receipt if selected
+    let finalReceiptUrl = receiptUrl
+    if (newReceiptFile) {
+      setIsUploadingReceipt(true)
+      try {
+        finalReceiptUrl = await uploadReceipt(newReceiptFile)
+      } finally {
+        setIsUploadingReceipt(false)
+      }
+    }
 
     updateMutation.mutate({
       date,
@@ -125,6 +168,7 @@ export function TransactionEditModal({
       source,
       type,
       account_id: accountId,
+      receipt_url: finalReceiptUrl,
     })
   }
 
@@ -248,6 +292,48 @@ export function TransactionEditModal({
                 ]}
               />
 
+              {/* Receipt Attachment */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {t('receipt.receipt', 'Receipt')}
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleReceiptSelect}
+                  className="hidden"
+                />
+
+                {(receiptPreview || receiptUrl) ? (
+                  <div className="relative rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <img
+                      src={receiptPreview || getReceiptUrl(receiptUrl) || ''}
+                      alt="Receipt"
+                      className="w-full h-20 object-cover cursor-pointer"
+                      onClick={() => !receiptPreview && setShowReceiptViewer(true)}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemoveReceipt}
+                      className="absolute top-1 right-1 p-1 bg-black/50 rounded-full text-white hover:bg-black/70"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-10 flex items-center justify-center gap-2 border border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 text-gray-500 dark:text-gray-400 rounded-lg text-sm"
+                  >
+                    <Camera size={16} />
+                    {t('receipt.attachReceipt', 'Attach Receipt')}
+                  </button>
+                )}
+              </div>
+
               {/* Actions */}
               <div className="flex gap-3 pt-4">
                 <Button
@@ -260,10 +346,10 @@ export function TransactionEditModal({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={updateMutation.isPending}
+                  disabled={updateMutation.isPending || isUploadingReceipt}
                   className="flex-1"
                 >
-                  {updateMutation.isPending ? '...' : t('button.save')}
+                  {isUploadingReceipt ? t('receipt.uploading', 'Uploading...') : updateMutation.isPending ? '...' : t('button.save')}
                 </Button>
               </div>
 
@@ -282,6 +368,14 @@ export function TransactionEditModal({
           )}
         </div>
       </div>
+
+      {/* Receipt Viewer Modal */}
+      {showReceiptViewer && receiptUrl && (
+        <ReceiptViewer
+          receiptUrl={receiptUrl}
+          onClose={() => setShowReceiptViewer(false)}
+        />
+      )}
     </div>
   )
 }

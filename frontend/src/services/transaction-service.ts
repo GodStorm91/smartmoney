@@ -14,6 +14,7 @@ interface BackendTransaction {
   month_key: string
   tx_hash: string
   account_id?: number | null
+  receipt_url?: string | null
 }
 
 interface TransactionListResponse {
@@ -39,6 +40,7 @@ function transformTransaction(tx: BackendTransaction): Transaction {
     created_at: tx.date, // Use date as created_at fallback
     account_id: tx.account_id,
     is_transfer: tx.is_transfer,
+    receipt_url: tx.receipt_url,
   }
 }
 
