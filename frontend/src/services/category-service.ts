@@ -18,6 +18,24 @@ export async function deleteCategory(id: number): Promise<void> {
   await api.delete(`/api/categories/${id}`)
 }
 
+export interface UpdateCategoryPayload {
+  name?: string
+  icon?: string
+}
+
+export interface UpdateCategoryResponse {
+  category: CategoryChild
+  affected_transactions: number
+}
+
+export async function updateCategory(
+  id: number,
+  payload: UpdateCategoryPayload
+): Promise<UpdateCategoryResponse> {
+  const { data } = await api.patch(`/api/categories/${id}`, payload)
+  return data
+}
+
 // Legacy functions for backward compatibility with old user-categories
 export async function getCustomCategories(): Promise<UserCategory[]> {
   const { data } = await api.get('/api/user-categories')

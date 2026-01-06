@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RecurringTransactionsList } from '@/components/recurring/RecurringTransactionsList'
 import { CategoryRulesList } from '@/components/settings/CategoryRulesList'
+import { CategoryManagementSection } from '@/components/settings/CategoryManagementSection'
 import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 
@@ -163,23 +164,8 @@ export function Settings() {
           </div>
         </Card>
 
-        {/* Categories */}
-        <CollapsibleCard
-          title={t('settings.categoryManagement')}
-          badge={settings?.categories?.length || 0}
-        >
-          <div className="space-y-2 max-h-64 overflow-y-auto">
-            {settings?.categories?.map((cat, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                <span className="text-gray-900 dark:text-gray-100">{cat}</span>
-                <button className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm">{t('settings.delete')}</button>
-              </div>
-            )) || <p className="text-gray-400 dark:text-gray-500 text-center py-4">{t('settings.noCategories')}</p>}
-          </div>
-          <div className="mt-4">
-            <Button variant="outline">{t('settings.addCategory')}</Button>
-          </div>
-        </CollapsibleCard>
+        {/* Custom Categories Management */}
+        <CategoryManagementSection />
 
         {/* Payment Sources */}
         <CollapsibleCard

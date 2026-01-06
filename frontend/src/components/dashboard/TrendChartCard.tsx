@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
+import { ZoomableChart } from '@/components/charts/ZoomableChart'
 import type { MonthlyData } from '@/types'
 
 interface TrendChartCardProps {
@@ -52,7 +53,9 @@ export function TrendChartCard({ data }: TrendChartCardProps) {
 
       <div className="h-80" role="img" aria-label={t('chart.trendChart')}>
         {data && data.length > 0 ? (
-          <TrendLineChart data={data} dataKey={selectedMetric} />
+          <ZoomableChart className="h-full">
+            <TrendLineChart data={data} dataKey={selectedMetric} />
+          </ZoomableChart>
         ) : (
           <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
             {t('common.noData')}
