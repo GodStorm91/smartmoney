@@ -33,6 +33,7 @@ services:
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
       ZERION_API_KEY: ${ZERION_API_KEY}
       POLYGONSCAN_API_KEY: ${POLYGONSCAN_API_KEY}
+      UPLOAD_DIR: /app/uploads/receipts
     volumes:
       - ../uploads:/app/uploads
     depends_on:
