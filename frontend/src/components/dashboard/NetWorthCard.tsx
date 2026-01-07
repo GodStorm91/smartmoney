@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { CountUp } from '@/components/ui/CountUp'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -90,6 +91,12 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
   const totalAssets = assets + cryptoBalanceJpy
   const netWorth = totalAssets - liabilities
 
+  // Memoized formatter for CountUp
+  const currencyFormatter = useMemo(
+    () => (value: number) => formatCurrencyPrivacy(value, currency, rates, false, isPrivacyMode),
+    [currency, rates, isPrivacyMode]
+  )
+
   return (
     <div
       className="mb-6 cursor-pointer"
@@ -104,7 +111,11 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
           'text-4xl sm:text-5xl font-bold font-numbers tracking-tight',
           netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
         )}>
-          {formatCurrencyPrivacy(netWorth, currency, rates, false, isPrivacyMode)}
+          <CountUp
+            end={netWorth}
+            duration={1200}
+            formatter={currencyFormatter}
+          />
         </p>
 
         {/* Monthly Net Trend Indicator */}

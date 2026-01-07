@@ -83,6 +83,10 @@ export function TrendLineChart({ data, dataKey }: TrendLineChartProps) {
           dot={{ fill: colorMap[dataKey], r: 4 }}
           activeDot={{ r: 6 }}
           name={labelMap[dataKey]}
+          isAnimationActive={true}
+          animationBegin={0}
+          animationDuration={1200}
+          animationEasing="ease-out"
         />
       </LineChart>
     </ResponsiveContainer>

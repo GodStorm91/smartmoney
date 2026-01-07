@@ -318,7 +318,7 @@ function AllocationCard({
       <div className="mt-2">
         <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 transition-all"
+            className="h-full bg-blue-500 transition-all duration-500 ease-out"
             style={{ width: `${Math.min(percentage, 100)}%` }}
           />
         </div>

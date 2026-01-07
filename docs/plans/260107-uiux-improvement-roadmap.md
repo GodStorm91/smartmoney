@@ -94,10 +94,10 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 - [ ] Slide-up for modals/bottom sheets
 - [ ] Subtle parallax on scroll (optional)
 
-### 3.5 Data Visualization Animations
-- [ ] Chart draw-in animations on load
-- [ ] Number count-up animations for totals
-- [ ] Progress bar fill animations
+### 3.5 Data Visualization Animations ✅
+- [x] Chart draw-in animations on load
+- [x] Number count-up animations for totals
+- [x] Progress bar fill animations
 
 ---
 
@@ -182,6 +182,7 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 | 2026-01-07 | 1, 2 | Implemented FAB and Hero section simplification |
 | 2026-01-07 | 1-3 | Empty states, skeleton loaders, touch targets, info hierarchy |
 | 2026-01-07 | 3 | Success animations: Confetti, Toast notifications, checkmark |
+| 2026-01-07 | 3 | Data viz animations: Chart draw-in, CountUp, progress bars |
 
 ---
 

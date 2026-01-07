@@ -188,6 +188,10 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
             dataKey="percentage"
             radius={[0, 4, 4, 0]}
             maxBarSize={24}
+            isAnimationActive={true}
+            animationBegin={0}
+            animationDuration={800}
+            animationEasing="ease-out"
           >
             {displayData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />

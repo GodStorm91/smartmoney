@@ -101,7 +101,16 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
         <Legend
           wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif', color: legendColor }}
         />
-        <Bar dataKey="income" fill="#4CAF50" name={t('chart.income')} radius={[4, 4, 0, 0]}>
+        <Bar
+          dataKey="income"
+          fill="#4CAF50"
+          name={t('chart.income')}
+          radius={[4, 4, 0, 0]}
+          isAnimationActive={true}
+          animationBegin={0}
+          animationDuration={800}
+          animationEasing="ease-out"
+        >
           <LabelList
             dataKey="income"
             position="top"
@@ -109,7 +118,16 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
             style={{ fontSize: '10px', fill: '#4CAF50', fontWeight: 500 }}
           />
         </Bar>
-        <Bar dataKey="expenses" fill="#F44336" name={t('chart.expense')} radius={[4, 4, 0, 0]}>
+        <Bar
+          dataKey="expenses"
+          fill="#F44336"
+          name={t('chart.expense')}
+          radius={[4, 4, 0, 0]}
+          isAnimationActive={true}
+          animationBegin={200}
+          animationDuration={800}
+          animationEasing="ease-out"
+        >
           {hasNoExpenses ? (
             // Show subtle indicator for zero expense
             enhancedData.map((_, index) => (
@@ -135,6 +153,10 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
           strokeWidth={2}
           dot={{ fill: '#2196F3', strokeWidth: 2, r: 4 }}
           activeDot={{ r: 6 }}
+          isAnimationActive={true}
+          animationBegin={400}
+          animationDuration={1000}
+          animationEasing="ease-out"
         />
       </ComposedChart>
     </ResponsiveContainer>

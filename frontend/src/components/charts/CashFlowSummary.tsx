@@ -89,7 +89,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={cn(
-                  'h-full rounded-full transition-all',
+                  'h-full rounded-full transition-all duration-700 ease-out',
                   goalProgress && goalProgress >= 100
                     ? 'bg-green-500'
                     : 'bg-primary-500'
@@ -152,7 +152,15 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
                 }}
               />
             )}
-            <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={32}>
+            <Bar
+              dataKey="value"
+              radius={[0, 4, 4, 0]}
+              maxBarSize={32}
+              isAnimationActive={true}
+              animationBegin={0}
+              animationDuration={800}
+              animationEasing="ease-out"
+            >
               {comparisonData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
@@ -186,7 +194,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
           <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               className={cn(
-                'h-full rounded-full transition-all',
+                'h-full rounded-full transition-all duration-700 ease-out',
                 goalProgress && goalProgress >= 100
                   ? 'bg-green-500'
                   : 'bg-primary-500'
