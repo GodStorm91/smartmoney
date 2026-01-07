@@ -78,7 +78,7 @@ class AnalyticsService:
         """Convert amount to JPY using exchange rates.
 
         Args:
-            amount: Amount in original currency
+            amount: Amount in original currency (USD stored in cents, others as-is)
             currency: Currency code (JPY, USD, VND)
             rates: Exchange rates dict {currency: rate_to_jpy}
 
@@ -90,9 +90,13 @@ class AnalyticsService:
         rate = rates.get(currency, 1.0)
         if rate == 0:
             return amount
+
+        # USD is stored in cents, convert to dollars first
+        actual_amount = amount / 100 if currency == "USD" else amount
+
         # rate_to_jpy means "how many units of currency per 1 JPY"
         # So to convert to JPY: amount / rate
-        return int(amount / rate)
+        return int(actual_amount / rate)
 
     @staticmethod
     def get_category_breakdown(
