@@ -1,44 +1,40 @@
 import { useState, ReactNode } from 'react'
-import { Card } from './Card'
+import { ChevronDown } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { cn } from '@/utils/cn'
 
 interface CollapsibleCardProps {
   title: string
   children: ReactNode
+  badge?: number | string
   defaultOpen?: boolean
-  badge?: string | number
-}
-
-function ChevronIcon({ isOpen }: { isOpen: boolean }) {
-  return (
-    <svg
-      className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-    </svg>
-  )
+  defaultExpanded?: boolean // Alias for defaultOpen
+  headerAction?: ReactNode
+  className?: string
+  contentClassName?: string
 }
 
 export function CollapsibleCard({
   title,
   children,
-  defaultOpen = false,
-  badge
+  badge,
+  defaultOpen,
+  defaultExpanded,
+  headerAction,
+  className,
+  contentClassName,
 }: CollapsibleCardProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen)
+  const [isExpanded, setIsExpanded] = useState(defaultOpen ?? defaultExpanded ?? true)
 
   return (
-    <Card className="overflow-hidden">
+    <Card className={cn('overflow-hidden', className)}>
+      {/* Header - always visible */}
       <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between text-left"
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="w-full flex items-center justify-between p-0 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded-lg"
       >
-        <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {title}
           </h3>
           {badge !== undefined && (
@@ -47,15 +43,34 @@ export function CollapsibleCard({
             </span>
           )}
         </div>
-        <ChevronIcon isOpen={isOpen} />
+        <div className="flex items-center gap-2">
+          {headerAction && (
+            <div onClick={e => e.stopPropagation()}>
+              {headerAction}
+            </div>
+          )}
+          <ChevronDown
+            size={20}
+            className={cn(
+              'text-gray-400 transition-transform duration-200',
+              isExpanded ? 'rotate-180' : 'rotate-0'
+            )}
+          />
+        </div>
       </button>
 
+      {/* Collapsible content */}
       <div
-        className={`transition-all duration-200 ease-in-out ${
-          isOpen ? 'mt-6 max-h-[1000px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-        }`}
+        className={cn(
+          'grid transition-all duration-200 ease-in-out',
+          isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        )}
       >
-        {children}
+        <div className="overflow-hidden">
+          <div className={cn('pt-4', contentClassName)}>
+            {children}
+          </div>
+        </div>
       </div>
     </Card>
   )

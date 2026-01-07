@@ -44,6 +44,19 @@
   "fab": {
     "quickActions": "クイックアクション"
   },
+  "quickActions": {
+    "addTransaction": "追加",
+    "scan": "スキャン",
+    "upload": "アップロード",
+    "analytics": "分析",
+    "accounts": "口座",
+    "goals": "目標"
+  },
+  "pullToRefresh": {
+    "pull": "引っ張って更新",
+    "release": "離して更新",
+    "refreshing": "更新中..."
+  },
   "aria": {
     "mainNavigation": "メインナビゲーション",
     "mobileNavigation": "モバイルナビゲーション",

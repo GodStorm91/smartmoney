@@ -44,6 +44,19 @@
   "fab": {
     "quickActions": "Quick Actions"
   },
+  "quickActions": {
+    "addTransaction": "Add",
+    "scan": "Scan",
+    "upload": "Upload",
+    "analytics": "Analytics",
+    "accounts": "Accounts",
+    "goals": "Goals"
+  },
+  "pullToRefresh": {
+    "pull": "Pull to refresh",
+    "release": "Release to refresh",
+    "refreshing": "Refreshing..."
+  },
   "aria": {
     "mainNavigation": "Main Navigation",
     "mobileNavigation": "Mobile Navigation",

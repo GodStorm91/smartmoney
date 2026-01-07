@@ -44,6 +44,19 @@
   "fab": {
     "quickActions": "Thao tác nhanh"
   },
+  "quickActions": {
+    "addTransaction": "Thêm",
+    "scan": "Quét",
+    "upload": "Tải lên",
+    "analytics": "Phân tích",
+    "accounts": "Tài khoản",
+    "goals": "Mục tiêu"
+  },
+  "pullToRefresh": {
+    "pull": "Kéo để làm mới",
+    "release": "Thả để làm mới",
+    "refreshing": "Đang làm mới..."
+  },
   "aria": {
     "mainNavigation": "Điều hướng chính",
     "mobileNavigation": "Điều hướng di động",

@@ -12,6 +12,7 @@ import { FinancialHealthCard } from '@/components/dashboard/FinancialHealthCard'
 import { SpendingInsightsCard } from '@/components/dashboard/SpendingInsightsCard'
 import { MonthComparisonCard } from '@/components/dashboard/MonthComparisonCard'
 import { SmartAlertsCard } from '@/components/dashboard/SmartAlertsCard'
+import { QuickActionsBar } from '@/components/dashboard/QuickActionsBar'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -80,6 +81,11 @@ export function Dashboard() {
         monthlyNet={summary?.net}
         monthlyNetChange={summary?.net_change}
       />
+
+      {/* Quick Actions Bar - Mobile Only */}
+      <div className="lg:hidden mb-6">
+        <QuickActionsBar />
+      </div>
 
       {/* Smart Alerts */}
       {monthlyTrends && monthlyTrends.length > 0 && (

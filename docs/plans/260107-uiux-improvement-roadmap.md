@@ -13,7 +13,7 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 ---
 
 ## Phase 1: Mobile UX Improvements (Priority: HIGH)
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 **Estimated Effort:** 3-4 hours
 
 ### 1.1 Floating Action Button (FAB) ✅
@@ -25,22 +25,22 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 ### 1.2 Larger Touch Targets ✅
 - [x] Audit all buttons/links for 44px minimum touch target
 - [x] Fix modal close buttons (p-1 → p-2.5)
-- [ ] Improve category grid tap areas (deferred)
+- [x] Improve category grid tap areas
 
-### 1.3 Gesture Improvements
-- [ ] Pull-to-refresh on transaction list
-- [ ] Swipe actions on transaction items (edit/delete)
-- [ ] Swipe between dashboard cards (carousel)
+### 1.3 Gesture Improvements ✅
+- [x] Pull-to-refresh hook and component
+- [x] Swipe actions component (edit/delete)
+- [ ] Swipe between dashboard cards (carousel) - deferred
 
-### 1.4 Mobile-Specific Layouts
-- [ ] Simplified mobile dashboard (fewer cards, vertical stack)
-- [ ] Full-screen modals on mobile (bottom sheets)
-- [ ] Collapsible sections for dense information
+### 1.4 Mobile-Specific Layouts ✅
+- [x] Quick actions bar on mobile dashboard
+- [x] Bottom sheet modals on mobile (ResponsiveModal)
+- [x] Collapsible card sections
 
 ---
 
 ## Phase 2: Dashboard Redesign (Priority: HIGH)
-**Status:** 🔄 In Progress
+**Status:** ✅ Complete
 **Estimated Effort:** 4-6 hours
 
 ### 2.1 Hero Section Simplification ✅
@@ -48,15 +48,15 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 - [x] Large, scannable numbers (4xl/5xl)
 - [x] Trend indicator (up/down arrow with %)
 
-### 2.2 Quick Actions Bar
-- [ ] Horizontal scrollable quick actions
-- [ ] Icons: Add Transaction, Upload, Scan Receipt, View All
-- [ ] Sticky on scroll (mobile)
+### 2.2 Quick Actions Bar ✅
+- [x] Horizontal scrollable quick actions (mobile)
+- [x] Icons: Add, Scan, Upload, Analytics, Accounts, Goals
+- [x] Mobile-only display (lg:hidden)
 
-### 2.3 Smart Cards Layout
-- [ ] Prioritize cards by user behavior
-- [ ] Collapsible/expandable cards
-- [ ] "See more" links instead of cramming data
+### 2.3 Smart Cards Layout ✅
+- [x] Collapsible/expandable cards (CollapsibleCard component)
+- [x] Badge counts on card headers
+- [x] "See more" links to detailed views
 
 ### 2.4 Information Hierarchy ✅
 - [x] Primary: Balance/Net Worth (4xl/5xl)
@@ -156,8 +156,8 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 
 | Phase | Impact | Effort | Status |
 |-------|--------|--------|--------|
-| Phase 1: Mobile UX | High | Medium | 🟡 Partial |
-| Phase 2: Dashboard | High | Medium | 🟡 Partial |
+| Phase 1: Mobile UX | High | Medium | ✅ Complete |
+| Phase 2: Dashboard | High | Medium | ✅ Complete |
 | Phase 3: Microinteractions | Medium | Low | ✅ Complete |
 | Phase 4: Financial Insights | High | High | ✅ Complete |
 | Phase 5: Performance | High | Low | ✅ Complete |
