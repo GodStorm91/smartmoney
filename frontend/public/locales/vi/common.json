@@ -436,6 +436,12 @@
       "friday": "Thứ Sáu",
       "saturday": "Thứ Bảy",
       "sunday": "Chủ Nhật"
+    },
+    "suggestions": {
+      "title": "Mẫu đã phát hiện",
+      "subtitle": "Phát hiện {{count}} giao dịch định kỳ tiềm năng",
+      "occurrences": "{{count}} lần",
+      "dismiss": "Ẩn"
     }
   },
   "transaction": {

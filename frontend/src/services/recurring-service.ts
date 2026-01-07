@@ -153,3 +153,45 @@ export async function fetchRecurringMonthlySummary(
   )
   return response.data
 }
+
+// Suggestion types
+export interface RecurringSuggestion {
+  hash: string
+  description: string
+  normalized_description: string
+  amount: number
+  category: string
+  frequency: string
+  day_of_month: number | null
+  day_of_week: number | null
+  interval_days: number | null
+  is_income: boolean
+  occurrences: number
+  last_date: string
+  avg_interval: number
+  confidence: number
+}
+
+interface RecurringSuggestionsResponse {
+  suggestions: RecurringSuggestion[]
+  total: number
+}
+
+/**
+ * Fetch detected recurring transaction suggestions
+ */
+export async function fetchRecurringSuggestions(
+  minOccurrences: number = 3
+): Promise<RecurringSuggestion[]> {
+  const response = await apiClient.get<RecurringSuggestionsResponse>(
+    `/api/recurring/suggestions?min_occurrences=${minOccurrences}`
+  )
+  return response.data.suggestions
+}
+
+/**
+ * Dismiss a recurring suggestion
+ */
+export async function dismissRecurringSuggestion(hash: string): Promise<void> {
+  await apiClient.post(`/api/recurring/suggestions/${hash}/dismiss`)
+}

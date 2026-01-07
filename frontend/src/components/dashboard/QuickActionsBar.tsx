@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { Plus, Upload, Camera, BarChart3, Wallet, Target } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
@@ -23,18 +23,23 @@ export function QuickActionsBar({
   className,
 }: QuickActionsBarProps) {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
+
+  // Default handlers navigate to transactions page
+  const handleAddTransaction = onAddTransaction || (() => navigate({ to: '/transactions' }))
+  const handleScanReceipt = onScanReceipt || (() => navigate({ to: '/transactions' }))
 
   const actions: QuickAction[] = [
     {
       icon: <Plus size={20} />,
       label: t('quickActions.addTransaction', 'Add'),
-      onClick: onAddTransaction,
+      onClick: handleAddTransaction,
       color: 'bg-primary-500 text-white',
     },
     {
       icon: <Camera size={20} />,
       label: t('quickActions.scan', 'Scan'),
-      onClick: onScanReceipt,
+      onClick: handleScanReceipt,
       color: 'bg-purple-500 text-white',
     },
     {

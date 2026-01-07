@@ -17,6 +17,7 @@ import {
   updateRecurringTransaction,
   type RecurringTransaction,
   type RecurringTransactionCreate,
+  type RecurringSuggestion,
   type FrequencyType,
 } from '@/services/recurring-service'
 import { cn } from '@/utils/cn'
@@ -25,9 +26,10 @@ interface RecurringFormModalProps {
   isOpen: boolean
   onClose: () => void
   editItem?: RecurringTransaction | null
+  initialSuggestion?: RecurringSuggestion | null
 }
 
-export function RecurringFormModal({ isOpen, onClose, editItem }: RecurringFormModalProps) {
+export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestion }: RecurringFormModalProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
   const { data: accounts } = useAccounts()
@@ -52,7 +54,7 @@ export function RecurringFormModal({ isOpen, onClose, editItem }: RecurringFormM
   const [intervalDays, setIntervalDays] = useState(7)
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
 
-  // Reset form when modal opens/closes or editItem changes
+  // Reset form when modal opens/closes or editItem/initialSuggestion changes
   useEffect(() => {
     if (isOpen && editItem) {
       setDescription(editItem.description)
@@ -65,6 +67,18 @@ export function RecurringFormModal({ isOpen, onClose, editItem }: RecurringFormM
       setDayOfMonth(editItem.day_of_month ?? 1)
       setIntervalDays(editItem.interval_days ?? 7)
       setStartDate(editItem.next_run_date)
+    } else if (isOpen && initialSuggestion) {
+      // Pre-fill from suggestion
+      setDescription(initialSuggestion.description)
+      setAmount(initialSuggestion.amount.toString())
+      setCategory(initialSuggestion.category)
+      setAccountId(null)
+      setIsIncome(initialSuggestion.is_income)
+      setFrequency(initialSuggestion.frequency as FrequencyType)
+      setDayOfWeek(initialSuggestion.day_of_week ?? 0)
+      setDayOfMonth(initialSuggestion.day_of_month ?? new Date().getDate())
+      setIntervalDays(initialSuggestion.interval_days ?? 14)
+      setStartDate(new Date().toISOString().split('T')[0])
     } else if (isOpen) {
       // Reset to defaults
       setDescription('')
@@ -78,7 +92,7 @@ export function RecurringFormModal({ isOpen, onClose, editItem }: RecurringFormM
       setIntervalDays(7)
       setStartDate(new Date().toISOString().split('T')[0])
     }
-  }, [isOpen, editItem])
+  }, [isOpen, editItem, initialSuggestion])
 
   const createMutation = useMutation({
     mutationFn: createRecurringTransaction,

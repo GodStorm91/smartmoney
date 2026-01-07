@@ -15,8 +15,10 @@ from ..schemas.recurring import (
     RecurringTransactionResponse,
     RecurringTransactionListResponse,
     RecurringMonthlySummaryResponse,
+    RecurringSuggestionsResponse,
 )
 from ..services.recurring_service import RecurringTransactionService
+from ..services.recurring_suggestion_service import RecurringSuggestionService
 
 router = APIRouter(prefix="/api/recurring", tags=["recurring"])
 
@@ -33,6 +35,16 @@ async def create_recurring(
         user_id=current_user.id,
         data=data.model_dump(),
     )
+
+    # Auto-dismiss any matching suggestion
+    RecurringSuggestionService.auto_dismiss_on_create(
+        db=db,
+        user_id=current_user.id,
+        description=data.description,
+        amount=data.amount,
+        frequency=data.frequency.value,
+    )
+
     return _to_response(recurring)
 
 
@@ -241,3 +253,40 @@ def _to_response(recurring) -> dict:
         "created_at": recurring.created_at.isoformat(),
         "updated_at": recurring.updated_at.isoformat(),
     }
+
+
+# Suggestion endpoints
+@router.get("/suggestions", response_model=RecurringSuggestionsResponse)
+async def get_suggestions(
+    min_occurrences: int = Query(3, ge=2, le=10, description="Minimum occurrences to detect"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get detected recurring transaction suggestions.
+
+    Analyzes transaction history to find patterns that look like recurring transactions.
+    """
+    suggestions = RecurringSuggestionService.detect_patterns(
+        db=db,
+        user_id=current_user.id,
+        min_occurrences=min_occurrences,
+    )
+    return {
+        "suggestions": suggestions,
+        "total": len(suggestions),
+    }
+
+
+@router.post("/suggestions/{suggestion_hash}/dismiss", status_code=204)
+async def dismiss_suggestion(
+    suggestion_hash: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Dismiss a suggestion so it won't appear again."""
+    RecurringSuggestionService.dismiss_suggestion(
+        db=db,
+        user_id=current_user.id,
+        suggestion_hash=suggestion_hash,
+    )
+    return None

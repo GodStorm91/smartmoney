@@ -462,6 +462,12 @@
       "friday": "金曜日",
       "saturday": "土曜日",
       "sunday": "日曜日"
+    },
+    "suggestions": {
+      "title": "検出されたパターン",
+      "subtitle": "{{count}}件の定期取引候補を検出",
+      "occurrences": "{{count}}回",
+      "dismiss": "非表示"
     }
   },
   "category": {

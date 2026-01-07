@@ -8,6 +8,7 @@ from .crypto_wallet import (
     CryptoWallet, RewardContract, CryptoSyncState, RewardClaim,
     DefiPositionSnapshot, PositionReward, PositionCostBasis
 )
+from .dismissed_suggestion import DismissedSuggestion
 from .position_closure import PositionClosure
 from .exchange_rate import ExchangeRate
 from .goal import Goal
@@ -25,5 +26,5 @@ __all__ = [
     "UserCredit", "CreditPurchase", "CreditTransaction", "CategoryRule",
     "CryptoWallet", "RewardContract", "CryptoSyncState", "RewardClaim",
     "RecurringTransaction", "DefiPositionSnapshot", "PositionReward", "PositionCostBasis",
-    "PositionClosure"
+    "PositionClosure", "DismissedSuggestion"
 ]

@@ -118,3 +118,30 @@ class RecurringMonthlySummaryResponse(BaseModel):
     upcoming_count: int
     paid_transactions: list[RecurringMonthlySummaryItem]
     upcoming_transactions: list[RecurringMonthlySummaryItem]
+
+
+# Suggestion schemas
+class RecurringSuggestion(BaseModel):
+    """Schema for a detected recurring pattern suggestion."""
+
+    hash: str  # Unique identifier for dismissing
+    description: str
+    normalized_description: str
+    amount: int
+    category: str
+    frequency: str
+    day_of_month: Optional[int] = None
+    day_of_week: Optional[int] = None
+    interval_days: Optional[int] = None
+    is_income: bool
+    occurrences: int
+    last_date: str
+    avg_interval: float
+    confidence: int  # 0-100
+
+
+class RecurringSuggestionsResponse(BaseModel):
+    """Schema for list of recurring suggestions."""
+
+    suggestions: list[RecurringSuggestion]
+    total: int

@@ -826,6 +826,30 @@ npm run build
 # Nginx serves new dist/ automatically
 ```
 
+### Quick Frontend Deployment (Docker Server)
+
+**From local machine to production:**
+```bash
+cd frontend
+
+# Build locally
+npm run build
+
+# Create tarball with correct permissions
+tar --mode='a+r,u+w,a+X' -czf /tmp/frontend.tar.gz -C dist .
+
+# Upload to server
+scp /tmp/frontend.tar.gz root@<server-ip>:/tmp/
+
+# Extract on server with permission fix
+ssh root@<server-ip> "cd /root/smartmoney/deploy/frontend-dist && rm -rf * && tar -xzf /tmp/frontend.tar.gz && find . -type f -exec chmod 644 {} \; && find . -type d -exec chmod 755 {} \;"
+
+# Restart nginx (optional, usually not needed for static files)
+ssh root@<server-ip> "cd /root/smartmoney/deploy && docker compose restart nginx"
+```
+
+**Why permissions matter:** `tar` preserves original file permissions. If local files have restrictive permissions (e.g., `600`), nginx won't be able to read them, resulting in 403 Forbidden errors.
+
 ### Zero-Downtime Updates (Future)
 
 **Blue-green deployment:**

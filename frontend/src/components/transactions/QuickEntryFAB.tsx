@@ -278,7 +278,7 @@ export function QuickEntryFAB() {
       <button
         onClick={handleOpen}
         className={cn(
-          'fixed bottom-40 right-4 sm:bottom-6 sm:right-6 z-40',
+          'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50',
           'w-14 h-14 rounded-full',
           'bg-gradient-to-r from-blue-500 to-purple-500',
           'hover:from-blue-600 hover:to-purple-600',

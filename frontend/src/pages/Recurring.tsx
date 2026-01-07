@@ -3,13 +3,30 @@
  */
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus, RefreshCw } from 'lucide-react'
 import { RecurringTransactionsList } from '@/components/recurring/RecurringTransactionsList'
 import { RecurringFormModal } from '@/components/recurring/RecurringFormModal'
+import { RecurringSuggestionsCard } from '@/components/recurring/RecurringSuggestionsCard'
+import type { RecurringSuggestion } from '@/services/recurring-service'
 
 export default function Recurring() {
   const { t } = useTranslation('common')
+  const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedSuggestion, setSelectedSuggestion] = useState<RecurringSuggestion | null>(null)
+
+  const handleCreateFromSuggestion = (suggestion: RecurringSuggestion) => {
+    setSelectedSuggestion(suggestion)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setSelectedSuggestion(null)
+    // Refresh suggestions after creating from one
+    queryClient.invalidateQueries({ queryKey: ['recurring-suggestions'] })
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -35,13 +52,17 @@ export default function Recurring() {
         </button>
       </div>
 
+      {/* Suggestions Banner */}
+      <RecurringSuggestionsCard onCreateFromSuggestion={handleCreateFromSuggestion} />
+
       {/* List */}
       <RecurringTransactionsList />
 
       {/* Form Modal */}
       <RecurringFormModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleModalClose}
+        initialSuggestion={selectedSuggestion}
       />
     </div>
   )

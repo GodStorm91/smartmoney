@@ -1,5 +1,28 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, Component, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/Skeleton'
+
+// Error boundary to catch chart rendering errors
+class ChartErrorBoundary extends Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props)
+    this.state = { hasError: false }
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm">
+          Chart failed to load
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 // Lazy load chart components to defer Recharts bundle
 const LazyTrendLineChart = lazy(() => import('./TrendLineChart').then(m => ({ default: m.TrendLineChart })))
@@ -70,8 +93,10 @@ export function CashFlowSummaryLazy(props: React.ComponentProps<typeof LazyCashF
 
 export function ForecastChartLazy(props: React.ComponentProps<typeof LazyForecastChart>) {
   return (
-    <Suspense fallback={<ChartSkeleton height="h-80" />}>
-      <LazyForecastChart {...props} />
-    </Suspense>
+    <ChartErrorBoundary>
+      <Suspense fallback={<ChartSkeleton height="h-80" />}>
+        <LazyForecastChart {...props} />
+      </Suspense>
+    </ChartErrorBoundary>
   )
 }

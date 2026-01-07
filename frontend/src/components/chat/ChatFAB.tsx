@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { cn } from '@/utils/cn'
 import { MessageCircle } from 'lucide-react'
 
@@ -7,11 +8,11 @@ interface ChatFABProps {
 }
 
 export function ChatFAB({ onClick, hasUnread = false }: ChatFABProps) {
-  return (
+  const content = (
     <button
       onClick={onClick}
       className={cn(
-        'fixed bottom-40 right-4 sm:bottom-6 sm:right-6 z-40',
+        'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50',
         'w-14 h-14 rounded-full',
         'bg-primary-500 text-white shadow-lg',
         'hover:bg-primary-600 hover:scale-105',
@@ -28,4 +29,11 @@ export function ChatFAB({ onClick, hasUnread = false }: ChatFABProps) {
       )}
     </button>
   )
+
+  // Use portal to ensure fixed positioning works correctly
+  if (typeof document !== 'undefined') {
+    return createPortal(content, document.body)
+  }
+
+  return null
 }

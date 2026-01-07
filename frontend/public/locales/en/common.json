@@ -436,6 +436,12 @@
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"
+    },
+    "suggestions": {
+      "title": "Detected Patterns",
+      "subtitle": "{{count}} potential recurring transactions found",
+      "occurrences": "{{count}} times",
+      "dismiss": "Dismiss"
     }
   },
   "transaction": {

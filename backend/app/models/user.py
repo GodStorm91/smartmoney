@@ -58,3 +58,8 @@ class User(Base):
     reward_claims: Mapped[list["RewardClaim"]] = relationship(
         "RewardClaim", back_populates="user", cascade="all, delete-orphan"
     )
+
+    # Dismissed recurring suggestions
+    dismissed_suggestions: Mapped[list["DismissedSuggestion"]] = relationship(
+        "DismissedSuggestion", back_populates="user", cascade="all, delete-orphan"
+    )

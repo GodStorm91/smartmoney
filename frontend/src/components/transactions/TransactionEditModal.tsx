@@ -176,10 +176,22 @@ export function TransactionEditModal({
     deleteMutation.mutate()
   }
 
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+      // Scroll to top of page to ensure modal is visible
+      window.scrollTo(0, 0)
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   if (!isOpen || !transaction) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
@@ -187,7 +199,7 @@ export function TransactionEditModal({
       />
 
       {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             {t('transaction.editTitle')}
