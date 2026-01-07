@@ -289,7 +289,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/50"
+      className="fixed inset-0 z-50 bg-black/50 animate-modal-backdrop"
       onClick={handleBackdropClick}
     >
       <div
@@ -297,8 +297,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           'fixed inset-x-0 bottom-0 z-50',
           'bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl',
           'max-h-[90vh] overflow-y-auto',
-          'transform transition-transform duration-300',
-          isOpen ? 'translate-y-0' : 'translate-y-full'
+          'animate-modal-in'
         )}
       >
         {/* Handle bar */}

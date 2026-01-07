@@ -5,6 +5,7 @@ import { Footer } from './Footer'
 import { BottomNavigation } from './BottomNavigation'
 import { ChatFAB, ChatPanel } from '@/components/chat'
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { ShortcutsHelpModal } from '@/components/ui/ShortcutsHelpModal'
 import { useKeyboardShortcuts, SHORTCUT_KEYS } from '@/hooks/useKeyboardShortcuts'
@@ -117,7 +118,9 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="flex-1 pb-20 md:pb-0">
+        <PageTransition>{children}</PageTransition>
+      </main>
       <Footer />
       <BottomNavigation />
 
