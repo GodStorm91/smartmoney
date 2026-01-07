@@ -1,9 +1,14 @@
+import { useState, useEffect } from 'react'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { Badge } from '@/components/ui/Badge'
+import { Confetti } from '@/components/ui/Confetti'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import type { GoalProgress } from '@/types/goal'
 import { useTranslation } from 'react-i18next'
+
+// Track which goals have been celebrated this session
+const celebratedGoals = new Set<number>()
 
 interface GoalProgressCardProps {
   goal: GoalProgress
@@ -39,6 +44,15 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
   const { t } = useTranslation()
   const progress = goal.progress_percentage ?? 0
   const config = statusConfig[goal.status as keyof typeof statusConfig] || statusConfig.on_track
+  const [showConfetti, setShowConfetti] = useState(false)
+
+  // Trigger confetti when goal is completed (only once per session)
+  useEffect(() => {
+    if (progress >= 100 && goal.goal_id && !celebratedGoals.has(goal.goal_id)) {
+      celebratedGoals.add(goal.goal_id)
+      setShowConfetti(true)
+    }
+  }, [progress, goal.goal_id])
 
   if (compact) {
     return (
@@ -73,8 +87,10 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
-      <div className="flex items-start justify-between mb-6">
+    <>
+      <Confetti active={showConfetti} onComplete={() => setShowConfetti(false)} />
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-start justify-between mb-6">
         <div>
           <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{goal.name || `${goal.years}${t('goals.yearGoal')}`}</h3>
           <p className="text-gray-600 dark:text-gray-400">
@@ -145,6 +161,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }

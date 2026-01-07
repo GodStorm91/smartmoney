@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Receipt, RefreshCw, Camera, X } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { useToast } from '@/components/ui/Toast'
 import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { uploadReceipt, type ReceiptData } from '@/services/receipt-service'
@@ -42,6 +43,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
   const queryClient = useQueryClient()
+  const toast = useToast()
 
   // Form state
   const [isIncome, setIsIncome] = useState(false)
@@ -269,6 +271,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
         })
       }
       onClose()
+      toast.success(t('transaction.saved', 'Transaction saved!'))
     } catch {
       // Error handled by mutation state
     }

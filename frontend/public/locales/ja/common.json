@@ -126,6 +126,7 @@
     "selectAccount": "口座を選択",
     "deleteTransaction": "この取引を削除",
     "deleteConfirm": "この取引を削除してもよろしいですか？",
+    "saved": "取引を保存しました！",
     "errors": {
       "amountRequired": "金額は必須です",
       "descriptionRequired": "説明は必須です",

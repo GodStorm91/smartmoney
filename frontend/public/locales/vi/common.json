@@ -380,6 +380,7 @@
     "selectAccount": "Chọn tài khoản",
     "deleteTransaction": "Xóa giao dịch này",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
+    "saved": "Đã lưu giao dịch!",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
       "descriptionRequired": "Mô tả là bắt buộc",

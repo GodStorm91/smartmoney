@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { SettingsProvider } from './contexts/SettingsContext'
 import { PrivacyProvider } from './contexts/PrivacyContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { ToastProvider } from './components/ui/Toast'
 import { SyncProvider } from './contexts/SyncContext'
 import { queryClient, shouldPersistQuery } from './lib/query-client'
 import { persister } from './lib/persister'
@@ -41,7 +42,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <AuthProvider>
             <SettingsProvider>
               <PrivacyProvider>
-                <App />
+                <ToastProvider>
+                  <App />
+                </ToastProvider>
               </PrivacyProvider>
             </SettingsProvider>
           </AuthProvider>
