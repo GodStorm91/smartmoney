@@ -542,6 +542,19 @@
     "expense": "Expense",
     "net": "Difference"
   },
+  "forecast": {
+    "title": "6-Month Cash Flow Forecast",
+    "chartLabel": "Cash flow forecast chart",
+    "actual": "Actual",
+    "projected": "Projected",
+    "balance": "Balance",
+    "projectedBalance": "Projected balance",
+    "avgMonthlySavings": "Avg monthly savings",
+    "perMonth": "per month",
+    "warningNegative": "Balance may go negative in {{months}} months",
+    "noData": "No data available for forecast",
+    "error": "Unable to load forecast"
+  },
   "dateRange": {
     "thisMonth": "This Month",
     "lastMonth": "Last Month",

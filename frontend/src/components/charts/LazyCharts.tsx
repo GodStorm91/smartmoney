@@ -8,6 +8,7 @@ const LazyIncomeExpenseBarChart = lazy(() => import('./IncomeExpenseBarChart').t
 const LazyCategoryBarChart = lazy(() => import('./CategoryBarChart').then(m => ({ default: m.CategoryBarChart })))
 const LazyCategoryPieChart = lazy(() => import('./CategoryPieChart').then(m => ({ default: m.CategoryPieChart })))
 const LazyCashFlowSummary = lazy(() => import('./CashFlowSummary').then(m => ({ default: m.CashFlowSummary })))
+const LazyForecastChart = lazy(() => import('./ForecastChart').then(m => ({ default: m.ForecastChart })))
 
 // Chart loading skeleton
 function ChartSkeleton({ height = 'h-64' }: { height?: string }) {
@@ -63,6 +64,14 @@ export function CashFlowSummaryLazy(props: React.ComponentProps<typeof LazyCashF
   return (
     <Suspense fallback={<ChartSkeleton height="h-32" />}>
       <LazyCashFlowSummary {...props} />
+    </Suspense>
+  )
+}
+
+export function ForecastChartLazy(props: React.ComponentProps<typeof LazyForecastChart>) {
+  return (
+    <Suspense fallback={<ChartSkeleton height="h-80" />}>
+      <LazyForecastChart {...props} />
     </Suspense>
   )
 }

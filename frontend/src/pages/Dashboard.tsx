@@ -13,6 +13,7 @@ import { SpendingInsightsCard } from '@/components/dashboard/SpendingInsightsCar
 import { MonthComparisonCard } from '@/components/dashboard/MonthComparisonCard'
 import { SmartAlertsCard } from '@/components/dashboard/SmartAlertsCard'
 import { QuickActionsBar } from '@/components/dashboard/QuickActionsBar'
+import { CashFlowForecastCard } from '@/components/dashboard/CashFlowForecastCard'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -102,6 +103,11 @@ export function Dashboard() {
           />
         </div>
       )}
+
+      {/* Cash Flow Forecast */}
+      <div className="mb-6">
+        <CashFlowForecastCard />
+      </div>
 
       {/* KPI Summary Cards */}
       <DashboardKPIs summary={summary} />

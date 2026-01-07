@@ -542,6 +542,19 @@
     "expense": "支出",
     "net": "差額"
   },
+  "forecast": {
+    "title": "6ヶ月キャッシュフロー予測",
+    "chartLabel": "キャッシュフロー予測チャート",
+    "actual": "実績",
+    "projected": "予測",
+    "balance": "残高",
+    "projectedBalance": "予測残高",
+    "avgMonthlySavings": "月平均貯蓄額",
+    "perMonth": "月あたり",
+    "warningNegative": "{{months}}ヶ月後に残高がマイナスになる可能性があります",
+    "noData": "予測に必要なデータがありません",
+    "error": "予測を読み込めませんでした"
+  },
   "dateRange": {
     "thisMonth": "今月",
     "lastMonth": "先月",

@@ -542,6 +542,19 @@
     "expense": "Chi tiêu",
     "net": "Chênh lệch"
   },
+  "forecast": {
+    "title": "Dự báo dòng tiền 6 tháng",
+    "chartLabel": "Biểu đồ dự báo dòng tiền",
+    "actual": "Thực tế",
+    "projected": "Dự báo",
+    "balance": "Số dư",
+    "projectedBalance": "Số dư dự kiến",
+    "avgMonthlySavings": "Tiết kiệm trung bình",
+    "perMonth": "mỗi tháng",
+    "warningNegative": "Số dư có thể âm trong {{months}} tháng",
+    "noData": "Không có dữ liệu để dự báo",
+    "error": "Không thể tải dự báo"
+  },
   "dateRange": {
     "thisMonth": "Tháng này",
     "lastMonth": "Tháng trước",

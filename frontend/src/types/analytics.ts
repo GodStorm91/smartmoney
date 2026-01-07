@@ -51,3 +51,30 @@ export interface SpendingInsightsResponse {
   insights: SpendingInsight[]
   generated_at: string
 }
+
+// Forecast types
+export interface ForecastMonth {
+  month: string
+  income: number
+  expense: number
+  net: number
+  balance: number
+  is_actual: boolean
+  recurring_income?: number
+  recurring_expense?: number
+  variable_expense?: number
+}
+
+export interface ForecastSummary {
+  avg_monthly_net: number
+  end_balance: number
+  months_until_negative: number | null
+  total_projected_income: number
+  total_projected_expense: number
+}
+
+export interface ForecastResponse {
+  current_balance: number
+  months: ForecastMonth[]
+  summary: ForecastSummary
+}
