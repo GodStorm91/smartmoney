@@ -19,6 +19,15 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # Create enum type if it doesn't exist (for production databases that don't have it)
+    op.execute("""
+        DO $$ BEGIN
+            CREATE TYPE recurrencetransactionfrequency AS ENUM ('weekly', 'biweekly', 'monthly', 'quarterly', 'yearly', 'daily');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+    """)
+
     # Add currency and source fields
     op.add_column('recurring_transactions', sa.Column('currency', sa.String(3), nullable=False, server_default='JPY'))
     op.add_column('recurring_transactions', sa.Column('source', sa.String(100), nullable=False, server_default='Manual'))
@@ -30,10 +39,6 @@ def upgrade() -> None:
     # Add end_date and auto_submit
     op.add_column('recurring_transactions', sa.Column('end_date', sa.Date(), nullable=True))
     op.add_column('recurring_transactions', sa.Column('auto_submit', sa.Boolean(), nullable=False, server_default='false'))
-
-    # Update frequency enum to include 'daily' and 'biweekly'
-    op.execute("ALTER TYPE recurrencetransactionfrequency ADD VALUE IF NOT EXISTS 'daily'")
-    op.execute("ALTER TYPE recurrencetransactionfrequency ADD VALUE IF NOT EXISTS 'biweekly'")
 
 
 def downgrade() -> None:
