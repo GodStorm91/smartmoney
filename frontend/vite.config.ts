@@ -6,6 +6,28 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core
+          'vendor-react': ['react', 'react-dom'],
+          // TanStack libraries
+          'vendor-tanstack': ['@tanstack/react-query', '@tanstack/react-router'],
+          // Charting library (heavy)
+          'vendor-recharts': ['recharts'],
+          // i18n
+          'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector', 'i18next-http-backend'],
+          // Date utilities
+          'vendor-date': ['date-fns'],
+          // Icons (tree-shake by importing individually)
+          'vendor-icons': ['lucide-react'],
+        },
+      },
+    },
+    // Increase warning threshold since we have chunking
+    chunkSizeWarningLimit: 300,
+  },
   plugins: [
     react(),
     TanStackRouterVite(),
