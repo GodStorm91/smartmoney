@@ -10,6 +10,7 @@
  * - Always defaults to expense type
  */
 import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus, X, Delete, Mic, Search } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -273,27 +274,27 @@ export function QuickEntryFAB() {
 
   // Closed state - show FAB
   if (step === 'closed') {
-    return (
+    return createPortal(
       <button
         onClick={handleOpen}
         className={cn(
-          'fixed bottom-20 right-4 z-40',
+          'fixed bottom-40 right-4 sm:bottom-6 sm:right-6 z-40',
           'w-14 h-14 rounded-full',
           'bg-gradient-to-r from-blue-500 to-purple-500',
           'hover:from-blue-600 hover:to-purple-600',
           'text-white shadow-lg',
           'flex items-center justify-center',
-          'transition-all hover:scale-110',
-          'md:bottom-6'
+          'transition-all hover:scale-110'
         )}
         aria-label={t('quickEntry.add', 'Quick Add')}
       >
         <Plus size={28} />
-      </button>
+      </button>,
+      document.body
     )
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 bg-black/50" onClick={handleClose}>
       <div
         className={cn(
@@ -535,6 +536,7 @@ export function QuickEntryFAB() {
           </div>
         )}
       </div>
-    </div>
-  )
+    </div>,
+      document.body
+    )
 }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Plus, X, Receipt, Upload, CreditCard } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -15,10 +15,19 @@ interface FloatingActionButtonProps {
   onAddTransaction?: () => void
 }
 
+// Pages that have their own FAB - don't show global FAB on these
+const PAGES_WITH_OWN_FAB = ['/transactions']
+
 export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonProps) {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
+
+  // Hide on pages that have their own FAB
+  if (PAGES_WITH_OWN_FAB.includes(location.pathname)) {
+    return null
+  }
 
   const actions: FABAction[] = [
     {
