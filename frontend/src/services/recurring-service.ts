@@ -3,7 +3,7 @@
  */
 import { apiClient } from './api-client'
 
-export type FrequencyType = 'weekly' | 'monthly' | 'yearly' | 'custom'
+export type FrequencyType = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly' | 'custom'
 
 export interface RecurringTransaction {
   id: number
@@ -12,13 +12,19 @@ export interface RecurringTransaction {
   category: string
   account_id: number | null
   is_income: boolean
+  currency: string
+  source: string
   frequency: FrequencyType
   interval_days: number | null
   day_of_week: number | null
   day_of_month: number | null
+  month_of_year: number | null
+  start_date: string
+  end_date: string | null
   next_run_date: string
   last_run_date: string | null
   is_active: boolean
+  auto_submit: boolean
   created_at: string
   updated_at: string
 }
@@ -29,11 +35,16 @@ export interface RecurringTransactionCreate {
   category: string
   account_id?: number | null
   is_income: boolean
+  currency?: string
+  source?: string
   frequency: FrequencyType
   interval_days?: number | null
   day_of_week?: number | null
   day_of_month?: number | null
-  start_date: string
+  month_of_year?: number | null
+  start_date?: string
+  end_date?: string | null
+  auto_submit?: boolean
 }
 
 export interface RecurringTransactionUpdate {
@@ -42,11 +53,17 @@ export interface RecurringTransactionUpdate {
   category?: string
   account_id?: number | null
   is_income?: boolean
+  currency?: string
+  source?: string
   frequency?: FrequencyType
   interval_days?: number | null
   day_of_week?: number | null
   day_of_month?: number | null
+  month_of_year?: number | null
+  start_date?: string
+  end_date?: string | null
   is_active?: boolean
+  auto_submit?: boolean
 }
 
 interface RecurringListResponse {

@@ -30,18 +30,26 @@ class RecurringTransaction(Base):
     )
     is_income: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    # Currency and source (for templates)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")
+    source: Mapped[str] = mapped_column(String(100), nullable=False, default="Manual")
+
     # Frequency settings
-    frequency: Mapped[str] = mapped_column(String(20), nullable=False)  # weekly, monthly, yearly, custom
+    frequency: Mapped[str] = mapped_column(String(20), nullable=False)  # daily, weekly, biweekly, monthly, yearly
     interval_days: Mapped[int | None] = mapped_column(Integer, nullable=True)  # for custom: every N days
     day_of_week: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 0-6 for weekly (0=Monday)
     day_of_month: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 1-31 for monthly
+    month_of_year: Mapped[int | None] = mapped_column(Integer, nullable=True)  # 1-12 for yearly
 
     # Scheduling
+    start_date: Mapped[date] = mapped_column(Date, nullable=False, default=date.today)
+    end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     next_run_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     last_run_date: Mapped[date | None] = mapped_column(Date, nullable=True)
 
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False, index=True)
+    auto_submit: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)  # Auto-create without confirmation
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False

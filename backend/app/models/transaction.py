@@ -56,6 +56,7 @@ class Transaction(Base):
     tags: Mapped[list["Tag"]] = relationship(
         "Tag", secondary="transaction_tags", back_populates="transactions", lazy="select"
     )
+    receipt: Mapped["Receipt | None"] = relationship("Receipt", back_populates="transaction", lazy="select")
 
     __table_args__ = (
         Index("ix_duplicate_check", "date", "amount", "description", "source"),

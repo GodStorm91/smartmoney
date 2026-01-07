@@ -43,6 +43,11 @@ class User(Base):
         "RecurringTransaction", back_populates="user", cascade="all, delete-orphan"
     )
 
+    # Receipts relationship
+    receipts: Mapped[list["Receipt"]] = relationship(
+        "Receipt", back_populates="user", cascade="all, delete-orphan"
+    )
+
     # Category rules relationship
     category_rules: Mapped[list["CategoryRule"]] = relationship(
         "CategoryRule", back_populates="user", cascade="all, delete-orphan"

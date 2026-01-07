@@ -9,7 +9,9 @@ from pydantic import BaseModel, Field, field_validator
 class FrequencyType(str, Enum):
     """Frequency types for recurring transactions."""
 
+    DAILY = "daily"
     WEEKLY = "weekly"
+    BIWEEKLY = "biweekly"
     MONTHLY = "monthly"
     YEARLY = "yearly"
     CUSTOM = "custom"
@@ -19,15 +21,20 @@ class RecurringTransactionBase(BaseModel):
     """Base schema for recurring transactions."""
 
     description: str = Field(..., max_length=500)
-    amount: int = Field(..., description="Amount in JPY as integer (positive)")
+    amount: int = Field(..., description="Amount in currency as integer (positive)")
     category: str = Field(..., max_length=100)
     account_id: Optional[int] = None
     is_income: bool = False
+
+    # Currency and source
+    currency: str = Field(default="JPY", max_length=3)
+    source: str = Field(default="Manual", max_length=100)
 
     frequency: FrequencyType
     interval_days: Optional[int] = Field(None, ge=1, le=365, description="For custom frequency: every N days")
     day_of_week: Optional[int] = Field(None, ge=0, le=6, description="0=Monday, 6=Sunday")
     day_of_month: Optional[int] = Field(None, ge=1, le=31, description="1-31")
+    month_of_year: Optional[int] = Field(None, ge=1, le=12, description="1-12 for yearly")
 
     @field_validator("interval_days")
     @classmethod
@@ -40,7 +47,9 @@ class RecurringTransactionBase(BaseModel):
 class RecurringTransactionCreate(RecurringTransactionBase):
     """Schema for creating a recurring transaction."""
 
-    start_date: date = Field(..., description="When to start the recurring schedule")
+    start_date: date = Field(default_factory=date.today, description="When to start the recurring schedule")
+    end_date: Optional[date] = None
+    auto_submit: bool = Field(default=False, description="Auto-create without user confirmation")
 
     @field_validator("amount")
     @classmethod
@@ -55,17 +64,26 @@ class RecurringTransactionUpdate(BaseModel):
     """Schema for updating a recurring transaction."""
 
     description: Optional[str] = Field(None, max_length=500)
-    amount: Optional[int] = Field(None, description="Amount in JPY as integer (positive)")
+    amount: Optional[int] = Field(None, description="Amount in currency as integer (positive)")
     category: Optional[str] = Field(None, max_length=100)
     account_id: Optional[int] = None
     is_income: Optional[bool] = None
+
+    # Currency and source
+    currency: Optional[str] = Field(None, max_length=3)
+    source: Optional[str] = Field(None, max_length=100)
 
     frequency: Optional[FrequencyType] = None
     interval_days: Optional[int] = Field(None, ge=1, le=365)
     day_of_week: Optional[int] = Field(None, ge=0, le=6)
     day_of_month: Optional[int] = Field(None, ge=1, le=31)
+    month_of_year: Optional[int] = Field(None, ge=1, le=12)
 
+    # Schedule and auto-submit
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
     is_active: Optional[bool] = None
+    auto_submit: Optional[bool] = None
 
     @field_validator("amount")
     @classmethod
@@ -80,9 +98,12 @@ class RecurringTransactionResponse(RecurringTransactionBase):
     """Schema for recurring transaction response."""
 
     id: int
+    start_date: date
+    end_date: Optional[date] = None
     next_run_date: date
     last_run_date: Optional[date] = None
     is_active: bool
+    auto_submit: bool
     created_at: str
     updated_at: str
 

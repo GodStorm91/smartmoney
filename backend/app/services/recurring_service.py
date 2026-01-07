@@ -21,20 +21,34 @@ class RecurringTransactionService:
         interval_days: Optional[int] = None,
         day_of_week: Optional[int] = None,
         day_of_month: Optional[int] = None,
+        month_of_year: Optional[int] = None,
     ) -> date:
         """Calculate the next run date based on frequency settings.
 
         Args:
-            frequency: weekly, monthly, yearly, or custom
+            frequency: daily, weekly, biweekly, monthly, yearly, or custom
             current_date: The reference date to calculate from
             interval_days: For custom frequency, run every N days
             day_of_week: For weekly, 0=Monday to 6=Sunday
             day_of_month: For monthly/yearly, day of month (1-31)
+            month_of_year: For yearly, month of year (1-12)
 
         Returns:
             The next date to run the recurring transaction
         """
-        if frequency == "weekly":
+        if frequency == "daily":
+            return current_date + timedelta(days=1)
+
+        elif frequency == "biweekly":
+            # Every 2 weeks (14 days)
+            days_ahead = (day_of_week or 0) - current_date.weekday()
+            if days_ahead <= 0:
+                days_ahead += 14
+            else:
+                days_ahead += 7  # First occurrence
+            return current_date + timedelta(days=days_ahead)
+
+        elif frequency == "weekly":
             # Find next occurrence of day_of_week
             days_ahead = (day_of_week or 0) - current_date.weekday()
             if days_ahead <= 0:  # Target day already happened this week
@@ -58,10 +72,10 @@ class RecurringTransactionService:
             return date(next_year, next_month, actual_day)
 
         elif frequency == "yearly":
-            # Same day next year
+            # Same date next year
             target_day = day_of_month or current_date.day
+            target_month = month_of_year or current_date.month
             next_year = current_date.year + 1
-            target_month = current_date.month
 
             # Handle leap year edge case (Feb 29)
             max_day = monthrange(next_year, target_month)[1]
@@ -74,7 +88,7 @@ class RecurringTransactionService:
             days = interval_days or 7
             return current_date + timedelta(days=days)
 
-        # Default: 7 days
+        # Default: 7 days (weekly)
         return current_date + timedelta(days=7)
 
     @staticmethod
@@ -92,6 +106,8 @@ class RecurringTransactionService:
             Created recurring transaction
         """
         start_date = data.pop("start_date", date.today())
+        end_date = data.pop("end_date", None)
+        auto_submit = data.pop("auto_submit", False)
 
         # Calculate initial next_run_date
         next_run = RecurringTransactionService.calculate_next_run_date(
@@ -100,6 +116,7 @@ class RecurringTransactionService:
             interval_days=data.get("interval_days"),
             day_of_week=data.get("day_of_week"),
             day_of_month=data.get("day_of_month"),
+            month_of_year=data.get("month_of_year"),
         )
 
         # If the calculated date is before start_date, use start_date
@@ -108,7 +125,10 @@ class RecurringTransactionService:
 
         recurring = RecurringTransaction(
             user_id=user_id,
+            start_date=start_date,
+            end_date=end_date,
             next_run_date=next_run,
+            auto_submit=auto_submit,
             **data,
         )
 
@@ -179,7 +199,7 @@ class RecurringTransactionService:
                 setattr(recurring, key, value)
 
         # Recalculate next_run_date if frequency settings changed
-        frequency_fields = {"frequency", "interval_days", "day_of_week", "day_of_month"}
+        frequency_fields = {"frequency", "interval_days", "day_of_week", "day_of_month", "month_of_year"}
         if frequency_fields & set(update_data.keys()):
             recurring.next_run_date = RecurringTransactionService.calculate_next_run_date(
                 frequency=recurring.frequency,
@@ -187,6 +207,7 @@ class RecurringTransactionService:
                 interval_days=recurring.interval_days,
                 day_of_week=recurring.day_of_week,
                 day_of_month=recurring.day_of_month,
+                month_of_year=recurring.month_of_year,
             )
 
         db.commit()
