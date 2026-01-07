@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -12,7 +13,12 @@ import { fetchWallets, fetchWallet, fetchDefiPositions } from '@/services/crypto
 
 const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
 
-export function NetWorthCard() {
+interface NetWorthCardProps {
+  monthlyNet?: number
+  monthlyNetChange?: number | null
+}
+
+export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps) {
   const { t } = useTranslation('common')
   const { data: accounts } = useAccounts()
   const { currency } = useSettings()
@@ -89,17 +95,50 @@ export function NetWorthCard() {
       className="mb-6 cursor-pointer"
       onClick={() => setShowBreakdown(!showBreakdown)}
     >
-      <Card className="hover:shadow-md transition-shadow">
-        <div className="text-center">
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+      <Card className="hover:shadow-md transition-shadow bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+        <div className="text-center py-2">
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
           {t('dashboard.netWorth', 'Net Worth')}
         </p>
         <p className={cn(
-          'text-3xl font-bold font-numbers',
+          'text-4xl sm:text-5xl font-bold font-numbers tracking-tight',
           netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
         )}>
           {formatCurrencyPrivacy(netWorth, currency, rates, false, isPrivacyMode)}
         </p>
+
+        {/* Monthly Net Trend Indicator */}
+        {monthlyNet !== undefined && (
+          <div className="flex items-center justify-center gap-2 mt-3">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {t('dashboard.thisMonth', 'This month')}:
+            </span>
+            <span className={cn(
+              'flex items-center gap-1 text-sm font-medium',
+              monthlyNet >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+            )}>
+              {monthlyNet >= 0 ? (
+                <TrendingUp size={14} />
+              ) : (
+                <TrendingDown size={14} />
+              )}
+              {monthlyNet >= 0 ? '+' : ''}{formatCurrencyPrivacy(monthlyNet, currency, rates, false, isPrivacyMode)}
+            </span>
+            {monthlyNetChange !== undefined && monthlyNetChange !== null && (
+              <span className={cn(
+                'flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full',
+                monthlyNetChange > 0
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                  : monthlyNetChange < 0
+                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+              )}>
+                {monthlyNetChange > 0 ? <TrendingUp size={10} /> : monthlyNetChange < 0 ? <TrendingDown size={10} /> : <Minus size={10} />}
+                {monthlyNetChange > 0 ? '+' : ''}{monthlyNetChange?.toFixed(0)}%
+              </span>
+            )}
+          </div>
+        )}
 
         {showBreakdown && (
           <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 text-sm">

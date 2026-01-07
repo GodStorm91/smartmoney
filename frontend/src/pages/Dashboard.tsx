@@ -73,7 +73,10 @@ export function Dashboard() {
       <OnboardingChecklist />
 
       {/* Net Worth Hero Card */}
-      <NetWorthCard />
+      <NetWorthCard
+        monthlyNet={summary?.net}
+        monthlyNetChange={summary?.net_change}
+      />
 
       {/* KPI Summary Cards */}
       <DashboardKPIs summary={summary} />

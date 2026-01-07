@@ -41,6 +41,9 @@
     "USD": "$ USD",
     "VND": "₫ VND"
   },
+  "fab": {
+    "quickActions": "Quick Actions"
+  },
   "aria": {
     "mainNavigation": "Main Navigation",
     "mobileNavigation": "Mobile Navigation",

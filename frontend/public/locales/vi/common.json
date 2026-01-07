@@ -41,6 +41,9 @@
     "USD": "$ Đô la",
     "VND": "₫ Đồng"
   },
+  "fab": {
+    "quickActions": "Thao tác nhanh"
+  },
   "aria": {
     "mainNavigation": "Điều hướng chính",
     "mobileNavigation": "Điều hướng di động",

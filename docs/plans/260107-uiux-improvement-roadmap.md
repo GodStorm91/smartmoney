@@ -16,11 +16,11 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 **Status:** 🔄 In Progress
 **Estimated Effort:** 3-4 hours
 
-### 1.1 Floating Action Button (FAB)
-- [ ] Add FAB on mobile for quick "Add Transaction"
-- [ ] Position: bottom-right, above bottom nav
-- [ ] Actions: Add Transaction, Scan Receipt, Upload CSV
-- [ ] Expandable menu on tap
+### 1.1 Floating Action Button (FAB) ✅
+- [x] Add FAB on mobile for quick "Add Transaction"
+- [x] Position: bottom-right, above bottom nav
+- [x] Actions: Add Transaction, Scan Receipt, Upload CSV
+- [x] Expandable menu on tap
 
 ### 1.2 Larger Touch Targets
 - [ ] Audit all buttons/links for 44px minimum touch target
@@ -43,10 +43,10 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 **Status:** 🔄 In Progress
 **Estimated Effort:** 4-6 hours
 
-### 2.1 Hero Section Simplification
-- [ ] Single prominent "Net Worth" or "Monthly Balance" hero
-- [ ] Large, scannable numbers
-- [ ] Trend indicator (up/down arrow with %)
+### 2.1 Hero Section Simplification ✅
+- [x] Single prominent "Net Worth" or "Monthly Balance" hero
+- [x] Large, scannable numbers (4xl/5xl)
+- [x] Trend indicator (up/down arrow with %)
 
 ### 2.2 Quick Actions Bar
 - [ ] Horizontal scrollable quick actions
@@ -179,6 +179,7 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 | Date | Phase | Changes |
 |------|-------|---------|
 | 2026-01-07 | - | Initial roadmap created |
+| 2026-01-07 | 1, 2 | Implemented FAB and Hero section simplification |
 
 ---
 

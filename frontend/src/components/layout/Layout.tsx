@@ -4,6 +4,7 @@ import { Header } from './Header'
 import { Footer } from './Footer'
 import { BottomNavigation } from './BottomNavigation'
 import { ChatFAB, ChatPanel } from '@/components/chat'
+import { FloatingActionButton } from '@/components/ui/FloatingActionButton'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { ShortcutsHelpModal } from '@/components/ui/ShortcutsHelpModal'
 import { useKeyboardShortcuts, SHORTCUT_KEYS } from '@/hooks/useKeyboardShortcuts'
@@ -119,6 +120,9 @@ export function Layout({ children }: LayoutProps) {
       <main className="flex-1 pb-20 md:pb-0">{children}</main>
       <Footer />
       <BottomNavigation />
+
+      {/* Quick Actions FAB (mobile only) */}
+      <FloatingActionButton />
 
       {/* AI Chat Assistant */}
       <ChatFAB onClick={() => setIsChatOpen(true)} />
