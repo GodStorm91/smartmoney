@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
@@ -21,8 +22,6 @@ export function BulkRecategorizeModal({
   const { t } = useTranslation('common')
   const [category, setCategory] = useState('')
 
-  if (!isOpen) return null
-
   const categoryOptions = [
     { value: '', label: t('transactions.selectCategory', 'Select category...') },
     { value: '食費', label: t('category.food', 'Food') },
@@ -43,7 +42,9 @@ export function BulkRecategorizeModal({
     }
   }
 
-  return (
+  if (!isOpen) return null
+
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-[calc(100%-2rem)] max-w-md shadow-xl">
@@ -76,4 +77,9 @@ export function BulkRecategorizeModal({
       </div>
     </div>
   )
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+  return null
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Camera, X } from 'lucide-react'
@@ -180,8 +181,6 @@ export function TransactionEditModal({
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      // Scroll to top of page to ensure modal is visible
-      window.scrollTo(0, 0)
     }
     return () => {
       document.body.style.overflow = ''
@@ -190,7 +189,7 @@ export function TransactionEditModal({
 
   if (!isOpen || !transaction) return null
 
-  return (
+  const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
@@ -390,4 +389,9 @@ export function TransactionEditModal({
       )}
     </div>
   )
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+  return null
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Receipt, RefreshCw, Camera, X } from 'lucide-react'
@@ -287,7 +288,7 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
   if (!isOpen) return null
 
-  return (
+  const modalContent = (
     <div
       className="fixed inset-0 z-50 bg-black/50 animate-modal-backdrop"
       onClick={handleBackdropClick}
@@ -561,4 +562,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
       />
     </div>
   )
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalContent, document.body)
+  }
+  return null
 }

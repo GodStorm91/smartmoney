@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import type { Transaction } from '@/types'
@@ -29,7 +30,7 @@ export function DeleteConfirmDialog({
 
   if (!isOpen || !transaction) return null
 
-  return (
+  const dialogContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
@@ -62,7 +63,7 @@ export function DeleteConfirmDialog({
           </div>
           <div className="flex gap-2 text-xs text-gray-600 dark:text-gray-400">
             <span>{transaction.category}</span>
-            <span>•</span>
+            <span>-</span>
             <span>{transaction.source}</span>
           </div>
         </div>
@@ -92,4 +93,9 @@ export function DeleteConfirmDialog({
       </div>
     </div>
   )
+
+  if (typeof document !== 'undefined') {
+    return createPortal(dialogContent, document.body)
+  }
+  return null
 }
