@@ -174,7 +174,7 @@ export function ProxyPurchaseWizard({ isOpen, onClose }: ProxyPurchaseWizardProp
             <ShoppingCart className="w-5 h-5 text-blue-500" />
             <h2 className="text-lg font-semibold">{t('proxy.title')}</h2>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <button onClick={onClose} className="p-2.5 -mr-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>

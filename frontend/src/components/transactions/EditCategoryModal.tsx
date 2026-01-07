@@ -116,7 +116,7 @@ export function EditCategoryModal({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {t('category.editTitle', 'Edit Category')}
           </h3>
-          <button onClick={handleClose} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+          <button onClick={handleClose} className="p-2.5 -mr-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
             <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>

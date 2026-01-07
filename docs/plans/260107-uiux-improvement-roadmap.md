@@ -22,10 +22,10 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 - [x] Actions: Add Transaction, Scan Receipt, Upload CSV
 - [x] Expandable menu on tap
 
-### 1.2 Larger Touch Targets
-- [ ] Audit all buttons/links for 44px minimum touch target
-- [ ] Increase spacing between interactive elements
-- [ ] Improve category grid tap areas
+### 1.2 Larger Touch Targets ✅
+- [x] Audit all buttons/links for 44px minimum touch target
+- [x] Fix modal close buttons (p-1 → p-2.5)
+- [ ] Improve category grid tap areas (deferred)
 
 ### 1.3 Gesture Improvements
 - [ ] Pull-to-refresh on transaction list
@@ -58,15 +58,15 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 - [ ] Collapsible/expandable cards
 - [ ] "See more" links instead of cramming data
 
-### 2.4 Information Hierarchy
-- [ ] Primary: Balance/Net Worth (largest)
-- [ ] Secondary: This month's income/expense
-- [ ] Tertiary: Charts, trends, goals progress
+### 2.4 Information Hierarchy ✅
+- [x] Primary: Balance/Net Worth (4xl/5xl)
+- [x] Secondary: KPIs (2xl/3xl with tracking-tight)
+- [x] Tertiary: Section titles (lg) → content (sm/base)
 
-### 2.5 Empty States
-- [ ] Friendly empty state illustrations
-- [ ] Clear CTAs ("Upload your first CSV", "Add a transaction")
-- [ ] Onboarding hints for new users
+### 2.5 Empty States ✅
+- [x] Friendly empty state with icons (PieChart, Target)
+- [x] Clear CTAs ("Add transaction", "Create a goal")
+- [x] Compact variant for card contexts
 
 ---
 
@@ -74,10 +74,10 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 **Status:** ⏳ Planned
 **Estimated Effort:** 3-4 hours
 
-### 3.1 Loading States
-- [ ] Skeleton loaders for dashboard cards
-- [ ] Skeleton loaders for transaction list
-- [ ] Shimmer effect on loading items
+### 3.1 Loading States ✅
+- [x] Skeleton loaders for dashboard cards
+- [x] Skeleton loaders for KPIs, categories, goals
+- [ ] Shimmer effect on loading items (deferred)
 
 ### 3.2 Success Feedback
 - [ ] Confetti animation on goal milestone reached
@@ -180,6 +180,7 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 |------|-------|---------|
 | 2026-01-07 | - | Initial roadmap created |
 | 2026-01-07 | 1, 2 | Implemented FAB and Hero section simplification |
+| 2026-01-07 | 1-3 | Empty states, skeleton loaders, touch targets, info hierarchy |
 
 ---
 

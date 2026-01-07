@@ -83,8 +83,8 @@ export function KPICard({ title, amount, change, icon, type, clickable, ...props
         )}
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">{title}</p>
-        <p className={cn('text-3xl md:text-4xl font-bold font-numbers', colors.text)}>
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{title}</p>
+        <p className={cn('text-2xl sm:text-3xl font-bold font-numbers tracking-tight', colors.text)}>
           {formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         </p>
       </div>

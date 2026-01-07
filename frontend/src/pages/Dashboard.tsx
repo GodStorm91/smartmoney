@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { PieChart, Target } from 'lucide-react'
 import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { CategoryBreakdownList } from '@/components/financial/CategoryBreakdownList'
 import { DashboardKPIs } from '@/components/dashboard/DashboardKPIs'
@@ -10,6 +11,8 @@ import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { SkeletonKPI, SkeletonNetWorth, SkeletonCategoryBreakdown, SkeletonGoalCard, Skeleton } from '@/components/ui/Skeleton'
 import { formatMonth } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
@@ -55,8 +58,53 @@ export function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <LoadingSpinner size="lg" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Title Skeleton */}
+        <div className="mb-8">
+          <Skeleton className="w-40 h-8 mb-2" />
+          <Skeleton className="w-56 h-5" />
+        </div>
+
+        {/* Net Worth Skeleton */}
+        <SkeletonNetWorth className="mb-6" />
+
+        {/* KPI Skeletons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <SkeletonKPI />
+          <SkeletonKPI />
+          <SkeletonKPI />
+        </div>
+
+        {/* Chart and Actions Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+          <Card className="lg:col-span-2 h-80">
+            <Skeleton className="w-32 h-5 mb-4" />
+            <Skeleton className="w-full h-56" />
+          </Card>
+          <Card>
+            <Skeleton className="w-28 h-5 mb-4" />
+            <div className="space-y-3">
+              <Skeleton className="w-full h-12 rounded-lg" />
+              <Skeleton className="w-full h-12 rounded-lg" />
+              <Skeleton className="w-full h-12 rounded-lg" />
+            </div>
+          </Card>
+        </div>
+
+        {/* Category & Goals Skeletons */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <Skeleton className="w-40 h-5 mb-6" />
+            <SkeletonCategoryBreakdown />
+          </Card>
+          <Card>
+            <Skeleton className="w-36 h-5 mb-6" />
+            <div className="space-y-6">
+              <SkeletonGoalCard />
+              <SkeletonGoalCard />
+            </div>
+          </Card>
+        </div>
       </div>
     )
   }
@@ -103,7 +151,20 @@ export function Dashboard() {
               </Link>
             </>
           ) : (
-            <p className="text-center text-gray-400 dark:text-gray-500 py-8">{t('dashboard.noData')}</p>
+            <EmptyState
+              icon={<PieChart />}
+              title={t('dashboard.noCategories', 'No spending data yet')}
+              description={t('dashboard.noCategoriesDescription', 'Add transactions to see your spending breakdown')}
+              compact
+              action={
+                <Link
+                  to="/transactions"
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                >
+                  {t('dashboard.addTransaction', 'Add transaction')}
+                </Link>
+              }
+            />
           )}
         </Card>
 
@@ -139,7 +200,20 @@ export function Dashboard() {
               <LoadingSpinner size="md" />
             </div>
           ) : (
-            <p className="text-center text-gray-400 dark:text-gray-500 py-8">{t('dashboard.noGoals')}</p>
+            <EmptyState
+              icon={<Target />}
+              title={t('dashboard.noGoals', 'No goals yet')}
+              description={t('dashboard.noGoalsDescription', 'Set financial goals to track your progress')}
+              compact
+              action={
+                <Link
+                  to="/goals"
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                >
+                  {t('dashboard.createGoal', 'Create a goal')}
+                </Link>
+              }
+            />
           )}
         </Card>
       </div>
