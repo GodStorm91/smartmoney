@@ -8,11 +8,15 @@ import { DashboardKPIs } from '@/components/dashboard/DashboardKPIs'
 import { TrendChartCard } from '@/components/dashboard/TrendChartCard'
 import { QuickActionsCard } from '@/components/dashboard/QuickActionsCard'
 import { NetWorthCard } from '@/components/dashboard/NetWorthCard'
+import { FinancialHealthCard } from '@/components/dashboard/FinancialHealthCard'
+import { SpendingInsightsCard } from '@/components/dashboard/SpendingInsightsCard'
+import { MonthComparisonCard } from '@/components/dashboard/MonthComparisonCard'
+import { SmartAlertsCard } from '@/components/dashboard/SmartAlertsCard'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { SkeletonKPI, SkeletonNetWorth, SkeletonCategoryBreakdown, SkeletonGoalCard, Skeleton } from '@/components/ui/Skeleton'
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { formatMonth } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
@@ -57,56 +61,7 @@ export function Dashboard() {
   const isLoading = summaryLoading || trendsLoading || categoriesLoading || goalsLoading
 
   if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Title Skeleton */}
-        <div className="mb-8">
-          <Skeleton className="w-40 h-8 mb-2" />
-          <Skeleton className="w-56 h-5" />
-        </div>
-
-        {/* Net Worth Skeleton */}
-        <SkeletonNetWorth className="mb-6" />
-
-        {/* KPI Skeletons */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <SkeletonKPI />
-          <SkeletonKPI />
-          <SkeletonKPI />
-        </div>
-
-        {/* Chart and Actions Skeletons */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-          <Card className="lg:col-span-2 h-80">
-            <Skeleton className="w-32 h-5 mb-4" />
-            <Skeleton className="w-full h-56" />
-          </Card>
-          <Card>
-            <Skeleton className="w-28 h-5 mb-4" />
-            <div className="space-y-3">
-              <Skeleton className="w-full h-12 rounded-lg" />
-              <Skeleton className="w-full h-12 rounded-lg" />
-              <Skeleton className="w-full h-12 rounded-lg" />
-            </div>
-          </Card>
-        </div>
-
-        {/* Category & Goals Skeletons */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <Skeleton className="w-40 h-5 mb-6" />
-            <SkeletonCategoryBreakdown />
-          </Card>
-          <Card>
-            <Skeleton className="w-36 h-5 mb-6" />
-            <div className="space-y-6">
-              <SkeletonGoalCard />
-              <SkeletonGoalCard />
-            </div>
-          </Card>
-        </div>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   return (
@@ -126,13 +81,54 @@ export function Dashboard() {
         monthlyNetChange={summary?.net_change}
       />
 
+      {/* Smart Alerts */}
+      {monthlyTrends && monthlyTrends.length > 0 && (
+        <div className="mb-6">
+          <SmartAlertsCard
+            income={monthlyTrends[monthlyTrends.length - 1]?.income || 0}
+            expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
+            savingsRate={
+              monthlyTrends[monthlyTrends.length - 1]?.income > 0
+                ? ((monthlyTrends[monthlyTrends.length - 1]?.income - monthlyTrends[monthlyTrends.length - 1]?.expenses) /
+                    monthlyTrends[monthlyTrends.length - 1]?.income) * 100
+                : 0
+            }
+          />
+        </div>
+      )}
+
       {/* KPI Summary Cards */}
       <DashboardKPIs summary={summary} />
+
+      {/* Financial Health & Insights Row */}
+      {monthlyTrends && monthlyTrends.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <FinancialHealthCard
+            income={monthlyTrends[monthlyTrends.length - 1]?.income || 0}
+            expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
+            goals={goalsProgress?.map(g => ({ progress: (g.total_saved / g.target_amount) * 100 })) || []}
+          />
+          <SpendingInsightsCard
+            categories={categories || []}
+            income={monthlyTrends[monthlyTrends.length - 1]?.income || 0}
+            expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
+            previousExpense={monthlyTrends.length > 1 ? monthlyTrends[monthlyTrends.length - 2]?.expenses : undefined}
+          />
+        </div>
+      )}
 
       {/* Bento Grid Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
         <TrendChartCard data={monthlyTrends} />
-        <QuickActionsCard />
+        <div className="space-y-6">
+          <QuickActionsCard />
+          {monthlyTrends && monthlyTrends.length > 1 && (
+            <MonthComparisonCard
+              currentMonth={monthlyTrends[monthlyTrends.length - 1]}
+              previousMonth={monthlyTrends[monthlyTrends.length - 2]}
+            />
+          )}
+        </div>
       </div>
 
       {/* Category Breakdown & Goals Row */}

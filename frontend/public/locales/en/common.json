@@ -77,7 +77,69 @@
     "quickActionAnalytics": "View Analytics",
     "netWorth": "Net Worth",
     "assets": "Assets",
-    "liabilities": "Liabilities"
+    "liabilities": "Liabilities",
+    "thisMonth": "This month"
+  },
+  "health": {
+    "title": "Financial Health",
+    "savingsRate": "Savings Rate",
+    "budgetAdherence": "Budget Adherence",
+    "goalProgress": "Goal Progress",
+    "grade": {
+      "A": "Excellent",
+      "B": "Good",
+      "C": "Fair",
+      "D": "Needs Work",
+      "F": "Critical"
+    },
+    "description": {
+      "A": "Outstanding! You're saving well and on track with goals.",
+      "B": "Great work! Small improvements will get you to excellent.",
+      "C": "Decent progress. Focus on one area to improve.",
+      "D": "Room for improvement. Review your budget and spending.",
+      "F": "Action needed. Consider reducing expenses or increasing income."
+    },
+    "tip": {
+      "increaseSavings": "Try to save at least 10% of your income each month.",
+      "stayWithinBudget": "Review categories where you're over budget.",
+      "focusOnGoals": "Allocate more towards your financial goals.",
+      "reduceSpending": "Your expenses exceed income. Look for areas to cut back.",
+      "keepItUp": "Keep up the great work! You're on the right track."
+    }
+  },
+  "alerts": {
+    "title": "Smart Alerts",
+    "overspending": "Overspending Alert",
+    "overspendingDesc": "Expenses exceed income by {{amount}}",
+    "lowSavings": "Low Savings Rate",
+    "lowSavingsDesc": "Only saving {{rate}}% of income",
+    "budgetExceeded": "Budget Exceeded",
+    "budgetExceededDesc": "{{category}} is {{amount}} over budget",
+    "goalDeadline": "Goal Deadline",
+    "goalDeadlineDesc": "{{name}}: {{days}} days left, {{progress}}% complete"
+  },
+  "comparison": {
+    "title": "Month vs Month",
+    "income": "Income",
+    "expenses": "Expenses",
+    "savings": "Savings",
+    "lastMonth": "Last month",
+    "thisMonth": "This month"
+  },
+  "insights": {
+    "title": "Spending Insights",
+    "highSpending": "High Spending Alert",
+    "highSpendingDesc": "You're spending {{ratio}}% of your income",
+    "goodSavings": "Great Savings!",
+    "goodSavingsDesc": "You're saving {{ratio}}% of your income",
+    "spendingUp": "Spending Increased",
+    "spendingUpDesc": "Up {{change}}% from last month",
+    "spendingDown": "Spending Decreased",
+    "spendingDownDesc": "Down {{change}}% from last month",
+    "topCategory": "Top Category: {{category}}",
+    "topCategoryDesc": "{{percentage}}% of your spending",
+    "unusualSpending": "Unusual: {{category}}",
+    "unusualSpendingDesc": "Up {{change}}% vs last month"
   },
   "transactions": {
     "title": "Transactions",

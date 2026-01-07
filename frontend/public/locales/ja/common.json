@@ -77,7 +77,69 @@
     "quickActionAnalytics": "分析を表示",
     "netWorth": "純資産",
     "assets": "資産",
-    "liabilities": "負債"
+    "liabilities": "負債",
+    "thisMonth": "今月"
+  },
+  "health": {
+    "title": "家計の健康度",
+    "savingsRate": "貯蓄率",
+    "budgetAdherence": "予算達成度",
+    "goalProgress": "目標進捗",
+    "grade": {
+      "A": "優秀",
+      "B": "良好",
+      "C": "普通",
+      "D": "要改善",
+      "F": "要注意"
+    },
+    "description": {
+      "A": "素晴らしい！貯蓄も目標も順調です。",
+      "B": "良い調子！少し改善すれば優秀になれます。",
+      "C": "まずまずの進捗。一つに集中して改善を。",
+      "D": "改善の余地あり。予算と支出を見直しましょう。",
+      "F": "対策が必要。支出削減または収入増を検討してください。"
+    },
+    "tip": {
+      "increaseSavings": "毎月収入の10%以上を貯蓄しましょう。",
+      "stayWithinBudget": "予算超過のカテゴリを見直しましょう。",
+      "focusOnGoals": "目標達成のために資金を増やしましょう。",
+      "reduceSpending": "支出が収入を超えています。削減できる項目を探しましょう。",
+      "keepItUp": "この調子で頑張りましょう！順調です。"
+    }
+  },
+  "alerts": {
+    "title": "スマートアラート",
+    "overspending": "支出超過アラート",
+    "overspendingDesc": "支出が収入を{{amount}}超過しています",
+    "lowSavings": "貯蓄率低下",
+    "lowSavingsDesc": "収入の{{rate}}%しか貯蓄できていません",
+    "budgetExceeded": "予算超過",
+    "budgetExceededDesc": "{{category}}が予算を{{amount}}超過しています",
+    "goalDeadline": "目標期限",
+    "goalDeadlineDesc": "{{name}}: 残り{{days}}日、{{progress}}%達成"
+  },
+  "comparison": {
+    "title": "月間比較",
+    "income": "収入",
+    "expenses": "支出",
+    "savings": "貯蓄",
+    "lastMonth": "先月",
+    "thisMonth": "今月"
+  },
+  "insights": {
+    "title": "支出インサイト",
+    "highSpending": "支出過多アラート",
+    "highSpendingDesc": "収入の{{ratio}}%を支出しています",
+    "goodSavings": "優秀な貯蓄率！",
+    "goodSavingsDesc": "収入の{{ratio}}%を貯蓄しています",
+    "spendingUp": "支出増加",
+    "spendingUpDesc": "先月比{{change}}%増",
+    "spendingDown": "支出減少",
+    "spendingDownDesc": "先月比{{change}}%減",
+    "topCategory": "最大カテゴリ: {{category}}",
+    "topCategoryDesc": "支出の{{percentage}}%を占めています",
+    "unusualSpending": "異常: {{category}}",
+    "unusualSpendingDesc": "先月比{{change}}%増"
   },
   "transactions": {
     "title": "取引履歴",

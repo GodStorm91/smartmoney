@@ -77,7 +77,69 @@
     "quickActionAnalytics": "Xem phân tích",
     "netWorth": "Tổng tài sản ròng",
     "assets": "Tài sản",
-    "liabilities": "Nợ phải trả"
+    "liabilities": "Nợ phải trả",
+    "thisMonth": "Tháng này"
+  },
+  "health": {
+    "title": "Sức khỏe tài chính",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "budgetAdherence": "Tuân thủ ngân sách",
+    "goalProgress": "Tiến độ mục tiêu",
+    "grade": {
+      "A": "Xuất sắc",
+      "B": "Tốt",
+      "C": "Khá",
+      "D": "Cần cải thiện",
+      "F": "Cần chú ý"
+    },
+    "description": {
+      "A": "Tuyệt vời! Bạn đang tiết kiệm tốt và đạt mục tiêu.",
+      "B": "Tốt lắm! Cải thiện một chút nữa là xuất sắc.",
+      "C": "Tiến triển khá. Tập trung vào một lĩnh vực để cải thiện.",
+      "D": "Cần cải thiện. Xem lại ngân sách và chi tiêu.",
+      "F": "Cần hành động. Cân nhắc giảm chi tiêu hoặc tăng thu nhập."
+    },
+    "tip": {
+      "increaseSavings": "Hãy cố gắng tiết kiệm ít nhất 10% thu nhập mỗi tháng.",
+      "stayWithinBudget": "Xem lại các danh mục vượt ngân sách.",
+      "focusOnGoals": "Phân bổ thêm cho các mục tiêu tài chính.",
+      "reduceSpending": "Chi tiêu vượt thu nhập. Hãy tìm cách cắt giảm.",
+      "keepItUp": "Tiếp tục phát huy! Bạn đang đi đúng hướng."
+    }
+  },
+  "alerts": {
+    "title": "Cảnh báo Thông minh",
+    "overspending": "Cảnh báo Chi tiêu Quá mức",
+    "overspendingDesc": "Chi tiêu vượt thu nhập {{amount}}",
+    "lowSavings": "Tỷ lệ Tiết kiệm Thấp",
+    "lowSavingsDesc": "Chỉ tiết kiệm được {{rate}}% thu nhập",
+    "budgetExceeded": "Vượt Ngân sách",
+    "budgetExceededDesc": "{{category}} vượt ngân sách {{amount}}",
+    "goalDeadline": "Hạn chót Mục tiêu",
+    "goalDeadlineDesc": "{{name}}: còn {{days}} ngày, hoàn thành {{progress}}%"
+  },
+  "comparison": {
+    "title": "So sánh Tháng",
+    "income": "Thu nhập",
+    "expenses": "Chi tiêu",
+    "savings": "Tiết kiệm",
+    "lastMonth": "Tháng trước",
+    "thisMonth": "Tháng này"
+  },
+  "insights": {
+    "title": "Phân tích Chi tiêu",
+    "highSpending": "Cảnh báo Chi tiêu Cao",
+    "highSpendingDesc": "Bạn đang chi {{ratio}}% thu nhập",
+    "goodSavings": "Tiết kiệm Tuyệt vời!",
+    "goodSavingsDesc": "Bạn đang tiết kiệm {{ratio}}% thu nhập",
+    "spendingUp": "Chi tiêu Tăng",
+    "spendingUpDesc": "Tăng {{change}}% so với tháng trước",
+    "spendingDown": "Chi tiêu Giảm",
+    "spendingDownDesc": "Giảm {{change}}% so với tháng trước",
+    "topCategory": "Danh mục lớn nhất: {{category}}",
+    "topCategoryDesc": "{{percentage}}% tổng chi tiêu",
+    "unusualSpending": "Bất thường: {{category}}",
+    "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước"
   },
   "transactions": {
     "title": "Giao dịch",
