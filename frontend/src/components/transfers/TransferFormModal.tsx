@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, X } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { Button } from '@/components/ui/Button'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { createTransfer } from '@/services/transfer-service'
@@ -353,23 +354,21 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
 
           {/* Buttons */}
           <div className="flex gap-3 pt-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="flex-1 h-12 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300"
+              className="flex-1 h-12"
             >
               {t('common.cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={mutation.isPending}
-              className={cn(
-                'flex-1 h-12 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700',
-                mutation.isPending && 'opacity-50 cursor-not-allowed'
-              )}
+              loading={mutation.isPending}
+              className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
             >
-              {mutation.isPending ? t('common.saving') : t('transfer.create')}
-            </button>
+              {t('transfer.create')}
+            </Button>
           </div>
         </form>
       </div>

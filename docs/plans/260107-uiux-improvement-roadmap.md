@@ -84,10 +84,10 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 - [x] Checkmark animation on transaction saved
 - [x] Toast notifications with icons
 
-### 3.3 Button Interactions
-- [ ] Press state animations (scale down)
-- [ ] Loading spinners inside buttons
-- [ ] Disabled state visual feedback
+### 3.3 Button Interactions ✅
+- [x] Press state animations (scale down)
+- [x] Loading spinners inside buttons
+- [x] Disabled state visual feedback
 
 ### 3.4 Page Transitions
 - [ ] Smooth fade transitions between pages
@@ -183,6 +183,7 @@ This roadmap outlines UI/UX improvements based on 2025 fintech design best pract
 | 2026-01-07 | 1-3 | Empty states, skeleton loaders, touch targets, info hierarchy |
 | 2026-01-07 | 3 | Success animations: Confetti, Toast notifications, checkmark |
 | 2026-01-07 | 3 | Data viz animations: Chart draw-in, CountUp, progress bars |
+| 2026-01-07 | 3 | Button interactions: Press scale, loading spinners, disabled states |
 
 ---
 

@@ -105,10 +105,10 @@ export function BudgetGenerateForm({ onGenerate, isLoading, error, suggestions }
               </p>
               <Button
                 onClick={handleClonePrevious}
-                disabled={isLoading}
+                loading={isLoading}
                 className="w-full sm:w-auto"
               >
-                {isLoading ? t('budget.generating') : t('budget.clonePreviousMonth')}
+                {t('budget.clonePreviousMonth')}
               </Button>
             </div>
           </div>
@@ -178,8 +178,8 @@ export function BudgetGenerateForm({ onGenerate, isLoading, error, suggestions }
             </p>
           </div>
 
-          <Button type="submit" disabled={isLoading || !monthlyIncome} className="w-full">
-            {isLoading ? t('budget.generating') : t('budget.generateButton')}
+          <Button type="submit" loading={isLoading} disabled={!monthlyIncome} className="w-full">
+            {t('budget.generateButton')}
           </Button>
 
           {error && (

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Receipt, RefreshCw, Camera, X } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
@@ -524,29 +525,24 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
           {/* Submit buttons */}
           <div className="flex gap-3 pt-4">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={onClose}
-              className="flex-1 h-12 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300"
+              className="flex-1 h-12"
             >
               {t('common.cancel', 'Cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              disabled={createMutation.isPending || recurringMutation.isPending || isUploadingReceipt}
+              loading={createMutation.isPending || recurringMutation.isPending || isUploadingReceipt}
               className={cn(
-                'flex-1 h-12 rounded-lg font-medium text-white',
-                isRecurring ? 'bg-blue-500' : (isIncome ? 'bg-green-500' : 'bg-red-500'),
-                (createMutation.isPending || recurringMutation.isPending || isUploadingReceipt) && 'opacity-50 cursor-not-allowed'
+                'flex-1 h-12',
+                isRecurring ? 'bg-blue-500 hover:bg-blue-600' : (isIncome ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')
               )}
             >
-              {isUploadingReceipt
-                ? t('receipt.uploading', 'Uploading...')
-                : (createMutation.isPending || recurringMutation.isPending)
-                  ? t('common.saving', 'Saving...')
-                  : t('common.save', 'Save')
-              }
-            </button>
+              {t('common.save', 'Save')}
+            </Button>
           </div>
 
           {/* Error message */}
