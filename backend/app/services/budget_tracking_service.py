@@ -35,7 +35,7 @@ class BudgetTrackingService:
 
         # rate_to_jpy means "how many units of currency per 1 JPY"
         # So to convert to JPY: amount / rate
-        return int(actual_amount / rate)
+        return int(float(actual_amount) / rate)
 
     @staticmethod
     def get_parent_category_map(db: Session, user_id: int) -> dict[str, str]:
