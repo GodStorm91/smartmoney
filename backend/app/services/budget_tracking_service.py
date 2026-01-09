@@ -6,10 +6,36 @@ from ..models.transaction import Transaction
 from ..models.budget import Budget
 from ..models.settings import AppSettings
 from ..services.email_service import EmailService
+from ..services.exchange_rate_service import ExchangeRateService
 
 
 class BudgetTrackingService:
     """Service for tracking budget spending and sending alerts."""
+
+    @staticmethod
+    def _convert_to_jpy(amount: int, currency: str, rates: dict[str, float]) -> int:
+        """Convert amount to JPY using exchange rates.
+
+        Args:
+            amount: Amount in original currency
+            currency: Currency code (JPY, USD, VND)
+            rates: Exchange rates dict {currency: rate_to_jpy}
+
+        Returns:
+            Amount converted to JPY
+        """
+        if currency == "JPY" or currency not in rates:
+            return amount
+        rate = rates.get(currency, 1.0)
+        if rate == 0:
+            return amount
+
+        # USD is stored in cents, convert to dollars first
+        actual_amount = amount / 100 if currency == "USD" else amount
+
+        # rate_to_jpy means "how many units of currency per 1 JPY"
+        # So to convert to JPY: amount / rate
+        return int(actual_amount / rate)
 
     @staticmethod
     def get_parent_category_map(db: Session, user_id: int) -> dict[str, str]:
@@ -69,9 +95,15 @@ class BudgetTrackingService:
 
         # Calculate spending per category for current month
         category_spending = {}
+
+        # Get exchange rates for currency conversion
+        exchange_rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query includes currency for proper conversion to JPY
         spending_data = (
             db.query(
                 Transaction.category,
+                Transaction.currency,
                 func.sum(Transaction.amount).label("total")
             )
             .filter(
@@ -82,18 +114,20 @@ class BudgetTrackingService:
                 Transaction.date >= month_start,
                 Transaction.date <= month_end
             )
-            .group_by(Transaction.category)
+            .group_by(Transaction.category, Transaction.currency)
             .all()
         )
 
         # Build parent mapping for category rollup
         parent_map = BudgetTrackingService.get_parent_category_map(db, user_id)
 
-        # Aggregate spending by PARENT category
+        # Aggregate spending by PARENT category (convert all currencies to JPY)
         for row in spending_data:
             child_name = row.category
             parent_name = parent_map.get(child_name, child_name)  # fallback to self if not found
-            category_spending[parent_name] = category_spending.get(parent_name, 0) + abs(row.total)
+            # Convert amount to JPY before aggregating
+            amount_in_jpy = BudgetTrackingService._convert_to_jpy(abs(row.total), row.currency, exchange_rates)
+            category_spending[parent_name] = category_spending.get(parent_name, 0) + amount_in_jpy
 
         # Build tracking items
         categories = []

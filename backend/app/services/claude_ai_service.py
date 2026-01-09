@@ -214,7 +214,7 @@ class ClaudeAIService:
         ]) if annual_spending else "  No annual data"
 
         # System category names - MUST use these exact names for budget tracking
-        system_categories = "Food, Housing, Transportation, Entertainment, Shopping, Health, Communication, Other"
+        system_categories = "Food, Housing, Transportation, Entertainment, Shopping, Health, Communication, Education, Other"
 
         prompt = f"""You are a personal finance advisor helping create a monthly budget.
 
