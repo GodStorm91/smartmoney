@@ -3,6 +3,7 @@
  * Shows performance metrics, IL analysis, charts, and AI insights
  */
 import { useState, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Sparkles, ChevronDown, ChevronUp, Gift } from 'lucide-react'
@@ -504,10 +505,17 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
     return amt < 0.0001 ? '<0.0001' : amt < 1 ? amt.toFixed(4) : amt.toFixed(2)
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden"
+      style={{ touchAction: 'pan-y' }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+
+      {/* Modal */}
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden min-w-0"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90dvh] overflow-y-auto overflow-x-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -746,4 +754,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
       )}
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

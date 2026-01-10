@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { Command } from 'cmdk'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
@@ -111,12 +112,13 @@ export function CommandPalette({
     [navigate, onOpenChange, onNewTransaction, onUpload, toggleTheme, onShowShortcuts]
   )
 
-  return (
+  const paletteContent = (
     <Command.Dialog
       open={open}
       onOpenChange={onOpenChange}
       label={t('commandPalette.label', 'Command Palette')}
-      className="fixed inset-0 z-50"
+      className="fixed inset-0 z-[100000] overflow-hidden"
+      style={{ touchAction: 'pan-y' }}
     >
       {/* Backdrop */}
       <div
@@ -297,6 +299,9 @@ export function CommandPalette({
       </div>
     </Command.Dialog>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(paletteContent, document.body)
 }
 
 // Helper component for consistent item styling

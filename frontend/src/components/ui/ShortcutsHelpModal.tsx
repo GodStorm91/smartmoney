@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 interface ShortcutsHelpModalProps {
@@ -48,10 +49,13 @@ export function ShortcutsHelpModal({ open, onClose }: ShortcutsHelpModalProps) {
 
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+
+    >
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-lg mx-4 max-h-[80vh] overflow-hidden">
@@ -112,6 +116,9 @@ export function ShortcutsHelpModal({ open, onClose }: ShortcutsHelpModalProps) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
 
 export default ShortcutsHelpModal

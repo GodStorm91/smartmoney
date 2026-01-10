@@ -167,7 +167,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
           'shadow-2xl',
           'flex flex-col',
           'transform transition-transform duration-300 ease-out',
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+          isOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         )}
       >
         <ChatHeader onClose={onClose} credits={credits} />

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
@@ -33,8 +34,11 @@ export function ResponsiveModal({
 
   // Mobile: Bottom Sheet
   if (isMobile) {
-    return (
-      <div className="fixed inset-0 z-50">
+    const bottomSheetContent = (
+      <div
+        className="fixed inset-0 z-[100000] overflow-hidden"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Backdrop */}
         <div
           className="absolute inset-0 bg-black/50 animate-fade-in"
@@ -77,11 +81,17 @@ export function ResponsiveModal({
         </div>
       </div>
     )
+
+    if (typeof document === 'undefined') return null
+    return createPortal(bottomSheetContent, document.body)
   }
 
   // Desktop: Centered Modal
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  const desktopModalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+      style={{ touchAction: 'pan-y' }}
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 animate-fade-in"
@@ -119,4 +129,7 @@ export function ResponsiveModal({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(desktopModalContent, document.body)
 }

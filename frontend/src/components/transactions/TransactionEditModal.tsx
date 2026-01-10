@@ -190,15 +190,18 @@ export function TransactionEditModal({
   if (!isOpen || !transaction) return null
 
   const modalContent = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      {/* Modal - prevents horizontal scroll while allowing vertical scroll */}
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90dvh] overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
+      >
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             {t('transaction.editTitle')}

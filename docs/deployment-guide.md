@@ -826,27 +826,51 @@ npm run build
 # Nginx serves new dist/ automatically
 ```
 
-### Quick Frontend Deployment (Docker Server)
+## Quick Frontend Deployment (Docker Server)
 
-**From local machine to production:**
+**CRITICAL: Always deploy to `/root/smartmoney/deploy/frontend-dist/`**
+
+The nginx container mounts from this specific path. Using any other path (e.g., `/root/frontend-dist/`) will NOT work because Docker volume mounts are not updated automatically.
+
+**Correct deployment steps:**
 ```bash
 cd frontend
 
 # Build locally
 npm run build
 
-# Create tarball with correct permissions
-tar --mode='a+r,u+w,a+X' -czf /tmp/frontend.tar.gz -C dist .
+# Copy to deploy directory locally
+rm -rf ../deploy/frontend-dist && cp -r dist ../deploy/frontend-dist
 
-# Upload to server
-scp /tmp/frontend.tar.gz root@<server-ip>:/tmp/
+# Upload to server CORRECT path
+scp -r ../deploy/frontend-dist/* root@<server-ip>:/root/smartmoney/deploy/frontend-dist/
 
-# Extract on server with permission fix
-ssh root@<server-ip> "cd /root/smartmoney/deploy/frontend-dist && rm -rf * && tar -xzf /tmp/frontend.tar.gz && find . -type f -exec chmod 644 {} \; && find . -type d -exec chmod 755 {} \;"
-
-# Restart nginx (optional, usually not needed for static files)
-ssh root@<server-ip> "cd /root/smartmoney/deploy && docker compose restart nginx"
+# Reload nginx
+ssh root@<server-ip> "docker exec smartmoney-nginx nginx -s reload"
 ```
+
+**Verify deployment:**
+```bash
+ssh root@<server-ip> "ls -la /root/smartmoney/deploy/frontend-dist/*.js | head -3"
+# Should show recent timestamps matching your build time
+
+ssh root@money.khanh.page "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/*.js | head -3"
+# Should match - Docker copies mount at container start
+```
+
+**If files don't update after upload:**
+```bash
+# Nginx needs restart to pick up changed files from volume mount
+ssh root@<server-ip> "docker restart smartmoney-nginx"
+```
+
+**Why this path:** Check `deploy/docker-compose.yml`:
+```yaml
+volumes:
+  - ./frontend-dist:/usr/share/nginx/html:ro  # Relative to deploy/ directory on server
+```
+
+---
 
 **Why permissions matter:** `tar` preserves original file permissions. If local files have restrictive permissions (e.g., `600`), nginx won't be able to read them, resulting in 403 Forbidden errors.
 

@@ -3,6 +3,7 @@
  * Records realized P&L and creates income transaction
  */
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { X, Wallet, Calendar, DollarSign, AlertCircle } from 'lucide-react'
@@ -98,10 +99,17 @@ export function ClosePositionModal({
     },
   })
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50" onClick={onClose}>
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4 overflow-hidden"
+      style={{ touchAction: 'pan-y' }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal */}
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto overflow-x-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -273,4 +281,7 @@ export function ClosePositionModal({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

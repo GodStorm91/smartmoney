@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { createGoal, updateGoal, fetchGoal, hasEmergencyFund } from '@/services/goal-service'
@@ -190,9 +191,17 @@ export function GoalCreateModal({
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+  const modalContent = (
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal - allows vertical scroll */}
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full mx-4 max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -315,4 +324,7 @@ export function GoalCreateModal({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

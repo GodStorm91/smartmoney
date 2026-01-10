@@ -19,16 +19,19 @@ import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTra
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { BulkRecategorizeModal } from '@/components/transactions/BulkRecategorizeModal'
 import { BulkDeleteConfirmDialog } from '@/components/transactions/BulkDeleteConfirmDialog'
-import { formatCurrencyPrivacy, formatCurrencySignedPrivacy, CURRENCY_DECIMALS } from '@/utils/formatCurrency'
+import { ReceiptScannerModal } from '@/components/receipts/ReceiptScannerModal'
+import { formatCurrencyPrivacy, formatCurrencySignedPrivacy, CURRENCY_DECIMALS, toStorageAmount } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange, formatDateHeader } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
-import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory } from '@/services/transaction-service'
+import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory, createTransaction } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import type { Transaction, TransactionFilters } from '@/types'
+import type { ReceiptData } from '@/services/receipt-service'
 
 // Helper to get month date range from YYYY-MM format
 function getMonthDateRange(month: string): { start: string; end: string } {
@@ -141,6 +144,7 @@ export function Transactions() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
+  const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
 
   // Bulk selection state
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
@@ -156,6 +160,54 @@ export function Transactions() {
   useEffect(() => {
     setSelectedIds(new Set())
   }, [transactions])
+
+  // Listen for custom events from QuickEntryFAB long-press menu
+  useEffect(() => {
+    const handleOpenAddTransaction = () => {
+      setIsAddModalOpen(true)
+    }
+    const handleOpenReceiptScanner = () => {
+      setIsReceiptScannerOpen(true)
+    }
+
+    window.addEventListener('open-add-transaction-modal', handleOpenAddTransaction)
+    window.addEventListener('open-receipt-scanner', handleOpenReceiptScanner)
+
+    return () => {
+      window.removeEventListener('open-add-transaction-modal', handleOpenAddTransaction)
+      window.removeEventListener('open-receipt-scanner', handleOpenReceiptScanner)
+    }
+  }, [])
+
+  // Create transaction from receipt data
+  const createFromReceipt = useOfflineCreate(
+    createTransaction,
+    'transaction',
+    [['transactions'], ['analytics']]
+  )
+
+  // Handle receipt scan complete
+  const handleReceiptScanComplete = (data: ReceiptData) => {
+    if (!data.amount || !data.category) return
+
+    // Get first account's currency
+    const defaultAccount = accounts?.[0]
+    const currency = defaultAccount?.currency || 'JPY'
+
+    // Convert amount to storage format
+    const amount = toStorageAmount(Math.abs(data.amount), currency)
+
+    // Create transaction from receipt data
+    createFromReceipt.mutate({
+      date: data.date || new Date().toISOString().split('T')[0],
+      description: data.merchant || 'Receipt Scan',
+      amount: -amount,
+      currency,
+      category: data.category,
+      source: defaultAccount?.name || 'Unknown',
+      type: 'expense',
+    })
+  }
 
   // Category options for filters
   const categoryOptions = [
@@ -796,6 +848,12 @@ export function Transactions() {
         onConfirm={() => bulkDeleteMutation.mutate()}
         selectedCount={selectedIds.size}
         isDeleting={bulkDeleteMutation.isPending}
+      />
+
+      <ReceiptScannerModal
+        isOpen={isReceiptScannerOpen}
+        onClose={() => setIsReceiptScannerOpen(false)}
+        onScanComplete={handleReceiptScanComplete}
       />
 
       {/* FAB Buttons */}

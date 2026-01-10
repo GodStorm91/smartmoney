@@ -22,7 +22,10 @@ export function BulkDeleteConfirmDialog({
   if (!isOpen) return null
 
   const dialogContent = (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+
+    >
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
       <div className="relative bg-white dark:bg-gray-800 rounded-lg p-6 w-[calc(100%-2rem)] max-w-md shadow-xl">
         <div className="text-center">

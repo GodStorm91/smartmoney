@@ -21,6 +21,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             'w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
             'transition-default focus-ring',
             'disabled:opacity-50 disabled:cursor-not-allowed',
+            'max-w-full overflow-hidden text-ellipsis',
             error ? 'border-red-500' : 'border-gray-300 dark:border-gray-600',
             className
           )}

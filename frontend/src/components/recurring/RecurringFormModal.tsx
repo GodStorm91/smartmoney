@@ -2,6 +2,7 @@
  * RecurringFormModal - Create/edit recurring transaction
  */
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
@@ -139,13 +140,16 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+  const modalContent = (
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto">
+      {/* Modal - allows vertical scroll */}
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -271,4 +275,7 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

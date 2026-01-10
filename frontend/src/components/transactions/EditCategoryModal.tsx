@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, AlertTriangle } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -106,11 +107,16 @@ export function EditCategoryModal({
 
   const nameChanged = name.trim() !== category.name
 
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+
+    >
+      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
 
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm mx-4 p-6">
+      {/* Modal */}
+      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-sm p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -227,4 +233,7 @@ export function EditCategoryModal({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

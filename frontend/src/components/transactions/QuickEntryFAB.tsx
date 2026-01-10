@@ -9,10 +9,10 @@
  * - 3-4 taps to save: Amount → Category → Account → Save
  * - Always defaults to expense type
  */
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { Plus, X, Delete, Mic, Search } from 'lucide-react'
+import { Plus, X, Delete, Mic, Search, Receipt, CreditCard } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { createTransaction } from '@/services/transaction-service'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -56,6 +56,12 @@ export function QuickEntryFAB() {
   const [inputCurrency, setInputCurrency] = useState<SupportedCurrency>('JPY')
   const [voiceDescription, setVoiceDescription] = useState('')
   const [accountSearch, setAccountSearch] = useState('')
+
+  // Long press state
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isLongPress = useRef(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [pressProgress, setPressProgress] = useState(0) // 0-100 for scale animation
 
   // Voice input hook
   const {
@@ -272,24 +278,119 @@ export function QuickEntryFAB() {
     }
   }
 
+  // Long press handlers
+  const LONG_PRESS_DURATION = 600
+
+  const startPress = () => {
+    isLongPress.current = false
+    setPressProgress(0)
+    const startTime = Date.now()
+
+    pressTimer.current = setTimeout(() => {
+      isLongPress.current = true
+      setShowMenu(true)
+      setPressProgress(100)
+    }, LONG_PRESS_DURATION)
+
+    // Animate progress
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min((elapsed / LONG_PRESS_DURATION) * 100, 100)
+      setPressProgress(progress)
+      if (progress >= 100) clearInterval(interval)
+    }, 16)
+  }
+
+  const endPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+    setPressProgress(0)
+
+    if (!isLongPress.current) {
+      // Short tap - open quick entry
+      handleOpen()
+    }
+  }
+
+  const cancelPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+    setPressProgress(0)
+    isLongPress.current = false
+  }
+
+  const handleMenuAction = (action: 'transaction' | 'receipt') => {
+    setShowMenu(false)
+    isLongPress.current = false
+    if (action === 'transaction') {
+      // Dispatch event to open add transaction modal (no page navigation)
+      window.dispatchEvent(new CustomEvent('open-add-transaction-modal'))
+    } else if (action === 'receipt') {
+      // Dispatch event to open receipt scanner
+      window.dispatchEvent(new CustomEvent('open-receipt-scanner'))
+    }
+  }
+
+  // Calculate scale based on press progress
+  const scale = 1 + (pressProgress / 100) * 0.15 // Scale from 1 to 1.15
+
   // Closed state - show FAB
   if (step === 'closed') {
     return createPortal(
-      <button
-        onClick={handleOpen}
-        className={cn(
-          'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50',
-          'w-14 h-14 rounded-full',
-          'bg-gradient-to-r from-blue-500 to-purple-500',
-          'hover:from-blue-600 hover:to-purple-600',
-          'text-white shadow-lg',
-          'flex items-center justify-center',
-          'transition-all hover:scale-110'
+      <>
+        {/* Action Menu Backdrop */}
+        {showMenu && (
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setShowMenu(false)}
+          />
         )}
-        aria-label={t('quickEntry.add', 'Quick Add')}
-      >
-        <Plus size={28} />
-      </button>,
+
+        {/* Action Menu */}
+        {showMenu && (
+          <div className="fixed bottom-32 right-4 z-50 flex flex-col-reverse gap-2 animate-in fade-in slide-in-from-bottom-2">
+            <button
+              onClick={() => handleMenuAction('receipt')}
+              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
+            >
+              <Receipt size={20} />
+              <span className="text-sm font-medium">{t('receipt.scanReceipt', 'Scan Receipt')}</span>
+            </button>
+            <button
+              onClick={() => handleMenuAction('transaction')}
+              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg"
+            >
+              <CreditCard size={20} />
+              <span className="text-sm font-medium">{t('transaction.addTransaction', 'Add Transaction')}</span>
+            </button>
+          </div>
+        )}
+
+        {/* FAB Button */}
+        <button
+          onPointerDown={startPress}
+          onPointerUp={endPress}
+          onPointerLeave={cancelPress}
+          onPointerCancel={cancelPress}
+          className={cn(
+            'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50',
+            'w-14 h-14 rounded-full',
+            'bg-gradient-to-r from-blue-500 to-purple-500',
+            'text-white shadow-lg',
+            'flex items-center justify-center',
+            'transition-transform duration-75',
+            showMenu && 'rotate-45' // X icon when menu open
+          )}
+          style={{ transform: `scale(${scale})` }}
+          aria-label={t('quickEntry.add', 'Quick Add')}
+        >
+          <Plus size={28} />
+        </button>
+      </>,
       document.body
     )
   }

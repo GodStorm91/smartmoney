@@ -2,6 +2,7 @@
  * VoiceInputButton - Microphone button for voice transaction input
  */
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Mic, MicOff, X, Check } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -83,9 +84,9 @@ export function VoiceInputButton({ onTransactionParsed, className }: VoiceInputB
 
   // Preview mode - show parsed result
   if (showPreview && parsedResult) {
-    return (
+    const modalContent = (
       <div className={cn(
-        'fixed inset-0 z-50 flex items-center justify-center bg-black/50',
+        'fixed inset-0 z-[100000] flex items-center justify-center bg-black/50',
         className
       )}>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-xl">
@@ -119,6 +120,9 @@ export function VoiceInputButton({ onTransactionParsed, className }: VoiceInputB
         </div>
       </div>
     )
+
+    if (typeof document === 'undefined') return null
+    return createPortal(modalContent, document.body)
   }
 
   // Main mic button

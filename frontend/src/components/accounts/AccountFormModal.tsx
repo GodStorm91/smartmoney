@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useCreateAccount, useUpdateAccount, useAccount } from '@/hooks/useAccounts'
 import type { AccountType, AccountCreate, AccountUpdate, AccountWithBalance } from '@/types'
@@ -42,7 +43,8 @@ export function AccountFormModal({
   const { t } = useTranslation('common')
   const createMutation = useCreateAccount()
   const updateMutation = useUpdateAccount()
-  const { data: existingAccount } = useAccount(editingAccountId || 0)
+  // Only fetch account when editing (pass undefined when no ID to prevent query execution)
+  const { data: existingAccount } = useAccount(editingAccountId ? editingAccountId : undefined as unknown as number)
   const rates = useRatesMap()
   const { isPrivacyMode } = usePrivacy()
 
@@ -187,9 +189,18 @@ export function AccountFormModal({
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+  // Use createPortal to render modal outside the DOM hierarchy
+  // This prevents z-index conflicts with sidebar drawers and other fixed elements
+  const modalContent = (
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal - allows vertical scroll */}
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
+      >
         {/* Header */}
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
@@ -535,4 +546,8 @@ export function AccountFormModal({
       </div>
     </div>
   )
+
+  // Use createPortal to render at document body level to avoid z-index conflicts
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

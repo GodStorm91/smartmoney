@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, X } from 'lucide-react'
@@ -169,10 +170,15 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-modal-backdrop" onClick={onClose}>
+  const modalContent = (
+    <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50 animate-modal-backdrop" onClick={onClose} />
+
+      {/* Modal - allows vertical scroll, blocks horizontal */}
       <div
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto animate-modal-in"
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -374,4 +380,7 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

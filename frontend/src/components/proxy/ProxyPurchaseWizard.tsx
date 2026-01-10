@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { X, ArrowRight, ArrowLeft, ShoppingCart } from 'lucide-react'
@@ -165,8 +166,15 @@ export function ProxyPurchaseWizard({ isOpen, onClose }: ProxyPurchaseWizardProp
 
   if (!isOpen) return null
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+  const modalContent = (
+    <div
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4 overflow-hidden"
+
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+
+      {/* Modal */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
@@ -402,4 +410,7 @@ export function ProxyPurchaseWizard({ isOpen, onClose }: ProxyPurchaseWizardProp
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

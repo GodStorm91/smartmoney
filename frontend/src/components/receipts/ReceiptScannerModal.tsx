@@ -2,6 +2,7 @@
  * Receipt Scanner Modal - Main modal for scanning receipts
  */
 import { useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, X, AlertCircle, Check } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
@@ -61,17 +62,20 @@ export function ReceiptScannerModal({
 
   // Camera mode - fullscreen
   if (mode === 'camera') {
-    return (
+    const cameraContent = (
       <CameraCapture
         onCapture={handleImageCapture}
         onCancel={() => setMode('select')}
       />
     )
+    if (typeof document === 'undefined') return null
+    return createPortal(cameraContent, document.body)
   }
 
-  return (
+  const modalContent = (
     <div
-      className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose()
       }}
@@ -174,4 +178,7 @@ export function ReceiptScannerModal({
       </div>
     </div>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
