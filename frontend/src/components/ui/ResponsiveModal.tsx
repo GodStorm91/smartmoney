@@ -36,7 +36,7 @@ export function ResponsiveModal({
   if (isMobile) {
     const bottomSheetContent = (
       <div
-        className="fixed inset-0 z-[100000] overflow-hidden"
+        className="fixed inset-0 z-[100001] overflow-hidden"
         style={{ touchAction: 'pan-y' }}
       >
         {/* Backdrop */}
@@ -89,7 +89,7 @@ export function ResponsiveModal({
   // Desktop: Centered Modal
   const desktopModalContent = (
     <div
-      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100001] flex items-center justify-center p-4"
       style={{ touchAction: 'pan-y' }}
     >
       {/* Backdrop */}
