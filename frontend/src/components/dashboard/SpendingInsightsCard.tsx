@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
+import { TrendingUp, TrendingDown, AlertTriangle, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/utils/cn'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -36,6 +36,40 @@ export function SpendingInsightsCard({
   previousExpense,
 }: SpendingInsightsCardProps) {
   const { t } = useTranslation('common')
+  const [isDismissed, setIsDismissed] = useState(false)
+
+  // Check if user previously dismissed the insights
+  useEffect(() => {
+    const dismissed = localStorage.getItem('spendingInsightsDismissed')
+    if (dismissed) {
+      setIsDismissed(true)
+    }
+  }, [])
+
+  const handleDismiss = () => {
+    setIsDismissed(true)
+    localStorage.setItem('spendingInsightsDismissed', 'true')
+  }
+
+  const handleShowAgain = () => {
+    setIsDismissed(false)
+    localStorage.removeItem('spendingInsightsDismissed')
+  }
+
+  // Don't render if dismissed
+  if (isDismissed) {
+    return (
+      <div className="relative">
+        <button
+          onClick={handleShowAgain}
+          className="w-full text-left text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors flex items-center gap-2"
+        >
+          <AlertTriangle size={14} />
+          {t('insights.showAgain', 'Show spending insights')}
+        </button>
+      </div>
+    )
+  }
 
   const insights = useMemo(() => {
     const result: Insight[] = []
@@ -121,9 +155,18 @@ export function SpendingInsightsCard({
 
   return (
     <Card className="overflow-hidden">
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4">
-        {t('insights.title', 'Spending Insights')}
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          {t('insights.title', 'Spending Insights')}
+        </h3>
+        <button
+          onClick={handleDismiss}
+          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          aria-label={t('button.dismiss', 'Dismiss')}
+        >
+          <X size={14} />
+        </button>
+      </div>
 
       <div className="space-y-3">
         {insights.map((insight, index) => (

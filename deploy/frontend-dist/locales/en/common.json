@@ -28,7 +28,8 @@
     "apply": "Apply Filters",
     "reset": "Reset",
     "selectFile": "Select File",
-    "addMore": "Add More"
+    "addMore": "Add More",
+    "dismiss": "Dismiss"
   },
   "language": {
     "selectLanguage": "Select Language",
@@ -152,7 +153,8 @@
     "topCategory": "Top Category: {{category}}",
     "topCategoryDesc": "{{percentage}}% of your spending",
     "unusualSpending": "Unusual: {{category}}",
-    "unusualSpendingDesc": "Up {{change}}% vs last month"
+    "unusualSpendingDesc": "Up {{change}}% vs last month",
+    "showAgain": "Show spending insights"
   },
   "transactions": {
     "title": "Transactions",
@@ -182,14 +184,7 @@
     "sortDateDesc": "Date ↓",
     "sortDateAsc": "Date ↑",
     "sortAmountDesc": "Amount ↓",
-    "sortAmountAsc": "Amount ↑",
-    "search": "Search",
-    "searchPlaceholder": "Search by description...",
-    "dateRange": "Date Range",
-    "amountRange": "Amount Range",
-    "minAmount": "Min",
-    "maxAmount": "Max",
-    "allCategories": "All Categories"
+    "sortAmountAsc": "Amount ↑"
   },
   "export": {
     "title": "Export Reports",
@@ -610,20 +605,12 @@
     "error": "Unable to load forecast"
   },
   "dateRange": {
-    "thisWeek": "This Week",
     "thisMonth": "This Month",
     "lastMonth": "Last Month",
     "last3Months": "Last 3 Months",
     "last6Months": "Last 6 Months",
     "thisYear": "This Year",
-    "allTime": "All Time",
-    "custom": "Custom"
-  },
-  "filter": {
-    "category": "Category",
-    "source": "Source",
-    "min": "Min",
-    "max": "Max"
+    "allTime": "All Time"
   },
   "kpi": {
     "thisMonthIncome": "Income this month",

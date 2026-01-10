@@ -182,14 +182,7 @@
     "sortDateDesc": "Ngày ↓",
     "sortDateAsc": "Ngày ↑",
     "sortAmountDesc": "Số tiền ↓",
-    "sortAmountAsc": "Số tiền ↑",
-    "search": "Tìm kiếm",
-    "searchPlaceholder": "Tìm kiếm theo mô tả...",
-    "dateRange": "Phạm vi ngày",
-    "amountRange": "Phạm vi số tiền",
-    "minAmount": "Tối thiểu",
-    "maxAmount": "Tối đa",
-    "allCategories": "Tất cả danh mục"
+    "sortAmountAsc": "Số tiền ↑"
   },
   "upload": {
     "title": "Tải lên CSV",
@@ -574,15 +567,7 @@
     "last3Months": "3 tháng qua",
     "last6Months": "6 tháng qua",
     "thisYear": "Năm nay",
-    "allTime": "Toàn bộ",
-    "thisWeek": "Tuần này",
-    "custom": "Tùy chỉnh"
-  },
-  "filter": {
-    "category": "Danh mục",
-    "source": "Nguồn",
-    "min": "Tối thiểu",
-    "max": "Tối đa"
+    "allTime": "Toàn bộ"
   },
   "kpi": {
     "thisMonthIncome": "Thu nhập tháng này",
