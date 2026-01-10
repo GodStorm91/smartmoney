@@ -86,7 +86,7 @@ export function VoiceInputButton({ onTransactionParsed, className }: VoiceInputB
   if (showPreview && parsedResult) {
     const modalContent = (
       <div className={cn(
-        'fixed inset-0 z-[100000] flex items-center justify-center bg-black/50',
+        'fixed inset-0 z-[100001] flex items-center justify-center bg-black/50',
         className
       )}>
         <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-xl">

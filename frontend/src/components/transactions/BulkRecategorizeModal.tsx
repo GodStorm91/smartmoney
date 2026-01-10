@@ -46,7 +46,7 @@ export function BulkRecategorizeModal({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100001] flex items-center justify-center p-4"
 
     >
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />

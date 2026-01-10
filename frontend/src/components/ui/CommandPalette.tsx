@@ -117,7 +117,7 @@ export function CommandPalette({
       open={open}
       onOpenChange={onOpenChange}
       label={t('commandPalette.label', 'Command Palette')}
-      className="fixed inset-0 z-[100000] overflow-hidden"
+      className="fixed inset-0 z-[100001] overflow-hidden"
       style={{ touchAction: 'pan-y' }}
     >
       {/* Backdrop */}

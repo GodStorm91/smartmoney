@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy": "npm run build && rm -rf ../deploy/frontend-dist/* && cp -r dist/* ../deploy/frontend-dist/ && chmod -R 755 ../deploy/frontend-dist/locales/",
     "lint": "eslint .",
     "preview": "vite preview"
   },

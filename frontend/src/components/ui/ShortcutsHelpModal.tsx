@@ -51,7 +51,7 @@ export function ShortcutsHelpModal({ open, onClose }: ShortcutsHelpModalProps) {
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-[100000] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[100001] flex items-center justify-center p-4"
 
     >
       {/* Backdrop */}
