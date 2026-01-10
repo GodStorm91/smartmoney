@@ -182,7 +182,14 @@
     "sortDateDesc": "日付 ↓",
     "sortDateAsc": "日付 ↑",
     "sortAmountDesc": "金額 ↓",
-    "sortAmountAsc": "金額 ↑"
+    "sortAmountAsc": "金額 ↑",
+    "search": "検索",
+    "searchPlaceholder": "内容で検索...",
+    "dateRange": "日付範囲",
+    "amountRange": "金額範囲",
+    "minAmount": "最小",
+    "maxAmount": "最大",
+    "allCategories": "すべてのカテゴリー"
   },
   "transaction": {
     "addTransaction": "取引を追加",
@@ -567,7 +574,15 @@
     "last3Months": "過去3ヶ月",
     "last6Months": "過去6ヶ月",
     "thisYear": "今年",
-    "allTime": "全期間"
+    "allTime": "全期間",
+    "thisWeek": "今週",
+    "custom": "カスタム"
+  },
+  "filter": {
+    "category": "カテゴリー",
+    "source": "ソース",
+    "min": "最小",
+    "max": "最大"
   },
   "kpi": {
     "thisMonthIncome": "今月の収入",
