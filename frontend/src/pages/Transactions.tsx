@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -73,6 +73,103 @@ export function Transactions() {
   })
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebouncedValue(searchInput, 300)
+
+  // Amount range state
+  const [minAmount, setMinAmount] = useState('')
+  const [maxAmount, setMaxAmount] = useState('')
+
+  // Quick date presets
+  type DatePreset = 'today' | 'thisWeek' | 'thisMonth' | 'lastMonth' | 'last3Months' | 'custom'
+  const [datePreset, setDatePreset] = useState<DatePreset>('thisMonth')
+
+  // Helper to get date preset range
+  const getDatePresetRange = (preset: DatePreset): { start: string; end: string } => {
+    const today = new Date()
+    let start: Date
+    let end: Date = today
+
+    switch (preset) {
+      case 'today':
+        start = today
+        break
+      case 'thisWeek':
+        start = new Date(today)
+        start.setDate(today.getDate() - today.getDay()) // Sunday
+        break
+      case 'thisMonth':
+        start = new Date(today.getFullYear(), today.getMonth(), 1)
+        break
+      case 'lastMonth':
+        start = new Date(today.getFullYear(), today.getMonth() - 1, 1)
+        end = new Date(today.getFullYear(), today.getMonth(), 0)
+        break
+      case 'last3Months':
+        start = new Date(today.getFullYear(), today.getMonth() - 3, 1)
+        break
+      default:
+        start = new Date(today.getFullYear(), today.getMonth(), 1)
+    }
+
+    return {
+      start: start.toISOString().split('T')[0],
+      end: end.toISOString().split('T')[0],
+    }
+  }
+
+  // Handle date preset change
+  const handleDatePresetChange = (preset: DatePreset) => {
+    setDatePreset(preset)
+    if (preset !== 'custom') {
+      const range = getDatePresetRange(preset)
+      setFilters(prev => ({ ...prev, start_date: range.start, end_date: range.end }))
+    }
+  }
+
+  // Handle amount range change
+  const handleAmountChange = (type: 'min' | 'max', value: string) => {
+    const numValue = value ? parseFloat(value) : undefined
+    if (type === 'min') {
+      setMinAmount(value)
+      setFilters(prev => ({ ...prev, min_amount: numValue }))
+    } else {
+      setMaxAmount(value)
+      setFilters(prev => ({ ...prev, max_amount: numValue }))
+    }
+  }
+
+  // Clear individual filter
+  const clearFilter = (key: keyof TransactionFilters) => {
+    setFilters(prev => {
+      const next = { ...prev }
+      if (key === 'categories') next.categories = []
+      else if (key === 'source') next.source = ''
+      else if (key === 'type') next.type = 'all'
+      else if (key === 'search') {
+        setSearchInput('')
+        next.search = undefined
+      }
+      else if (key === 'min_amount') {
+        setMinAmount('')
+        next.min_amount = undefined
+      }
+      else if (key === 'max_amount') {
+        setMaxAmount('')
+        next.max_amount = undefined
+      }
+      else delete (next as any)[key]
+      return next
+    })
+  }
+
+  // Check if filter is active
+  const isFilterActive = (key: keyof TransactionFilters): boolean => {
+    const val = filters[key]
+    if (key === 'categories') return !!(val && (val as string[]).length > 0)
+    if (key === 'type') return val !== 'all'
+    if (key === 'source') return !!val
+    if (key === 'min_amount' || key === 'max_amount') return val !== undefined
+    return !!val
+  }
 
   // Sorting state
   type SortField = 'date' | 'description' | 'category' | 'source' | 'amount'
@@ -433,57 +530,205 @@ export function Transactions() {
 
       {/* Filters */}
       <Card className="mb-6">
-        {/* Search */}
+        {/* Search with clear button */}
         <div className="mb-4">
-          <Input
-            label={t('transactions.search', 'Search')}
-            placeholder={t('transactions.searchPlaceholder', 'Search by description...')}
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
+          <div className="relative">
+            <Input
+              label={t('transactions.search', 'Search')}
+              placeholder={t('transactions.searchPlaceholder', 'Search by description...')}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            {searchInput && (
+              <button
+                onClick={() => { setSearchInput(''); clearFilter('search') }}
+                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                aria-label="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Date Range */}
+        {/* Quick Date Presets */}
         <div className="mb-4">
-          <DateRangePicker
-            startDate={filters.start_date || ''}
-            endDate={filters.end_date || ''}
-            onRangeChange={(start, end) => setFilters({ ...filters, start_date: start, end_date: end })}
-          />
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t('transactions.dateRange', 'Date Range')}
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {([
+              { key: 'thisWeek', label: t('date.thisWeek', 'This Week') },
+              { key: 'thisMonth', label: t('date.thisMonth', 'This Month') },
+              { key: 'lastMonth', label: t('date.lastMonth', 'Last Month') },
+              { key: 'last3Months', label: t('date.last3Months', 'Last 3 Months') },
+              { key: 'custom', label: t('date.custom', 'Custom') },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => handleDatePresetChange(key)}
+                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                  datePreset === key
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Date Range (shown when custom selected) */}
+        {datePreset === 'custom' && (
+          <div className="mb-4">
+            <DateRangePicker
+              startDate={filters.start_date || ''}
+              endDate={filters.end_date || ''}
+              onRangeChange={(start, end) => {
+                setFilters({ ...filters, start_date: start, end_date: end })
+              }}
+            />
+          </div>
+        )}
+
+        {/* Amount Range */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t('transactions.amountRange', 'Amount Range')}
+          </label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="relative">
+              <Input
+                type="number"
+                placeholder={t('transactions.minAmount', 'Min')}
+                value={minAmount}
+                onChange={(e) => handleAmountChange('min', e.target.value)}
+              />
+              {minAmount && (
+                <button
+                  onClick={() => handleAmountChange('min', '')}
+                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear min"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <div className="relative">
+              <Input
+                type="number"
+                placeholder={t('transactions.maxAmount', 'Max')}
+                value={maxAmount}
+                onChange={(e) => handleAmountChange('max', e.target.value)}
+              />
+              {maxAmount && (
+                <button
+                  onClick={() => handleAmountChange('max', '')}
+                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                  aria-label="Clear max"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Category & Source */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <MultiSelect
-            label={t('transactions.category', 'Category')}
-            options={categoryOptions}
-            selected={filters.categories || []}
-            onChange={(categories) => setFilters({ ...filters, categories })}
-            placeholder={t('transactions.allCategories', 'All categories')}
-          />
-          <Select
-            label={t('transactions.source', 'Source')}
-            value={filters.source || ''}
-            onChange={(e) => setFilters({ ...filters, source: e.target.value })}
-            options={[
-              { value: '', label: t('transactions.all', 'All') },
-              { value: '楽天カード', label: t('transactions.sourceRakuten', 'Rakuten Card') },
-            ]}
-          />
+          <div className="relative">
+            <MultiSelect
+              label={t('transactions.category', 'Category')}
+              options={categoryOptions}
+              selected={filters.categories || []}
+              onChange={(categories) => setFilters({ ...filters, categories })}
+              placeholder={t('transactions.allCategories', 'All categories')}
+            />
+            {(filters.categories?.length ?? 0) > 0 && (
+              <button
+                onClick={() => clearFilter('categories')}
+                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label="Clear categories"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <Select
+              label={t('transactions.source', 'Source')}
+              value={filters.source || ''}
+              onChange={(e) => setFilters({ ...filters, source: e.target.value })}
+              options={[
+                { value: '', label: t('transactions.all', 'All') },
+                ...(accounts?.map(a => ({ value: a.name, label: a.name })) || []),
+              ]}
+            />
+            {filters.source && (
+              <button
+                onClick={() => clearFilter('source')}
+                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
+                aria-label="Clear source"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-4 flex gap-3">
-          <Button variant="outline" onClick={handleReset}>
-            {t('button.reset', 'Reset')}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
-            disabled={!transactions || transactions.length === 0}
-          >
-            {t('transactions.export', 'Export')}
-          </Button>
+        {/* Active Filters & Action Buttons */}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          {/* Active filter badges */}
+          {(isFilterActive('categories') || isFilterActive('source') || isFilterActive('min_amount') || isFilterActive('max_amount')) && (
+            <div className="flex flex-wrap gap-2">
+              {isFilterActive('categories') && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+                  {t('filter.category')}: {filters.categories?.length}
+                  <button onClick={() => clearFilter('categories')} className="hover:text-blue-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {isFilterActive('source') && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
+                  {t('filter.source')}: {filters.source}
+                  <button onClick={() => clearFilter('source')} className="hover:text-green-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {isFilterActive('min_amount') && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
+                  {t('filter.min')}: {filters.min_amount}
+                  <button onClick={() => clearFilter('min_amount')} className="hover:text-purple-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {isFilterActive('max_amount') && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
+                  {t('filter.max')}: {filters.max_amount}
+                  <button onClick={() => clearFilter('max_amount')} className="hover:text-purple-900">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="flex gap-3 ml-auto">
+            <Button variant="outline" onClick={handleReset}>
+              {t('button.reset', 'Reset')}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
+              disabled={!transactions || transactions.length === 0}
+            >
+              {t('transactions.export', 'Export')}
+            </Button>
+          </div>
         </div>
       </Card>
 

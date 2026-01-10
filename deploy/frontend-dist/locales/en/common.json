@@ -182,7 +182,14 @@
     "sortDateDesc": "Date ↓",
     "sortDateAsc": "Date ↑",
     "sortAmountDesc": "Amount ↓",
-    "sortAmountAsc": "Amount ↑"
+    "sortAmountAsc": "Amount ↑",
+    "search": "Search",
+    "searchPlaceholder": "Search by description...",
+    "dateRange": "Date Range",
+    "amountRange": "Amount Range",
+    "minAmount": "Min",
+    "maxAmount": "Max",
+    "allCategories": "All Categories"
   },
   "export": {
     "title": "Export Reports",
@@ -603,12 +610,20 @@
     "error": "Unable to load forecast"
   },
   "dateRange": {
+    "thisWeek": "This Week",
     "thisMonth": "This Month",
     "lastMonth": "Last Month",
     "last3Months": "Last 3 Months",
     "last6Months": "Last 6 Months",
     "thisYear": "This Year",
-    "allTime": "All Time"
+    "allTime": "All Time",
+    "custom": "Custom"
+  },
+  "filter": {
+    "category": "Category",
+    "source": "Source",
+    "min": "Min",
+    "max": "Max"
   },
   "kpi": {
     "thisMonthIncome": "Income this month",

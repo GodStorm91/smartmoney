@@ -62,6 +62,8 @@ export async function fetchTransactions(
     params.append('is_income', filters.type === 'income' ? 'true' : 'false')
   }
   if (filters?.search) params.append('search', filters.search)
+  if (filters?.min_amount !== undefined) params.append('min_amount', filters.min_amount.toString())
+  if (filters?.max_amount !== undefined) params.append('max_amount', filters.max_amount.toString())
 
   // Request all transactions (up to 5000) to show complete filtered results
   params.append('limit', '5000')

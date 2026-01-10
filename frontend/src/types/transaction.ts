@@ -22,6 +22,8 @@ export interface TransactionFilters {
   source?: string
   type?: 'income' | 'expense' | 'all'
   search?: string
+  min_amount?: number
+  max_amount?: number
 }
 
 export interface DateRange {
