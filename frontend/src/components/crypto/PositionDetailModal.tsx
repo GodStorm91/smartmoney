@@ -515,7 +515,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
       {/* Modal */}
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90dvh] overflow-y-auto overflow-x-hidden"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90dvh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -602,7 +602,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
         </div>
 
         {/* Content */}
-        <div className="p-4 overflow-y-auto overflow-x-hidden max-h-[calc(90vh-120px)] space-y-4">
+        <div className="p-4 space-y-4">
           {isLoading ? (
             <div className="flex justify-center py-12">
               <LoadingSpinner size="lg" />
