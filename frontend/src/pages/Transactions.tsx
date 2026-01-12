@@ -14,6 +14,7 @@ import { MultiSelect } from '@/components/ui/MultiSelect'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
 import { QuickEntryFAB } from '@/components/transactions/QuickEntryFAB'
+import { AddTransactionFAB } from '@/components/transactions/AddTransactionFAB'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
 import { BulkRecategorizeModal } from '@/components/transactions/BulkRecategorizeModal'
@@ -51,7 +52,7 @@ export function Transactions() {
   const monthRange = getCurrentMonthRange()
   const { data: accounts } = useAccounts()
 
-  const { categories: categoriesParam, month: monthParam, accountId, fromAccounts, type: typeParam } = useSearch({
+  const { categories: categoriesParam, month: monthParam, accountId, fromAccounts, type: typeParam, action: actionParam } = useSearch({
     from: '/transactions',
   })
 
@@ -244,6 +245,16 @@ export function Transactions() {
   useEffect(() => {
     setSelectedIds(new Set())
   }, [transactions])
+
+  useEffect(() => {
+    if (actionParam === 'add-transaction') {
+      setIsAddModalOpen(true)
+      navigate({ to: '/transactions', search: (prev) => ({ ...prev, action: undefined }) })
+    } else if (actionParam === 'scan-receipt') {
+      setIsReceiptScannerOpen(true)
+      navigate({ to: '/transactions', search: (prev) => ({ ...prev, action: undefined }) })
+    }
+  }, [actionParam, navigate])
 
   useEffect(() => {
     const handleOpenAddTransaction = () => {
@@ -976,8 +987,9 @@ export function Transactions() {
         onScanComplete={handleReceiptScanComplete}
       />
 
-      {/* FAB Buttons */}
+      {/* FAB Buttons - positioned to not overlap */}
       <QuickEntryFAB />
+      <AddTransactionFAB onClick={() => setIsAddModalOpen(true)} />
     </div>
   )
 }

@@ -7,6 +7,7 @@ type TransactionsSearch = {
   accountId?: number   // Filter by account ID
   fromAccounts?: boolean  // Show back to accounts button
   type?: 'income' | 'expense'  // Filter by transaction type
+  action?: 'add-transaction' | 'scan-receipt'  // Open modals from other pages
 }
 
 export const Route = createFileRoute('/transactions')({
@@ -17,5 +18,6 @@ export const Route = createFileRoute('/transactions')({
                (typeof search.accountId === 'string' && !isNaN(Number(search.accountId)) ? Number(search.accountId) : undefined),
     fromAccounts: search.fromAccounts === true || search.fromAccounts === 'true',
     type: search.type === 'income' || search.type === 'expense' ? search.type : undefined,
+    action: search.action === 'add-transaction' || search.action === 'scan-receipt' ? search.action : undefined,
   }),
 })

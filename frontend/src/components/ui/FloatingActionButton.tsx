@@ -38,7 +38,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
         if (onAddTransaction) {
           onAddTransaction()
         } else {
-          navigate({ to: '/transactions' })
+          navigate({ to: '/transactions', search: { action: 'add-transaction' } })
         }
       },
       color: 'bg-green-500 hover:bg-green-600',
@@ -48,7 +48,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
       label: t('receipt.scanReceipt', 'Scan Receipt'),
       onClick: () => {
         setIsOpen(false)
-        navigate({ to: '/transactions' })
+        navigate({ to: '/transactions', search: { action: 'scan-receipt' } })
       },
       color: 'bg-purple-500 hover:bg-purple-600',
     },

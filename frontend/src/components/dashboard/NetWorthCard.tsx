@@ -99,82 +99,94 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
 
   return (
     <div
-      className="mb-6 cursor-pointer"
+      className="mb-6 cursor-pointer group"
       onClick={() => setShowBreakdown(!showBreakdown)}
     >
-      <Card className="hover:shadow-md transition-shadow bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="text-center py-2">
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
-          {t('dashboard.netWorth', 'Net Worth')}
-        </p>
-        <p className={cn(
-          'text-4xl sm:text-5xl font-bold font-numbers tracking-tight',
-          netWorth >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-        )}>
-          <CountUp
-            end={netWorth}
-            duration={1200}
-            formatter={currencyFormatter}
-          />
-        </p>
-
-        {/* Monthly Net Trend Indicator */}
-        {monthlyNet !== undefined && (
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              {t('dashboard.thisMonth', 'This month')}:
-            </span>
-            <span className={cn(
-              'flex items-center gap-1 text-sm font-medium',
-              monthlyNet >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            )}>
-              {monthlyNet >= 0 ? (
-                <TrendingUp size={14} />
-              ) : (
-                <TrendingDown size={14} />
-              )}
-              {monthlyNet >= 0 ? '+' : ''}{formatCurrencyPrivacy(monthlyNet, currency, rates, false, isPrivacyMode)}
-            </span>
-            {monthlyNetChange !== undefined && monthlyNetChange !== null && (
-              <span className={cn(
-                'flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full',
-                monthlyNetChange > 0
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                  : monthlyNetChange < 0
-                    ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-              )}>
-                {monthlyNetChange > 0 ? <TrendingUp size={10} /> : monthlyNetChange < 0 ? <TrendingDown size={10} /> : <Minus size={10} />}
-                {monthlyNetChange > 0 ? '+' : ''}{monthlyNetChange?.toFixed(0)}%
-              </span>
-            )}
-          </div>
-        )}
-
-        {showBreakdown && (
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 text-sm">
-            <div className="flex justify-between mb-2">
-              <span className="text-gray-600 dark:text-gray-400">{t('dashboard.assets', 'Assets')}</span>
-              <span className="font-numbers text-green-600 dark:text-green-400">
-                {formatCurrencyPrivacy(assets, currency, rates, false, isPrivacyMode)}
-              </span>
+      <Card
+        variant="gradient"
+        className="relative overflow-hidden group-hover:shadow-lg transition-all duration-300"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="relative">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="p-2 rounded-full bg-primary-100 dark:bg-primary-900/30">
+              <TrendingUp className="w-4 h-4 text-primary-600 dark:text-primary-400" />
             </div>
-            {cryptoBalanceJpy > 0 && (
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600 dark:text-gray-400">{t('crypto.totalBalance', 'Crypto')}</span>
-                <span className="font-numbers text-purple-600 dark:text-purple-400">
-                  {formatCurrencyPrivacy(cryptoBalanceJpy, currency, rates, false, isPrivacyMode)}
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t('dashboard.netWorth', 'Net Worth')}
+            </p>
+          </div>
+          <p className={cn(
+            'text-4xl sm:text-5xl font-bold font-numbers tracking-tight text-center',
+            netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400'
+          )}>
+            <CountUp
+              end={netWorth}
+              duration={1200}
+              formatter={currencyFormatter}
+            />
+          </p>
+
+          {monthlyNet !== undefined && (
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <div className={cn(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
+                monthlyNet >= 0
+                  ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
+                  : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+              )}>
+                {monthlyNet >= 0 ? (
+                  <TrendingUp size={14} />
+                ) : (
+                  <TrendingDown size={14} />
+                )}
+                <span className="font-numbers">
+                  {monthlyNet >= 0 ? '+' : ''}{formatCurrencyPrivacy(monthlyNet, currency, rates, false, isPrivacyMode)}
                 </span>
               </div>
-            )}
-            <div className="flex justify-between">
-              <span className="text-gray-600 dark:text-gray-400">{t('dashboard.liabilities', 'Liabilities')}</span>
-              <span className="font-numbers text-red-600 dark:text-red-400">
-                -{formatCurrencyPrivacy(liabilities, currency, rates, false, isPrivacyMode)}
-              </span>
+              {monthlyNetChange !== undefined && monthlyNetChange !== null && (
+                <div className={cn(
+                  'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium',
+                  monthlyNetChange > 0
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                    : monthlyNetChange < 0
+                      ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                      : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                )}>
+                  {monthlyNetChange > 0 ? <TrendingUp size={12} /> : monthlyNetChange < 0 ? <TrendingDown size={12} /> : <Minus size={12} />}
+                  <span className="font-numbers">{monthlyNetChange > 0 ? '+' : ''}{monthlyNetChange?.toFixed(0)}%</span>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          )}
+
+          {showBreakdown && (
+            <div className="mt-5 pt-5 border-t border-gray-200/50 dark:border-gray-700/50">
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="text-center">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('dashboard.assets', 'Assets')}</p>
+                  <p className="font-semibold font-numbers text-green-600 dark:text-green-400">
+                    {formatCurrencyPrivacy(assets, currency, rates, false, isPrivacyMode)}
+                  </p>
+                </div>
+                {cryptoBalanceJpy > 0 && (
+                  <div className="text-center">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('crypto.totalBalance', 'Crypto')}</p>
+                    <p className="font-semibold font-numbers text-purple-600 dark:text-purple-400">
+                      {formatCurrencyPrivacy(cryptoBalanceJpy, currency, rates, false, isPrivacyMode)}
+                    </p>
+                  </div>
+                )}
+                <div className="text-center">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('dashboard.liabilities', 'Liabilities')}</p>
+                  <p className="font-semibold font-numbers text-red-600 dark:text-red-400">
+                    -{formatCurrencyPrivacy(liabilities, currency, rates, false, isPrivacyMode)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>

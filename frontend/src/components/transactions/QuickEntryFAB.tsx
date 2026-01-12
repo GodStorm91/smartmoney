@@ -11,6 +11,7 @@
  */
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Plus, X, Delete, Mic, Search, Receipt, CreditCard } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -46,6 +47,7 @@ type Step = 'closed' | 'amount' | 'category' | 'account'
 
 export function QuickEntryFAB() {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
   const { data: accounts } = useAccounts()
   const rates = useRatesMap()
 
@@ -327,11 +329,9 @@ export function QuickEntryFAB() {
     setShowMenu(false)
     isLongPress.current = false
     if (action === 'transaction') {
-      // Dispatch event to open add transaction modal (no page navigation)
-      window.dispatchEvent(new CustomEvent('open-add-transaction-modal'))
+      navigate({ to: '/transactions', search: { action: 'add-transaction' } })
     } else if (action === 'receipt') {
-      // Dispatch event to open receipt scanner
-      window.dispatchEvent(new CustomEvent('open-receipt-scanner'))
+      navigate({ to: '/transactions', search: { action: 'scan-receipt' } })
     }
   }
 

@@ -17,15 +17,16 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const navItems = [
   { path: '/', icon: Home, labelKey: 'nav.home' },
-  { path: '/transactions', icon: Receipt, labelKey: 'nav.transactions' },
+  { path: '/budget', icon: TrendingUp, labelKey: 'nav.budget' },
   { path: '/accounts', icon: Wallet, labelKey: 'nav.accounts' },
-  { path: '/goals', icon: Target, labelKey: 'nav.goals' },
-  { path: '/settings', icon: Settings, labelKey: 'nav.settings' },
+  { path: '/transactions', icon: Receipt, labelKey: 'nav.transactions' },
 ]
 
 const moreMenuItems = [
-  { path: '/upload', icon: Upload, labelKey: 'header.upload' },
   { path: '/analytics', icon: TrendingUp, labelKey: 'nav.analytics' },
+  { path: '/goals', icon: Target, labelKey: 'nav.goals' },
+  { path: '/settings', icon: Settings, labelKey: 'nav.settings' },
+  { path: '/upload', icon: Upload, labelKey: 'header.upload' },
 ]
 
 export function BottomNavigation() {
@@ -85,7 +86,7 @@ export function BottomNavigation() {
       )}
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-40 md:hidden safe-area-bottom">
-        <div className="flex items-stretch justify-around h-[68px]">
+        <div className="flex items-stretch justify-around h-16">
           {navItems.map((item) => {
             const active = isActive(item.path)
 

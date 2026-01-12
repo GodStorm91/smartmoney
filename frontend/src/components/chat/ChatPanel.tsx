@@ -153,7 +153,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-[99] sm:hidden"
+          className="fixed inset-0 bg-black/30 z-[99]"
           onClick={onClose}
         />
       )}
