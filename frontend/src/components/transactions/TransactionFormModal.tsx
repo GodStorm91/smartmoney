@@ -290,12 +290,12 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-50 bg-black/50 animate-modal-backdrop"
+      className="fixed inset-0 z-[100002] bg-black/50 animate-modal-backdrop"
       onClick={handleBackdropClick}
     >
       <div
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50',
+          'fixed inset-x-0 bottom-0 z-[100002]',
           'bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl',
           'max-h-[90vh] overflow-y-auto',
           'animate-modal-in'
