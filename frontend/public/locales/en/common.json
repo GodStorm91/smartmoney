@@ -12,6 +12,7 @@
   },
   "nav": {
     "home": "Home",
+    "budget": "Budget",
     "transactions": "Transactions",
     "accounts": "Accounts",
     "goals": "Goals",

@@ -12,6 +12,7 @@
   },
   "nav": {
     "home": "ホーム",
+    "budget": "予算",
     "transactions": "取引",
     "accounts": "口座",
     "goals": "目標",
