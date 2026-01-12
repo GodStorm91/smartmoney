@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, X, Filter, ChevronDown, Camera } from 'lucide-react'
+import { ArrowLeft, X, Filter, ChevronDown } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -978,15 +978,6 @@ export function Transactions() {
 
       {/* FAB Buttons */}
       <QuickEntryFAB />
-
-      {/* Direct Scan Button */}
-      <button
-        onClick={() => setIsReceiptScannerOpen(true)}
-        className="fixed bottom-28 right-16 sm:bottom-6 sm:right-20 z-40 w-12 h-12 rounded-full bg-purple-500 text-white shadow-lg flex items-center justify-center hover:bg-purple-600 active:scale-95 transition-all md:hidden"
-        aria-label={t('receipt.scanReceipt', 'Scan Receipt')}
-      >
-        <Camera size={20} />
-      </button>
     </div>
   )
 }
