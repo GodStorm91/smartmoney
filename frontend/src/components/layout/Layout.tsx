@@ -3,7 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { BottomNavigation } from './BottomNavigation'
-import { ChatFAB, ChatPanel } from '@/components/chat'
+import { ChatPanel } from '@/components/chat'
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { CommandPalette } from '@/components/ui/CommandPalette'
@@ -16,7 +16,6 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate()
-  const [isChatOpen, setIsChatOpen] = useState(false)
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false)
 
@@ -56,7 +55,6 @@ export function Layout({ children }: LayoutProps) {
       callback: () => {
         if (isCommandPaletteOpen) setIsCommandPaletteOpen(false)
         else if (isShortcutsModalOpen) setIsShortcutsModalOpen(false)
-        else if (isChatOpen) setIsChatOpen(false)
         setPendingNavKey(null)
       },
       description: 'Close modal',
@@ -126,10 +124,6 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Quick Actions FAB (mobile only) */}
       <FloatingActionButton />
-
-      {/* AI Chat Assistant */}
-      <ChatFAB onClick={() => setIsChatOpen(true)} />
-      <ChatPanel isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
 
       {/* Command Palette */}
       <CommandPalette
