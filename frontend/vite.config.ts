@@ -1,12 +1,23 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import { VitePWA } from 'vite-plugin-pwa'
+import compression from 'vite-plugin-compression'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug'],
+      },
+    },
+    cssMinify: true,
     rollupOptions: {
       output: {
         manualChunks: {
@@ -29,6 +40,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 300,
   },
   plugins: [
+    compression({ algorithm: 'brotliCompress', ext: '.br' }),
+    compression({ algorithm: 'gzip', ext: '.gz' }),
     react(),
     TanStackRouterVite(),
     VitePWA({
@@ -105,5 +118,10 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
   },
 })

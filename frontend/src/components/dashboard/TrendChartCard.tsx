@@ -3,17 +3,19 @@ import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { TrendLineChartLazy, ZoomableChartLazy } from '@/components/charts/LazyCharts'
 import type { MonthlyData } from '@/types'
+import { cn } from '@/utils/cn'
 
 interface TrendChartCardProps {
   data?: MonthlyData[]
+  className?: string
 }
 
-export function TrendChartCard({ data }: TrendChartCardProps) {
+export function TrendChartCard({ data, className }: TrendChartCardProps) {
   const { t } = useTranslation('common')
   const [selectedMetric, setSelectedMetric] = useState<'net' | 'income' | 'expense'>('net')
 
   return (
-    <Card className="lg:col-span-2">
+    <Card className={cn('', className)}>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('chart.trend12months')}</h3>
         <div className="flex items-center gap-2">

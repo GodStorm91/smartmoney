@@ -11,9 +11,11 @@
     "settings": "Cài đặt"
   },
   "nav": {
-    "dashboard": "Trang chủ",
+    "home": "Trang chủ",
     "transactions": "Giao dịch",
-    "budget": "Ngân sách",
+    "accounts": "Tài khoản",
+    "goals": "Mục tiêu",
+    "settings": "Cài đặt",
     "analytics": "Phân tích",
     "more": "Thêm"
   },
@@ -27,8 +29,15 @@
     "close": "Đóng",
     "apply": "Áp dụng bộ lọc",
     "reset": "Đặt lại",
+    "filter": "Lọc",
     "selectFile": "Chọn tệp",
     "addMore": "Thêm"
+  },
+  "filter": {
+    "category": "Danh mục",
+    "source": "Nguồn",
+    "min": "Tối thiểu",
+    "max": "Tối đa"
   },
   "language": {
     "selectLanguage": "Chọn ngôn ngữ",
@@ -397,7 +406,11 @@
     "today": "Hôm nay",
     "back": "Quay lại",
     "optional": "Tùy chọn",
-    "backToAccounts": "Quay lại Tài khoản"
+    "backToAccounts": "Quay lại Tài khoản",
+    "undo": "Hoàn tác",
+    "export": "Xuất",
+    "previous": "Trước",
+    "next": "Sau"
   },
   "autocomplete": {
     "used": "lần dùng"
@@ -869,7 +882,34 @@
       "projectedSavings": "Dự báo tiết kiệm",
       "onTrack": "Đang trên đà đạt mục tiêu tiết kiệm!",
       "offTrack": "Có nguy cơ thiếu {{amount}} so với mục tiêu"
-    }
+    },
+    "addCategory": "Thêm Danh Mục",
+    "selectCategory": "Chọn danh mục",
+    "customCategory": "Danh mục tùy chỉnh",
+    "categoryName": "Tên Danh Mục",
+    "categoryPlaceholder": "Nhập tên danh mục",
+    "add": "Thêm",
+    "remainingBudget": "Ngân sách còn lại",
+    "suggestAmount": "Đề xuất {{amount}}",
+    "groupNone": "Không",
+    "groupNeedsWants": "Nhu Cầu/Mong Muốn",
+    "sortPriority": "Ưu tiên",
+    "sortAmount": "Số tiền",
+    "needs": "Nhu Cầu",
+    "wants": "Mong Muốn",
+    "savings": "Tiết Kiệm",
+    "health": {
+      "title": "Sức Khỏe Ngân Sách",
+      "onTrack": "Đúng hướng",
+      "overAllocated": "Phân bổ quá",
+      "almostFull": "Gần đầy",
+      "warningNearLimit": "Cảnh báo: Gần giới hạn",
+      "exceededTotal": "Vượt tổng ngân sách",
+      "overBudget": "{{count}} danh mục vượt ngân sách",
+      "totalBudget": "Tổng Ngân Sách"
+    },
+    "undo": "Hoàn tác",
+    "export": "Xuất"
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",

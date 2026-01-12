@@ -2,8 +2,9 @@ import { useState, useRef, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Pencil, Trash2 } from 'lucide-react'
+import { AlertTriangle, Pencil, Trash2, Plus, ArrowUp, ArrowDown, LayoutGrid } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 import { useCategoryTree } from '@/hooks/useCategories'
@@ -17,8 +18,12 @@ interface BudgetAllocationListProps {
   tracking?: BudgetTracking
   month?: string
   isDraft?: boolean
+  onAddCategory?: () => void
   onAllocationChange?: (updatedAllocations: BudgetAllocation[]) => void
 }
+
+type SortOption = 'priority' | 'amount' | 'category' | 'percentage'
+type GroupOption = 'none' | 'needs-wants'
 
 export function BudgetAllocationList({
   budgetId,
@@ -27,14 +32,17 @@ export function BudgetAllocationList({
   tracking,
   month,
   isDraft,
+  onAddCategory,
   onAllocationChange
 }: BudgetAllocationListProps) {
   const { t } = useTranslation('common')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: categoryTree } = useCategoryTree()
+  const [sortBy, setSortBy] = useState<SortOption>('priority')
+  const [groupBy, setGroupBy] = useState<GroupOption>('none')
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
-  // Build a map of parent category -> all child category names
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()
     if (!categoryTree) return map
@@ -52,7 +60,6 @@ export function BudgetAllocationList({
     return map
   }, [categoryTree])
 
-  // Create a map of tracking items by category for quick lookup
   const trackingMap = new Map<string, BudgetTrackingItem>()
   if (tracking?.categories) {
     tracking.categories.forEach(item => {
@@ -60,7 +67,6 @@ export function BudgetAllocationList({
     })
   }
 
-  // Update allocation mutation (for saved budgets)
   const updateMutation = useMutation({
     mutationFn: ({ category, amount }: { category: string; amount: number }) =>
       updateAllocation(budgetId, category, amount),
@@ -69,7 +75,6 @@ export function BudgetAllocationList({
     },
   })
 
-  // Delete allocation mutation
   const deleteMutation = useMutation({
     mutationFn: (category: string) => deleteAllocation(budgetId, category),
     onSuccess: () => {
@@ -77,60 +82,206 @@ export function BudgetAllocationList({
     },
   })
 
-  // Navigate to transactions filtered by category and month
   const handleCategoryClick = (category: string) => {
     const children = parentToChildrenMap.get(category) || []
     const categories = [category, ...children].join(',')
-
     navigate({
       to: '/transactions',
       search: { categories, month: month || undefined }
     })
   }
 
+  const categorizeAllocation = (allocation: BudgetAllocation): 'need' | 'want' | 'savings' => {
+    const category = allocation.category.toLowerCase()
+    const needsKeywords = ['housing', 'rent', 'utilities', 'electric', 'gas', 'water', 'internet', 'phone', 'insurance', 'groceries', 'transportation', 'medical', 'health']
+    const savingsKeywords = ['savings', 'investment', 'retirement', 'emergency', 'fund']
+
+    if (savingsKeywords.some(k => category.includes(k))) return 'savings'
+    if (needsKeywords.some(k => category.includes(k))) return 'need'
+    return 'want'
+  }
+
+  const sortedAllocations = useMemo(() => {
+    let sorted = [...allocations]
+
+    sorted.sort((a, b) => {
+      const trackingA = trackingMap.get(a.category)
+      const trackingB = trackingMap.get(b.category)
+      const spentA = trackingA?.spent || 0
+      const spentB = trackingB?.spent || 0
+      const budgetedA = trackingA?.budgeted || a.amount
+      const budgetedB = trackingB?.budgeted || b.amount
+      const percentA = budgetedA > 0 ? spentA / budgetedA : 0
+      const percentB = budgetedB > 0 ? spentB / budgetedB : 0
+      const overA = spentA - budgetedA
+      const overB = spentB - budgetedB
+
+      let comparison = 0
+
+      switch (sortBy) {
+        case 'priority':
+          comparison = overB - overA
+          if (comparison === 0) comparison = percentB - percentA
+          break
+        case 'amount':
+          comparison = b.amount - a.amount
+          break
+        case 'category':
+          comparison = a.category.localeCompare(b.category)
+          break
+        case 'percentage':
+          comparison = percentB - percentA
+          break
+      }
+
+      return sortDirection === 'asc' ? -comparison : comparison
+    })
+
+    return sorted
+  }, [allocations, sortBy, sortDirection, trackingMap])
+
+  const groupedAllocations = useMemo(() => {
+    if (groupBy === 'none') return { default: sortedAllocations }
+
+    const groups: Record<string, BudgetAllocation[]> = {
+      need: [],
+      want: [],
+      savings: [],
+    }
+
+    sortedAllocations.forEach(allocation => {
+      const type = categorizeAllocation(allocation)
+      groups[type].push(allocation)
+    })
+
+    return groups
+  }, [sortedAllocations, groupBy])
+
+  const handleQuickAdjust = (index: number, adjustment: number | 'percent') => {
+    if (!isDraft || !onAllocationChange) return
+
+    const allocation = allocations[index]
+    let newAmount = allocation.amount
+
+    if (adjustment === 'percent') {
+      newAmount = Math.floor(allocation.amount * 1.1)
+    } else {
+      newAmount = Math.max(0, allocation.amount + (adjustment as number))
+    }
+
+    const updated = [...allocations]
+    updated[index] = { ...allocation, amount: newAmount }
+    onAllocationChange(updated)
+  }
+
+  const toggleSort = (column: SortOption) => {
+    if (sortBy === column) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(column)
+      setSortDirection('desc')
+    }
+  }
+
   return (
     <div>
-      <h3 className="text-lg font-semibold mb-4">{t('budget.allocations')}</h3>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+        <h3 className="text-lg font-semibold">{t('budget.allocations')}</h3>
+        <div className="flex items-center gap-2">
+          {onAddCategory && (
+            <Button variant="outline" size="sm" onClick={onAddCategory}>
+              <Plus className="w-4 h-4 mr-1" />
+              {t('budget.addCategory')}
+            </Button>
+          )}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <select
+              value={groupBy}
+              onChange={(e) => setGroupBy(e.target.value as GroupOption)}
+              className="text-sm bg-transparent border-none px-2 py-1"
+            >
+              <option value="none">{t('budget.groupNone')}</option>
+              <option value="needs-wants">{t('budget.groupNeedsWants')}</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+            <button
+              onClick={() => toggleSort('priority')}
+              className={cn(
+                'px-2 py-1 text-xs rounded',
+                sortBy === 'priority' ? 'bg-white dark:bg-gray-700 shadow' : ''
+              )}
+            >
+              {t('budget.sortPriority')}
+            </button>
+            <button
+              onClick={() => toggleSort('amount')}
+              className={cn(
+                'px-2 py-1 text-xs rounded',
+                sortBy === 'amount' ? 'bg-white dark:bg-gray-700 shadow' : ''
+              )}
+            >
+              {t('budget.sortAmount')}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {isDraft && onAllocationChange && (
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          {t('budget.tapToEdit', 'Tap amount to edit')}
+          {t('budget.tapToEdit', 'Tap amount to edit or use quick buttons')}
         </p>
       )}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {allocations.map((allocation, index) => (
-          <AllocationCard
-            key={index}
-            allocation={allocation}
-            totalBudget={totalBudget}
-            trackingItem={trackingMap.get(allocation.category)}
-            isDraft={isDraft}
-            isUpdating={updateMutation.isPending}
-            isDeleting={deleteMutation.isPending}
-            onAmountChange={(newAmount) => {
-              if (isDraft && onAllocationChange) {
-                // Draft mode: update local state
-                const updated = [...allocations]
-                updated[index] = { ...allocation, amount: newAmount }
-                onAllocationChange(updated)
-              } else {
-                // Saved mode: call API
-                updateMutation.mutate({ category: allocation.category, amount: newAmount })
-              }
-            }}
-            onDelete={() => {
-              if (isDraft && onAllocationChange) {
-                // Draft mode: remove from local state
-                const updated = allocations.filter((_, i) => i !== index)
-                onAllocationChange(updated)
-              } else {
-                // Saved mode: call API
-                deleteMutation.mutate(allocation.category)
-              }
-            }}
-            onCategoryClick={() => handleCategoryClick(allocation.category)}
-          />
-        ))}
-      </div>
+
+      {Object.entries(groupedAllocations).map(([groupName, groupAllocations]) => (
+        groupAllocations.length > 0 && (
+          <div key={groupName} className="mb-6">
+            {groupBy === 'needs-wants' && (
+              <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4" />
+                {groupName === 'need' ? t('budget.needs') :
+                 groupName === 'want' ? t('budget.wants') : t('budget.savings')}
+                <span className="text-xs text-gray-400">({groupAllocations.length})</span>
+              </h4>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {groupAllocations.map((allocation) => {
+                const originalIndex = allocations.findIndex(a => a.category === allocation.category)
+                return (
+                  <AllocationCard
+                    key={allocation.category}
+                    allocation={allocation}
+                    totalBudget={totalBudget}
+                    trackingItem={trackingMap.get(allocation.category)}
+                    isDraft={isDraft}
+                    isUpdating={updateMutation.isPending}
+                    isDeleting={deleteMutation.isPending}
+                    onAmountChange={(newAmount) => {
+                      if (isDraft && onAllocationChange) {
+                        const updated = [...allocations]
+                        updated[originalIndex] = { ...allocation, amount: newAmount }
+                        onAllocationChange(updated)
+                      } else {
+                        updateMutation.mutate({ category: allocation.category, amount: newAmount })
+                      }
+                    }}
+                    onDelete={() => {
+                      if (isDraft && onAllocationChange) {
+                        const updated = allocations.filter((_, i) => i !== originalIndex)
+                        onAllocationChange(updated)
+                      } else {
+                        deleteMutation.mutate(allocation.category)
+                      }
+                    }}
+                    onCategoryClick={() => handleCategoryClick(allocation.category)}
+                    onQuickAdjust={(adjustment) => handleQuickAdjust(originalIndex, adjustment)}
+                  />
+                )
+              })}
+            </div>
+          </div>
+        )
+      ))}
     </div>
   )
 }
@@ -145,6 +296,7 @@ interface AllocationCardProps {
   onAmountChange: (newAmount: number) => void
   onDelete: () => void
   onCategoryClick: () => void
+  onQuickAdjust: (adjustment: number | 'percent') => void
 }
 
 function AllocationCard({
@@ -156,7 +308,8 @@ function AllocationCard({
   isDeleting,
   onAmountChange,
   onDelete,
-  onCategoryClick
+  onCategoryClick,
+  onQuickAdjust
 }: AllocationCardProps) {
   const { t } = useTranslation('common')
   const [isEditing, setIsEditing] = useState(false)
@@ -205,7 +358,6 @@ function AllocationCard({
 
   const percentage = totalBudget > 0 ? (allocation.amount / totalBudget) * 100 : 0
 
-  // Tracking calculations
   const spent = trackingItem?.spent || 0
   const budgeted = trackingItem?.budgeted || allocation.amount
   const remaining = budgeted - spent
@@ -237,17 +389,15 @@ function AllocationCard({
       )}
       onClick={handleCardClick}
     >
-      {/* Header with category name, amount, and action buttons */}
       <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center gap-2">
-          <h4 className="font-semibold dark:text-gray-100">{allocation.category}</h4>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <h4 className="font-semibold dark:text-gray-100 truncate">{allocation.category}</h4>
           {trackingItem && isOverBudget && (
-            <AlertTriangle className="w-4 h-4 text-red-500" aria-label={t('budget.overBudget')} />
+            <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" aria-label={t('budget.overBudget')} />
           )}
         </div>
 
-        <div className="flex items-center gap-1">
-          {/* Amount display or edit input */}
+        <div className="flex items-center gap-1 flex-shrink-0">
           {isEditing ? (
             <input
               ref={inputRef}
@@ -257,15 +407,40 @@ function AllocationCard({
               onBlur={handleBlur}
               onKeyDown={handleKeyDown}
               onClick={(e) => e.stopPropagation()}
-              className="w-28 text-right text-lg font-bold border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+              className="w-24 text-right text-lg font-bold border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
           ) : (
-            <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+            <span className="text-lg font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
               {formatCurrency(allocation.amount)}
             </span>
           )}
 
-          {/* Edit button */}
+          {isDraft && !isEditing && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); onQuickAdjust(-5000) }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                aria-label="Decrease by 5000"
+              >
+                <ArrowDown className="w-3 h-3 text-gray-500" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onQuickAdjust(5000) }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                aria-label="Increase by 5000"
+              >
+                <ArrowUp className="w-3 h-3 text-gray-500" />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onQuickAdjust('percent') }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                aria-label="Increase by 10%"
+              >
+                <span className="text-xs font-medium text-gray-500">+10%</span>
+              </button>
+            </>
+          )}
+
           {!isEditing && (
             <button
               onClick={handleEditClick}
@@ -276,7 +451,6 @@ function AllocationCard({
             </button>
           )}
 
-          {/* Delete button */}
           <button
             onClick={handleDeleteClick}
             className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
@@ -287,7 +461,6 @@ function AllocationCard({
         </div>
       </div>
 
-      {/* Delete confirmation */}
       {showDeleteConfirm && (
         <div className="mb-3 p-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
           <p className="text-sm text-red-700 dark:text-red-300 mb-2">
@@ -311,10 +484,9 @@ function AllocationCard({
       )}
 
       {allocation.reasoning && (
-        <p className="text-sm text-gray-600 dark:text-gray-400">{allocation.reasoning}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{allocation.reasoning}</p>
       )}
 
-      {/* Budget allocation bar */}
       <div className="mt-2">
         <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
@@ -327,7 +499,6 @@ function AllocationCard({
         </p>
       </div>
 
-      {/* Tracking progress bar */}
       {trackingItem && (
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
           <div className="flex justify-between text-sm mb-1">

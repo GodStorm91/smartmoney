@@ -352,7 +352,7 @@ export function QuickEntryFAB() {
 
         {/* Action Menu */}
         {showMenu && (
-          <div className="fixed bottom-32 right-4 z-50 flex flex-col-reverse gap-2 animate-in fade-in slide-in-from-bottom-2">
+          <div className="fixed bottom-36 right-4 z-50 flex flex-col-reverse gap-2 animate-in fade-in slide-in-from-bottom-2">
             <button
               onClick={() => handleMenuAction('receipt')}
               className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
@@ -377,7 +377,7 @@ export function QuickEntryFAB() {
           onPointerLeave={cancelPress}
           onPointerCancel={cancelPress}
           className={cn(
-            'fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50',
+            'fixed bottom-28 right-4 sm:bottom-6 sm:right-6 z-50',
             'w-14 h-14 rounded-full',
             'bg-gradient-to-r from-blue-500 to-purple-500',
             'text-white shadow-lg',

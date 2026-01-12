@@ -59,6 +59,15 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
 
   if (rewards.length === 0) return null
 
+  // Filter out rewards under $1
+  const MIN_REWARD_THRESHOLD = 1
+  const filteredRewards = rewards.filter(
+    (r: PositionReward) => Number(r.reward_usd || 0) >= MIN_REWARD_THRESHOLD
+  )
+
+  // Return null if no rewards above threshold
+  if (filteredRewards.length === 0) return null
+
   const positions = positionsData?.positions || []
 
   const formatAmount = (reward: PositionReward) => {
@@ -88,12 +97,15 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
   }
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === rewards.length) {
+    if (selectedIds.size === filteredRewards.length) {
       setSelectedIds(new Set())
     } else {
-      setSelectedIds(new Set(rewards.map((r) => r.id)))
+      setSelectedIds(new Set(filteredRewards.map((r) => r.id)))
     }
   }
+
+  const allSelected = filteredRewards.length > 0 && selectedIds.size === filteredRewards.length
+  const someSelected = selectedIds.size > 0
 
   const handleBatchAssign = () => {
     if (selectedIds.size === 0 || !batchPositionId) return
@@ -103,15 +115,12 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
     })
   }
 
-  const allSelected = rewards.length > 0 && selectedIds.size === rewards.length
-  const someSelected = selectedIds.size > 0
-
   return (
     <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="h-5 w-5 text-yellow-600 dark:text-yellow-500" />
         <h3 className="font-medium text-yellow-800 dark:text-yellow-200">
-          {t('crypto.unattributedRewards', { count: rewards.length })}
+          {t('crypto.unattributedRewards', { count: filteredRewards.length })}
         </h3>
       </div>
 
@@ -179,7 +188,7 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
 
       {/* Rewards List with Checkboxes */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
-        {rewards.map((reward) => (
+        {filteredRewards.map((reward) => (
           <div
             key={reward.id}
             onClick={() => toggleSelect(reward.id)}

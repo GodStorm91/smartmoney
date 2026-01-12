@@ -17,7 +17,7 @@ export function DashboardKPIs({ summary }: DashboardKPIsProps) {
   const { t } = useTranslation('common')
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <Link to="/transactions" search={{ type: 'income' }} className="block">
         <KPICard
           title={t('chart.income')}

@@ -8,6 +8,8 @@ import { CryptoWalletSection } from '@/components/accounts/CryptoWalletSection'
 import { LPPositionsSection } from '@/components/accounts/LPPositionsSection'
 import { ClosedPositionsSection } from '@/components/crypto/ClosedPositionsSection'
 import { TransferFormModal } from '@/components/transfers'
+import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
+import { ReceiptScannerModal } from '@/components/receipts/ReceiptScannerModal'
 import type { AccountType } from '@/types'
 
 const COLLAPSED_SECTIONS_KEY = 'accounts_collapsed_sections'
@@ -35,6 +37,8 @@ export default function Accounts() {
   const [includeInactive, setIncludeInactive] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [isAddTransactionModalOpen, setIsAddTransactionModalOpen] = useState(false)
+  const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
   const [editingAccountId, setEditingAccountId] = useState<number | null>(null)
   const [collapsedSections, setCollapsedSections] = useState<Set<AccountType>>(() => loadCollapsedSections())
 
@@ -42,6 +46,22 @@ export default function Accounts() {
   useEffect(() => {
     saveCollapsedSections(collapsedSections)
   }, [collapsedSections])
+
+  // Event listeners for QuickEntryFAB actions
+  useEffect(() => {
+    const handleOpenAddTransaction = () => {
+      setIsAddTransactionModalOpen(true)
+    }
+    const handleOpenReceiptScanner = () => {
+      setIsReceiptScannerOpen(true)
+    }
+    window.addEventListener('open-add-transaction-modal', handleOpenAddTransaction)
+    window.addEventListener('open-receipt-scanner', handleOpenReceiptScanner)
+    return () => {
+      window.removeEventListener('open-add-transaction-modal', handleOpenAddTransaction)
+      window.removeEventListener('open-receipt-scanner', handleOpenReceiptScanner)
+    }
+  }, [])
 
   const toggleSection = useCallback((accountType: AccountType) => {
     setCollapsedSections(prev => {
@@ -268,6 +288,19 @@ export default function Accounts() {
       <TransferFormModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
+      />
+
+      {/* Transaction Form Modal */}
+      <TransactionFormModal
+        isOpen={isAddTransactionModalOpen}
+        onClose={() => setIsAddTransactionModalOpen(false)}
+      />
+
+      {/* Receipt Scanner Modal */}
+      <ReceiptScannerModal
+        isOpen={isReceiptScannerOpen}
+        onClose={() => setIsReceiptScannerOpen(false)}
+        onScanComplete={() => setIsReceiptScannerOpen(false)}
       />
     </div>
   )

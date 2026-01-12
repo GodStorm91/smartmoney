@@ -79,6 +79,30 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
     (r: PositionReward) => !r.transaction_id
   )
 
+  // Filter out rewards under $1 from display
+  const MIN_REWARD_THRESHOLD = 1
+
+  // Filter tokens by USD value >= $1
+  const filteredTokens = roi?.rewards_by_token?.filter(
+    (token) => Number(token.amount_usd) >= MIN_REWARD_THRESHOLD
+  ) || []
+
+  // Filter monthly breakdown by USD value >= $1
+  const filteredMonthly = roi?.rewards_by_month?.filter(
+    (monthly) => Number(monthly.amount_usd) >= MIN_REWARD_THRESHOLD
+  ) || []
+
+  // Filter individual rewards by USD value >= $1
+  const filteredRewards = rewards.filter(
+    (reward: PositionReward) => Number(reward.reward_usd || 0) >= MIN_REWARD_THRESHOLD
+  )
+
+  // Calculate filtered total rewards USD
+  const filteredTotalRewardsUsd = filteredTokens.reduce(
+    (sum, token) => sum + Number(token.amount_usd || 0),
+    0
+  )
+
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-4">
@@ -163,9 +187,9 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               <div className="text-sm text-green-600 dark:text-green-400">
                 {t('crypto.totalRewards', 'Total Rewards')}
               </div>
-              {roi.rewards_by_token && roi.rewards_by_token.length > 0 ? (
+              {filteredTokens.length > 0 ? (
                 <div className="space-y-1">
-                  {roi.rewards_by_token.map((token) => {
+                  {filteredTokens.map((token) => {
                     const usdValue = formatCurrency(token.amount_usd)
                     return (
                       <div key={token.symbol}>
@@ -183,11 +207,11 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
                 </div>
               ) : (
                 <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                  {formatCurrency(roi.total_rewards_usd) || '-'}
+                  {formatCurrency(filteredTotalRewardsUsd) || '-'}
                 </div>
               )}
               <div className="text-xs text-green-600 dark:text-green-400">
-                {roi.rewards_count} {t('crypto.claims', 'claims')}
+                {filteredRewards.length} {t('crypto.claims', 'claims')}
               </div>
             </div>
 
@@ -226,7 +250,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
       )}
 
       {/* Monthly Breakdown */}
-      {roi && roi.rewards_by_month && roi.rewards_by_month.length > 0 && (
+      {roi && filteredMonthly.length > 0 && (
         <div>
           <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
             <Calendar className="h-4 w-4" />
@@ -234,7 +258,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
           </h4>
 
           <div className="space-y-2">
-            {roi.rewards_by_month.map((monthly) => {
+            {filteredMonthly.map((monthly) => {
               const usdValue = formatCurrency(monthly.amount_usd)
               return (
                 <div
@@ -267,7 +291,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
       )}
 
       {/* Individual Rewards List */}
-      {rewards.length > 0 && (
+      {filteredRewards.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <button
@@ -275,7 +299,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               className="flex items-center gap-2 font-medium text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
             >
               <Receipt className="h-4 w-4" />
-              {t('crypto.allRewards', 'All Rewards')} ({rewards.length})
+              {t('crypto.allRewards', 'All Rewards')} ({filteredRewards.length})
               {showAllRewards ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
 
@@ -314,7 +338,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
               )}
 
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {rewards.map((reward: PositionReward) => (
+                {filteredRewards.map((reward: PositionReward) => (
                   <div
                     key={reward.id}
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
@@ -373,10 +397,12 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
       )}
 
       {/* Empty State */}
-      {roi && roi.rewards_count === 0 && (
+      {roi && filteredRewards.length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <Gift className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          {t('crypto.noRewards', 'No rewards claimed for this position yet.')}
+          {filteredTotalRewardsUsd < MIN_REWARD_THRESHOLD
+            ? t('crypto.rewardsBelowThreshold', 'No rewards above ${{threshold}} to display', { threshold: MIN_REWARD_THRESHOLD })
+            : t('crypto.noRewards', 'No rewards claimed for this position yet.')}
         </div>
       )}
     </div>

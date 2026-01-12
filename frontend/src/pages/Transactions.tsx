@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, X } from 'lucide-react'
+import { ArrowLeft, X, Filter, ChevronDown } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skeleton'
-import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { MultiSelect } from '@/components/ui/MultiSelect'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
@@ -32,8 +31,8 @@ import { useAccounts } from '@/hooks/useAccounts'
 import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import type { Transaction, TransactionFilters } from '@/types'
 import type { ReceiptData } from '@/services/receipt-service'
+import { cn } from '@/utils/cn'
 
-// Helper to get month date range from YYYY-MM format
 function getMonthDateRange(month: string): { start: string; end: string } {
   const [year, monthNum] = month.split('-').map(Number)
   const start = `${year}-${String(monthNum).padStart(2, '0')}-01`
@@ -52,18 +51,14 @@ export function Transactions() {
   const monthRange = getCurrentMonthRange()
   const { data: accounts } = useAccounts()
 
-  // Read URL search params from TanStack Router
   const { categories: categoriesParam, month: monthParam, accountId, fromAccounts, type: typeParam } = useSearch({
     from: '/transactions',
   })
 
-  // Parse categories from comma-separated string
   const parsedCategories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : []
 
-  // Calculate initial date range from URL month param or use current month
   const initialDateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
 
-  // Filter state - initialize from URL params if present
   const [filters, setFilters] = useState<TransactionFilters>({
     start_date: initialDateRange.start,
     end_date: initialDateRange.end,
@@ -74,15 +69,14 @@ export function Transactions() {
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebouncedValue(searchInput, 300)
 
-  // Amount range state
   const [minAmount, setMinAmount] = useState('')
   const [maxAmount, setMaxAmount] = useState('')
 
-  // Quick date presets
   type DatePreset = 'today' | 'thisWeek' | 'thisMonth' | 'lastMonth' | 'last3Months' | 'custom'
   const [datePreset, setDatePreset] = useState<DatePreset>('thisMonth')
 
-  // Helper to get date preset range
+  const [isFilterExpanded, setIsFilterExpanded] = useState(false)
+
   const getDatePresetRange = (preset: DatePreset): { start: string; end: string } => {
     const today = new Date()
     let start: Date
@@ -94,7 +88,7 @@ export function Transactions() {
         break
       case 'thisWeek':
         start = new Date(today)
-        start.setDate(today.getDate() - today.getDay()) // Sunday
+        start.setDate(today.getDay() - today.getDay())
         break
       case 'thisMonth':
         start = new Date(today.getFullYear(), today.getMonth(), 1)
@@ -116,7 +110,6 @@ export function Transactions() {
     }
   }
 
-  // Handle date preset change
   const handleDatePresetChange = (preset: DatePreset) => {
     setDatePreset(preset)
     if (preset !== 'custom') {
@@ -125,7 +118,6 @@ export function Transactions() {
     }
   }
 
-  // Handle amount range change
   const handleAmountChange = (type: 'min' | 'max', value: string) => {
     const numValue = value ? parseFloat(value) : undefined
     if (type === 'min') {
@@ -137,7 +129,6 @@ export function Transactions() {
     }
   }
 
-  // Clear individual filter
   const clearFilter = (key: keyof TransactionFilters) => {
     setFilters(prev => {
       const next = { ...prev }
@@ -161,7 +152,6 @@ export function Transactions() {
     })
   }
 
-  // Check if filter is active
   const isFilterActive = (key: keyof TransactionFilters): boolean => {
     const val = filters[key]
     if (key === 'categories') return !!(val && (val as string[]).length > 0)
@@ -171,17 +161,22 @@ export function Transactions() {
     return !!val
   }
 
-  // Sorting state
+  const activeFilterCount = [
+    isFilterActive('categories'),
+    isFilterActive('source'),
+    isFilterActive('min_amount'),
+    isFilterActive('max_amount'),
+    datePreset !== 'thisMonth',
+  ].filter(Boolean).length
+
   type SortField = 'date' | 'description' | 'category' | 'source' | 'amount'
   type SortDirection = 'asc' | 'desc'
   const [sortField, setSortField] = useState<SortField>('date')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
-  // Show count state for display limit
   type ShowCount = 50 | 100 | 'all'
   const [showCount, setShowCount] = useState<ShowCount>(50)
 
-  // Sorting transition state for visual feedback
   const [isSorting, setIsSorting] = useState(false)
 
   const handleSort = (field: SortField) => {
@@ -192,11 +187,9 @@ export function Transactions() {
       setSortField(field)
       setSortDirection('desc')
     }
-    // Brief delay for visual feedback
     setTimeout(() => setIsSorting(false), 150)
   }
 
-  // Handle mobile sort dropdown change
   const handleMobileSort = (value: string) => {
     setIsSorting(true)
     const [field, direction] = value.split('-') as [SortField, SortDirection]
@@ -205,12 +198,10 @@ export function Transactions() {
     setTimeout(() => setIsSorting(false), 150)
   }
 
-  // Update filters when debounced search changes
   useEffect(() => {
     setFilters(prev => ({ ...prev, search: debouncedSearch || undefined }))
   }, [debouncedSearch])
 
-  // Update filters when URL params change (browser back/forward)
   useEffect(() => {
     if (categoriesParam || monthParam || typeParam !== undefined) {
       const dateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
@@ -225,7 +216,6 @@ export function Transactions() {
     }
   }, [categoriesParam, monthParam, typeParam])
 
-  // Handle summary card click to toggle type filter
   const handleTypeFilter = (type: 'income' | 'expense') => {
     const newType = typeParam === type ? undefined : type
     navigate({
@@ -237,13 +227,11 @@ export function Transactions() {
     })
   }
 
-  // Modal state
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
 
-  // Bulk selection state
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [isBulkRecategorizeOpen, setIsBulkRecategorizeOpen] = useState(false)
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false)
@@ -253,12 +241,10 @@ export function Transactions() {
     queryFn: () => fetchTransactions(filters),
   })
 
-  // Clear selection when transactions change
   useEffect(() => {
     setSelectedIds(new Set())
   }, [transactions])
 
-  // Listen for custom events from QuickEntryFAB long-press menu
   useEffect(() => {
     const handleOpenAddTransaction = () => {
       setIsAddModalOpen(true)
@@ -276,25 +262,19 @@ export function Transactions() {
     }
   }, [])
 
-  // Create transaction from receipt data
   const createFromReceipt = useOfflineCreate(
     createTransaction,
     'transaction',
     [['transactions'], ['analytics']]
   )
 
-  // Handle receipt scan complete
   const handleReceiptScanComplete = (data: ReceiptData) => {
     if (!data.amount || !data.category) return
 
-    // Get first account's currency
     const defaultAccount = accounts?.[0]
     const currency = defaultAccount?.currency || 'JPY'
-
-    // Convert amount to storage format
     const amount = toStorageAmount(Math.abs(data.amount), currency)
 
-    // Create transaction from receipt data
     createFromReceipt.mutate({
       date: data.date || new Date().toISOString().split('T')[0],
       description: data.merchant || 'Receipt Scan',
@@ -306,7 +286,6 @@ export function Transactions() {
     })
   }
 
-  // Category options for filters
   const categoryOptions = [
     { value: '食費', label: t('category.food', 'Food') },
     { value: '住宅', label: t('category.housing', 'Housing') },
@@ -319,7 +298,6 @@ export function Transactions() {
     { value: 'その他', label: t('category.other', 'Other') },
   ]
 
-  // Selection handlers
   const allSelected = transactions && transactions.length > 0 &&
     transactions.every(tx => selectedIds.has(tx.id))
 
@@ -341,7 +319,6 @@ export function Transactions() {
     setSelectedIds(newSet)
   }
 
-  // Mutations
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteTransaction(id),
     onSuccess: () => {
@@ -387,78 +364,59 @@ export function Transactions() {
       type: 'all',
     })
     setSearchInput('')
-    // Clear URL params by navigating without search params
+    setDatePreset('thisMonth')
+    setMinAmount('')
+    setMaxAmount('')
     navigate({ to: '/transactions', search: {} })
   }
 
-  // Filter transactions by account (client-side)
   const accountFilteredTransactions = useMemo(() => {
     if (!transactions) return []
     if (!accountId) return transactions
-    // Convert both to numbers for robust comparison (URL params may be strings)
     const targetAccountId = Number(accountId)
     return transactions.filter(tx => tx.account_id != null && Number(tx.account_id) === targetAccountId)
   }, [transactions, accountId])
 
-  // Get selected account for currency display
   const selectedAccount = useMemo(() => {
     if (!accountId || !accounts) return null
     return accounts.find(a => a.id === Number(accountId)) || null
   }, [accountId, accounts])
 
-  // Summary currency: use account's currency if filtering by account, else user's display currency
   const summaryCurrency = selectedAccount?.currency || currency
 
-  // Default rates for fallback when API hasn't loaded
-  // These represent "1 JPY = X foreign currency"
   const DEFAULT_RATES: Record<string, number> = { JPY: 1, USD: 0.00667, VND: 167 }
 
-  // Calculate summary from filtered transactions (respects account filter)
-  // When filtering by account: amounts are in account's currency (no conversion)
-  // When viewing all: convert each transaction to JPY base currency for aggregation
   const { income, expense, net } = useMemo(() => {
     const txList = accountFilteredTransactions
 
-    // Helper to convert amount to JPY base currency
-    // Transaction amounts are stored in storage format (cents for USD, whole units for JPY/VND)
-    // To convert to JPY: first convert from storage format, then divide by rate
     const toJpy = (amount: number, txCurrency: string) => {
       if (selectedAccount) {
-        // Filtering by account - amounts are native to account currency, no conversion needed
         return amount
       }
 
-      // First convert from storage format to actual currency value
-      // USD stores in cents (1022 = $10.22), JPY/VND store as whole units
       const decimals = CURRENCY_DECIMALS[txCurrency] ?? 0
       const actualAmount = amount / Math.pow(10, decimals)
 
-      // JPY transactions: no currency conversion needed (already in JPY)
       if (txCurrency === 'JPY') {
         return actualAmount
       }
 
-      // Convert foreign currency to JPY: divide by rate
-      // rate represents "1 JPY = X foreign currency", so foreign/rate = JPY
       const rate = rates[txCurrency] ?? DEFAULT_RATES[txCurrency]
       if (!rate || rate === 0) {
-        // Fallback: treat as JPY if no rate available (shouldn't happen)
-        console.warn(`No exchange rate found for currency: ${txCurrency}, treating as JPY`)
         return actualAmount
       }
       return actualAmount / rate
     }
 
     const inc = txList
-      .filter(t => t.type === 'income' && !t.is_transfer)  // Exclude transfers
+      .filter(t => t.type === 'income' && !t.is_transfer)
       .reduce((sum, t) => sum + toJpy(t.amount, t.currency || 'JPY'), 0)
     const exp = txList
-      .filter(t => t.type === 'expense' && !t.is_transfer)  // Exclude transfers
+      .filter(t => t.type === 'expense' && !t.is_transfer)
       .reduce((sum, t) => sum + toJpy(Math.abs(t.amount), t.currency || 'JPY'), 0)
     return { income: inc, expense: exp, net: inc - exp }
   }, [accountFilteredTransactions, selectedAccount, rates])
 
-  // Sort transactions
   const sortedTransactions = useMemo(() => {
     if (!accountFilteredTransactions.length) return []
     return [...accountFilteredTransactions].sort((a, b) => {
@@ -484,13 +442,11 @@ export function Transactions() {
     })
   }, [accountFilteredTransactions, sortField, sortDirection])
 
-  // Apply display limit
   const displayedTransactions = useMemo(() => {
     if (showCount === 'all') return sortedTransactions
     return sortedTransactions.slice(0, showCount)
   }, [sortedTransactions, showCount])
 
-  // Group transactions by date for mobile view
   const groupedTransactions = useMemo(() => {
     if (!displayedTransactions.length) return []
     const groups: { date: string; transactions: Transaction[] }[] = []
@@ -509,8 +465,7 @@ export function Transactions() {
   }, [displayedTransactions])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24">
-      {/* Back to Accounts button (shown when navigating from Accounts page) */}
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 pb-28">
       {fromAccounts && (
         <Button
           variant="ghost"
@@ -523,212 +478,132 @@ export function Transactions() {
         </Button>
       )}
 
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('transactions.title')}</h2>
-        <p className="text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
+      <div className="mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+          {t('transactions.title')}
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
       </div>
 
-      {/* Filters */}
-      <Card className="mb-6">
-        {/* Search with clear button */}
-        <div className="mb-4">
+      <Card className="mb-4">
+        <div className="space-y-3">
           <div className="relative">
             <Input
-              label={t('transactions.search', 'Search')}
-              placeholder={t('transactions.searchPlaceholder', 'Search by description...')}
+              placeholder={t('transactions.searchPlaceholder', 'Search transactions...')}
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
+              className="h-11"
             />
             {searchInput && (
               <button
                 onClick={() => { setSearchInput(''); clearFilter('search') }}
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
           </div>
-        </div>
 
-        {/* Quick Date Presets */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('transactions.dateRange', 'Date Range')}
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {([
-              { key: 'thisWeek', label: t('date.thisWeek', 'This Week') },
-              { key: 'thisMonth', label: t('date.thisMonth', 'This Month') },
-              { key: 'lastMonth', label: t('date.lastMonth', 'Last Month') },
-              { key: 'last3Months', label: t('date.last3Months', 'Last 3 Months') },
-              { key: 'custom', label: t('date.custom', 'Custom') },
-            ] as const).map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => handleDatePresetChange(key)}
-                className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-                  datePreset === key
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Date Range (shown when custom selected) */}
-        {datePreset === 'custom' && (
-          <div className="mb-4">
-            <DateRangePicker
-              startDate={filters.start_date || ''}
-              endDate={filters.end_date || ''}
-              onRangeChange={(start, end) => {
-                setFilters({ ...filters, start_date: start, end_date: end })
-              }}
-            />
-          </div>
-        )}
-
-        {/* Amount Range */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('transactions.amountRange', 'Amount Range')}
-          </label>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
-              <Input
-                type="number"
-                placeholder={t('transactions.minAmount', 'Min')}
-                value={minAmount}
-                onChange={(e) => handleAmountChange('min', e.target.value)}
-              />
-              {minAmount && (
-                <button
-                  onClick={() => handleAmountChange('min', '')}
-                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                  aria-label="Clear min"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                isFilterExpanded || activeFilterCount > 0
+                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               )}
-            </div>
-            <div className="relative">
-              <Input
-                type="number"
-                placeholder={t('transactions.maxAmount', 'Max')}
-                value={maxAmount}
-                onChange={(e) => handleAmountChange('max', e.target.value)}
-              />
-              {maxAmount && (
-                <button
-                  onClick={() => handleAmountChange('max', '')}
-                  className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                  aria-label="Clear max"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            >
+              <Filter className="w-4 h-4" />
+              {t('button.filter', 'Filter')}
+              {activeFilterCount > 0 && (
+                <span className="bg-primary-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {activeFilterCount}
+                </span>
               )}
+              <ChevronDown className={cn(
+                'w-4 h-4 transition-transform',
+                isFilterExpanded && 'rotate-180'
+              )} />
+            </button>
+
+            <div className="flex gap-1 overflow-x-auto scrollbar-hide flex-1">
+              {([
+                { key: 'today', label: t('date.today', 'Today') },
+                { key: 'thisWeek', label: t('date.thisWeek', 'This Week') },
+                { key: 'thisMonth', label: t('date.thisMonth', 'This Month') },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => handleDatePresetChange(key)}
+                  className={cn(
+                    'px-3 py-2 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-colors',
+                    datePreset === key
+                      ? 'bg-primary-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Category & Source */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="relative">
-            <MultiSelect
-              label={t('transactions.category', 'Category')}
-              options={categoryOptions}
-              selected={filters.categories || []}
-              onChange={(categories) => setFilters({ ...filters, categories })}
-              placeholder={t('transactions.allCategories', 'All categories')}
-            />
-            {(filters.categories?.length ?? 0) > 0 && (
-              <button
-                onClick={() => clearFilter('categories')}
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                aria-label="Clear categories"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <div className="relative">
-            <Select
-              label={t('transactions.source', 'Source')}
-              value={filters.source || ''}
-              onChange={(e) => setFilters({ ...filters, source: e.target.value })}
-              options={[
-                { value: '', label: t('transactions.all', 'All') },
-                ...(accounts?.map(a => ({ value: a.name, label: a.name })) || []),
-              ]}
-            />
-            {filters.source && (
-              <button
-                onClick={() => clearFilter('source')}
-                className="absolute right-3 top-8 text-gray-400 hover:text-gray-600"
-                aria-label="Clear source"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-        </div>
+          {isFilterExpanded && (
+            <div className="pt-3 border-t border-gray-200 dark:border-gray-600 space-y-3 animate-slide-up">
+              <div className="grid grid-cols-2 gap-3">
+                <Input
+                  type="number"
+                  placeholder={t('transactions.minAmount', 'Min')}
+                  value={minAmount}
+                  onChange={(e) => handleAmountChange('min', e.target.value)}
+                  className="h-10"
+                />
+                <Input
+                  type="number"
+                  placeholder={t('transactions.maxAmount', 'Max')}
+                  value={maxAmount}
+                  onChange={(e) => handleAmountChange('max', e.target.value)}
+                  className="h-10"
+                />
+              </div>
 
-        {/* Active Filters & Action Buttons */}
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          {/* Active filter badges */}
-          {(isFilterActive('categories') || isFilterActive('source') || isFilterActive('min_amount') || isFilterActive('max_amount')) && (
-            <div className="flex flex-wrap gap-2">
-              {isFilterActive('categories') && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
-                  {t('filter.category')}: {filters.categories?.length}
-                  <button onClick={() => clearFilter('categories')} className="hover:text-blue-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {isFilterActive('source') && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full">
-                  {t('filter.source')}: {filters.source}
-                  <button onClick={() => clearFilter('source')} className="hover:text-green-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {isFilterActive('min_amount') && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
-                  {t('filter.min')}: {filters.min_amount}
-                  <button onClick={() => clearFilter('min_amount')} className="hover:text-purple-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
-              {isFilterActive('max_amount') && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full">
-                  {t('filter.max')}: {filters.max_amount}
-                  <button onClick={() => clearFilter('max_amount')} className="hover:text-purple-900">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="relative">
+                  <MultiSelect
+                    label={t('transactions.category', 'Category')}
+                    options={categoryOptions}
+                    selected={filters.categories || []}
+                    onChange={(categories) => setFilters({ ...filters, categories })}
+                    placeholder={t('transactions.allCategories', 'All')}
+                  />
+                </div>
+                <Select
+                  label={t('transactions.source', 'Source')}
+                  value={filters.source || ''}
+                  onChange={(e) => setFilters({ ...filters, source: e.target.value })}
+                  options={[
+                    { value: '', label: t('transactions.all', 'All') },
+                    ...(accounts?.map(a => ({ value: a.name, label: a.name })) || []),
+                  ]}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="ghost" size="sm" onClick={handleReset}>
+                  {t('button.reset', 'Reset')}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
+                  disabled={!transactions || transactions.length === 0}
+                >
+                  {t('transactions.export', 'Export')}
+                </Button>
+              </div>
             </div>
           )}
-
-          <div className="flex gap-3 ml-auto">
-            <Button variant="outline" onClick={handleReset}>
-              {t('button.reset', 'Reset')}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => transactions && exportTransactionsCsv(transactions, filters.start_date, filters.end_date)}
-              disabled={!transactions || transactions.length === 0}
-            >
-              {t('transactions.export', 'Export')}
-            </Button>
-          </div>
         </div>
       </Card>
 

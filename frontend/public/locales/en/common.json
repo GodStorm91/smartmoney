@@ -11,9 +11,11 @@
     "settings": "Settings"
   },
   "nav": {
-    "dashboard": "Home",
+    "home": "Home",
     "transactions": "Transactions",
-    "budget": "Budget",
+    "accounts": "Accounts",
+    "goals": "Goals",
+    "settings": "Settings",
     "analytics": "Analytics",
     "more": "More"
   },
@@ -27,8 +29,15 @@
     "close": "Close",
     "apply": "Apply Filters",
     "reset": "Reset",
+    "filter": "Filter",
     "selectFile": "Select File",
     "addMore": "Add More"
+  },
+  "filter": {
+    "category": "Category",
+    "source": "Source",
+    "min": "Min",
+    "max": "Max"
   },
   "language": {
     "selectLanguage": "Select Language",
@@ -432,7 +441,11 @@
     "today": "Today",
     "back": "Back",
     "optional": "Optional",
-    "backToAccounts": "Back to Accounts"
+    "backToAccounts": "Back to Accounts",
+    "undo": "Undo",
+    "export": "Export",
+    "previous": "Previous",
+    "next": "Next"
   },
   "autocomplete": {
     "used": "used"
@@ -911,11 +924,34 @@
       "projectedSavings": "Projected savings",
       "onTrack": "On track to meet your savings goal!",
       "offTrack": "At risk of missing savings goal by {{amount}}"
-    }
-  },
-  "common": {
-    "cancel": "Cancel",
-    "back": "Back"
+    },
+    "addCategory": "Add Category",
+    "selectCategory": "Select category",
+    "customCategory": "Custom category",
+    "categoryName": "Category Name",
+    "categoryPlaceholder": "Enter category name",
+    "add": "Add",
+    "remainingBudget": "Remaining budget",
+    "suggestAmount": "Suggest {{amount}}",
+    "groupNone": "None",
+    "groupNeedsWants": "Needs/Wants",
+    "sortPriority": "Priority",
+    "sortAmount": "Amount",
+    "needs": "Needs",
+    "wants": "Wants",
+    "savings": "Savings",
+    "health": {
+      "title": "Budget Health",
+      "onTrack": "On track",
+      "overAllocated": "Over allocated",
+      "almostFull": "Almost full",
+      "warningNearLimit": "Warning: Near limit",
+      "exceededTotal": "Total budget exceeded",
+      "overBudget": "{{count}} categories over budget",
+      "totalBudget": "Total Budget"
+    },
+    "undo": "Undo",
+    "export": "Export"
   },
   "credits": {
     "balance": "Credit Balance",
@@ -973,12 +1009,6 @@
     "type": "Type",
     "description": "Description",
     "showingResults": "Showing {{start}} - {{end}} of {{total}}"
-  },
-  "common": {
-    "cancel": "Cancel",
-    "back": "Back",
-    "previous": "Previous",
-    "next": "Next"
   },
   "sync": {
     "offline": "Offline",

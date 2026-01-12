@@ -58,6 +58,25 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
 
   const sourceLabel = source === 'symbiotic' ? 'Symbiotic' : source
 
+  // Filter out rewards under $1 from display
+  const MIN_REWARD_THRESHOLD = 1
+
+  // Filter tokens by USD value >= $1
+  const filteredTokens = rewards?.rewards_by_token?.filter(
+    (token) => Number(token.amount_usd) >= MIN_REWARD_THRESHOLD
+  ) || []
+
+  // Filter monthly breakdown by USD value >= $1
+  const filteredMonthly = rewards?.rewards_by_month?.filter(
+    (monthly) => Number(monthly.amount_usd) >= MIN_REWARD_THRESHOLD
+  ) || []
+
+  // Calculate filtered total rewards USD
+  const filteredTotalRewardsUsd = filteredTokens.reduce(
+    (sum, token) => sum + Number(token.amount_usd || 0),
+    0
+  )
+
   return (
     <div className="space-y-4">
       {/* Scan Button */}
@@ -93,7 +112,7 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
       )}
 
       {/* Rewards Summary Card */}
-      {rewards && rewards.rewards_count > 0 && (
+      {rewards && filteredTokens.length > 0 && (
         <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
           <h4 className="font-medium text-green-800 dark:text-green-200 mb-3 flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
@@ -106,9 +125,9 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
               <div className="text-sm text-green-600 dark:text-green-400">
                 {t('crypto.totalRewards', 'Total Rewards')}
               </div>
-              {rewards.rewards_by_token && rewards.rewards_by_token.length > 0 ? (
+              {filteredTokens.length > 0 ? (
                 <div className="space-y-1">
-                  {rewards.rewards_by_token.map((token) => {
+                  {filteredTokens.map((token) => {
                     const usdValue = formatCurrency(token.amount_usd)
                     return (
                       <div key={token.symbol}>
@@ -126,11 +145,11 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
                 </div>
               ) : (
                 <div className="text-lg font-semibold text-green-800 dark:text-green-200">
-                  {formatCurrency(rewards.total_rewards_usd) || '-'}
+                  {formatCurrency(filteredTotalRewardsUsd) || '-'}
                 </div>
               )}
               <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                {rewards.rewards_count} {t('crypto.claims', 'claims')}
+                {filteredMonthly.reduce((sum, m) => sum + m.count, 0)} {t('crypto.claims', 'claims')}
               </div>
             </div>
           </div>
@@ -138,7 +157,7 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
       )}
 
       {/* Monthly Breakdown */}
-      {rewards && rewards.rewards_by_month && rewards.rewards_by_month.length > 0 && (
+      {rewards && filteredMonthly.length > 0 && (
         <div>
           <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center gap-2">
             <Calendar className="h-4 w-4" />
@@ -146,7 +165,7 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
           </h4>
 
           <div className="space-y-2">
-            {rewards.rewards_by_month.map((monthly) => {
+            {filteredMonthly.map((monthly) => {
               const usdValue = formatCurrency(monthly.amount_usd)
               return (
                 <div
@@ -179,11 +198,13 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
       )}
 
       {/* Empty State */}
-      {rewards && rewards.rewards_count === 0 && (
+      {rewards && filteredTokens.length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           <Gift className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p className="font-medium text-gray-700 dark:text-gray-300 mb-2">
-            {t('crypto.noStakingRewards', 'No staking rewards found')}
+            {filteredTotalRewardsUsd < MIN_REWARD_THRESHOLD
+              ? t('crypto.rewardsBelowThreshold', 'No rewards above ${{threshold}} to display', { threshold: MIN_REWARD_THRESHOLD })
+              : t('crypto.noStakingRewards', 'No staking rewards found')}
           </p>
           <p className="text-sm">
             {t('crypto.noStakingRewardsHint', 'Click "Scan Rewards" to search for claimed rewards on the blockchain.')}

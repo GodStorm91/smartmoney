@@ -506,15 +506,20 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
   }
 
   const modalContent = (
-    <div
-      className="fixed inset-0 z-[100001] flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden"
-      style={{ touchAction: 'pan-y' }}
-    >
-      {/* Modal */}
+    <div className="fixed inset-0 z-[100001]">
+      {/* Backdrop - fixed to cover entire screen */}
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Modal Container - centered with scrolling */}
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90dvh]"
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-[100002] flex items-center justify-center p-4 overflow-y-auto overflow-x-hidden"
+        style={{ touchAction: 'pan-y' }}
       >
+        {/* Modal */}
+        <div
+          className="relative bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90dvh] my-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 min-w-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -749,6 +754,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
           }}
         />
       )}
+      </div>
     </div>
   )
 

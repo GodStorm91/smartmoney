@@ -11,9 +11,11 @@
     "budget": "予算"
   },
   "nav": {
-    "dashboard": "ホーム",
+    "home": "ホーム",
     "transactions": "取引",
-    "budget": "予算",
+    "accounts": "口座",
+    "goals": "目標",
+    "settings": "設定",
     "analytics": "分析",
     "more": "その他"
   },
@@ -27,8 +29,15 @@
     "close": "閉じる",
     "apply": "フィルター適用",
     "reset": "リセット",
+    "filter": "フィルター",
     "selectFile": "ファイルを選択",
     "addMore": "追加"
+  },
+  "filter": {
+    "category": "カテゴリー",
+    "source": "支払元",
+    "min": "最小",
+    "max": "最大"
   },
   "language": {
     "selectLanguage": "言語を選択",
@@ -423,7 +432,11 @@
     "today": "今日",
     "back": "戻る",
     "optional": "任意",
-    "backToAccounts": "口座一覧に戻る"
+    "backToAccounts": "口座一覧に戻る",
+    "undo": "取り消し",
+    "export": "エクスポート",
+    "previous": "前へ",
+    "next": "次へ"
   },
   "autocomplete": {
     "used": "回使用"
@@ -870,7 +883,34 @@
       "projectedSavings": "予測貯蓄",
       "onTrack": "貯蓄目標達成の見込みです！",
       "offTrack": "貯蓄目標に{{amount}}不足の見込みです"
-    }
+    },
+    "addCategory": "カテゴリを追加",
+    "selectCategory": "カテゴリを選択",
+    "customCategory": "カスタムカテゴリ",
+    "categoryName": "カテゴリ名",
+    "categoryPlaceholder": "カテゴリ名を入力",
+    "add": "追加",
+    "remainingBudget": "残り予算",
+    "suggestAmount": "{{amount}}を提案",
+    "groupNone": "なし",
+    "groupNeedsWants": "必要/希望",
+    "sortPriority": "優先度",
+    "sortAmount": "金額",
+    "needs": "必要費",
+    "wants": "希望費",
+    "savings": "貯蓄",
+    "health": {
+      "title": "予算健全性",
+      "onTrack": "軌道に乗っています",
+      "overAllocated": "超過配分",
+      "almostFull": "ほぼ満杯",
+      "warningNearLimit": "警告: 限度額に近い",
+      "exceededTotal": "総予算を超過",
+      "overBudget": "{{count}}カテゴリが予算超過",
+      "totalBudget": "総予算"
+    },
+    "undo": "取り消し",
+    "export": "エクスポート"
   },
   "credits": {
     "balance": "クレジット残高",

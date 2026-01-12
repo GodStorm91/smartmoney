@@ -27,7 +27,6 @@ import { ProxyReceivablesWidget } from '@/components/proxy'
 export function Dashboard() {
   const { t } = useTranslation('common')
 
-  // Fetch dashboard data
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard-summary'],
     queryFn: () => fetchDashboardSummary(),
@@ -48,7 +47,6 @@ export function Dashboard() {
     queryFn: fetchGoals,
   })
 
-  // Fetch goal progress with achievability for each goal
   const { data: goalsProgress, isLoading: goalsProgressLoading } = useQuery({
     queryKey: ['goals-progress', goals?.map(g => g.id)],
     queryFn: async () => {
@@ -67,30 +65,31 @@ export function Dashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Page Title */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{t('dashboard.title')}</h2>
-        <p className="text-gray-600 dark:text-gray-400">{t('dashboard.subtitle', { month: formatMonth(new Date()) })}</p>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-5 sm:py-8 pb-28">
+      <div className="mb-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+          {t('dashboard.title')}
+        </h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          {t('dashboard.subtitle', { month: formatMonth(new Date()) })}
+        </p>
       </div>
 
-      {/* Onboarding Checklist for new users */}
       <OnboardingChecklist />
 
-      {/* Net Worth Hero Card */}
-      <NetWorthCard
-        monthlyNet={summary?.net}
-        monthlyNetChange={summary?.net_change}
-      />
+      <section className="mt-6">
+        <NetWorthCard
+          monthlyNet={summary?.net}
+          monthlyNetChange={summary?.net_change}
+        />
+      </section>
 
-      {/* Quick Actions Bar - Mobile Only */}
-      <div className="lg:hidden mb-6">
+      <section className="mt-6">
         <QuickActionsBar />
-      </div>
+      </section>
 
-      {/* Smart Alerts */}
       {monthlyTrends && monthlyTrends.length > 0 && (
-        <div className="mb-6">
+        <section className="mt-6">
           <SmartAlertsCard
             income={monthlyTrends[monthlyTrends.length - 1]?.income || 0}
             expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
@@ -101,20 +100,19 @@ export function Dashboard() {
                 : 0
             }
           />
-        </div>
+        </section>
       )}
 
-      {/* Cash Flow Forecast */}
-      <div className="mb-6">
+      <section className="mt-6">
         <CashFlowForecastCard />
-      </div>
+      </section>
 
-      {/* KPI Summary Cards */}
-      <DashboardKPIs summary={summary} />
+      <section className="mt-6">
+        <DashboardKPIs summary={summary} />
+      </section>
 
-      {/* Financial Health & Insights Row */}
       {monthlyTrends && monthlyTrends.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <FinancialHealthCard
             income={monthlyTrends[monthlyTrends.length - 1]?.income || 0}
             expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
@@ -126,34 +124,33 @@ export function Dashboard() {
             expense={monthlyTrends[monthlyTrends.length - 1]?.expenses || 0}
             previousExpense={monthlyTrends.length > 1 ? monthlyTrends[monthlyTrends.length - 2]?.expenses : undefined}
           />
-        </div>
+        </section>
       )}
 
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-        <TrendChartCard data={monthlyTrends} />
-        <div className="space-y-6">
-          <QuickActionsCard />
+      <section className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <TrendChartCard data={monthlyTrends} className="lg:col-span-2" />
+        <div className="space-y-4">
           {monthlyTrends && monthlyTrends.length > 1 && (
             <MonthComparisonCard
               currentMonth={monthlyTrends[monthlyTrends.length - 1]}
               previousMonth={monthlyTrends[monthlyTrends.length - 2]}
             />
           )}
+          <QuickActionsCard />
         </div>
-      </div>
+      </section>
 
-      {/* Category Breakdown & Goals Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Category Breakdown */}
-        <Card>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">{t('dashboard.categoryBreakdown')}</h3>
+      <section className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Card className="p-5">
+          <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            {t('dashboard.categoryBreakdown')}
+          </h3>
           {categories && categories.length > 0 ? (
             <>
               <CategoryBreakdownList categories={categories} maxItems={4} />
               <Link
                 to="/analytics"
-                className="mt-6 block text-center text-sm font-medium text-primary-600 hover:text-primary-700"
+                className="mt-4 block text-center text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
               >
                 {t('dashboard.viewAllCategories')}
               </Link>
@@ -167,7 +164,7 @@ export function Dashboard() {
               action={
                 <Link
                   to="/transactions"
-                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   {t('dashboard.addTransaction', 'Add transaction')}
                 </Link>
@@ -176,20 +173,21 @@ export function Dashboard() {
           )}
         </Card>
 
-        {/* Goals Achievability */}
-        <Card>
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t('dashboard.goalAchievability')}</h3>
+        <Card className="p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-base font-semibold text-gray-900 dark:text-gray-100">
+              {t('dashboard.goalAchievability')}
+            </h3>
             <Link
               to="/goals"
-              className="text-sm font-medium text-primary-600 hover:text-primary-700"
+              className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
             >
               {t('dashboard.viewDetails')}
             </Link>
           </div>
 
           {goalsProgress && goalsProgress.length > 0 && !goalsProgressLoading ? (
-            <div className="space-y-6">
+            <div className="space-y-4">
               {goalsProgress.slice(0, 3).map((progress) => (
                 progress.achievability && (
                   <GoalAchievabilityCard
@@ -216,7 +214,7 @@ export function Dashboard() {
               action={
                 <Link
                   to="/goals"
-                  className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                  className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                 >
                   {t('dashboard.createGoal', 'Create a goal')}
                 </Link>
@@ -224,12 +222,11 @@ export function Dashboard() {
             />
           )}
         </Card>
-      </div>
+      </section>
 
-      {/* Proxy Receivables Widget */}
-      <div className="mt-6">
+      <section className="mt-6">
         <ProxyReceivablesWidget />
-      </div>
+      </section>
     </div>
   )
 }
