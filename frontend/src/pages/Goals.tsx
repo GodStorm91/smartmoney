@@ -92,7 +92,7 @@ export function Goals() {
     const totalSaved = goalsProgress.reduce((sum, g) => sum + g.total_saved, 0)
     const avgProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0
     const onTrackCount = goalsProgress.filter(g =>
-      g.achievability?.current_monthly_net >= g.achievability?.required_monthly
+      g.achievability && g.achievability.current_monthly_net >= g.achievability.required_monthly
     ).length
     return {
       totalTarget,
