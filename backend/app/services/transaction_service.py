@@ -1,4 +1,5 @@
 """Transaction service for CRUD operations and filtering."""
+
 from datetime import date
 from typing import Optional
 
@@ -33,9 +34,7 @@ class TransactionService:
         return transaction
 
     @staticmethod
-    def bulk_create_transactions(
-        db: Session, transactions_data: list[dict]
-    ) -> tuple[int, int]:
+    def bulk_create_transactions(db: Session, transactions_data: list[dict]) -> tuple[int, int]:
         """Bulk create transactions with duplicate handling.
 
         Args:
@@ -71,10 +70,11 @@ class TransactionService:
         Returns:
             Transaction or None
         """
-        return db.query(Transaction).filter(
-            Transaction.id == transaction_id,
-            Transaction.user_id == user_id
-        ).first()
+        return (
+            db.query(Transaction)
+            .filter(Transaction.id == transaction_id, Transaction.user_id == user_id)
+            .first()
+        )
 
     @staticmethod
     def get_transactions(
@@ -125,7 +125,7 @@ class TransactionService:
         if search:
             query = query.filter(Transaction.description.ilike(f"%{search}%"))
 
-        return query.order_by(Transaction.date.desc()).limit(limit).offset(offset).all()
+        return query.order_by(Transaction.created_at.desc()).limit(limit).offset(offset).all()
 
     @staticmethod
     def count_transactions(
@@ -176,10 +176,7 @@ class TransactionService:
 
     @staticmethod
     def update_transaction(
-        db: Session,
-        user_id: int,
-        transaction_id: int,
-        update_data: dict
+        db: Session, user_id: int, transaction_id: int, update_data: dict
     ) -> Optional[Transaction]:
         """Update a transaction.
 
@@ -195,22 +192,23 @@ class TransactionService:
         Raises:
             ValueError: If trying to update a transaction that doesn't belong to user
         """
-        transaction = db.query(Transaction).filter(
-            Transaction.id == transaction_id,
-            Transaction.user_id == user_id
-        ).first()
+        transaction = (
+            db.query(Transaction)
+            .filter(Transaction.id == transaction_id, Transaction.user_id == user_id)
+            .first()
+        )
 
         if not transaction:
             return None
 
         # Update fields
         for key, value in update_data.items():
-            if hasattr(transaction, key) and key not in ['id', 'created_at', 'user_id']:
+            if hasattr(transaction, key) and key not in ["id", "created_at", "user_id"]:
                 setattr(transaction, key, value)
 
         # Regenerate month_key if date changed
-        if 'date' in update_data:
-            transaction.month_key = update_data['date'].strftime("%Y-%m")
+        if "date" in update_data:
+            transaction.month_key = update_data["date"].strftime("%Y-%m")
 
         db.commit()
         db.refresh(transaction)
@@ -228,10 +226,11 @@ class TransactionService:
         Returns:
             True if deleted, False if not found
         """
-        transaction = db.query(Transaction).filter(
-            Transaction.id == transaction_id,
-            Transaction.user_id == user_id
-        ).first()
+        transaction = (
+            db.query(Transaction)
+            .filter(Transaction.id == transaction_id, Transaction.user_id == user_id)
+            .first()
+        )
 
         if not transaction:
             return False
@@ -252,10 +251,11 @@ class TransactionService:
         Returns:
             Number of deleted transactions
         """
-        result = db.query(Transaction).filter(
-            Transaction.user_id == user_id,
-            Transaction.id.in_(transaction_ids)
-        ).delete(synchronize_session=False)
+        result = (
+            db.query(Transaction)
+            .filter(Transaction.user_id == user_id, Transaction.id.in_(transaction_ids))
+            .delete(synchronize_session=False)
+        )
         db.commit()
         return result
 
@@ -274,10 +274,11 @@ class TransactionService:
         Returns:
             Number of updated transactions
         """
-        result = db.query(Transaction).filter(
-            Transaction.user_id == user_id,
-            Transaction.id.in_(transaction_ids)
-        ).update({"category": category}, synchronize_session=False)
+        result = (
+            db.query(Transaction)
+            .filter(Transaction.user_id == user_id, Transaction.id.in_(transaction_ids))
+            .update({"category": category}, synchronize_session=False)
+        )
         db.commit()
         return result
 
@@ -300,8 +301,7 @@ class TransactionService:
             Dictionary with income, expenses, and net
         """
         query = db.query(Transaction).filter(
-            Transaction.user_id == user_id,
-            ~Transaction.is_transfer
+            Transaction.user_id == user_id, ~Transaction.is_transfer
         )
 
         if start_date:
@@ -352,13 +352,12 @@ class TransactionService:
                 Transaction.category,
                 Transaction.is_income,
                 Transaction.date,
-                func.count(Transaction.id).over(
-                    partition_by=Transaction.description
-                ).label("count"),
-                func.row_number().over(
-                    partition_by=Transaction.description,
-                    order_by=desc(Transaction.date)
-                ).label("rn")
+                func.count(Transaction.id)
+                .over(partition_by=Transaction.description)
+                .label("count"),
+                func.row_number()
+                .over(partition_by=Transaction.description, order_by=desc(Transaction.date))
+                .label("rn"),
             )
             .filter(
                 Transaction.user_id == user_id,
