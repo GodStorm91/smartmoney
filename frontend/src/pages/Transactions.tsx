@@ -13,7 +13,6 @@ import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skele
 import { MultiSelect } from '@/components/ui/MultiSelect'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
-import { QuickEntryFAB } from '@/components/transactions/QuickEntryFAB'
 import { AddTransactionFAB } from '@/components/transactions/AddTransactionFAB'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
@@ -987,8 +986,7 @@ export function Transactions() {
         onScanComplete={handleReceiptScanComplete}
       />
 
-      {/* FAB Buttons - positioned to not overlap */}
-      <QuickEntryFAB />
+      {/* FAB Button */}
       <AddTransactionFAB onClick={() => setIsAddModalOpen(true)} />
     </div>
   )

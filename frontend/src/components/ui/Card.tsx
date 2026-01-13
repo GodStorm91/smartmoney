@@ -14,7 +14,7 @@ export function Card({ children, className, hover = false, variant = 'default', 
   return (
     <div
       className={cn(
-        'rounded-xl border transition-all duration-200',
+        'rounded-xl border transition-all duration-200 p-4 sm:p-5',
         // Variants
         variant === 'default' && 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm',
         variant === 'glass' && 'bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/20 dark:border-gray-700/50 shadow-sm',

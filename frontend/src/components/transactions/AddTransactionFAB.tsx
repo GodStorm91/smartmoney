@@ -14,7 +14,7 @@ export function AddTransactionFAB({ onClick }: AddTransactionFABProps) {
     <button
       onClick={onClick}
       className={cn(
-        'fixed bottom-28 left-4 sm:bottom-6 sm:left-6 z-50',
+        'fixed bottom-28 right-4 sm:bottom-6 sm:right-6 z-50',
         'w-14 h-14 rounded-full',
         'bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600',
         'text-white shadow-lg',
