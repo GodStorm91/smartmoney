@@ -125,11 +125,11 @@ export function GoalAchievabilityCard({
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {achievability.months_remaining} {t('goal.months').toLowerCase()}
+                {achievability.months_remaining} {t('goal.months', 'months')}
               </p>
               {!isCompleted && (
                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                  {isOnPace ? t('goal.onTrack') : t('goal.behind')}
+                  {isOnPace ? t('goal.onTrack', 'On track') : t('goal.behind', 'Behind')}
                 </p>
               )}
             </div>
@@ -155,17 +155,17 @@ export function GoalAchievabilityCard({
             onClick={() => setShowDetails(!showDetails)}
             className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
-            {showDetails ? (
-              <>
-                <ChevronUp className="w-3.5 h-3.5" />
-                {t('common.hideDetails')}
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-3.5 h-3.5" />
-                {t('common.showDetails')}
-              </>
-            )}
+          {showDetails ? (
+            <>
+              <ChevronUp className="w-3.5 h-3.5" />
+              {t('button.hideDetails', 'Hide Details')}
+            </>
+          ) : (
+            <>
+              <ChevronDown className="w-3.5 h-3.5" />
+              {t('button.showDetails', 'Show Details')}
+            </>
+          )}
           </button>
           {onEdit && (
             <button
@@ -173,7 +173,7 @@ export function GoalAchievabilityCard({
               className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
-              {t('common.edit')}
+              {t('button.edit', 'Edit')}
             </button>
           )}
           {onDelete && !showDeleteConfirm && (
@@ -182,7 +182,7 @@ export function GoalAchievabilityCard({
               className="flex items-center gap-1 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              {t('common.delete')}
+              {t('button.delete', 'Delete')}
             </button>
           )}
         </div>
@@ -198,7 +198,7 @@ export function GoalAchievabilityCard({
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 py-1.5 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
               >
-                {t('common.cancel')}
+                {t('button.cancel', 'Cancel')}
               </button>
               <button
                 onClick={() => {
@@ -207,7 +207,7 @@ export function GoalAchievabilityCard({
                 }}
                 className="flex-1 py-1.5 text-xs text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
               >
-                {t('common.delete')}
+                {t('button.delete', 'Delete')}
               </button>
             </div>
           </div>
@@ -221,7 +221,7 @@ export function GoalAchievabilityCard({
           <div className="grid grid-cols-2 gap-3 text-center">
             <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                {t('goal.savingNow')}
+                {t('goal.savingNow', 'Saving now')}
               </p>
               <p className={cn(
                 'text-sm font-semibold',
@@ -233,7 +233,7 @@ export function GoalAchievabilityCard({
             </div>
             <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                {t('goal.needed')}
+                {t('goal.needed', 'Needed')}
               </p>
               <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {formatCurrencyCompactPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}

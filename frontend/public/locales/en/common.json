@@ -32,7 +32,9 @@
     "reset": "Reset",
     "filter": "Filter",
     "selectFile": "Select File",
-    "addMore": "Add More"
+    "addMore": "Add More",
+    "showDetails": "Show Details",
+    "hideDetails": "Hide Details"
   },
   "filter": {
     "category": "Category",
@@ -630,6 +632,11 @@
     "thisMonthNet": "Difference this month"
   },
   "goal": {
+    "months": "months",
+    "onTrack": "On track",
+    "behind": "Behind",
+    "savingNow": "Saving now",
+    "needed": "Needed",
     "status": {
       "onTrack": "On Track",
       "behind": "Behind",

@@ -32,7 +32,9 @@
     "reset": "リセット",
     "filter": "フィルター",
     "selectFile": "ファイルを選択",
-    "addMore": "追加"
+    "addMore": "追加",
+    "showDetails": "詳細を表示",
+    "hideDetails": "詳細を非表示"
   },
   "filter": {
     "category": "カテゴリー",
@@ -589,6 +591,11 @@
     "thisMonthNet": "今月の差額"
   },
   "goal": {
+    "months": "ヶ月",
+    "onTrack": "順調",
+    "behind": "遅れ",
+    "savingNow": "現在貯蓄中",
+    "needed": "必要",
     "status": {
       "onTrack": "順調",
       "behind": "遅れ",

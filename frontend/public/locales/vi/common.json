@@ -32,7 +32,9 @@
     "reset": "Đặt lại",
     "filter": "Lọc",
     "selectFile": "Chọn tệp",
-    "addMore": "Thêm"
+    "addMore": "Thêm",
+    "showDetails": "Hiện chi tiết",
+    "hideDetails": "Ẩn chi tiết"
   },
   "filter": {
     "category": "Danh mục",
@@ -589,6 +591,11 @@
     "thisMonthNet": "Chênh lệch tháng này"
   },
   "goal": {
+    "months": "tháng",
+    "onTrack": "Đúng tiến độ",
+    "behind": "Chậm",
+    "savingNow": "Đang tiết kiệm",
+    "needed": "Cần thiết",
     "status": {
       "onTrack": "Đúng hướng",
       "behind": "Chậm",
