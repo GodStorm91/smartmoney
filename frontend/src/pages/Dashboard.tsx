@@ -16,14 +16,10 @@ import {
   ArrowRight,
   Bell
 } from 'lucide-react'
-import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
-import { DashboardKPIs } from '@/components/dashboard/DashboardKPIs'
 import { Card } from '@/components/ui/Card'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { EmptyState } from '@/components/ui/EmptyState'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
-import { formatMonth, formatDateShort } from '@/utils/formatDate'
+import { formatMonth, formatDate } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
 import { fetchTransactions } from '@/services/transaction-service'
@@ -62,7 +58,7 @@ export function Dashboard() {
     queryFn: fetchGoals,
   })
 
-  const { data: goalsProgress, isLoading: goalsProgressLoading } = useQuery({
+  const { data: goalsProgress } = useQuery({
     queryKey: ['goals-progress', goals?.map(g => g.id)],
     queryFn: async () => {
       if (!goals || goals.length === 0) return []
@@ -75,10 +71,10 @@ export function Dashboard() {
 
   // Fetch recent transactions for quick view
   const { data: recentTransactions } = useQuery({
-    queryKey: ['recent-transactions', 5],
+    queryKey: ['recent-transactions'],
     queryFn: async () => {
-      const transactions = await fetchTransactions({ limit: 5 })
-      return transactions
+      const transactions = await fetchTransactions()
+      return transactions.slice(0, 5)
     },
   })
 
@@ -86,7 +82,7 @@ export function Dashboard() {
 
   // Calculate savings rate
   const currentMonth = monthlyTrends?.[monthlyTrends.length - 1]
-  const savingsRate = currentMonth?.income > 0 
+  const savingsRate = currentMonth && currentMonth.income > 0 
     ? ((currentMonth.income - currentMonth.expenses) / currentMonth.income) * 100 
     : 0
 
@@ -167,7 +163,7 @@ export function Dashboard() {
         <OnboardingChecklist />
 
         {/* Net Worth Hero */}
-        <NetWorthHero summary={summary} savingsRate={savingsRate} />
+        <NetWorthHero summary={summary} />
 
         {/* Smart Alerts Banner */}
         {alerts.length > 0 && (
@@ -271,7 +267,7 @@ export function Dashboard() {
                         {tx.description || tx.category}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDateShort(tx.date)}
+                        {formatDate(tx.date, 'MM/dd')}
                       </p>
                     </div>
                   </div>
@@ -367,7 +363,7 @@ export function Dashboard() {
 }
 
 // Net Worth Hero Component
-function NetWorthHero({ summary, savingsRate }: { summary: any; savingsRate: number }) {
+function NetWorthHero({ summary }: { summary: any }) {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
