@@ -9,9 +9,6 @@ import {
   Repeat, 
   CreditCard,
   Globe,
-  Bell,
-  Shield,
-  ChevronRight,
   Check
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
@@ -183,8 +180,10 @@ export function Settings() {
                 onChange={(e) => setBaseDate(parseInt(e.target.value, 10))}
                 min={1}
                 max={31}
-                helper={t('settings.paydayDescription')}
               />
+              <p className="text-xs text-gray-500 dark:text-gray-500 -mt-2">
+                {t('settings.paydayDescription')}
+              </p>
             </div>
           </SectionCard>
         </div>
