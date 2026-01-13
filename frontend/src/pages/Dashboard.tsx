@@ -234,7 +234,7 @@ export function Dashboard() {
         </div>
 
         {/* Savings Rate */}
-        <SavingsRateCard rate={savingsRate} formatCurrency={formatCurrency} />
+        <SavingsRateCard rate={savingsRate} />
 
         {/* Recent Transactions */}
         <Card className="p-4">
@@ -471,7 +471,7 @@ function QuickStatCard({
 }
 
 // Savings Rate Card
-function SavingsRateCard({ rate, formatCurrency }: { rate: number; formatCurrency: (amount: number) => string }) {
+function SavingsRateCard({ rate }: { rate: number }) {
   const { t } = useTranslation('common')
   
   const getStatus = () => {
