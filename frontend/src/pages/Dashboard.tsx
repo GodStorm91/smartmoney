@@ -29,14 +29,14 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 
-// Navigation date state
-const [currentDate, setCurrentDate] = useState(new Date())
-
 export function Dashboard() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
+
+  // Navigation date state
+  const [currentDate, setCurrentDate] = useState(new Date())
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard-summary'],

@@ -103,7 +103,20 @@
     "netWorth": "Net Worth",
     "assets": "Assets",
     "liabilities": "Liabilities",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "income": "Income",
+    "expenses": "Expenses",
+    "savingsRate": "Savings Rate",
+    "savingsGood": "Healthy",
+    "savingsFair": "Fair",
+    "savingsLow": "Low",
+    "ofIncome": "of income",
+    "recentTransactions": "Recent",
+    "spendingByCategory": "Spending",
+    "goals": "Goals",
+    "createFirstGoal": "Create your first goal",
+    "goalMotivation": "Track your savings progress",
+    "noTransactions": "No transactions yet"
   },
   "health": {
     "title": "Financial Health",

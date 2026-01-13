@@ -1,6 +1,6 @@
 # SmartMoney Deployment Guide
-**Version:** 1.1
-**Last Updated:** 2026-01-13
+**Version:** 1.3
+**Last Updated:** 2026-01-14
 
 ---
 
@@ -13,7 +13,7 @@ After every deployment to production, you MUST verify:
 ### 1. Verify All Files Are Copied
 ```bash
 # Check files exist in nginx serving directory
-ssh root@money.khanh.page "ls -la /root/smartmoney/deploy/frontend-dist/"
+ssh root@money.khanh.page "ls -la /root/frontend-dist/"
 ```
 Expected output should include:
 - `index.html`
@@ -24,11 +24,11 @@ Expected output should include:
 ### 2. Verify Main Bundle Exists
 ```bash
 # Critical: index.html references specific hashed files
-ssh root@money.khanh.page "cat /root/smartmoney/deploy/frontend-dist/index.html | grep -o 'assets/[a-zA-Z0-9-]*\.js' | head -3"
-# Example: assets/index-B-DeipIB.js
+ssh root@money.khanh.page "cat /root/frontend-dist/index.html | grep -o 'assets/index-[a-zA-Z0-9-]*\.js' | head -1"
+# Example: assets/index-CXhUaumL.js
 
 # Verify the referenced file exists
-ssh root@money.khanh.page "ls /root/smartmoney/deploy/frontend-dist/assets/index-B-*.js"
+ssh root@money.khanh.page "ls /root/frontend-dist/assets/index-C-*.js"
 ```
 
 ### 3. Verify Nginx Serves Files
@@ -60,6 +60,7 @@ curl -I https://money.khanh.page/assets/index-B-DeipIB.js
 | Blank page, no console | Missing index.html | Copy index.html to nginx directory |
 | Old code still running | Nginx caching | Restart nginx container |
 | Partial files | Incomplete copy command | Use `cp -r dist/* frontend-dist/` |
+| `Cannot read properties of null (reading 'useState')` | React hook called outside component | Move hooks inside component function |
 
 ### Correct Copy Command
 ```bash
@@ -896,49 +897,43 @@ npm run build
 
 ## Quick Frontend Deployment (Docker Server)
 
-**CRITICAL: Always deploy to `/root/smartmoney/deploy/frontend-dist/`**
+**CRITICAL:** The docker-compose file runs from `/root` directory, so the volume mount uses `/root/frontend-dist`, NOT `/root/smartmoney/deploy/frontend-dist/`
 
-The nginx container mounts from this specific path. Using any other path (e.g., `/root/frontend-dist/`) will NOT work because Docker volume mounts are not updated automatically.
-
-**Correct deployment steps:**
+**Deployment Steps:**
 ```bash
 cd frontend
 
-# Build locally
+# 1. Build locally
 npm run build
 
-# Copy to deploy directory locally
-rm -rf ../deploy/frontend-dist && cp -r dist ../deploy/frontend-dist
+# 2. Upload dist to server (correct path for docker volume mount)
+cd dist && tar cf - . | ssh root@<server-ip> "cd /root/frontend-dist && tar xf -"
 
-# Upload to server CORRECT path
-scp -r ../deploy/frontend-dist/* root@<server-ip>:/root/smartmoney/deploy/frontend-dist/
+# 3. Fix file permissions (IMPORTANT - nginx needs read+execute on directories)
+ssh root@<server-ip> "chmod -R 755 /root/frontend-dist/"
 
-# Reload nginx
-ssh root@<server-ip> "docker exec smartmoney-nginx nginx -s reload"
+# 4. Also copy to deploy directory for backup
+ssh root@<server-ip> "cp -r /root/frontend-dist/* /root/smartmoney/deploy/frontend-dist/"
+
+# 5. Restart nginx to pick up new files
+ssh root@<server-ip> "docker restart smartmoney-nginx"
 ```
 
 **Verify deployment:**
 ```bash
-ssh root@<server-ip> "ls -la /root/smartmoney/deploy/frontend-dist/*.js | head -3"
-# Should show recent timestamps matching your build time
+# Check files are on server
+ssh root@<server-ip> "ls -la /root/frontend-dist/assets/index-*.js"
 
-ssh root@money.khanh.page "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/*.js | head -3"
-# Should match - Docker copies mount at container start
+# Check files in nginx container
+ssh root@<server-ip> "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/assets/index-*.js"
 ```
 
-**If files don't update after upload:**
-```bash
-# Nginx needs restart to pick up changed files from volume mount
-ssh root@<server-ip> "docker restart smartmoney-nginx"
-```
-
-**Why this path:** Check `deploy/docker-compose.yml`:
+**Volume Mount Configuration** (from `deploy/docker-compose.yml`):
 ```yaml
 volumes:
-  - ./frontend-dist:/usr/share/nginx/html:ro  # Relative to deploy/ directory on server
+  - ./frontend-dist:/usr/share/nginx/html:ro
 ```
-
----
+The `./frontend-dist` path is relative to where docker-compose is run. Since we run it from `/root`, it mounts `/root/frontend-dist`.
 
 **Why permissions matter:** `tar` preserves original file permissions. If local files have restrictive permissions (e.g., `600`), nginx won't be able to read them, resulting in 403 Forbidden errors.
 

@@ -103,7 +103,20 @@
     "netWorth": "純資産",
     "assets": "資産",
     "liabilities": "負債",
-    "thisMonth": "今月"
+    "thisMonth": "今月",
+    "income": "収入",
+    "expenses": "支出",
+    "savingsRate": "貯蓄率",
+    "savingsGood": "健全",
+    "savingsFair": "普通",
+    "savingsLow": "低め",
+    "ofIncome": "収入の",
+    "recentTransactions": "最近の取引",
+    "spendingByCategory": "支出",
+    "goals": "目標",
+    "createFirstGoal": "最初の目標を作成",
+    "goalMotivation": "貯蓄進捗を追跡",
+    "noTransactions": "取引がありません"
   },
   "health": {
     "title": "家計の健康度",

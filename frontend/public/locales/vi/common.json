@@ -103,7 +103,20 @@
     "netWorth": "Tổng tài sản ròng",
     "assets": "Tài sản",
     "liabilities": "Nợ phải trả",
-    "thisMonth": "Tháng này"
+    "thisMonth": "Tháng này",
+    "income": "Thu nhập",
+    "expenses": "Chi tiêu",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "savingsGood": "Tốt",
+    "savingsFair": "Khá",
+    "savingsLow": "Thấp",
+    "ofIncome": "của thu nhập",
+    "recentTransactions": "Gần đây",
+    "spendingByCategory": "Chi tiêu",
+    "goals": "Mục tiêu",
+    "createFirstGoal": "Tạo mục tiêu đầu tiên",
+    "goalMotivation": "Theo dõi tiến độ tiết kiệm",
+    "noTransactions": "Chưa có giao dịch"
   },
   "health": {
     "title": "Sức khỏe tài chính",
