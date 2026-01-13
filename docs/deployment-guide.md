@@ -1,6 +1,74 @@
 # SmartMoney Deployment Guide
-**Version:** 1.0
-**Last Updated:** 2025-11-17
+**Version:** 1.1
+**Last Updated:** 2026-01-13
+
+---
+
+## 🚨 CRITICAL RULE: Deployment Verification
+
+**THIS IS MANDATORY - NEVER SKIP THIS STEP**
+
+After every deployment to production, you MUST verify:
+
+### 1. Verify All Files Are Copied
+```bash
+# Check files exist in nginx serving directory
+ssh root@money.khanh.page "ls -la /root/smartmoney/deploy/frontend-dist/"
+```
+Expected output should include:
+- `index.html`
+- `index.html.br` (brotli)
+- `index.html.gz` (gzip)
+- `assets/` directory with all JS/CSS files
+
+### 2. Verify Main Bundle Exists
+```bash
+# Critical: index.html references specific hashed files
+ssh root@money.khanh.page "cat /root/smartmoney/deploy/frontend-dist/index.html | grep -o 'assets/[a-zA-Z0-9-]*\.js' | head -3"
+# Example: assets/index-B-DeipIB.js
+
+# Verify the referenced file exists
+ssh root@money.khanh.page "ls /root/smartmoney/deploy/frontend-dist/assets/index-B-*.js"
+```
+
+### 3. Verify Nginx Serves Files
+```bash
+# Check nginx container has correct files
+ssh root@money.khanh.page "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/ | head -10"
+
+# Test HTTP response
+curl -I https://money.khanh.page/assets/index-B-DeipIB.js
+# Should return 200 OK, NOT 404
+```
+
+### 4. Test the Application
+```bash
+# Open in browser - check console for 404 errors
+# Visit: https://money.khanh.page
+
+# Check for JavaScript errors
+# - Blank page = missing bundle (404 error)
+# - Console errors = build/integration issue
+```
+
+### Deployment Failure Scenarios
+
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `net::ERR_ABORTED 404` | index.html copied but assets not | Copy entire dist/ directory |
+| `net::ERR_ABORTED 404` for specific .js | File hash mismatch | Ensure index.html matches actual files |
+| Blank page, no console | Missing index.html | Copy index.html to nginx directory |
+| Old code still running | Nginx caching | Restart nginx container |
+| Partial files | Incomplete copy command | Use `cp -r dist/* frontend-dist/` |
+
+### Correct Copy Command
+```bash
+# WRONG - will cause 404 errors:
+cp -r /var/www/smartmoney/frontend/dist/assets frontend-dist/
+
+# CORRECT - copies everything:
+rm -rf frontend-dist/* && cp -r /var/www/smartmoney/frontend/dist/* frontend-dist/
+```
 
 ---
 
