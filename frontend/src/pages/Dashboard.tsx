@@ -109,9 +109,13 @@ export function Dashboard() {
     return <DashboardSkeleton />
   }
 
-  // Currency formatter
-  const formatCurrency = (amount: number) => 
+  // Currency formatter for dashboard totals (already JPY-normalized by API)
+  const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+
+  // Currency formatter for transactions (amount already in native currency)
+  const formatTransactionCurrency = (amount: number, txCurrency: string = 'JPY') =>
+    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
   return (
     <div className="min-h-screen pb-32">
@@ -277,7 +281,7 @@ export function Dashboard() {
                       ? 'text-green-600 dark:text-green-400' 
                       : 'text-gray-900 dark:text-gray-100'
                   )}>
-                    {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount))}
+                    {tx.type === 'income' ? '+' : '-'}{formatTransactionCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}
                   </span>
                 </div>
               ))}
@@ -329,7 +333,7 @@ export function Dashboard() {
                     key={progress.goal_id}
                     years={progress.years}
                     progress={progress}
-                    formatCurrency={formatCurrency}
+                    formatCurrency={formatTransactionCurrency}
                   />
                 )
               ))}

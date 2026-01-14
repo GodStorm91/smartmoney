@@ -20,9 +20,11 @@ import {
   Sun,
 } from 'lucide-react'
 import { useTheme } from '@/contexts/ThemeContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { fetchTransactions } from '@/services/transaction-service'
 import type { Transaction } from '@/types'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencySigned } from '@/utils/formatCurrency'
 
 interface CommandPaletteProps {
   open: boolean
@@ -42,9 +44,15 @@ export function CommandPalette({
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { resolvedTheme, toggleTheme } = useTheme()
+  const { isPrivacyMode } = usePrivacy()
+  const { data: exchangeRates } = useExchangeRates()
   const [search, setSearch] = useState('')
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(false)
+
+  // Format transaction amount (already in native currency)
+  const formatTxAmount = (amount: number, txCurrency: string) =>
+    formatCurrencySigned(amount, undefined, txCurrency, exchangeRates?.rates || {}, true)
 
   // Search transactions when query changes
   useEffect(() => {
@@ -175,8 +183,9 @@ export function CommandPalette({
                           : 'text-red-600 dark:text-red-400'
                       }`}
                     >
-                      {tx.type === 'income' ? '+' : '-'}
-                      {formatCurrency(tx.amount, tx.currency)}
+                      {isPrivacyMode
+                        ? (tx.type === 'income' ? '+¥***' : '-¥***')
+                        : formatTxAmount(tx.amount, tx.currency || 'JPY')}
                     </span>
                   </Command.Item>
                 ))}

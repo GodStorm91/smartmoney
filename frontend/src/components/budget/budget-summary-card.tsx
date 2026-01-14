@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { AlertCircle, TrendingUp, TrendingDown } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
 import type { Budget } from '@/types'
 
@@ -26,6 +29,13 @@ export function BudgetSummaryCard({
   isSaving
 }: BudgetSummaryCardProps) {
   const { t, i18n } = useTranslation('common')
+  const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
+  const { data: exchangeRates } = useExchangeRates()
+
+  // Budget amounts are in user's display currency (native)
+  const formatBudgetCurrency = (amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
   const budgetLang = budget.language || 'ja'
   const currentLang = i18n.language
@@ -68,7 +78,7 @@ export function BudgetSummaryCard({
         <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.monthlyIncome')}</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {formatCurrency(budget.monthly_income)}
+            {formatBudgetCurrency(budget.monthly_income)}
           </p>
           {previousMonth && incomeDiff !== 0 && (
             <div className={cn(
@@ -76,7 +86,7 @@ export function BudgetSummaryCard({
               incomeDiff > 0 ? "text-green-600" : "text-red-600"
             )}>
               {incomeDiff > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              <span>{incomeDiff > 0 ? '+' : ''}{formatCurrency(incomeDiff)}</span>
+              <span>{incomeDiff > 0 ? '+' : ''}{formatBudgetCurrency(incomeDiff)}</span>
             </div>
           )}
         </div>
@@ -85,7 +95,7 @@ export function BudgetSummaryCard({
           <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.savingsTarget')}</p>
             <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {formatCurrency(budget.savings_target)}
+              {formatBudgetCurrency(budget.savings_target)}
             </p>
           </div>
         )}
@@ -94,7 +104,7 @@ export function BudgetSummaryCard({
           <div className={`p-4 rounded-lg ${budget.carry_over > 0 ? 'bg-teal-50 dark:bg-teal-900/30' : 'bg-orange-50 dark:bg-orange-900/30'}`}>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.carryOver')}</p>
             <p className={`text-2xl font-bold ${budget.carry_over > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-orange-600 dark:text-orange-400'}`}>
-              {budget.carry_over > 0 ? '+' : ''}{formatCurrency(budget.carry_over)}
+              {budget.carry_over > 0 ? '+' : ''}{formatBudgetCurrency(budget.carry_over)}
             </p>
           </div>
         )}
@@ -102,7 +112,7 @@ export function BudgetSummaryCard({
         <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.totalAllocated')}</p>
           <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {formatCurrency(totalAllocated)}
+            {formatBudgetCurrency(totalAllocated)}
           </p>
           {previousMonth && allocatedDiff !== 0 && (
             <div className={cn(
@@ -110,7 +120,7 @@ export function BudgetSummaryCard({
               allocatedDiff > 0 ? "text-red-600" : "text-green-600"
             )}>
               {allocatedDiff > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-              <span>{allocatedDiff > 0 ? '+' : ''}{formatCurrency(allocatedDiff)}</span>
+              <span>{allocatedDiff > 0 ? '+' : ''}{formatBudgetCurrency(allocatedDiff)}</span>
             </div>
           )}
         </div>

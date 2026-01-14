@@ -5,7 +5,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, Pencil, Trash2, Plus, ArrowUp, ArrowDown, LayoutGrid } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
 import { useCategoryTree } from '@/hooks/useCategories'
 import { updateAllocation, deleteAllocation } from '@/services/budget-service'
@@ -39,9 +42,16 @@ export function BudgetAllocationList({
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { data: categoryTree } = useCategoryTree()
+  const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
+  const { data: exchangeRates } = useExchangeRates()
   const [sortBy, setSortBy] = useState<SortOption>('priority')
   const [groupBy, setGroupBy] = useState<GroupOption>('none')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+
+  // Budget allocation amounts are in user's display currency (native)
+  const formatCurrency = (amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -256,6 +266,7 @@ export function BudgetAllocationList({
                     isDraft={isDraft}
                     isUpdating={updateMutation.isPending}
                     isDeleting={deleteMutation.isPending}
+                    formatCurrency={formatCurrency}
                     onAmountChange={(newAmount) => {
                       if (isDraft && onAllocationChange) {
                         const updated = [...allocations]
@@ -293,6 +304,7 @@ interface AllocationCardProps {
   isDraft?: boolean
   isUpdating?: boolean
   isDeleting?: boolean
+  formatCurrency: (amount: number) => string
   onAmountChange: (newAmount: number) => void
   onDelete: () => void
   onCategoryClick: () => void
@@ -306,6 +318,7 @@ function AllocationCard({
   isDraft,
   isUpdating,
   isDeleting,
+  formatCurrency,
   onAmountChange,
   onDelete,
   onCategoryClick,
