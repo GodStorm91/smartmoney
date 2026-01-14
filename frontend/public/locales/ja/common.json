@@ -862,6 +862,15 @@
     "currentBudget": "現在の予算",
     "regenerate": "再生成",
     "savingsTarget": "貯蓄目標",
+    "usedOfTotal": "{{total}}中{{used}}",
+    "budgetUsed": "使用済み",
+    "percentOfIncome": "収入の{{percent}}%",
+    "availableToSpend": "利用可能額",
+    "overAllocated": "超過配分",
+    "spendingProgress": "支出進捗",
+    "daysLeft": "日残り",
+    "spendingByCategory": "カテゴリ別支出",
+    "spentOfBudgeted": "予算{{budgeted}}",
     "totalAllocated": "割り当て合計",
     "aiAdvice": "AIアドバイス",
     "feedbackTitle": "フィードバックを提供して再生成",
@@ -928,7 +937,8 @@
       "warningNearLimit": "警告: 限度額に近い",
       "exceededTotal": "総予算を超過",
       "overBudget": "{{count}}カテゴリが予算超過",
-      "totalBudget": "総予算"
+      "totalBudget": "総予算",
+      "overBudgetStatus": "予算超過"
     },
     "undo": "取り消し",
     "export": "エクスポート"

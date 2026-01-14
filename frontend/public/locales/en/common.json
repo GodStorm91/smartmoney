@@ -903,6 +903,15 @@
     "currentBudget": "Current Budget",
     "regenerate": "Regenerate",
     "savingsTarget": "Savings Target",
+    "usedOfTotal": "{{used}} of {{total}}",
+    "budgetUsed": "used",
+    "percentOfIncome": "{{percent}}% of income",
+    "availableToSpend": "Available to spend",
+    "overAllocated": "Over allocated",
+    "spendingProgress": "Spending Progress",
+    "daysLeft": "days left",
+    "spendingByCategory": "Spending by Category",
+    "spentOfBudgeted": "{{budgeted}} budgeted",
     "totalAllocated": "Total Allocated",
     "aiAdvice": "AI Advice",
     "feedbackTitle": "Provide Feedback to Regenerate",
@@ -969,7 +978,8 @@
       "warningNearLimit": "Warning: Near limit",
       "exceededTotal": "Total budget exceeded",
       "overBudget": "{{count}} categories over budget",
-      "totalBudget": "Total Budget"
+      "totalBudget": "Total Budget",
+      "overBudgetStatus": "Over budget"
     },
     "undo": "Undo",
     "export": "Export"

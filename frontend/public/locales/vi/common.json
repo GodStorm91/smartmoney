@@ -861,6 +861,15 @@
     "currentBudget": "Ngân Sách Hiện Tại",
     "regenerate": "Tạo Lại",
     "savingsTarget": "Mục Tiêu Tiết Kiệm",
+    "usedOfTotal": "{{used}} / {{total}}",
+    "budgetUsed": "đã dùng",
+    "percentOfIncome": "{{percent}}% thu nhập",
+    "availableToSpend": "Có thể chi tiêu",
+    "overAllocated": "Phân bổ quá",
+    "spendingProgress": "Tiến Độ Chi Tiêu",
+    "daysLeft": "ngày còn lại",
+    "spendingByCategory": "Chi Tiêu Theo Danh Mục",
+    "spentOfBudgeted": "đã ngân sách {{budgeted}}",
     "totalAllocated": "Tổng Đã Phân Bổ",
     "aiAdvice": "Lời Khuyên AI",
     "feedbackTitle": "Cung Cấp Phản Hồi Để Tạo Lại",
@@ -927,7 +936,8 @@
       "warningNearLimit": "Cảnh báo: Gần giới hạn",
       "exceededTotal": "Vượt tổng ngân sách",
       "overBudget": "{{count}} danh mục vượt ngân sách",
-      "totalBudget": "Tổng Ngân Sách"
+      "totalBudget": "Tổng Ngân Sách",
+      "overBudgetStatus": "Vượt ngân sách"
     },
     "undo": "Hoàn tác",
     "export": "Xuất"

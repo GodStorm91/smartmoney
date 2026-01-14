@@ -1,4 +1,5 @@
 """Analytics service for cashflow analysis and category breakdown."""
+
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from typing import Optional
@@ -16,7 +17,10 @@ class AnalyticsService:
 
     @staticmethod
     def get_monthly_cashflow(
-        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session,
+        user_id: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ) -> list[dict]:
         """Get monthly cashflow grouped by month for a specific user.
 
@@ -27,27 +31,25 @@ class AnalyticsService:
             end_date: Filter by end date
 
         Returns:
-            List of monthly cashflow dictionaries
+            List of monthly cashflow dictionaries (amounts normalized to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query transactions grouped by month and currency
         query = (
             db.query(
                 Transaction.month_key,
-                func.sum(
-                    case(
-                        (Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("income"),
-                func.sum(
-                    case(
-                        (~Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("expenses"),
+                Transaction.currency,
+                func.sum(case((Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "income"
+                ),
+                func.sum(case((~Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "expenses"
+                ),
             )
-            .filter(
-                Transaction.user_id == user_id,
-                ~Transaction.is_transfer
-            )
-            .group_by(Transaction.month_key)
+            .filter(Transaction.user_id == user_id, ~Transaction.is_transfer)
+            .group_by(Transaction.month_key, Transaction.currency)
             .order_by(Transaction.month_key)
         )
 
@@ -58,20 +60,32 @@ class AnalyticsService:
 
         results = query.all()
 
-        monthly_data = []
-        for row in results:
-            income = row.income or 0
-            expenses = abs(row.expenses or 0)
-            monthly_data.append(
-                {
-                    "month": row.month_key,
-                    "income": income,
-                    "expenses": expenses,
-                    "net": income - expenses,
-                }
-            )
+        # Aggregate by month with currency conversion
+        monthly_data: dict[str, dict] = defaultdict(lambda: {"income": 0, "expenses": 0})
 
-        return monthly_data
+        for row in results:
+            month = row.month_key
+            currency = row.currency or "JPY"
+            income_raw = row.income or 0
+            expenses_raw = abs(row.expenses or 0)
+
+            # Convert to JPY
+            income_jpy = AnalyticsService._convert_to_jpy(int(income_raw), currency, rates)
+            expenses_jpy = AnalyticsService._convert_to_jpy(int(expenses_raw), currency, rates)
+
+            monthly_data[month]["income"] += income_jpy
+            monthly_data[month]["expenses"] += expenses_jpy
+
+        # Build result list
+        return [
+            {
+                "month": month,
+                "income": data["income"],
+                "expenses": data["expenses"],
+                "net": data["income"] - data["expenses"],
+            }
+            for month, data in sorted(monthly_data.items())
+        ]
 
     @staticmethod
     def _convert_to_jpy(amount: int, currency: str, rates: dict[str, float]) -> int:
@@ -100,7 +114,10 @@ class AnalyticsService:
 
     @staticmethod
     def get_category_breakdown(
-        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session,
+        user_id: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ) -> list[dict]:
         """Get expense breakdown by category for a specific user with comparison to previous period.
 
@@ -140,13 +157,15 @@ class AnalyticsService:
             if prev_amount is not None and prev_amount > 0:
                 change_pct = round(((data["amount"] - prev_amount) / prev_amount) * 100, 1)
 
-            categories.append({
-                "category": category,
-                "amount": data["amount"],
-                "count": data["count"],
-                "previous_amount": prev_amount,
-                "change_percent": change_pct,
-            })
+            categories.append(
+                {
+                    "category": category,
+                    "amount": data["amount"],
+                    "count": data["count"],
+                    "previous_amount": prev_amount,
+                    "change_percent": change_pct,
+                }
+            )
 
         return categories
 
@@ -155,18 +174,11 @@ class AnalyticsService:
         db: Session, user_id: int, start_date: Optional[date], end_date: Optional[date], rates: dict
     ) -> dict[str, dict]:
         """Get category totals with amount and count for a date range."""
-        query = (
-            db.query(
-                Transaction.category,
-                Transaction.amount,
-                Transaction.currency,
-            )
-            .filter(
-                Transaction.user_id == user_id,
-                ~Transaction.is_transfer,
-                ~Transaction.is_income
-            )
-        )
+        query = db.query(
+            Transaction.category,
+            Transaction.amount,
+            Transaction.currency,
+        ).filter(Transaction.user_id == user_id, ~Transaction.is_transfer, ~Transaction.is_income)
 
         if start_date:
             query = query.filter(Transaction.date >= start_date)
@@ -179,18 +191,14 @@ class AnalyticsService:
         category_data: dict[str, dict] = defaultdict(lambda: {"amount": 0, "count": 0})
 
         for row in results:
-            amount_jpy = AnalyticsService._convert_to_jpy(
-                abs(row.amount), row.currency, rates
-            )
+            amount_jpy = AnalyticsService._convert_to_jpy(abs(row.amount), row.currency, rates)
             category_data[row.category]["amount"] += amount_jpy
             category_data[row.category]["count"] += 1
 
         return dict(category_data)
 
     @staticmethod
-    def get_monthly_trend(
-        db: Session, user_id: int, months: int = 12
-    ) -> list[dict]:
+    def get_monthly_trend(db: Session, user_id: int, months: int = 12) -> list[dict]:
         """Get monthly trend for last N months for a specific user.
 
         Args:
@@ -199,51 +207,68 @@ class AnalyticsService:
             months: Number of months to include
 
         Returns:
-            List of monthly trend data
+            List of monthly trend data (amounts normalized to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query transactions grouped by month, currency, and income/expense
         query = (
             db.query(
                 Transaction.month_key,
-                func.sum(
-                    case(
-                        (Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("income"),
-                func.sum(
-                    case(
-                        (~Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("expenses"),
+                Transaction.currency,
+                func.sum(case((Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "income"
+                ),
+                func.sum(case((~Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "expenses"
+                ),
             )
-            .filter(
-                Transaction.user_id == user_id,
-                ~Transaction.is_transfer
-            )
-            .group_by(Transaction.month_key)
+            .filter(Transaction.user_id == user_id, ~Transaction.is_transfer)
+            .group_by(Transaction.month_key, Transaction.currency)
             .order_by(Transaction.month_key.desc())
-            .limit(months)
+            .limit(months * 3)  # Get more rows since we group by currency too
         )
 
         results = query.all()
 
-        trend_data = []
+        # Aggregate by month with currency conversion
+        monthly_totals: dict[str, dict] = defaultdict(lambda: {"income": 0, "expenses": 0})
+
         for row in results:
-            income = row.income or 0
-            expenses = abs(row.expenses or 0)
+            month = row.month_key
+            currency = row.currency or "JPY"
+            income_raw = row.income or 0
+            expenses_raw = abs(row.expenses or 0)
+
+            # Convert to JPY
+            income_jpy = AnalyticsService._convert_to_jpy(int(income_raw), currency, rates)
+            expenses_jpy = AnalyticsService._convert_to_jpy(int(expenses_raw), currency, rates)
+
+            monthly_totals[month]["income"] += income_jpy
+            monthly_totals[month]["expenses"] += expenses_jpy
+
+        # Build trend data in chronological order
+        trend_data = []
+        for month_data in sorted(monthly_totals.items(), key=lambda x: x[0]):
+            month, data = month_data
             trend_data.append(
                 {
-                    "month": row.month_key,
-                    "income": income,
-                    "expenses": expenses,
-                    "net": income - expenses,
+                    "month": month,
+                    "income": data["income"],
+                    "expenses": data["expenses"],
+                    "net": data["income"] - data["expenses"],
                 }
             )
 
-        return list(reversed(trend_data))  # Return chronological order
+        return trend_data
 
     @staticmethod
     def get_sources_breakdown(
-        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session,
+        user_id: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ) -> list[dict]:
         """Get transaction breakdown by source for a specific user.
 
@@ -262,10 +287,7 @@ class AnalyticsService:
                 func.sum(Transaction.amount).label("total"),
                 func.count(Transaction.id).label("count"),
             )
-            .filter(
-                Transaction.user_id == user_id,
-                ~Transaction.is_transfer
-            )
+            .filter(Transaction.user_id == user_id, ~Transaction.is_transfer)
             .group_by(Transaction.source)
             .order_by(func.count(Transaction.id).desc())
         )
@@ -306,12 +328,12 @@ class AnalyticsService:
         """
         results = (
             db.query(
-                func.sum(
-                    case((Transaction.is_income, Transaction.amount), else_=0)
-                ).label("income"),
-                func.sum(
-                    case((~Transaction.is_income, Transaction.amount), else_=0)
-                ).label("expenses"),
+                func.sum(case((Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "income"
+                ),
+                func.sum(case((~Transaction.is_income, Transaction.amount), else_=0)).label(
+                    "expenses"
+                ),
             )
             .filter(
                 Transaction.user_id == user_id,
@@ -342,7 +364,10 @@ class AnalyticsService:
 
     @staticmethod
     def get_comprehensive_analytics(
-        db: Session, user_id: int, start_date: Optional[date] = None, end_date: Optional[date] = None
+        db: Session,
+        user_id: int,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ) -> dict:
         """Get comprehensive analytics with all data for a specific user.
 
@@ -368,7 +393,7 @@ class AnalyticsService:
                 trends_start = date(
                     start_date.year if start_date.month > months_to_add else start_date.year - 1,
                     (start_date.month - months_to_add - 1) % 12 + 1,
-                    1
+                    1,
                 )
 
         # Get monthly trends (with extended date range for meaningful charts)
@@ -409,7 +434,9 @@ class AnalyticsService:
                 ),
                 "net_change": AnalyticsService._calculate_percentage_change(
                     net_cashflow, prev_totals["net"]
-                ) if prev_totals["net"] != 0 else None,
+                )
+                if prev_totals["net"] != 0
+                else None,
             }
 
         # Extract top category
@@ -433,9 +460,7 @@ class AnalyticsService:
         }
 
     @staticmethod
-    def generate_spending_insights(
-        db: Session, user_id: int
-    ) -> list[dict]:
+    def generate_spending_insights(db: Session, user_id: int) -> list[dict]:
         """Generate smart spending insights for a user.
 
         Args:
@@ -467,31 +492,38 @@ class AnalyticsService:
             if last_amount > 0:
                 change = ((amount - last_amount) / last_amount) * 100
                 if change > 30:
-                    insights.append({
-                        "type": "spike",
-                        "severity": "warning",
-                        "title": f"{category} spending increased",
-                        "message": f"Up {change:.0f}% compared to last month",
-                        "category": category,
-                        "amount": amount,
-                        "percentage_change": round(change, 1),
-                    })
+                    insights.append(
+                        {
+                            "type": "spike",
+                            "severity": "warning",
+                            "title": f"{category} spending increased",
+                            "message": f"Up {change:.0f}% compared to last month",
+                            "category": category,
+                            "amount": amount,
+                            "percentage_change": round(change, 1),
+                        }
+                    )
                 elif change < -20:
-                    insights.append({
-                        "type": "saving",
-                        "severity": "success",
-                        "title": f"{category} spending decreased",
-                        "message": f"Down {abs(change):.0f}% compared to last month",
-                        "category": category,
-                        "amount": amount,
-                        "percentage_change": round(change, 1),
-                    })
+                    insights.append(
+                        {
+                            "type": "saving",
+                            "severity": "success",
+                            "title": f"{category} spending decreased",
+                            "message": f"Down {abs(change):.0f}% compared to last month",
+                            "category": category,
+                            "amount": amount,
+                            "percentage_change": round(change, 1),
+                        }
+                    )
 
         # 2. Budget alerts
-        budgets = db.query(Budget).filter(
-            Budget.user_id == user_id,
-            Budget.month == current_month_start.strftime("%Y-%m")
-        ).all()
+        budgets = (
+            db.query(Budget)
+            .filter(
+                Budget.user_id == user_id, Budget.month == current_month_start.strftime("%Y-%m")
+            )
+            .all()
+        )
 
         for budget in budgets:
             # Iterate over budget allocations (category-level budgets)
@@ -500,25 +532,29 @@ class AnalyticsService:
                 if allocation.amount > 0:
                     usage = (spent / allocation.amount) * 100
                     if usage >= 100:
-                        insights.append({
-                            "type": "budget",
-                            "severity": "warning",
-                            "title": f"{allocation.category} budget exceeded",
-                            "message": f"Spent {usage:.0f}% of budget",
-                            "category": allocation.category,
-                            "amount": spent,
-                            "percentage_change": round(usage - 100, 1),
-                        })
+                        insights.append(
+                            {
+                                "type": "budget",
+                                "severity": "warning",
+                                "title": f"{allocation.category} budget exceeded",
+                                "message": f"Spent {usage:.0f}% of budget",
+                                "category": allocation.category,
+                                "amount": spent,
+                                "percentage_change": round(usage - 100, 1),
+                            }
+                        )
                     elif usage >= 80:
-                        insights.append({
-                            "type": "budget",
-                            "severity": "info",
-                            "title": f"{allocation.category} budget at {usage:.0f}%",
-                            "message": "Approaching budget limit",
-                            "category": allocation.category,
-                            "amount": spent,
-                            "percentage_change": round(usage, 1),
-                        })
+                        insights.append(
+                            {
+                                "type": "budget",
+                                "severity": "info",
+                                "title": f"{allocation.category} budget at {usage:.0f}%",
+                                "message": "Approaching budget limit",
+                                "category": allocation.category,
+                                "amount": spent,
+                                "percentage_change": round(usage, 1),
+                            }
+                        )
 
         # 3. Overall spending trend
         current_total = sum(current_spending.values())
@@ -526,23 +562,27 @@ class AnalyticsService:
         if last_total > 0:
             total_change = ((current_total - last_total) / last_total) * 100
             if total_change > 20:
-                insights.append({
-                    "type": "trend",
-                    "severity": "warning",
-                    "title": "Overall spending up",
-                    "message": f"Total spending increased {total_change:.0f}% this month",
-                    "amount": current_total,
-                    "percentage_change": round(total_change, 1),
-                })
+                insights.append(
+                    {
+                        "type": "trend",
+                        "severity": "warning",
+                        "title": "Overall spending up",
+                        "message": f"Total spending increased {total_change:.0f}% this month",
+                        "amount": current_total,
+                        "percentage_change": round(total_change, 1),
+                    }
+                )
             elif total_change < -10:
-                insights.append({
-                    "type": "trend",
-                    "severity": "success",
-                    "title": "Great job saving!",
-                    "message": f"Total spending down {abs(total_change):.0f}% this month",
-                    "amount": current_total,
-                    "percentage_change": round(total_change, 1),
-                })
+                insights.append(
+                    {
+                        "type": "trend",
+                        "severity": "success",
+                        "title": "Great job saving!",
+                        "message": f"Total spending down {abs(total_change):.0f}% this month",
+                        "amount": current_total,
+                        "percentage_change": round(total_change, 1),
+                    }
+                )
 
         # 4. Top spending category
         if current_spending:
@@ -551,22 +591,22 @@ class AnalyticsService:
             if current_total > 0:
                 percentage = (top_amount / current_total) * 100
                 if percentage > 40:
-                    insights.append({
-                        "type": "unusual",
-                        "severity": "info",
-                        "title": f"{top_category} is top expense",
-                        "message": f"Accounts for {percentage:.0f}% of spending",
-                        "category": top_category,
-                        "amount": top_amount,
-                        "percentage_change": round(percentage, 1),
-                    })
+                    insights.append(
+                        {
+                            "type": "unusual",
+                            "severity": "info",
+                            "title": f"{top_category} is top expense",
+                            "message": f"Accounts for {percentage:.0f}% of spending",
+                            "category": top_category,
+                            "amount": top_amount,
+                            "percentage_change": round(percentage, 1),
+                        }
+                    )
 
         return insights
 
     @staticmethod
-    def _get_category_spending(
-        db: Session, user_id: int, start_date: date, end_date: date
-    ) -> dict:
+    def _get_category_spending(db: Session, user_id: int, start_date: date, end_date: date) -> dict:
         """Get spending totals by category for a date range (normalized to JPY)."""
         rates = ExchangeRateService.get_cached_rates(db)
 
@@ -588,9 +628,7 @@ class AnalyticsService:
 
         category_totals: dict[str, int] = defaultdict(int)
         for row in results:
-            amount_jpy = AnalyticsService._convert_to_jpy(
-                abs(row.amount), row.currency, rates
-            )
+            amount_jpy = AnalyticsService._convert_to_jpy(abs(row.amount), row.currency, rates)
             category_totals[row.category] += amount_jpy
 
         return dict(category_totals)
