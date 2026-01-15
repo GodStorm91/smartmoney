@@ -1,4 +1,27 @@
 """API routes."""
-from . import analytics, goals, transactions, upload
 
-__all__ = ["transactions", "analytics", "goals", "upload"]
+from . import (
+    analytics,
+    budgets,
+    categories,
+    crypto,
+    gamification,
+    goals,
+    receipts,
+    rewards,
+    transactions,
+    upload,
+)
+
+__all__ = [
+    "analytics",
+    "budgets",
+    "categories",
+    "crypto",
+    "gamification",
+    "goals",
+    "receipts",
+    "rewards",
+    "transactions",
+    "upload",
+]
