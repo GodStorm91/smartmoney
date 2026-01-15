@@ -253,3 +253,41 @@ export function formatCurrencyCompactPrivacy(
   }
   return formatCurrencyCompact(amount, currency, rates, isNativeCurrency)
 }
+
+/**
+ * Format currency with both original and JPY equivalent
+ * e.g., "2,000,000 VND (110,000 JPY)"
+ */
+export function formatCurrencyWithJPY(
+  amount: number,
+  currency: string = 'JPY',
+  rates: Record<string, number> = DEFAULT_RATES,
+  isNativeCurrency: boolean = false,
+  isPrivacyMode: boolean = false
+): string {
+  if (isPrivacyMode) {
+    return '****'
+  }
+
+  // Get decimals for the currency
+  const decimals = CURRENCY_DECIMALS[currency] ?? 0
+  const displayAmount = isNativeCurrency 
+    ? amount / Math.pow(10, decimals)
+    : amount / Math.pow(10, decimals)
+
+  // Format original amount
+  const originalFormatted = formatCurrency(displayAmount, currency, rates, true)
+
+  // Convert to JPY for display
+  const jpyAmount = isNativeCurrency 
+    ? displayAmount * rates[currency] 
+    : displayAmount
+  const jpyFormatted = formatCurrency(jpyAmount, 'JPY', rates, true)
+
+  // If already JPY, just return the formatted amount
+  if (currency === 'JPY') {
+    return originalFormatted
+  }
+
+  return `${originalFormatted} (${jpyFormatted})`
+}

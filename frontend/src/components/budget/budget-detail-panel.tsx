@@ -20,6 +20,15 @@ import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@/utils/cn'
 import type { Transaction, BudgetTrackingItem } from '@/types'
 
+// Helper to convert amount to JPY
+function convertToJpy(amount: number, currency: string, rates: Record<string, number>): number {
+  if (currency === 'JPY') return amount
+  const rate = rates[currency]
+  if (!rate || rate === 0) return amount
+  // rate_to_jpy is "units per JPY", so divide to convert to JPY
+  return Math.round(amount / rate)
+}
+
 interface BudgetDetailPanelProps {
   category: string
   month: string
@@ -100,9 +109,18 @@ export function BudgetDetailPanel({
         })
 
         if (mounted) {
-          // Sort by amount (largest first) and take top 10
-          const sorted = [...data].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
-          setTransactions(sorted.slice(0, 10))
+          // Convert all amounts to JPY for consistent sorting
+          const rates = exchangeRates?.rates || {}
+          const withJpyAmount = data
+            .filter(tx => !tx.is_transfer)
+            .map(tx => ({
+              ...tx,
+              amountJpy: convertToJpy(Math.abs(tx.amount), tx.currency || 'JPY', rates)
+            }))
+
+          // Sort by JPY amount (largest first) and take top 10
+          const sorted = withJpyAmount.sort((a, b) => b.amountJpy - a.amountJpy)
+          setTransactions(sorted.slice(0, 10).map(({ amountJpy, ...tx }) => tx))
         }
       } catch (err) {
         if (mounted) {
@@ -151,7 +169,13 @@ export function BudgetDetailPanel({
         })
 
         if (mounted) {
-          const total = data.reduce((sum, tx) => sum + Math.abs(tx.amount), 0)
+          // Filter out transfers and calculate total in JPY
+          const rates = exchangeRates?.rates || {}
+          const filtered = data.filter(tx => !tx.is_transfer)
+          const total = filtered.reduce((sum, tx) => {
+            const jpyAmount = convertToJpy(Math.abs(tx.amount), tx.currency || 'JPY', rates)
+            return sum + jpyAmount
+          }, 0)
           setPreviousMonthSpent(total)
         }
       } catch {

@@ -17,6 +17,70 @@
   .dark .focus-ring {
     @apply focus:ring-offset-gray-900;
   }
+
+  /* Theme CSS Variables */
+  /* Default (Blue) */
+  [data-theme="default"] {
+    --color-primary: 59 130 246;
+    --color-primary-light: 96 165 250;
+    --color-primary-dark: 37 99 235;
+  }
+
+  /* Emerald (Green) */
+  [data-theme="emerald"] {
+    --color-primary: 16 185 129;
+    --color-primary-light: 52 211 153;
+    --color-primary-dark: 5 150 105;
+  }
+
+  /* Sunset (Orange) */
+  [data-theme="sunset"] {
+    --color-primary: 249 115 22;
+    --color-primary-light: 251 146 60;
+    --color-primary-dark: 234 88 12;
+  }
+
+  /* Purple */
+  [data-theme="purple"] {
+    --color-primary: 139 92 246;
+    --color-primary-light: 167 139 250;
+    --color-primary-dark: 124 58 237;
+  }
+
+  /* Rainbow (Pink gradient) */
+  [data-theme="rainbow"] {
+    --color-primary: 236 72 153;
+    --color-primary-light: 244 114 182;
+    --color-primary-dark: 219 39 119;
+  }
+
+  /* Gold Premium (Amber) */
+  [data-theme="gold-premium"] {
+    --color-primary: 245 158 11;
+    --color-primary-light: 251 191 36;
+    --color-primary-dark: 217 119 6;
+  }
+
+  /* Neon Night (Cyan/Teal) */
+  [data-theme="neon-night"] {
+    --color-primary: 6 182 212;
+    --color-primary-light: 34 211 238;
+    --color-primary-dark: 8 145 178;
+  }
+
+  /* Rose (Pink/Red) */
+  [data-theme="rose"] {
+    --color-primary: 244 63 94;
+    --color-primary-light: 251 113 133;
+    --color-primary-dark: 225 29 72;
+  }
+
+  /* Dark */
+  [data-theme="dark"] {
+    --color-primary: 156 163 175;
+    --color-primary-light: 209 213 219;
+    --color-primary-dark: 107 114 128;
+  }
 }
 
 @layer utilities {

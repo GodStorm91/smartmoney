@@ -16,6 +16,7 @@ import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
+import { useXPGain } from '@/hooks/useXPGain'
 
 interface TransactionFormModalProps {
   isOpen: boolean
@@ -77,6 +78,9 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
   const currencySymbol = selectedAccount?.currency
     ? CURRENCY_SYMBOLS[selectedAccount.currency] || selectedAccount.currency
     : '¥'
+
+  // XP Gain hook
+  const { showTransactionXP } = useXPGain()
 
   // Reset form when modal opens
   useEffect(() => {
@@ -272,6 +276,10 @@ export function TransactionFormModal({ isOpen, onClose }: TransactionFormModalPr
           start_date: date,
         })
       }
+
+      // Show XP gain toast
+      showTransactionXP()
+
       onClose()
       toast.success(t('transaction.saved', 'Transaction saved!'))
     } catch {

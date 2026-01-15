@@ -9,12 +9,14 @@ import type { Transaction } from '@/types'
 
 interface SwipeableTransactionCardProps {
   transaction: Transaction
+  onViewDetail: (transaction: Transaction) => void
   onEdit: (transaction: Transaction) => void
   onDelete: (transaction: Transaction) => void
 }
 
 export function SwipeableTransactionCard({
   transaction,
+  onViewDetail,
   onEdit,
   onDelete,
 }: SwipeableTransactionCardProps) {
@@ -104,11 +106,13 @@ export function SwipeableTransactionCard({
       return
     }
 
-    if (translateX > 0) {
-      setTranslateX(0)
-    } else {
-      onEdit(transaction)
+    if (translateX > SWIPE_THRESHOLD) {
+      // Swiped past threshold, show delete button
+      return
     }
+
+    // Tap to view detail
+    onViewDetail(transaction)
   }
 
   const handleDeleteClick = (e: React.MouseEvent) => {

@@ -11,8 +11,10 @@ import { Badge } from '@/components/ui/Badge'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { SkeletonTableRow, SkeletonTransactionCard } from '@/components/ui/Skeleton'
 import { MultiSelect } from '@/components/ui/MultiSelect'
+import { PullToRefresh } from '@/components/ui/PullToRefresh'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import { TransactionFormModal } from '@/components/transactions/TransactionFormModal'
+import { TransactionDetailModal } from '@/components/transactions/TransactionDetailModal'
 import { AddTransactionFAB } from '@/components/transactions/AddTransactionFAB'
 import { SwipeableTransactionCard } from '@/components/transactions/SwipeableTransactionCard'
 import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDialog'
@@ -228,6 +230,7 @@ export function Transactions() {
   }
 
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [viewingTransaction, setViewingTransaction] = useState<Transaction | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [deletingTransaction, setDeletingTransaction] = useState<Transaction | null>(null)
   const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
@@ -378,6 +381,12 @@ export function Transactions() {
     setMinAmount('')
     setMaxAmount('')
     navigate({ to: '/transactions', search: {} })
+  }
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['transactions'] })
+    await queryClient.invalidateQueries({ queryKey: ['dashboard'] })
+    await queryClient.invalidateQueries({ queryKey: ['analytics'] })
   }
 
   const accountFilteredTransactions = useMemo(() => {
@@ -865,43 +874,47 @@ export function Transactions() {
           </Card>
 
           {/* Mobile Cards */}
-          <div className="md:hidden space-y-6">
-            {sortField === 'date' ? (
-              // Grouped by date when sorting by date
-              groupedTransactions.map((group) => (
-                <div key={group.date}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {formatDateHeader(group.date)}
-                    </h3>
-                    <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          <PullToRefresh onRefresh={handleRefresh} className="md:hidden">
+            <div className="space-y-6 pb-20">
+              {sortField === 'date' ? (
+                // Grouped by date when sorting by date
+                groupedTransactions.map((group) => (
+                  <div key={group.date}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        {formatDateHeader(group.date)}
+                      </h3>
+                      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                    </div>
+                    <div className="space-y-3">
+                      {group.transactions.map((tx) => (
+                        <SwipeableTransactionCard
+                          key={tx.id}
+                          transaction={tx}
+                          onViewDetail={setViewingTransaction}
+                          onEdit={setEditingTransaction}
+                          onDelete={setDeletingTransaction}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="space-y-3">
-                    {group.transactions.map((tx) => (
-                      <SwipeableTransactionCard
-                        key={tx.id}
-                        transaction={tx}
-                        onEdit={setEditingTransaction}
-                        onDelete={setDeletingTransaction}
-                      />
-                    ))}
-                  </div>
+                ))
+              ) : (
+                // Flat list when sorting by amount (or other non-date fields)
+                <div className="space-y-3">
+                  {displayedTransactions.map((tx) => (
+                    <SwipeableTransactionCard
+                      key={tx.id}
+                      transaction={tx}
+                      onViewDetail={setViewingTransaction}
+                      onEdit={setEditingTransaction}
+                      onDelete={setDeletingTransaction}
+                    />
+                  ))}
                 </div>
-              ))
-            ) : (
-              // Flat list when sorting by amount (or other non-date fields)
-              <div className="space-y-3">
-                {displayedTransactions.map((tx) => (
-                  <SwipeableTransactionCard
-                    key={tx.id}
-                    transaction={tx}
-                    onEdit={setEditingTransaction}
-                    onDelete={setDeletingTransaction}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </PullToRefresh>
         </div>
       ) : (
         <Card>
@@ -949,6 +962,14 @@ export function Transactions() {
         isOpen={!!editingTransaction}
         onClose={() => setEditingTransaction(null)}
         transaction={editingTransaction}
+      />
+
+      <TransactionDetailModal
+        isOpen={!!viewingTransaction}
+        onClose={() => setViewingTransaction(null)}
+        transaction={viewingTransaction}
+        onEdit={setEditingTransaction}
+        onDelete={setDeletingTransaction}
       />
 
       <TransactionFormModal

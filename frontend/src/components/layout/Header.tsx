@@ -7,6 +7,7 @@ import { ThemeToggle } from './ThemeToggle'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useState } from 'react'
+import { LevelBadge } from '@/components/gamification/LevelBadge'
 
 export function Header() {
   const { t } = useTranslation('common')
@@ -43,8 +44,10 @@ export function Header() {
             <NavLink to="/goals">{t('header.goals')}</NavLink>
             <NavLink to="/analytics">{t('header.analytics')}</NavLink>
             <NavLink to="/budget">{t('header.budget')}</NavLink>
+            <NavLink to="/gamification">{t('header.gamification')}</NavLink>
             <NavLink to="/upload">{t('header.upload')}</NavLink>
             <NavLink to="/settings">{t('header.settings')}</NavLink>
+            <LevelBadge />
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -109,6 +112,9 @@ export function Header() {
               </MobileNavLink>
               <MobileNavLink to="/budget" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('header.budget')}
+              </MobileNavLink>
+              <MobileNavLink to="/gamification" onClick={() => setIsMobileMenuOpen(false)}>
+                {t('header.gamification')}
               </MobileNavLink>
               <MobileNavLink to="/upload" onClick={() => setIsMobileMenuOpen(false)}>
                 {t('header.upload')}

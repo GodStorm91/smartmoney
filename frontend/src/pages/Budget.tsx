@@ -22,11 +22,13 @@ import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { AddCategoryModal } from '@/components/budget/add-category-modal'
 import { AllocationCard } from '@/components/budget/allocation-card'
 import { BudgetDetailPanel } from '@/components/budget/budget-detail-panel'
+import { BudgetProjectionCard } from '@/components/budget/budget-projection-card'
 import { generateBudget, regenerateBudget, getBudgetByMonth, getBudgetTracking, getBudgetSuggestions } from '@/services/budget-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { useXPGain } from '@/hooks/useXPGain'
 import { cn } from '@/utils/cn'
 import type { Budget } from '@/types'
 
@@ -54,6 +56,9 @@ export function BudgetPage() {
   const handleToggleExpand = useCallback((category: string) => {
     setExpandedCategory(prev => prev === category ? null : category)
   }, [])
+
+  // XP Gain hook
+  const { showBudgetCreatedXP } = useXPGain()
 
   // Open desktop detail panel
   const handleOpenDetail = useCallback((category: string) => {
@@ -165,6 +170,7 @@ export function BudgetPage() {
     onSuccess: (data) => {
       setDraftBudget(data)
       pushUndo('generate', data)
+      showBudgetCreatedXP()
     },
   })
 
@@ -352,6 +358,13 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                 </div>
               </div>
             </div>
+
+            {/* Spending Forecast Card */}
+            <BudgetProjectionCard
+              totalBudget={totalBudget}
+              totalSpent={spentSoFar}
+              month={selectedMonth}
+            />
 
             {/* Quick Stats Row */}
             <div className="grid grid-cols-3 gap-3">

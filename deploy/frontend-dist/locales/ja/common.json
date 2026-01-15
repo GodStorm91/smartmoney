@@ -7,11 +7,13 @@
     "accounts": "口座管理",
     "analytics": "分析",
     "goals": "目標",
+    "gamification": "実績",
     "settings": "設定",
     "budget": "予算"
   },
   "nav": {
     "home": "ホーム",
+    "budget": "予算",
     "transactions": "取引",
     "accounts": "口座",
     "goals": "目標",
@@ -31,7 +33,9 @@
     "reset": "リセット",
     "filter": "フィルター",
     "selectFile": "ファイルを選択",
-    "addMore": "追加"
+    "addMore": "追加",
+    "showDetails": "詳細を表示",
+    "hideDetails": "詳細を非表示"
   },
   "filter": {
     "category": "カテゴリー",
@@ -85,6 +89,7 @@
     "goalAchievability": "目標達成可能性",
     "viewAllCategories": "すべてのカテゴリーを表示 →",
     "viewDetails": "詳細 →",
+    "viewAll": "すべて表示 →",
     "noData": "データがありません",
     "noCategories": "支出データがありません",
     "noCategoriesDescription": "取引を追加して支出内訳を確認しましょう",
@@ -100,7 +105,20 @@
     "netWorth": "純資産",
     "assets": "資産",
     "liabilities": "負債",
-    "thisMonth": "今月"
+    "thisMonth": "今月",
+    "income": "収入",
+    "expenses": "支出",
+    "savingsRate": "貯蓄率",
+    "savingsGood": "健全",
+    "savingsFair": "普通",
+    "savingsLow": "低め",
+    "ofIncome": "収入の",
+    "recentTransactions": "最近の取引",
+    "spendingByCategory": "支出",
+    "goals": "目標",
+    "createFirstGoal": "最初の目標を作成",
+    "goalMotivation": "貯蓄進捗を追跡",
+    "noTransactions": "取引がありません"
   },
   "health": {
     "title": "家計の健康度",
@@ -191,7 +209,18 @@
     "sortDateDesc": "日付 ↓",
     "sortDateAsc": "日付 ↑",
     "sortAmountDesc": "金額 ↓",
-    "sortAmountAsc": "金額 ↑"
+    "sortAmountAsc": "金額 ↑",
+    "transactionDetails": "取引詳細",
+    "originalAmount": "元の金額",
+    "receipt": "レシート",
+    "deleteConfirm": "この取引を削除してもよろしいですか？",
+    "minAmount": "最小",
+    "maxAmount": "最大",
+    "allCategories": "すべて",
+    "recategorize": "カテゴリー変更",
+    "deleteSelected": "削除",
+    "selectedCount": "{{count}}件選択中",
+    "clearSelection": "選択解除"
   },
   "transaction": {
     "addTransaction": "取引を追加",
@@ -331,7 +360,7 @@
     "selectPeriod": "期間を選択して貯蓄目標を設定しましょう",
     "remainingSlots": "残り{{count}}枠",
     "maxGoalsReached": "最大{{max}}個の目標を設定できます。新しい目標を追加するには、既存の目標を削除してください。",
-    "yearGoal": "年目標",
+    "yearGoal": "{{years}}年目標",
     "trendPeriod": "{{months}}ヶ月",
     "trendPeriodHint": "達成可能性の計算期間を選択してください",
     "selectType": "何のために貯金しますか？",
@@ -588,6 +617,11 @@
     "thisMonthNet": "今月の差額"
   },
   "goal": {
+    "months": "ヶ月",
+    "onTrack": "順調",
+    "behind": "遅れ",
+    "savingNow": "現在貯蓄中",
+    "needed": "必要",
     "status": {
       "onTrack": "順調",
       "behind": "遅れ",
@@ -703,6 +737,7 @@
     "currencyUSD": "米ドル ($)",
     "currencyVND": "ベトナムドン (₫)",
     "payday": "給料日 (毎月)",
+    "paydayDescription": "毎月給料日となる日付",
     "saveSettings": "設定を保存",
     "categoryManagement": "カテゴリー管理",
     "paymentSourceManagement": "支払元管理",
@@ -841,6 +876,15 @@
     "currentBudget": "現在の予算",
     "regenerate": "再生成",
     "savingsTarget": "貯蓄目標",
+    "usedOfTotal": "{{total}}中{{used}}",
+    "budgetUsed": "使用済み",
+    "percentOfIncome": "収入の{{percent}}%",
+    "availableToSpend": "利用可能額",
+    "overAllocated": "超過配分",
+    "spendingProgress": "支出進捗",
+    "daysLeft": "日残り",
+    "spendingByCategory": "カテゴリ別支出",
+    "spentOfBudgeted": "予算{{budgeted}}",
     "totalAllocated": "割り当て合計",
     "aiAdvice": "AIアドバイス",
     "feedbackTitle": "フィードバックを提供して再生成",
@@ -870,19 +914,21 @@
     "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。",
     "projection": {
       "title": "支出予測",
-      "monthProgress": "月間進捗",
-      "days": "日",
-      "elapsed": "経過",
-      "spentSoFar": "現在の支出",
-      "dailyAvg": "日平均",
-      "projectedByMonthEnd": "月末予測",
-      "variableSpending": "変動費",
-      "upcomingBills": "今後の請求",
-      "totalProjected": "合計予測",
-      "projectedSpending": "予測支出",
-      "projectedSavings": "予測貯蓄",
-      "onTrack": "貯蓄目標達成の見込みです！",
-      "offTrack": "貯蓄目標に{{amount}}不足の見込みです"
+      "daysLeft": "残り{{count}}日",
+      "spent": "支出",
+      "dailyRate": "1日あたり",
+      "projected": "予測",
+      "percentOfBudget": "予算の{{percent}}%",
+      "ofBudget": "予算",
+      "budget": "予算",
+      "status": {
+        "onTrack": "順調",
+        "atRisk": "要注意",
+        "overBudget": "予算超過"
+      },
+      "atPace": "このペースでは{{amount}}使います",
+      "overBy": "{{amount}}超過します",
+      "underBy": "{{amount}}節約できます"
     },
     "addCategory": "カテゴリを追加",
     "selectCategory": "カテゴリを選択",
@@ -907,7 +953,8 @@
       "warningNearLimit": "警告: 限度額に近い",
       "exceededTotal": "総予算を超過",
       "overBudget": "{{count}}カテゴリが予算超過",
-      "totalBudget": "総予算"
+      "totalBudget": "総予算",
+      "overBudgetStatus": "予算超過"
     },
     "undo": "取り消し",
     "export": "エクスポート"

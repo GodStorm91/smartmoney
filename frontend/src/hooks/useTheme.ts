@@ -109,10 +109,10 @@ export function useTheme() {
 }
 
 // Map backend theme codes to CSS theme codes
-function mapThemeCode(code: string): string {
+export function mapThemeCode(code: string): string {
   const codeMap: Record<string, string> = {
     'default': 'default',
-    'dark': 'default',
+    'dark': 'dark',
     'emerald': 'emerald',
     'sunset': 'sunset',
     'purple': 'purple',
@@ -130,6 +130,7 @@ function mapThemeCode(code: string): string {
 export function getThemeDisplayName(code: string): string {
   const nameMap: Record<string, string> = {
     'default': 'Default Blue',
+    'dark': 'Dark Gray',
     'emerald': 'Emerald Green',
     'sunset': 'Sunset Orange',
     'purple': 'Royal Purple',

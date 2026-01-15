@@ -8,10 +8,12 @@
     "analytics": "Analytics",
     "goals": "Goals",
     "budget": "Budget",
+    "gamification": "Achievements",
     "settings": "Settings"
   },
   "nav": {
     "home": "Home",
+    "budget": "Budget",
     "transactions": "Transactions",
     "accounts": "Accounts",
     "goals": "Goals",
@@ -31,7 +33,9 @@
     "reset": "Reset",
     "filter": "Filter",
     "selectFile": "Select File",
-    "addMore": "Add More"
+    "addMore": "Add More",
+    "showDetails": "Show Details",
+    "hideDetails": "Hide Details"
   },
   "filter": {
     "category": "Category",
@@ -85,6 +89,7 @@
     "goalAchievability": "Goal Achievability",
     "viewAllCategories": "View all categories →",
     "viewDetails": "View details →",
+    "viewAll": "View all →",
     "noData": "No data available",
     "noCategories": "No spending data yet",
     "noCategoriesDescription": "Add transactions to see your spending breakdown",
@@ -100,7 +105,20 @@
     "netWorth": "Net Worth",
     "assets": "Assets",
     "liabilities": "Liabilities",
-    "thisMonth": "This month"
+    "thisMonth": "This month",
+    "income": "Income",
+    "expenses": "Expenses",
+    "savingsRate": "Savings Rate",
+    "savingsGood": "Healthy",
+    "savingsFair": "Fair",
+    "savingsLow": "Low",
+    "ofIncome": "of income",
+    "recentTransactions": "Recent",
+    "spendingByCategory": "Spending",
+    "goals": "Goals",
+    "createFirstGoal": "Create your first goal",
+    "goalMotivation": "Track your savings progress",
+    "noTransactions": "No transactions yet"
   },
   "health": {
     "title": "Financial Health",
@@ -191,7 +209,18 @@
     "sortDateDesc": "Date ↓",
     "sortDateAsc": "Date ↑",
     "sortAmountDesc": "Amount ↓",
-    "sortAmountAsc": "Amount ↑"
+    "sortAmountAsc": "Amount ↑",
+    "transactionDetails": "Transaction Details",
+    "originalAmount": "Original Amount",
+    "receipt": "Receipt",
+    "deleteConfirm": "Are you sure you want to delete this transaction?",
+    "minAmount": "Min",
+    "maxAmount": "Max",
+    "allCategories": "All",
+    "recategorize": "Recategorize",
+    "deleteSelected": "Delete",
+    "selectedCount": "{{count}} selected",
+    "clearSelection": "Clear"
   },
   "export": {
     "title": "Export Reports",
@@ -340,7 +369,7 @@
     "selectPeriod": "Select a period to set your savings goal",
     "remainingSlots": "{{count}} remaining",
     "maxGoalsReached": "You can set up to {{max}} goals. To add a new goal, please delete an existing one.",
-    "yearGoal": "-Year Goal",
+    "yearGoal": "{{years}}-Year Goal",
     "trendPeriod": "{{months}}M",
     "trendPeriodHint": "Select calculation period for achievability",
     "selectType": "What are you saving for?",
@@ -629,6 +658,11 @@
     "thisMonthNet": "Difference this month"
   },
   "goal": {
+    "months": "months",
+    "onTrack": "On track",
+    "behind": "Behind",
+    "savingNow": "Saving now",
+    "needed": "Needed",
     "status": {
       "onTrack": "On Track",
       "behind": "Behind",
@@ -744,6 +778,7 @@
     "currencyUSD": "US Dollar ($)",
     "currencyVND": "Vietnamese Dong (₫)",
     "payday": "Payday (monthly)",
+    "paydayDescription": "Your regular income date each month",
     "saveSettings": "Save Settings",
     "categoryManagement": "Category Management",
     "paymentSourceManagement": "Payment Source Management",
@@ -882,6 +917,15 @@
     "currentBudget": "Current Budget",
     "regenerate": "Regenerate",
     "savingsTarget": "Savings Target",
+    "usedOfTotal": "{{used}} of {{total}}",
+    "budgetUsed": "used",
+    "percentOfIncome": "{{percent}}% of income",
+    "availableToSpend": "Available to spend",
+    "overAllocated": "Over allocated",
+    "spendingProgress": "Spending Progress",
+    "daysLeft": "days left",
+    "spendingByCategory": "Spending by Category",
+    "spentOfBudgeted": "{{budgeted}} budgeted",
     "totalAllocated": "Total Allocated",
     "aiAdvice": "AI Advice",
     "feedbackTitle": "Provide Feedback to Regenerate",
@@ -910,20 +954,22 @@
     "previousIncome": "Previous",
     "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language.",
     "projection": {
-      "title": "Spending Projection",
-      "monthProgress": "Month Progress",
-      "days": "days",
-      "elapsed": "elapsed",
-      "spentSoFar": "Spent so far",
-      "dailyAvg": "Daily average",
-      "projectedByMonthEnd": "Projected by month end",
-      "variableSpending": "Variable spending",
-      "upcomingBills": "Upcoming bills",
-      "totalProjected": "Total projected",
-      "projectedSpending": "Projected spending",
-      "projectedSavings": "Projected savings",
-      "onTrack": "On track to meet your savings goal!",
-      "offTrack": "At risk of missing savings goal by {{amount}}"
+      "title": "Spending Forecast",
+      "daysLeft": "{{count}} days left",
+      "spent": "Spent",
+      "dailyRate": "Daily Rate",
+      "projected": "Projected",
+      "percentOfBudget": "{{percent}}% of budget",
+      "ofBudget": "of budget",
+      "budget": "budget",
+      "status": {
+        "onTrack": "On Track",
+        "atRisk": "At Risk",
+        "overBudget": "Over Budget"
+      },
+      "atPace": "At this pace, you'll spend {{amount}}",
+      "overBy": "You'll exceed by {{amount}}",
+      "underBy": "You'll save {{amount}}"
     },
     "addCategory": "Add Category",
     "selectCategory": "Select category",
@@ -948,7 +994,8 @@
       "warningNearLimit": "Warning: Near limit",
       "exceededTotal": "Total budget exceeded",
       "overBudget": "{{count}} categories over budget",
-      "totalBudget": "Total Budget"
+      "totalBudget": "Total Budget",
+      "overBudgetStatus": "Over budget"
     },
     "undo": "Undo",
     "export": "Export"

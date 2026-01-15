@@ -8,6 +8,8 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as TransactionsRouteImport } from './routes/transactions'
@@ -22,6 +24,13 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 
+const GamificationLazyRouteImport = createFileRoute('/gamification')()
+
+const GamificationLazyRoute = GamificationLazyRouteImport.update({
+  id: '/gamification',
+  path: '/gamification',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/gamification.lazy').then((d) => d.Route))
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -96,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
+  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,6 +120,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
+  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,6 +136,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
+  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/upload'
+    | '/gamification'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -155,6 +168,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/upload'
+    | '/gamification'
   id:
     | '__root__'
     | '/'
@@ -169,6 +183,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/transactions'
     | '/upload'
+    | '/gamification'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -184,10 +199,18 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
   UploadRoute: typeof UploadRoute
+  GamificationLazyRoute: typeof GamificationLazyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/gamification': {
+      id: '/gamification'
+      path: '/gamification'
+      fullPath: '/gamification'
+      preLoaderRoute: typeof GamificationLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/upload': {
       id: '/upload'
       path: '/upload'
@@ -288,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,
   UploadRoute: UploadRoute,
+  GamificationLazyRoute: GamificationLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

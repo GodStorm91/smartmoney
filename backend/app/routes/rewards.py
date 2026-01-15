@@ -35,7 +35,7 @@ async def get_themes(level: int = 1, db: Session = Depends(get_db)):
 async def get_my_themes(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     service = RewardsService(db)
     return [
-        {"id": t.id, "code": t.code, "name": t.name, "icon": t.icon, "is_active": False}
+        {"id": t.id, "code": t.code, "name": t.name, "icon": t.icon, "is_active": t.is_active}
         for t in service.get_user_themes(user.id)
     ]
 

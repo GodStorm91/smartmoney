@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { useProfile, useThemes, useAvatars, useGamificationStats } from '@/services/rewards-service';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme, mapThemeCode } from '@/hooks/useTheme';
 import { toast } from 'sonner';
 
 const rarityColors: Record<string, string> = {
@@ -147,8 +147,9 @@ export const ProfilePage: React.FC = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {themes.map((theme: any) => {
               const isAvailable = theme.unlock_level <= level;
+              const mappedCode = mapThemeCode(theme.code);
               const isActive = theme.id === activatingThemeId || 
-                (activeTheme === theme.code && !activatingThemeId);
+                (activeTheme === mappedCode && !activatingThemeId);
               
               return (
                 <div

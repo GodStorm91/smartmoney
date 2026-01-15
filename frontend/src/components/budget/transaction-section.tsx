@@ -10,6 +10,15 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useCategoryTree } from '@/hooks/useCategories'
 import type { Transaction } from '@/types'
 
+// Helper to convert amount to JPY
+function convertToJpy(amount: number, currency: string, rates: Record<string, number>): number {
+  if (currency === 'JPY') return amount
+  const rate = rates[currency]
+  if (!rate || rate === 0) return amount
+  // rate_to_jpy is "units per JPY", so divide to convert to JPY
+  return Math.round(amount / rate)
+}
+
 interface TransactionSectionProps {
   category: string
   month: string
@@ -81,11 +90,19 @@ export function TransactionSection({
           type: 'expense'
         })
 
-        if (mounted) {
-          // Sort by amount (largest first) and take top 5
-          const sorted = [...data].sort((a, b) => Math.abs(b.amount) - Math.abs(a.amount))
-          setTransactions(sorted.slice(0, 5))
-        }
+        // Filter out transfers
+        const filtered = data.filter(tx => !tx.is_transfer)
+
+        // Convert all amounts to JPY for consistent sorting
+        const rates = exchangeRates?.rates || {}
+        const withJpyAmount = filtered.map(tx => ({
+          ...tx,
+          amountJpy: convertToJpy(Math.abs(tx.amount), tx.currency || 'JPY', rates)
+        }))
+
+        // Sort by JPY amount (largest first) and take top 5
+        const sorted = withJpyAmount.sort((a, b) => b.amountJpy - a.amountJpy)
+        setTransactions(sorted.slice(0, 5).map(({ amountJpy, ...tx }) => tx))
       } catch (err) {
         if (mounted) {
           setError('Failed to load transactions')

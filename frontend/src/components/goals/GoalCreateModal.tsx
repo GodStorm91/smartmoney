@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { createGoal, updateGoal, fetchGoal, hasEmergencyFund } from '@/services/goal-service'
 import { useAccounts } from '@/hooks/useAccounts'
+import { useXPGain } from '@/hooks/useXPGain'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { StartDateSelector } from './StartDateSelector'
@@ -58,6 +59,9 @@ export function GoalCreateModal({
     enabled: isOpen && !editingGoalId,
   })
 
+  // XP Gain hook
+  const { showGoalCreatedXP } = useXPGain()
+
   // Fetch existing goal if editing
   const { data: existingGoal } = useQuery({
     queryKey: ['goal', editingGoalId],
@@ -110,6 +114,7 @@ export function GoalCreateModal({
       queryClient.invalidateQueries({ queryKey: ['goals-progress-full'] })
       queryClient.invalidateQueries({ queryKey: ['has-emergency-fund'] })
       queryClient.invalidateQueries({ queryKey: ['accounts'] }) // Refresh if new account created
+      showGoalCreatedXP()
       onClose()
     },
     onError: () => {

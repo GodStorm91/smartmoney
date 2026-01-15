@@ -1,4 +1,5 @@
 """User model for authentication."""
+
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func
@@ -68,3 +69,8 @@ class User(Base):
     dismissed_suggestions: Mapped[list["DismissedSuggestion"]] = relationship(
         "DismissedSuggestion", back_populates="user", cascade="all, delete-orphan"
     )
+
+    # Gamification relationship
+    # gamification: Mapped["UserGamification"] = relationship(
+    #     "UserGamification", back_populates="user", uselist=False, cascade="all, delete-orphan"
+    # )
