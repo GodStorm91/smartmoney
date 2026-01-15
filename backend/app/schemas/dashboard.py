@@ -1,4 +1,5 @@
 """Dashboard schemas for API validation."""
+
 from pydantic import BaseModel
 
 
@@ -11,3 +12,4 @@ class DashboardSummaryResponse(BaseModel):
     income_change: float
     expense_change: float
     net_change: float
+    transaction_count: int

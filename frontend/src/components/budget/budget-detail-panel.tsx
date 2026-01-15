@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/Button'
 import { fetchTransactions } from '@/services/transaction-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { formatDate } from '@/utils/formatDate'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -46,7 +47,7 @@ export function BudgetDetailPanel({
   onClose,
   className
 }: BudgetDetailPanelProps) {
-  const { t, i18n } = useTranslation('common')
+  const { t } = useTranslation('common')
   const navigate = useNavigate()
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
@@ -190,12 +191,8 @@ export function BudgetDetailPanel({
     }
   }, [category, month, isOpen, searchCategories])
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return date.toLocaleDateString(i18n.language, {
-      month: 'short',
-      day: 'numeric'
-    })
+  const formatTxDate = (dateStr: string) => {
+    return formatDate(dateStr, 'MMM d')
   }
 
   const handleViewAll = () => {
@@ -336,7 +333,7 @@ export function BudgetDetailPanel({
                         {transaction.description}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(transaction.date)}
+                        {formatTxDate(transaction.date)}
                       </p>
                     </div>
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">

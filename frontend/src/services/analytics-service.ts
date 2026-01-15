@@ -45,6 +45,7 @@ export async function fetchDashboardSummary(month?: string): Promise<{
   income_change: number
   expense_change: number
   net_change: number
+  transaction_count: number
 }> {
   const params = month ? `?month=${month}` : ''
   const response = await apiClient.get(`/api/dashboard/summary${params}`)

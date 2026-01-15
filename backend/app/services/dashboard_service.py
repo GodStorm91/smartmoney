@@ -1,4 +1,5 @@
 """Dashboard service for KPI summary and analytics."""
+
 from datetime import date, datetime
 from typing import Optional
 
@@ -52,9 +53,7 @@ class DashboardService:
         expense_change = DashboardService._calculate_change(
             previous_data["expense"], current_data["expense"]
         )
-        net_change = DashboardService._calculate_change(
-            previous_data["net"], current_data["net"]
-        )
+        net_change = DashboardService._calculate_change(previous_data["net"], current_data["net"])
 
         return {
             "income": current_data["income"],
@@ -63,6 +62,7 @@ class DashboardService:
             "income_change": income_change,
             "expense_change": expense_change,
             "net_change": net_change,
+            "transaction_count": current_data["transaction_count"],
         }
 
     @staticmethod
@@ -105,15 +105,11 @@ class DashboardService:
         """
         # Query transactions with currency for proper conversion
         transactions = (
-            db.query(
-                Transaction.amount,
-                Transaction.currency,
-                Transaction.is_income
-            )
+            db.query(Transaction.amount, Transaction.currency, Transaction.is_income)
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer,
-                Transaction.month_key == month_key
+                Transaction.month_key == month_key,
             )
             .all()
         )
@@ -130,7 +126,12 @@ class DashboardService:
             else:
                 expense += amount_jpy
 
-        return {"income": income, "expense": expense, "net": income - expense}
+        return {
+            "income": income,
+            "expense": expense,
+            "net": income - expense,
+            "transaction_count": len(transactions),
+        }
 
     @staticmethod
     def _calculate_change(previous: int, current: int) -> float:

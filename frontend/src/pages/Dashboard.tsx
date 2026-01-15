@@ -26,6 +26,7 @@ import { fetchTransactions } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { useAccounts } from '@/hooks/useAccounts'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 
@@ -77,6 +78,9 @@ export function Dashboard() {
       return transactions.slice(0, 5)
     },
   })
+
+  // Fetch accounts for assets/liabilities calculation
+  const { data: accounts } = useAccounts()
 
   const isLoading = summaryLoading || trendsLoading || categoriesLoading || goalsLoading
 
@@ -217,7 +221,7 @@ export function Dashboard() {
         </div>
 
         {/* KPI Metrics Row */}
-        <KpiRow summary={summary} formatCurrency={formatCurrency} />
+        <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} />
 
         {/* Quick Stats Cards */}
         <div className="grid grid-cols-2 gap-3">
@@ -566,19 +570,27 @@ function MiniGoalCard({
 }
 
 // KPI Row Component
-function KpiRow({ summary, formatCurrency }: { summary: any; formatCurrency: (amount: number) => string }) {
+function KpiRow({ summary, formatCurrency, accounts }: { summary: any; formatCurrency: (amount: number) => string; accounts: any[] }) {
+  const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
+  
+  const assets = accounts?.filter(a => ASSET_TYPES.includes(a.type))
+    .reduce((sum, a) => sum + a.current_balance, 0) || 0
+  
+  const liabilities = accounts?.filter(a => !ASSET_TYPES.includes(a.type))
+    .reduce((sum, a) => sum + Math.abs(a.current_balance), 0) || 0
+
   return (
     <div className="grid grid-cols-3 gap-3">
       <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
         <p className="text-sm font-semibold font-numbers text-green-600 dark:text-green-400">
-          {formatCurrency(summary?.total_income || 0)}
+          {formatCurrency(assets)}
         </p>
       </div>
       <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Liabilities</p>
         <p className="text-sm font-semibold font-numbers text-red-600 dark:text-red-400">
-          {formatCurrency(summary?.total_expense || 0)}
+          {formatCurrency(liabilities)}
         </p>
       </div>
       <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">

@@ -4,6 +4,7 @@ import { ExternalLink, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { fetchTransactions } from '@/services/transaction-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { formatDate } from '@/utils/formatDate'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -32,7 +33,7 @@ export function TransactionSection({
   onViewAll,
   className
 }: TransactionSectionProps) {
-  const { t, i18n } = useTranslation('common')
+  const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
@@ -122,7 +123,7 @@ export function TransactionSection({
     }
   }, [category, month, searchCategories])
 
-  const formatDate = (dateStr: string) => {
+  const formatTxDate = (dateStr: string) => {
     const date = new Date(dateStr)
     const today = new Date()
     const yesterday = new Date(today)
@@ -134,10 +135,7 @@ export function TransactionSection({
       return t('common.previous')
     }
 
-    return date.toLocaleDateString(i18n.language, {
-      month: 'short',
-      day: 'numeric'
-    })
+    return formatDate(dateStr, 'MMM d')
   }
 
   const formatMerchant = (description: string) => {
@@ -192,7 +190,7 @@ export function TransactionSection({
         >
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <span className="text-xs text-gray-500 dark:text-gray-400 w-16 flex-shrink-0">
-              {formatDate(transaction.date)}
+              {formatTxDate(transaction.date)}
             </span>
             <span className="text-sm text-gray-900 dark:text-gray-100 truncate flex-1">
               {formatMerchant(transaction.description)}
