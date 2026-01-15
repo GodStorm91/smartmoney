@@ -33,10 +33,9 @@ class UserGamification(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    # Relationships
-    # user = relationship("User", back_populates="gamification")
-    achievements = relationship("UserAchievement", back_populates="user_gamification")
-    xp_events = relationship("XPEvent", back_populates="user_gamification")
+    # Relationships - Disabled due to FK issues
+    # achievements = relationship("UserAchievement", back_populates="user_gamification")
+    # xp_events = relationship("XPEvent", back_populates="user_gamification")
 
     def calculate_level(self) -> int:
         """Calculate user level based on total XP"""
@@ -149,8 +148,8 @@ class Achievement(Base):
     )  # The value needed to trigger (e.g., 10000 for balance)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
-    user_achievements = relationship("UserAchievement", back_populates="achievement")
+    # Relationships - Disabled due to FK issues
+    user_achievements = relationship("UserAchievement")  # No back_populates
 
 
 class UserAchievement(Base):
@@ -167,9 +166,9 @@ class UserAchievement(Base):
     # Unique constraint to prevent duplicate achievements
     __table_args__ = (UniqueConstraint("user_id", "achievement_id"),)
 
-    # Relationships
-    user_gamification = relationship("UserGamification", back_populates="achievements")
-    achievement = relationship("Achievement", back_populates="user_achievements")
+    # Relationships - Disabled due to FK issues
+    user_gamification = relationship("UserGamification")  # No back_populates
+    achievement = relationship("Achievement")  # No back_populates
 
 
 class XPEvent(Base):
@@ -184,5 +183,5 @@ class XPEvent(Base):
     event_metadata = Column(JSON, nullable=True)  # Additional context about the event
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
-    user_gamification = relationship("UserGamification", back_populates="xp_events")
+    # Relationships - Disabled due to FK issues
+    user_gamification = relationship("UserGamification")  # No back_populates
