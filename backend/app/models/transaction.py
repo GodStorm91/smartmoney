@@ -1,6 +1,7 @@
 """Transaction database model."""
 
 from datetime import date, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     BigInteger,
@@ -16,6 +17,10 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
+
+if TYPE_CHECKING:
+    from .account import Account
+    from .receipt import Receipt
 
 
 class Base(DeclarativeBase):
@@ -73,7 +78,9 @@ class Transaction(Base):
     )
 
     # Relationships
-    # account: Mapped["Account | None"] = relationship("Account", back_populates="transactions", lazy="select")
+    account: Mapped["Account | None"] = relationship(
+        "Account", back_populates="transactions", lazy="select"
+    )
     # tags: Mapped[list["Tag"]] = relationship(
     #     "Tag", secondary="transaction_tags", back_populates="transactions", lazy="select"
     # )
