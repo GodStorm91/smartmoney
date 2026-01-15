@@ -59,7 +59,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="text-sm font-medium text-gray-700">{goal.name || `${goal.years}${t('goals.yearGoal')}`}</p>
+            <p className="text-sm font-medium text-gray-700">{goal.name || t('goals.yearGoal', { years: goal.years })}</p>
             <p className="text-xs text-gray-500">
               {formatCurrency(goal.total_saved, currency, exchangeRates?.rates || {}, true)} / {formatCurrency(goal.target_amount, currency, exchangeRates?.rates || {}, true)}
             </p>
@@ -92,7 +92,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
       <div className="bg-white dark:bg-gray-800 rounded-xl p-8 border border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{goal.name || `${goal.years}${t('goals.yearGoal')}`}</h3>
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{goal.name || t('goals.yearGoal', { years: goal.years })}</h3>
           <p className="text-gray-600 dark:text-gray-400">
             {goal.start_date} → {goal.target_date}
           </p>
