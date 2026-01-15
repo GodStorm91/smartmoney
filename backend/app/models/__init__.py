@@ -1,17 +1,23 @@
 """Database models."""
+
 from .account import Account
 from .budget import Budget, BudgetAllocation, BudgetFeedback
 from .category_rule import CategoryRule
 from .credit_purchase import CreditPurchase
 from .credit_transaction import CreditTransaction
 from .crypto_wallet import (
-    CryptoWallet, RewardContract, CryptoSyncState, RewardClaim,
-    DefiPositionSnapshot, PositionReward, PositionCostBasis
+    CryptoWallet,
+    RewardContract,
+    CryptoSyncState,
+    RewardClaim,
+    DefiPositionSnapshot,
+    PositionReward,
+    PositionCostBasis,
 )
 from .dismissed_suggestion import DismissedSuggestion
-from .position_closure import PositionClosure
 from .exchange_rate import ExchangeRate
 from .goal import Goal
+from .receipt import Receipt
 from .recurring_transaction import RecurringTransaction
 from .settings import AppSettings
 from .tag import Tag
@@ -21,10 +27,31 @@ from .user import User
 from .user_credit import UserCredit
 
 __all__ = [
-    "Base", "Transaction", "Goal", "AppSettings", "ExchangeRate", "Account",
-    "Tag", "TransactionTag", "User", "Budget", "BudgetAllocation", "BudgetFeedback",
-    "UserCredit", "CreditPurchase", "CreditTransaction", "CategoryRule",
-    "CryptoWallet", "RewardContract", "CryptoSyncState", "RewardClaim",
-    "RecurringTransaction", "DefiPositionSnapshot", "PositionReward", "PositionCostBasis",
-    "PositionClosure", "DismissedSuggestion"
+    "Base",
+    "Transaction",
+    "Goal",
+    "AppSettings",
+    "ExchangeRate",
+    "Account",
+    "Tag",
+    "TransactionTag",
+    "User",
+    "Budget",
+    "BudgetAllocation",
+    "BudgetFeedback",
+    "UserCredit",
+    "CreditPurchase",
+    "CreditTransaction",
+    "CategoryRule",
+    "CryptoWallet",
+    "RewardContract",
+    "CryptoSyncState",
+    "RewardClaim",
+    "RecurringTransaction",
+    "DefiPositionSnapshot",
+    "PositionReward",
+    "PositionCostBasis",
+    "PositionClosure",
+    "DismissedSuggestion",
+    "Receipt",
 ]
