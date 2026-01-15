@@ -1,4 +1,5 @@
 """SmartMoney FastAPI application."""
+
 import logging
 import os
 
@@ -11,7 +12,35 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import accounts, ai_categorization, analytics, auth, budgets, categories, category_rules, chat, credits, crypto, dashboard, goals, proxy, receipts, recurring, reports, settings, tags, transactions, transfers, upload, exchange_rates, user_categories
+from .routes import (
+    accounts,
+    ai_categorization,
+    analytics,
+    auth,
+    budgets,
+    categories,
+    category_rules,
+    challenges,
+    chat,
+    credits,
+    crypto,
+    dashboard,
+    gamification,
+    goals,
+    proxy,
+    receipts,
+    recurring,
+    reports,
+    settings,
+    social_learning,
+    rewards,
+    tags,
+    transactions,
+    transfers,
+    upload,
+    exchange_rates,
+    user_categories,
+)
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
 from .services.defi_snapshot_service import DefiSnapshotService
@@ -84,6 +113,7 @@ def scheduled_recurring_transactions():
 def scheduled_defi_snapshots():
     """Background job to capture DeFi position snapshots daily."""
     import asyncio
+
     db = SessionLocal()
     try:
         loop = asyncio.new_event_loop()
@@ -157,7 +187,9 @@ async def startup_event():
     )
 
     scheduler.start()
-    logger.info("Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)")
+    logger.info(
+        "Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)"
+    )
 
 
 @app.on_event("shutdown")
@@ -183,6 +215,7 @@ app.include_router(credits.router)
 app.include_router(receipts.router)
 app.include_router(recurring.router)
 app.include_router(category_rules.router)
+app.include_router(challenges.router)
 app.include_router(user_categories.router)
 app.include_router(categories.router)
 app.include_router(ai_categorization.router)
@@ -191,6 +224,9 @@ app.include_router(transfers.router)
 app.include_router(crypto.router)
 app.include_router(proxy.router)
 app.include_router(reports.router)
+app.include_router(gamification.router)
+app.include_router(social_learning.router)
+app.include_router(rewards.router)
 
 
 # Root endpoints
@@ -200,7 +236,7 @@ async def root():
     return {
         "message": f"Welcome to {app_settings.app_name} API",
         "status": "healthy",
-        "version": "0.1.0"
+        "version": "0.1.0",
     }
 
 
