@@ -18,6 +18,8 @@ import {
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
+import { SpendingCalendar } from '@/components/dashboard/SpendingCalendar'
+import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { formatMonth, formatDate } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends, fetchCategoryBreakdown } from '@/services/analytics-service'
@@ -29,6 +31,7 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useAccounts } from '@/hooks/useAccounts'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
+import type { Transaction } from '@/types'
 
 export function Dashboard() {
   const { t } = useTranslation('common')
@@ -81,6 +84,22 @@ export function Dashboard() {
 
   // Fetch accounts for assets/liabilities calculation
   const { data: accounts } = useAccounts()
+
+  // State for calendar day click modal
+  const [selectedDayTransactions, setSelectedDayTransactions] = useState<Transaction[] | null>(null)
+  const [selectedDayDate, setSelectedDayDate] = useState<string | null>(null)
+
+  const handleDayClick = (date: Date, transactions: Transaction[]) => {
+    if (transactions.length > 0) {
+      setSelectedDayDate(date.toISOString())
+      setSelectedDayTransactions(transactions)
+    }
+  }
+
+  const closeDayModal = () => {
+    setSelectedDayTransactions(null)
+    setSelectedDayDate(null)
+  }
 
   const isLoading = summaryLoading || trendsLoading || categoriesLoading || goalsLoading
 
@@ -297,6 +316,9 @@ export function Dashboard() {
           )}
         </Card>
 
+        {/* Spending Calendar */}
+        <SpendingCalendar onDayClick={handleDayClick} />
+
         {/* Category Chips */}
         {categories && categories.length > 0 && (
           <Card className="p-4">
@@ -366,6 +388,16 @@ export function Dashboard() {
           </Link>
         )}
       </div>
+
+      {/* Day Detail Modal */}
+      {selectedDayTransactions && selectedDayDate && (
+        <DayTransactionsModal
+          isOpen={!!selectedDayTransactions}
+          onClose={closeDayModal}
+          date={new Date(selectedDayDate)}
+          transactions={selectedDayTransactions}
+        />
+      )}
     </div>
   )
 }
