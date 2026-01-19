@@ -13,34 +13,12 @@ const DEFAULT_RATES: Record<string, number> = {
  * Zero-decimal currencies (JPY, VND, KRW) have no sub-units
  * Decimal currencies (USD, EUR) have cents/sub-units
  */
-export const CURRENCY_DECIMALS: Record<string, number> = {
+const CURRENCY_DECIMALS: Record<string, number> = {
   JPY: 0,  // Japanese Yen - no sen/rin in modern use
   VND: 0,  // Vietnamese Dong - no decimal places
   KRW: 0,  // Korean Won - no decimal places
   USD: 2,  // US Dollar - cents (1/100)
   EUR: 2,  // Euro - cents (1/100)
-}
-
-/**
- * Convert user input amount to internal storage format (cents for decimal currencies)
- * @param amount - User input amount (e.g., 199 for $199)
- * @param currency - Currency code
- * @returns Amount in internal format (e.g., 19900 cents for $199 USD)
- */
-export function toStorageAmount(amount: number, currency: string): number {
-  const decimals = CURRENCY_DECIMALS[currency] ?? 0
-  return Math.round(amount * Math.pow(10, decimals))
-}
-
-/**
- * Convert internal storage amount to display amount
- * @param amount - Amount in internal format (cents for decimal currencies)
- * @param currency - Currency code
- * @returns Display amount (e.g., 199 for 19900 cents USD)
- */
-export function fromStorageAmount(amount: number, currency: string): number {
-  const decimals = CURRENCY_DECIMALS[currency] ?? 0
-  return amount / Math.pow(10, decimals)
 }
 
 /**
@@ -252,42 +230,4 @@ export function formatCurrencyCompactPrivacy(
     return maskCurrencyValue(currency)
   }
   return formatCurrencyCompact(amount, currency, rates, isNativeCurrency)
-}
-
-/**
- * Format currency with both original and JPY equivalent
- * e.g., "2,000,000 VND (110,000 JPY)"
- */
-export function formatCurrencyWithJPY(
-  amount: number,
-  currency: string = 'JPY',
-  rates: Record<string, number> = DEFAULT_RATES,
-  isNativeCurrency: boolean = false,
-  isPrivacyMode: boolean = false
-): string {
-  if (isPrivacyMode) {
-    return '****'
-  }
-
-  // Get decimals for the currency
-  const decimals = CURRENCY_DECIMALS[currency] ?? 0
-  const displayAmount = isNativeCurrency 
-    ? amount / Math.pow(10, decimals)
-    : amount / Math.pow(10, decimals)
-
-  // Format original amount
-  const originalFormatted = formatCurrency(displayAmount, currency, rates, true)
-
-  // Convert to JPY for display
-  const jpyAmount = isNativeCurrency 
-    ? displayAmount * rates[currency] 
-    : displayAmount
-  const jpyFormatted = formatCurrency(jpyAmount, 'JPY', rates, true)
-
-  // If already JPY, just return the formatted amount
-  if (currency === 'JPY') {
-    return originalFormatted
-  }
-
-  return `${originalFormatted} (${jpyFormatted})`
 }

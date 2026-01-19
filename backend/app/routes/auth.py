@@ -1,6 +1,5 @@
 """Authentication routes."""
-import logging
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -15,19 +14,12 @@ from app.auth.utils import (
 )
 from app.database import get_db
 from app.models.user import User
-from app.services.email_service import EmailService
-
-logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(
-    user_data: UserCreate,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db)
-):
+async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user."""
     # Check if email already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
@@ -45,11 +37,6 @@ async def register(
     db.add(user)
     db.commit()
     db.refresh(user)
-
-    # Send welcome email in background
-    email_service = EmailService()
-    background_tasks.add_task(email_service.send_welcome_email, user.email)
-    logger.info(f"Queued welcome email for new user: {user.email}")
 
     return user
 

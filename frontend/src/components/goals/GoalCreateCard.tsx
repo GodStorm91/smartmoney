@@ -1,35 +1,35 @@
-import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
-import { Check } from 'lucide-react'
+import { Badge } from '@/components/ui/Badge'
 
 interface GoalCreateCardProps {
   years?: number
   custom?: boolean
   disabled?: boolean
   onClick: () => void
-  className?: string
 }
 
-export function GoalCreateCard({ years, custom = false, disabled = false, onClick, className }: GoalCreateCardProps) {
-  const { t } = useTranslation()
-
+export function GoalCreateCard({ years, custom = false, disabled = false, onClick }: GoalCreateCardProps) {
   const getCardLabel = () => {
-    if (custom) return t('goals.card.customPeriod')
-    return t('goals.card.yearGoal', { years })
+    if (custom) return 'カスタム期間'
+    if (years === 1) return '1年目標'
+    if (years === 3) return '3年目標'
+    if (years === 5) return '5年目標'
+    if (years === 10) return '10年目標'
+    return '新規目標'
   }
 
   const getCardDescription = () => {
-    if (custom) return t('goals.card.customDescription')
-    if (years === 1) return t('goals.card.shortTerm')
-    if (years === 3) return t('goals.card.mediumTerm')
-    if (years === 5) return t('goals.card.mediumLongTerm')
-    if (years === 10) return t('goals.card.longTerm')
-    return t('goals.card.createGoal')
+    if (custom) return '自由に期間を設定'
+    if (years === 1) return '短期的な貯蓄目標'
+    if (years === 3) return '中期的な計画'
+    if (years === 5) return '中長期的な目標'
+    if (years === 10) return '長期的なビジョン'
+    return '目標を作成'
   }
 
   const getEmoji = () => {
     if (custom) return '⚙️'
-    return '📌'
+    return '➕'
   }
 
   return (
@@ -37,44 +37,52 @@ export function GoalCreateCard({ years, custom = false, disabled = false, onClic
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'relative p-4 rounded-xl border-2 transition-all duration-200',
-        'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1',
+        'relative w-full p-6 rounded-xl border-2 border-dashed',
+        'transition-all duration-200 ease-out',
+        'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
         disabled
-          ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 cursor-not-allowed opacity-60'
-          : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:shadow-md active:scale-95 cursor-pointer',
-        className
+          ? 'border-gray-200 bg-gray-50 cursor-not-allowed opacity-60'
+          : 'border-gray-300 bg-white hover:border-primary-500 hover:bg-primary-50 hover:shadow-md cursor-pointer'
       )}
-      aria-label={disabled ? t('goals.card.ariaDisabled', { label: getCardLabel() }) : t('goals.card.ariaCreate', { label: getCardLabel() })}
+      aria-label={disabled ? `${getCardLabel()} - 設定済み` : `${getCardLabel()}を作成`}
       aria-disabled={disabled}
     >
-      {/* Checkmark for disabled/active */}
+      {/* Badge for disabled state */}
       {disabled && (
-        <div className="absolute top-2 right-2">
-          <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-            <Check className="w-3 h-3 text-gray-500 dark:text-gray-400" />
-          </div>
+        <div className="absolute top-3 right-3">
+          <Badge variant="default" className="text-xs">
+            設定済み
+          </Badge>
         </div>
       )}
 
-      {/* Content */}
-      <div className="flex flex-col items-center text-center gap-2">
-        {/* Icon */}
-        <div className="text-3xl">
+      {/* Icon */}
+      <div className="flex flex-col items-center justify-center gap-3">
+        <div
+          className={cn(
+            'text-5xl transition-transform duration-200',
+            !disabled && 'group-hover:scale-110'
+          )}
+        >
           {getEmoji()}
         </div>
 
         {/* Label */}
-        <div>
-          <h3 className={cn(
-            'text-sm font-semibold',
-            disabled ? 'text-gray-400' : 'text-gray-900 dark:text-gray-100'
-          )}>
+        <div className="text-center">
+          <h3
+            className={cn(
+              'text-lg font-semibold mb-1',
+              disabled ? 'text-gray-400' : 'text-gray-900'
+            )}
+          >
             {getCardLabel()}
           </h3>
-          <p className={cn(
-            'text-xs mt-0.5',
-            disabled ? 'text-gray-400' : 'text-gray-500 dark:text-gray-400'
-          )}>
+          <p
+            className={cn(
+              'text-sm',
+              disabled ? 'text-gray-400' : 'text-gray-600'
+            )}
+          >
             {getCardDescription()}
           </p>
         </div>

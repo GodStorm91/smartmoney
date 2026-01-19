@@ -33,7 +33,6 @@ function fromDBTransaction(tx: DBTransaction): Transaction {
     date: tx.date,
     description: tx.description,
     amount: tx.amount,
-    currency: (tx as DBTransaction & { currency?: string }).currency || 'JPY',
     category: tx.category,
     source: tx.source,
     type: tx.type,
@@ -47,7 +46,7 @@ export function useOfflineTransactions(
   options?: Omit<UseQueryOptions<Transaction[]>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery({
-    queryKey: ['transactions', filters?.start_date, filters?.end_date, filters?.categories, filters?.search],
+    queryKey: ['transactions', filters?.start_date, filters?.end_date, filters?.category],
     queryFn: async () => {
       try {
         const data = await fetchFn(filters)
@@ -63,14 +62,8 @@ export function useOfflineTransactions(
         } else {
           cached = await getAllTransactions()
         }
-        // Filter by categories if provided
-        if (filters?.categories && filters.categories.length > 0 && cached.length > 0) {
-          cached = cached.filter(tx => filters.categories!.includes(tx.category))
-        }
-        // Filter by search if provided
-        if (filters?.search && cached.length > 0) {
-          const searchLower = filters.search.toLowerCase()
-          cached = cached.filter(tx => tx.description.toLowerCase().includes(searchLower))
+        if (filters?.category && cached.length > 0) {
+          cached = cached.filter(tx => tx.category === filters.category)
         }
         return cached.map(fromDBTransaction)
       }

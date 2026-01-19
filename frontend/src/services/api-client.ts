@@ -7,7 +7,7 @@ const baseURL = import.meta.env.DEV ? 'http://localhost:8000' : ''
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL,
-  timeout: 60000, // Increased to 60s for slow network connections
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },

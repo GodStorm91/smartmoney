@@ -39,7 +39,7 @@ if [ -z "$COMMAND" ]; then
 fi
 
 # Blocked patterns (regex)
-BLOCKED="node_modules|__pycache__|\.git/"
+BLOCKED="node_modules|__pycache__|\.git/|dist/|build/"
 
 # Check if command matches blocked pattern
 if echo "$COMMAND" | grep -qE "$BLOCKED"; then

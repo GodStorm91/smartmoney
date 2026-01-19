@@ -3,7 +3,7 @@
 /**
  * scout-block.js - Cross-platform hook dispatcher
  *
- * Blocks access to heavy directories: node_modules, __pycache__, .git/, , 
+ * Blocks access to heavy directories: node_modules, __pycache__, .git/, dist/, build/
  *
  * Platform Detection:
  * - Windows (win32): Uses PowerShell via scout-block.ps1

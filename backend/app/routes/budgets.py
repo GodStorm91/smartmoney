@@ -11,12 +11,10 @@ from ..database import get_db
 from ..models.budget import Budget
 from ..models.user import User
 from ..schemas.budget import (
-    AllocationUpdateRequest,
     BudgetGenerateRequest,
     BudgetRegenerateRequest,
     BudgetResponse,
-    BudgetTrackingResponse,
-    BudgetSuggestionsResponse
+    BudgetTrackingResponse
 )
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
@@ -103,8 +101,7 @@ def generate_budget(
             monthly_income=request.monthly_income,
             allocations=budget_data["allocations"],
             savings_target=budget_data.get("savings_target"),
-            advice=budget_data.get("advice"),
-            language=request.language
+            advice=budget_data.get("advice")
         )
 
         return budget
@@ -145,45 +142,6 @@ def get_current_budget(
         )
 
     return budget
-
-
-@router.get("/suggestions", response_model=BudgetSuggestionsResponse)
-def get_budget_suggestions(
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    """Get budget suggestions based on previous month.
-
-    Returns previous month's budget data for cloning/pre-fill.
-    """
-    current_month = date.today().strftime("%Y-%m")
-    previous_month = BudgetService.get_previous_month(current_month)
-
-    # Get previous month budget
-    prev_budget = BudgetService.get_budget_by_month(db, current_user.id, previous_month)
-
-    if not prev_budget:
-        return BudgetSuggestionsResponse(
-            has_previous=False,
-            previous_month=None,
-            previous_income=None,
-            previous_allocations=None,
-            carry_over=0
-        )
-
-    # Calculate carry-over for current month
-    carry_over = BudgetService.calculate_carry_over(db, current_user.id, current_month)
-
-    return BudgetSuggestionsResponse(
-        has_previous=True,
-        previous_month=previous_month,
-        previous_income=prev_budget.monthly_income,
-        previous_allocations=[
-            {"category": a.category, "amount": a.amount}
-            for a in prev_budget.allocations
-        ],
-        carry_over=carry_over
-    )
 
 
 @router.post("/{budget_id}/regenerate", response_model=BudgetResponse)
@@ -278,8 +236,7 @@ def regenerate_budget(
             monthly_income=existing_budget.monthly_income,
             allocations=budget_data["allocations"],
             savings_target=budget_data.get("savings_target"),
-            advice=budget_data.get("advice"),
-            language=request.language
+            advice=budget_data.get("advice")
         )
 
         return budget
@@ -392,95 +349,3 @@ def check_budget_alerts(
         current_user.email
     )
     return result
-
-
-@router.patch("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
-def update_allocation(
-    budget_id: int,
-    category: str,
-    request: AllocationUpdateRequest,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    """Update a single budget allocation amount.
-
-    Args:
-        budget_id: Budget ID
-        category: Category name to update
-        request: New amount
-        db: Database session
-        current_user: Authenticated user
-
-    Returns:
-        Updated budget
-
-    Raises:
-        HTTPException: If budget or allocation not found
-    """
-    # Verify budget belongs to user
-    budget = db.query(Budget).filter(
-        Budget.id == budget_id,
-        Budget.user_id == current_user.id
-    ).first()
-
-    if not budget:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Budget not found"
-        )
-
-    updated = BudgetService.update_allocation(
-        db, budget_id, category, request.amount
-    )
-
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Allocation for category '{category}' not found"
-        )
-
-    return updated
-
-
-@router.delete("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
-def delete_allocation(
-    budget_id: int,
-    category: str,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    """Delete a budget allocation.
-
-    Args:
-        budget_id: Budget ID
-        category: Category name to delete
-        db: Database session
-        current_user: Authenticated user
-
-    Returns:
-        Updated budget
-
-    Raises:
-        HTTPException: If budget or allocation not found
-    """
-    # Verify budget belongs to user
-    budget = db.query(Budget).filter(
-        Budget.id == budget_id,
-        Budget.user_id == current_user.id
-    ).first()
-
-    if not budget:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Budget not found"
-        )
-
-    updated = BudgetService.delete_allocation(db, budget_id, category)
-
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Allocation for category '{category}' not found"
-        )
-
-    return updated

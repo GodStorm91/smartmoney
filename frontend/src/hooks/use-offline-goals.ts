@@ -3,7 +3,7 @@
  */
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { bulkUpdateGoals, getAllGoals, type DBGoal } from '../db'
-import type { Goal } from '../types/goal'
+import type { Goal } from '../types'
 
 export function useOfflineGoals(
   fetchFn: () => Promise<Goal[]>,
@@ -17,18 +17,14 @@ export function useOfflineGoals(
         if (data.length > 0) {
           const dbGoals: DBGoal[] = data.map(g => ({
             id: g.id,
-            goal_type: g.goal_type,
             name: g.name,
-            years: g.years,
             target_amount: g.target_amount,
+            current_amount: g.current_amount,
+            years: g.years,
             start_date: g.start_date,
-            priority: g.priority,
-            account_id: g.account_id,
-            ai_advice: g.ai_advice,
-            milestone_25_at: g.milestone_25_at,
-            milestone_50_at: g.milestone_50_at,
-            milestone_75_at: g.milestone_75_at,
-            milestone_100_at: g.milestone_100_at,
+            end_date: g.end_date,
+            status: g.status,
+            monthly_required: g.monthly_required,
             synced_at: new Date().toISOString(),
             pending_sync: false,
           }))
@@ -40,18 +36,14 @@ export function useOfflineGoals(
         const cached = await getAllGoals()
         return cached.map(g => ({
           id: g.id,
-          goal_type: g.goal_type,
           name: g.name,
-          years: g.years,
           target_amount: g.target_amount,
+          current_amount: g.current_amount,
+          years: g.years,
           start_date: g.start_date,
-          priority: g.priority,
-          account_id: g.account_id,
-          ai_advice: g.ai_advice,
-          milestone_25_at: g.milestone_25_at,
-          milestone_50_at: g.milestone_50_at,
-          milestone_75_at: g.milestone_75_at,
-          milestone_100_at: g.milestone_100_at,
+          end_date: g.end_date,
+          status: g.status,
+          monthly_required: g.monthly_required,
         })) as Goal[]
       }
     },

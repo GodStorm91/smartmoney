@@ -1,47 +1,12 @@
-/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { TanStackRouterVite } from '@tanstack/router-vite-plugin'
 import { VitePWA } from 'vite-plugin-pwa'
-import compression from 'vite-plugin-compression'
 import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  build: {
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-      },
-    },
-    cssMinify: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // React core
-          'vendor-react': ['react', 'react-dom'],
-          // TanStack libraries
-          'vendor-tanstack': ['@tanstack/react-query', '@tanstack/react-router'],
-          // Charting library (heavy)
-          'vendor-recharts': ['recharts'],
-          // i18n
-          'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector', 'i18next-http-backend'],
-          // Date utilities
-          'vendor-date': ['date-fns'],
-          // Icons (tree-shake by importing individually)
-          'vendor-icons': ['lucide-react'],
-        },
-      },
-    },
-    // Increase warning threshold since we have chunking
-    chunkSizeWarningLimit: 300,
-  },
   plugins: [
-    compression({ algorithm: 'brotliCompress', ext: '.br' }),
-    compression({ algorithm: 'gzip', ext: '.gz' }),
     react(),
     TanStackRouterVite(),
     VitePWA({
@@ -118,10 +83,5 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
   },
 })

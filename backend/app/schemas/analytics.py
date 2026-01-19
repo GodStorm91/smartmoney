@@ -37,8 +37,6 @@ class CategoryBreakdownResponse(BaseModel):
     category: str
     amount: int
     count: int
-    previous_amount: Optional[int] = None  # Amount in previous period
-    change_percent: Optional[float] = None  # Percentage change vs previous
 
 
 class SourceBreakdownResponse(BaseModel):
@@ -49,22 +47,6 @@ class SourceBreakdownResponse(BaseModel):
     count: int
 
 
-class ComparisonData(BaseModel):
-    """Comparison data vs previous period."""
-
-    income_change: Optional[float] = None
-    expense_change: Optional[float] = None
-    net_change: Optional[float] = None
-
-
-class TopCategory(BaseModel):
-    """Top spending category."""
-
-    name: str
-    amount: int
-    percentage: float
-
-
 class AnalyticsResponse(BaseModel):
     """Comprehensive analytics response with all data."""
 
@@ -73,38 +55,3 @@ class AnalyticsResponse(BaseModel):
     total_income: int
     total_expense: int
     net_cashflow: int
-    comparison: Optional[ComparisonData] = None
-    top_category: Optional[TopCategory] = None
-
-
-# Forecast schemas
-class ForecastMonth(BaseModel):
-    """Single month in forecast."""
-
-    month: str  # YYYY-MM format
-    income: int
-    expense: int
-    net: int
-    balance: int
-    is_actual: bool
-    recurring_income: Optional[int] = None  # Only for projected months
-    recurring_expense: Optional[int] = None
-    variable_expense: Optional[int] = None
-
-
-class ForecastSummary(BaseModel):
-    """Forecast summary statistics."""
-
-    avg_monthly_net: int
-    end_balance: int
-    months_until_negative: Optional[int] = None
-    total_projected_income: int
-    total_projected_expense: int
-
-
-class ForecastResponse(BaseModel):
-    """Cash flow forecast response."""
-
-    current_balance: int
-    months: list[ForecastMonth]
-    summary: ForecastSummary

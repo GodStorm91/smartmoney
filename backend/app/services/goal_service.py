@@ -1,6 +1,5 @@
 """Goal service for financial goal tracking and progress calculations."""
-from collections import defaultdict
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
 
 from dateutil.relativedelta import relativedelta
@@ -9,24 +8,10 @@ from sqlalchemy.orm import Session
 
 from ..models.goal import Goal
 from ..models.transaction import Transaction
-from ..models.account import Account
-from ..models.settings import AppSettings
-from .account_service import AccountService
-from .exchange_rate_service import ExchangeRateService
 
 
 class GoalService:
     """Service for goal operations."""
-
-    @staticmethod
-    def _convert_to_jpy(amount: int, currency: str, rates: dict[str, float]) -> int:
-        """Convert amount to JPY using exchange rates."""
-        if currency == "JPY" or currency not in rates:
-            return amount
-        rate = rates.get(currency, 1.0)
-        if rate == 0:
-            return amount
-        return int(amount / rate)
 
     @staticmethod
     def create_goal(db: Session, goal_data: dict) -> Goal:
@@ -81,7 +66,7 @@ class GoalService:
 
     @staticmethod
     def get_all_goals(db: Session, user_id: int) -> list[Goal]:
-        """Get all goals ordered by priority for a specific user.
+        """Get all goals ordered by years for a specific user.
 
         Args:
             db: Database session
@@ -90,101 +75,7 @@ class GoalService:
         Returns:
             List of goals
         """
-        return db.query(Goal).filter(Goal.user_id == user_id).order_by(Goal.priority).all()
-
-    @staticmethod
-    def has_emergency_fund(db: Session, user_id: int) -> bool:
-        """Check if user has emergency fund goal.
-
-        Args:
-            db: Database session
-            user_id: User ID
-
-        Returns:
-            True if emergency fund goal exists
-        """
-        return db.query(Goal).filter(
-            Goal.user_id == user_id,
-            Goal.goal_type == "emergency_fund"
-        ).first() is not None
-
-    @staticmethod
-    def get_next_priority(db: Session, user_id: int) -> int:
-        """Get next priority number for new goal.
-
-        Args:
-            db: Database session
-            user_id: User ID
-
-        Returns:
-            Next priority number
-        """
-        max_priority = db.query(func.max(Goal.priority)).filter(
-            Goal.user_id == user_id
-        ).scalar()
-        return (max_priority or 0) + 1
-
-    @staticmethod
-    def reorder_goals(db: Session, user_id: int, goal_ids: list[int]) -> list[Goal]:
-        """Reorder goals by priority. Emergency fund must remain #1.
-
-        Args:
-            db: Database session
-            user_id: User ID
-            goal_ids: Ordered list of goal IDs
-
-        Returns:
-            Reordered list of goals
-
-        Raises:
-            ValueError: If goal IDs are invalid or emergency fund is not first
-        """
-        goals = db.query(Goal).filter(
-            Goal.user_id == user_id,
-            Goal.id.in_(goal_ids)
-        ).all()
-
-        if len(goals) != len(goal_ids):
-            raise ValueError("Invalid goal IDs")
-
-        # Check emergency fund constraint
-        emergency_goal = next((g for g in goals if g.goal_type == "emergency_fund"), None)
-        if emergency_goal and goal_ids[0] != emergency_goal.id:
-            raise ValueError("Emergency fund must be priority 1")
-
-        # Update priorities
-        for priority, goal_id in enumerate(goal_ids, start=1):
-            goal = next(g for g in goals if g.id == goal_id)
-            goal.priority = priority
-
-        db.commit()
-        return GoalService.get_all_goals(db, user_id)
-
-    @staticmethod
-    def update_milestones(db: Session, goal: Goal, progress_pct: float) -> Goal:
-        """Update milestone timestamps if reached.
-
-        Args:
-            db: Database session
-            goal: Goal object
-            progress_pct: Current progress percentage
-
-        Returns:
-            Updated goal
-        """
-        now = datetime.now()
-
-        if progress_pct >= 25 and not goal.milestone_25_at:
-            goal.milestone_25_at = now
-        if progress_pct >= 50 and not goal.milestone_50_at:
-            goal.milestone_50_at = now
-        if progress_pct >= 75 and not goal.milestone_75_at:
-            goal.milestone_75_at = now
-        if progress_pct >= 100 and not goal.milestone_100_at:
-            goal.milestone_100_at = now
-
-        db.commit()
-        return goal
+        return db.query(Goal).filter(Goal.user_id == user_id).order_by(Goal.years).all()
 
     @staticmethod
     def update_goal(db: Session, user_id: int, goal_id: int, goal_data: dict) -> Optional[Goal]:
@@ -240,9 +131,6 @@ class GoalService:
     def calculate_goal_progress(db: Session, user_id: int, goal: Goal) -> dict:
         """Calculate progress towards a financial goal.
 
-        Uses linked account balance for progress tracking. Falls back to
-        net cashflow calculation only if no account is linked.
-
         Args:
             db: Database session
             user_id: User ID
@@ -255,7 +143,19 @@ class GoalService:
         if goal.start_date:
             start_date = goal.start_date
         else:
-            start_date = date.today()
+            # Use earliest transaction date
+            first_tx = (
+                db.query(func.min(Transaction.date))
+                .filter(
+                    Transaction.user_id == user_id,
+                    ~Transaction.is_transfer
+                )
+                .scalar()
+            )
+            start_date = first_tx or date.today()
+
+        # Calculate total net savings so far
+        net_so_far = GoalService._calculate_net_savings(db, user_id, start_date)
 
         # Calculate time metrics
         now = date.today()
@@ -267,46 +167,19 @@ class GoalService:
         )
         months_remaining = max(months_total - months_elapsed, 1)
 
-        # Get linked account info and calculate progress from account balance
-        account_name = None
-        account_balance = 0
-        total_saved = 0
-
-        if goal.account_id:
-            try:
-                # Use account balance for progress tracking
-                account_balance = AccountService.calculate_balance(db, user_id, goal.account_id)
-                total_saved = max(account_balance, 0)  # Don't show negative progress
-
-                # Get account name
-                account = db.query(Account).filter(
-                    Account.id == goal.account_id,
-                    Account.user_id == user_id
-                ).first()
-                if account:
-                    account_name = account.name
-            except ValueError:
-                # Account not found, fall back to zero
-                total_saved = 0
-        else:
-            # Fallback: no linked account, use net cashflow (legacy behavior)
-            total_saved = max(GoalService._calculate_net_savings(db, user_id, start_date), 0)
-
         # Calculate required savings
-        needed_remaining = max(goal.target_amount - total_saved, 0)
-        needed_per_month = needed_remaining / months_remaining if months_remaining > 0 else 0
+        needed_remaining = max(goal.target_amount - net_so_far, 0)
+        needed_per_month = needed_remaining / months_remaining
 
-        # Calculate average monthly contribution (based on elapsed time)
-        avg_monthly_net = total_saved / max(months_elapsed, 1) if months_elapsed > 0 else 0
+        # Calculate average monthly net
+        avg_monthly_net = net_so_far / max(months_elapsed, 1) if months_elapsed > 0 else 0
 
-        # Calculate progress percentage (capped at 0-100 for display)
-        progress_pct = (total_saved / goal.target_amount * 100) if goal.target_amount > 0 else 0
+        # Calculate progress percentage
+        progress_pct = (net_so_far / goal.target_amount * 100) if goal.target_amount > 0 else 0
 
         # Determine status
-        projected_total = total_saved + (months_remaining * avg_monthly_net)
-        if progress_pct >= 100:
-            status = "completed"
-        elif projected_total > goal.target_amount * 1.05:
+        projected_total = net_so_far + (months_remaining * avg_monthly_net)
+        if projected_total > goal.target_amount * 1.05:
             status = "ahead"
         elif projected_total >= goal.target_amount * 0.95:
             status = "on_track"
@@ -315,15 +188,12 @@ class GoalService:
 
         return {
             "goal_id": goal.id,
-            "goal_type": goal.goal_type,
-            "name": goal.name,
             "years": goal.years,
             "target_amount": goal.target_amount,
-            "currency": goal.currency,
             "start_date": start_date.isoformat(),
             "target_date": target_date.isoformat(),
             "current_date": now.isoformat(),
-            "total_saved": total_saved,
+            "total_saved": net_so_far,
             "progress_percentage": round(progress_pct, 2),
             "months_total": months_total,
             "months_elapsed": months_elapsed,
@@ -333,14 +203,6 @@ class GoalService:
             "needed_remaining": needed_remaining,
             "projected_total": round(projected_total, 0),
             "status": status,
-            "priority": goal.priority,
-            "account_id": goal.account_id,
-            "account_name": account_name,
-            "account_balance": account_balance,
-            "milestone_25_at": goal.milestone_25_at,
-            "milestone_50_at": goal.milestone_50_at,
-            "milestone_75_at": goal.milestone_75_at,
-            "milestone_100_at": goal.milestone_100_at,
         }
 
     @staticmethod
@@ -421,55 +283,34 @@ class GoalService:
         last_complete_month = (now.replace(day=1) - relativedelta(days=1))
         trend_start = (last_complete_month.replace(day=1) - relativedelta(months=trend_months - 1))
 
-        # Get exchange rates for currency conversion
-        rates = ExchangeRateService.get_cached_rates(db)
-
-        # Get user's large transaction threshold setting (default 1,000,000 JPY)
-        user_settings = db.query(AppSettings).filter(AppSettings.user_id == user_id).first()
-        large_tx_threshold = user_settings.large_transaction_threshold if user_settings else 1000000
-
-        # Query transactions individually to handle currency conversion
-        transactions = db.query(
+        # Query monthly cashflows for trend period (grouped by month_key)
+        monthly_data = db.query(
             Transaction.month_key,
-            Transaction.amount,
-            Transaction.currency,
-            Transaction.is_income,
+            func.sum(
+                case(
+                    (Transaction.is_income, Transaction.amount), else_=0
+                )
+            ).label("income"),
+            func.sum(
+                case(
+                    (~Transaction.is_income, Transaction.amount), else_=0
+                )
+            ).label("expenses"),
         ).filter(
             Transaction.user_id == user_id,
             ~Transaction.is_transfer,
             Transaction.date >= trend_start,
             Transaction.date <= last_complete_month
-        ).all()
-
-        # Aggregate by month with currency conversion, excluding large transactions
-        monthly_income: dict[str, int] = defaultdict(int)
-        monthly_expenses: dict[str, int] = defaultdict(int)
-        excluded_count = 0
-
-        for txn in transactions:
-            amount_jpy = GoalService._convert_to_jpy(
-                abs(txn.amount), txn.currency or "JPY", rates
-            )
-            # Skip large one-time transactions if threshold is set (0 = disabled)
-            if large_tx_threshold > 0 and amount_jpy > large_tx_threshold:
-                excluded_count += 1
-                continue
-            if txn.is_income:
-                monthly_income[txn.month_key] += amount_jpy
-            else:
-                monthly_expenses[txn.month_key] += amount_jpy
+        ).group_by(Transaction.month_key).all()
 
         # Calculate average monthly net from period data
-        all_months = set(monthly_income.keys()) | set(monthly_expenses.keys())
-        if all_months:
-            monthly_nets = [
-                monthly_income[m] - monthly_expenses[m] for m in all_months
-            ]
+        if monthly_data:
+            monthly_nets = [float(income) - abs(float(expenses)) for _, income, expenses in monthly_data]
             current_monthly_net = sum(monthly_nets) / len(monthly_nets)
-            actual_months_used = len(all_months)
+            actual_months_used = len(monthly_nets)
 
             # Format period display
-            month_keys = sorted(all_months)
+            month_keys = sorted([row.month_key for row in monthly_data])
             if len(month_keys) > 1:
                 period_display = f"{month_keys[0]} to {month_keys[-1]} ({actual_months_used} months avg)"
             else:
@@ -490,22 +331,13 @@ class GoalService:
             else 0
         )
 
-        # Calculate required monthly savings based on current progress
-        # Use linked account balance if available, otherwise use net cashflow
-        if goal.account_id:
-            try:
-                account_balance = AccountService.calculate_balance(db, user_id, goal.account_id)
-                total_saved = max(account_balance, 0)
-            except ValueError:
-                total_saved = 0
-        else:
-            total_saved = max(GoalService._calculate_net_savings(db, user_id, start_date), 0)
-
-        needed_remaining = float(goal.target_amount) - float(total_saved)
-        required_monthly = needed_remaining / months_remaining if months_remaining > 0 else needed_remaining
+        # Calculate required monthly savings
+        total_saved = GoalService._calculate_net_savings(db, user_id, start_date)
+        needed_remaining = goal.target_amount - total_saved
+        required_monthly = needed_remaining / months_remaining
 
         # Calculate monthly gap
-        monthly_gap = required_monthly - float(current_monthly_net)
+        monthly_gap = required_monthly - current_monthly_net
 
         # Determine status tier based on achievable percentage
         if achievable_percentage >= 100:
@@ -540,8 +372,6 @@ class GoalService:
             "months_remaining": months_remaining,
             "trend_months_requested": trend_months,
             "trend_months_actual": actual_months_used,
-            "large_tx_excluded": excluded_count,
-            "large_tx_threshold": large_tx_threshold,
         }
 
     @staticmethod

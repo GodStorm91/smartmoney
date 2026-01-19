@@ -1,1 +1,0 @@
-export { TransferFormModal } from './TransferFormModal'

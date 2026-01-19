@@ -120,6 +120,14 @@
     "goalMotivation": "Track your savings progress",
     "noTransactions": "No transactions yet"
   },
+  "spendingCalendar": {
+    "title": "Spending Calendar",
+    "monthlyTotal": "Monthly",
+    "dailyAvg": "Daily Avg",
+    "highestDay": "Highest",
+    "transactionCount": "{{count}} transactions",
+    "noSpending": "No spending this day"
+  },
   "health": {
     "title": "Financial Health",
     "savingsRate": "Savings Rate",
@@ -796,7 +804,15 @@
     "largeTransactionThreshold": "Large Transaction Threshold",
     "largeTransactionThresholdDescription": "Exclude transactions above this amount from goal achievability calculations",
     "largeTransactionThresholdHint": "Set to 0 to disable. Large one-time expenses (medical, etc.) can skew monthly averages.",
-    "saveFailed": "Failed to save settings"
+    "saveFailed": "Failed to save settings",
+    "sections": {
+      "general": "General",
+      "budget": "Budget",
+      "categories": "Categories",
+      "sources": "Sources",
+      "recurring": "Recurring",
+      "crypto": "Crypto"
+    }
   },
   "crypto": {
     "wallets": "Crypto Wallets",
@@ -1259,6 +1275,191 @@
       "selectItems": "Please select at least one item",
       "receiveRequired": "Please select receiving account",
       "amountRequired": "Amount received is required"
+    }
+  },
+  "gamification": {
+    "title": "Achievements & Rewards",
+    "subtitle": "Track your progress, earn XP, and unlock achievements as you manage your finances!",
+    "loading": "Loading gamification data...",
+    "level": "Level",
+    "dayStreak": "Day Streak",
+    "best": "Best",
+    "badgesEarned": "Badges Earned",
+    "badgesRemaining": "{{count}} badges remaining",
+    "allBadges": "All Badges",
+    "noBadges": "No badges in this category yet.",
+    "keepUsing": "Keep using SmartMoney to unlock more badges!",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity",
+    "startEarningXP": "Start logging transactions to earn XP!",
+    "tabs": {
+      "badges": "Badges",
+      "profile": "Profile",
+      "activity": "Activity"
+    },
+    "categories": {
+      "all": "All",
+      "consistency": "Consistency",
+      "transactions": "Transactions",
+      "savings": "Savings",
+      "budgeting": "Budgeting",
+      "goals": "Goals",
+      "accounts": "Accounts",
+      "special": "Special",
+      "levels": "Levels"
+    },
+    "stats": {
+      "unlocked": "Unlocked",
+      "remaining": "Remaining",
+      "legendary": "Legendary",
+      "xpEarned": "XP Earned"
+    }
+  },
+  "bills": {
+    "pageTitle": "Bills & Reminders",
+    "pageSubtitle": "Track and manage your recurring bills",
+    "add_bill": "Add Bill",
+    "edit_bill": "Edit Bill",
+    "tabs": {
+      "list": "List",
+      "calendar": "Calendar"
+    },
+    "status": {
+      "paid": "Paid",
+      "due_today": "Due Today",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "recurrence": {
+      "none": "One-time",
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+    "reminder": {
+      "no_reminder": "No reminder",
+      "one_day": "1 day before",
+      "three_days": "3 days before",
+      "five_days": "5 days before",
+      "one_week": "1 week before"
+    },
+    "reminder_days": "{{count}} day before",
+    "reminder_days_notice": "{{count}} day notice",
+    "category": {
+      "select": "Select category",
+      "utilities": "Utilities",
+      "rent_mortgage": "Rent/Mortgage",
+      "insurance": "Insurance",
+      "subscriptions": "Subscriptions",
+      "phone_internet": "Phone/Internet",
+      "loan": "Loan",
+      "credit_card": "Credit Card",
+      "other": "Other"
+    },
+    "due_today": "Due today",
+    "tomorrow": "Tomorrow",
+    "in_days": "In {{count}} days",
+    "days_until_due": "{{count}} days left",
+    "field": {
+      "name": "Bill Name",
+      "amount": "Amount",
+      "due_date": "Due Date",
+      "recurrence": "Recurrence",
+      "reminder": "Reminder",
+      "category": "Category",
+      "color": "Color",
+      "notes": "Notes",
+      "already_paid": "Mark as already paid"
+    },
+    "placeholder": {
+      "name": "e.g., Electricity, Internet",
+      "notes": "Additional notes..."
+    },
+    "validation": {
+      "name_required": "Bill name is required",
+      "amount_required": "Please enter a valid amount",
+      "due_date_required": "Due date is required",
+      "submit_failed": "Failed to save bill. Please try again."
+    },
+    "actions": {
+      "mark_paid": "Mark as Paid",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "delete_confirm": "Are you sure you want to delete \"{{name}}\"?",
+    "search_placeholder": "Search bills...",
+    "no_bills_found": "No bills found",
+    "showing_count": "Showing {{count}} of {{total}} bills",
+    "sort": {
+      "due_date": "Due Date",
+      "amount": "Amount",
+      "name": "Name",
+      "created_at": "Date Added"
+    },
+    "filter": {
+      "all": "All",
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "calendar": {
+      "title": "Bill Calendar",
+      "total_due": "Total Due"
+    },
+    "upcoming": {
+      "title": "Upcoming Bills",
+      "empty": "No upcoming bills",
+      "total_due": "Total Due"
+    },
+    "detail": {
+      "title": "Bill Details"
+    },
+    "quick_stats": "Quick Stats",
+    "total_bills": "Total Bills",
+    "paid": "Paid",
+    "unpaid": "Unpaid"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "view_details": "View details",
+    "over_budget": {
+      "title": "Over Budget",
+      "message": "{{budget}} is over budget by {{amount}}"
+    },
+    "threshold_80": {
+      "title": "Near Limit",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "threshold_50": {
+      "title": "Halfway There",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "near_limit": {
+      "title": "Approaching Limit"
+    },
+    "halfway": {
+      "title": "Halfway Through Budget"
+    },
+    "bill_due": {
+      "title": "Bill Due",
+      "message": "{{bill}} is due ({{amount}})"
+    },
+    "default": {
+      "message": "You have a new alert"
+    },
+    "budget_progress": {
+      "message": "{{budget}}: {{spent}} of {{limit}}"
+    },
+    "remaining": "Remaining",
+    "left": "Left",
+    "over_by": "Over by {{amount}}",
+    "thresholds": {
+      "next": "Next threshold",
+      "at_threshold": "At {{percentage}}%"
     }
   }
 }

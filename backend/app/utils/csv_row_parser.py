@@ -1,35 +1,12 @@
-"""CSV row parsing utilities - main dispatcher."""
+"""CSV row parsing utilities."""
 import pandas as pd
 
 from .category_mapper import map_category
-from .parsers import parse_paypay_row, parse_smbc_row
 from .transaction_hasher import generate_tx_hash
 
 
 def parse_transaction_row(row: pd.Series, column_map: dict) -> dict | None:
     """Parse a single transaction row.
-
-    Args:
-        row: Pandas Series representing one row
-        column_map: Column mapping dictionary
-
-    Returns:
-        Transaction dictionary or None if invalid
-    """
-    # Check if this is PayPay format
-    if column_map.get("format") == "paypay":
-        return parse_paypay_row(row, column_map)
-
-    # Check if this is SMBC format
-    if column_map.get("format") == "smbc":
-        return parse_smbc_row(row, column_map)
-
-    # Generic CSV format (MoneyForward, etc.)
-    return parse_generic_row(row, column_map)
-
-
-def parse_generic_row(row: pd.Series, column_map: dict) -> dict | None:
-    """Parse a generic CSV row (MoneyForward format).
 
     Args:
         row: Pandas Series representing one row

@@ -8,18 +8,6 @@ class CSVParseError(Exception):
     pass
 
 
-def is_paypay_format(df: pd.DataFrame) -> bool:
-    """Check if the CSV is in PayPay export format."""
-    paypay_columns = ["Date & Time", "Amount Outgoing (Yen)", "Business Name", "Transaction Type"]
-    return all(col in df.columns for col in paypay_columns)
-
-
-def is_smbc_format(df: pd.DataFrame) -> bool:
-    """Check if the CSV is in SMBC bank statement format."""
-    smbc_columns = ["年月日", "お引出し", "お預入れ", "お取り扱い内容", "残高"]
-    return all(col in df.columns for col in smbc_columns)
-
-
 def map_columns(df: pd.DataFrame, filename: str) -> dict:
     """Map CSV columns to standard field names.
 
@@ -34,29 +22,6 @@ def map_columns(df: pd.DataFrame, filename: str) -> dict:
         CSVParseError: If required columns are missing
     """
     column_map = {}
-
-    # Check for PayPay format first
-    if is_paypay_format(df):
-        column_map["date"] = "Date & Time"
-        column_map["description"] = "Business Name"
-        column_map["amount_out"] = "Amount Outgoing (Yen)"
-        column_map["amount_in"] = "Amount Incoming (Yen)"
-        column_map["category"] = "Transaction Type"
-        column_map["source"] = "Method"
-        column_map["format"] = "paypay"
-        return column_map
-
-    # Check for SMBC format
-    if is_smbc_format(df):
-        column_map["date"] = "年月日"
-        column_map["description"] = "お取り扱い内容"
-        column_map["amount_out"] = "お引出し"  # Withdrawal
-        column_map["amount_in"] = "お預入れ"  # Deposit
-        column_map["balance"] = "残高"
-        column_map["memo"] = "メモ"
-        column_map["label"] = "ラベル"
-        column_map["format"] = "smbc"
-        return column_map
 
     # Date column
     for col in ["日付", "Date", "date"]:

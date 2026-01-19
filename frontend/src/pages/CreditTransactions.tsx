@@ -16,10 +16,10 @@ const TRANSACTION_ICONS: Record<TransactionType, typeof TrendingUp> = {
 }
 
 const TRANSACTION_COLORS: Record<TransactionType, string> = {
-  purchase: 'text-green-600 bg-green-50 dark:bg-green-900/30',
-  usage: 'text-red-600 bg-red-50 dark:bg-red-900/30',
-  refund: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30',
-  adjustment: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30'
+  purchase: 'text-green-600 bg-green-50',
+  usage: 'text-red-600 bg-red-50',
+  refund: 'text-blue-600 bg-blue-50',
+  adjustment: 'text-yellow-600 bg-yellow-50'
 }
 
 export function CreditTransactions() {
@@ -54,34 +54,34 @@ export function CreditTransactions() {
       <div className="mb-6">
         <button
           onClick={() => navigate({ to: '/' })}
-          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-4"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('common.back', 'Back')}
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-gray-900">
           {t('credits.transactionHistory', 'Transaction History')}
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+        <p className="text-sm text-gray-600 mt-2">
           {t('credits.viewAllTransactions', 'View all your credit transactions')}
         </p>
       </div>
 
       {/* Current Balance Card */}
       {balance && (
-        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 border-blue-200 dark:border-blue-700">
+        <Card className="mb-6 bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('credits.currentBalance', 'Current Balance')}</p>
+              <p className="text-sm text-gray-600 mb-1">{t('credits.currentBalance', 'Current Balance')}</p>
               <p className="text-3xl font-bold text-blue-600">{balance.balance.toFixed(4)}</p>
             </div>
             <div className="text-right space-y-2">
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">{t('credits.totalPurchased', 'Total Purchased')}</p>
+                <p className="text-xs text-gray-600">{t('credits.totalPurchased', 'Total Purchased')}</p>
                 <p className="text-lg font-semibold text-green-600">{balance.lifetime_purchased.toFixed(4)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-600 dark:text-gray-400">{t('credits.totalSpent', 'Total Spent')}</p>
+                <p className="text-xs text-gray-600">{t('credits.totalSpent', 'Total Spent')}</p>
                 <p className="text-lg font-semibold text-red-600">{balance.lifetime_spent.toFixed(4)}</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ export function CreditTransactions() {
               'px-4 py-2 rounded-lg font-medium transition-colors capitalize',
               filter === type
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             )}
           >
             {t(`credits.filter${type.charAt(0).toUpperCase() + type.slice(1)}`, type)}
@@ -115,11 +115,11 @@ export function CreditTransactions() {
         {isLoading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-4">{t('common.loading', 'Loading...')}</p>
+            <p className="text-gray-600 mt-4">{t('common.loading', 'Loading...')}</p>
           </div>
         ) : !history || history.transactions.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">{t('credits.noTransactions', 'No transactions found')}</p>
+            <p className="text-gray-600">{t('credits.noTransactions', 'No transactions found')}</p>
             <Button
               onClick={() => navigate({ to: '/register' })}
               className="mt-4"
@@ -130,7 +130,7 @@ export function CreditTransactions() {
         ) : (
           <div className="space-y-1">
             {/* Table Header */}
-            <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 dark:bg-gray-700/50 font-semibold text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
+            <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 font-semibold text-sm text-gray-700 border-b border-gray-200">
               <div className="col-span-3">{t('credits.date', 'Date')}</div>
               <div className="col-span-2">{t('credits.type', 'Type')}</div>
               <div className="col-span-4">{t('credits.description', 'Description')}</div>
@@ -146,10 +146,10 @@ export function CreditTransactions() {
               return (
                 <div
                   key={transaction.id}
-                  className="grid grid-cols-12 gap-4 px-4 py-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors border-b border-gray-100 dark:border-gray-700 items-center"
+                  className="grid grid-cols-12 gap-4 px-4 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100 items-center"
                 >
                   {/* Date */}
-                  <div className="col-span-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="col-span-3 text-sm text-gray-600">
                     {formatDate(transaction.created_at)}
                   </div>
 
@@ -162,7 +162,7 @@ export function CreditTransactions() {
                   </div>
 
                   {/* Description */}
-                  <div className="col-span-4 text-sm text-gray-900 dark:text-gray-100">
+                  <div className="col-span-4 text-sm text-gray-900">
                     {transaction.description}
                   </div>
 
@@ -175,7 +175,7 @@ export function CreditTransactions() {
                   </div>
 
                   {/* Balance After */}
-                  <div className="col-span-1 text-right text-sm font-mono text-gray-700 dark:text-gray-300">
+                  <div className="col-span-1 text-right text-sm font-mono text-gray-700">
                     {transaction.balance_after.toFixed(2)}
                   </div>
                 </div>
@@ -186,8 +186,8 @@ export function CreditTransactions() {
 
         {/* Pagination */}
         {history && history.pages > 1 && (
-          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
+            <p className="text-sm text-gray-600">
               {t('credits.showingResults', 'Showing {{start}} - {{end}} of {{total}}', {
                 start: (page - 1) * perPage + 1,
                 end: Math.min(page * perPage, history.total),
@@ -224,7 +224,7 @@ export function CreditTransactions() {
                         'w-8 h-8 rounded text-sm font-medium transition-colors',
                         page === pageNum
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       )}
                     >
                       {pageNum}

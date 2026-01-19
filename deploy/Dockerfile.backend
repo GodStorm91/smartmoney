@@ -16,5 +16,5 @@ RUN pip install --no-cache-dir .
 COPY backend/ .
 RUN pip install --no-cache-dir .
 
-# Run migrations with stamp first, then start server
-CMD ["sh", "-c", "alembic stamp head && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+# Run migrations and start server
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

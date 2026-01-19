@@ -1,6 +1,5 @@
 import type { AccountWithBalance, AccountType } from '@/types'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from '@tanstack/react-router'
 import { Card } from '@/components/ui/Card'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -18,40 +17,24 @@ const ACCOUNT_TYPE_CONFIG: Record<
   AccountType,
   { icon: string; color: string; bgColor: string }
 > = {
-  bank: { icon: '🏦', color: 'text-blue-600', bgColor: 'bg-blue-50 dark:bg-blue-900/30' },
-  cash: { icon: '💵', color: 'text-green-600', bgColor: 'bg-green-50 dark:bg-green-900/30' },
-  credit_card: { icon: '💳', color: 'text-purple-600', bgColor: 'bg-purple-50 dark:bg-purple-900/30' },
-  investment: { icon: '📈', color: 'text-orange-600', bgColor: 'bg-orange-50 dark:bg-orange-900/30' },
-  receivable: { icon: '💰', color: 'text-teal-600', bgColor: 'bg-teal-50 dark:bg-teal-900/30' },
-  savings: { icon: '🐷', color: 'text-pink-600', bgColor: 'bg-pink-50 dark:bg-pink-900/30' },
-  crypto: { icon: '₿', color: 'text-amber-600', bgColor: 'bg-amber-50 dark:bg-amber-900/30' },
-  other: { icon: '📁', color: 'text-gray-600', bgColor: 'bg-gray-50 dark:bg-gray-700' },
+  bank: { icon: '🏦', color: 'text-blue-600', bgColor: 'bg-blue-50' },
+  cash: { icon: '💵', color: 'text-green-600', bgColor: 'bg-green-50' },
+  credit_card: { icon: '💳', color: 'text-purple-600', bgColor: 'bg-purple-50' },
+  investment: { icon: '📈', color: 'text-orange-600', bgColor: 'bg-orange-50' },
+  receivable: { icon: '💰', color: 'text-teal-600', bgColor: 'bg-teal-50' },
+  other: { icon: '📁', color: 'text-gray-600', bgColor: 'bg-gray-50' },
 }
 
 export function AccountCard({ account, onEdit }: AccountCardProps) {
   const { t } = useTranslation('common')
-  const navigate = useNavigate()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
 
   const typeConfig = ACCOUNT_TYPE_CONFIG[account.type]
   const balancePositive = account.current_balance >= 0
 
-  // Navigate to transactions page filtered by this account
-  const handleCardClick = () => {
-    const now = new Date()
-    const month = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-    navigate({
-      to: '/transactions',
-      search: { accountId: account.id, month, fromAccounts: true }
-    })
-  }
-
   return (
-    <Card
-      className="relative hover:shadow-md transition-shadow cursor-pointer"
-      onClick={handleCardClick}
-    >
+    <Card className="relative hover:shadow-md transition-shadow">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
@@ -59,7 +42,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
             <span className="text-2xl">{typeConfig.icon}</span>
           </div>
           <div>
-            <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{account.name}</h3>
+            <h3 className="font-semibold text-lg text-gray-900">{account.name}</h3>
             <p className={cn('text-sm', typeConfig.color)}>
               {t(`account.type.${account.type}`)}
             </p>
@@ -70,8 +53,8 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
         <div className="flex items-center gap-2">
           {onEdit && (
             <button
-              onClick={(e) => { e.stopPropagation(); onEdit(account.id) }}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              onClick={() => onEdit(account.id)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               aria-label={t('account.edit')}
             >
               <svg
@@ -80,7 +63,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5 text-gray-600 dark:text-gray-400"
+                className="w-5 h-5 text-gray-600"
               >
                 <path
                   strokeLinecap="round"
@@ -91,7 +74,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
             </button>
           )}
           {!account.is_active && (
-            <span className="text-xs px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full">
+            <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">
               {t('account.inactive')}
             </span>
           )}
@@ -100,7 +83,7 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
 
       {/* Balance */}
       <div className="mb-4">
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('account.currentBalance')}</p>
+        <p className="text-sm text-gray-500 mb-1">{t('account.currentBalance')}</p>
         <p
           className={cn(
             'text-3xl font-bold font-mono',
@@ -112,16 +95,16 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
         <div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('account.initialBalance')}</p>
-          <p className="text-sm font-mono text-gray-700 dark:text-gray-300">
+          <p className="text-xs text-gray-500">{t('account.initialBalance')}</p>
+          <p className="text-sm font-mono text-gray-700">
             {formatCurrencyPrivacy(account.initial_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t('account.transactions')}</p>
-          <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+          <p className="text-xs text-gray-500">{t('account.transactions')}</p>
+          <p className="text-sm font-semibold text-gray-700">
             {account.transaction_count}
           </p>
         </div>
@@ -129,9 +112,9 @@ export function AccountCard({ account, onEdit }: AccountCardProps) {
 
       {/* Notes (if present) */}
       {account.notes && (
-        <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('account.notes')}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{account.notes}</p>
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-xs text-gray-500 mb-1">{t('account.notes')}</p>
+          <p className="text-sm text-gray-600">{account.notes}</p>
         </div>
       )}
     </Card>

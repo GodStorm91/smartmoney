@@ -8,14 +8,11 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as RecurringRouteImport } from './routes/recurring'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as GoalsRouteImport } from './routes/goals'
@@ -24,38 +21,26 @@ import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
 
-const GamificationLazyRouteImport = createFileRoute('/gamification')()
-
-const GamificationLazyRoute = GamificationLazyRouteImport.update({
-  id: '/gamification',
-  path: '/gamification',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/gamification.lazy').then((d) => d.Route))
 const UploadRoute = UploadRouteImport.update({
   id: '/upload',
   path: '/upload',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/upload.lazy').then((d) => d.Route))
+} as any)
 const TransactionsRoute = TransactionsRouteImport.update({
   id: '/transactions',
   path: '/transactions',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/transactions.lazy').then((d) => d.Route))
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RecurringRoute = RecurringRouteImport.update({
-  id: '/recurring',
-  path: '/recurring',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/recurring.lazy').then((d) => d.Route))
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -70,22 +55,22 @@ const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/goals.lazy').then((d) => d.Route))
+} as any)
 const BudgetRoute = BudgetRouteImport.update({
   id: '/budget',
   path: '/budget',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/budget.lazy').then((d) => d.Route))
+} as any)
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/analytics.lazy').then((d) => d.Route))
+} as any)
 const AccountsRoute = AccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
   getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/accounts.lazy').then((d) => d.Route))
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -100,12 +85,10 @@ export interface FileRoutesByFullPath {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
-  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -115,12 +98,10 @@ export interface FileRoutesByTo {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
-  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -131,12 +112,10 @@ export interface FileRoutesById {
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
-  '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
   '/upload': typeof UploadRoute
-  '/gamification': typeof GamificationLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,12 +127,10 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
-    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
-    | '/gamification'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -163,12 +140,10 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
-    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
-    | '/gamification'
   id:
     | '__root__'
     | '/'
@@ -178,12 +153,10 @@ export interface FileRouteTypes {
     | '/goals'
     | '/landing'
     | '/login'
-    | '/recurring'
     | '/register'
     | '/settings'
     | '/transactions'
     | '/upload'
-    | '/gamification'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -194,23 +167,14 @@ export interface RootRouteChildren {
   GoalsRoute: typeof GoalsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
-  RecurringRoute: typeof RecurringRoute
   RegisterRoute: typeof RegisterRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
   UploadRoute: typeof UploadRoute
-  GamificationLazyRoute: typeof GamificationLazyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/gamification': {
-      id: '/gamification'
-      path: '/gamification'
-      fullPath: '/gamification'
-      preLoaderRoute: typeof GamificationLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/upload': {
       id: '/upload'
       path: '/upload'
@@ -237,13 +201,6 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recurring': {
-      id: '/recurring'
-      path: '/recurring'
-      fullPath: '/recurring'
-      preLoaderRoute: typeof RecurringRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -306,12 +263,10 @@ const rootRouteChildren: RootRouteChildren = {
   GoalsRoute: GoalsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
-  RecurringRoute: RecurringRoute,
   RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,
   UploadRoute: UploadRoute,
-  GamificationLazyRoute: GamificationLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -56,10 +56,6 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
           dataKey="amount"
           nameKey="category"
           style={{ fill: labelColor }}
-          isAnimationActive={true}
-          animationBegin={0}
-          animationDuration={1000}
-          animationEasing="ease-out"
         >
           {data.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

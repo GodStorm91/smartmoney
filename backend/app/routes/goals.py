@@ -8,15 +8,10 @@ from ..models.user import User
 from ..schemas.goal import (
     GoalCreate,
     GoalProgressResponse,
-    GoalReorderRequest,
     GoalResponse,
-    GoalTemplateResponse,
     GoalUpdate,
 )
 from ..services.goal_service import GoalService
-from ..services.account_service import AccountService
-from ..services.claude_ai_service import ClaudeAIService
-from ..models.goal_type import GoalType
 
 router = APIRouter(prefix="/api/goals", tags=["goals"])
 
@@ -29,33 +24,18 @@ async def create_goal(
 ):
     """Create a new financial goal."""
     try:
+        # Pydantic schema already validates 1-10 years range
+
+        # Check if goal for this year horizon already exists for this user
+        existing = GoalService.get_goal_by_years(db, current_user.id, goal.years)
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Goal for {goal.years} years already exists"
+            )
+
         goal_data = goal.model_dump()
         goal_data["user_id"] = current_user.id
-
-        # Emergency fund enforcement: must be first goal if creating one
-        if goal_data.get("goal_type") == "emergency_fund":
-            if GoalService.has_emergency_fund(db, current_user.id):
-                raise HTTPException(
-                    status_code=400,
-                    detail="Emergency fund goal already exists"
-                )
-            goal_data["priority"] = 1
-        else:
-            # Assign next available priority
-            goal_data["priority"] = GoalService.get_next_priority(db, current_user.id)
-
-        # Auto-create savings account if no account_id provided
-        if not goal_data.get("account_id"):
-            goal_name = goal_data.get("name") or GoalType(goal_data["goal_type"]).value.replace("_", " ").title()
-            currency = goal_data.get("currency", "JPY")
-            savings_account = AccountService.create_savings_account_for_goal(
-                db=db,
-                user_id=current_user.id,
-                goal_name=goal_name,
-                currency=currency
-            )
-            goal_data["account_id"] = savings_account.id
-
         created = GoalService.create_goal(db, goal_data)
         return created
 
@@ -135,57 +115,3 @@ async def get_goal_progress(
         progress["achievability"] = GoalService.calculate_achievability(db, current_user.id, goal, trend_months)
 
     return progress
-
-
-@router.get("/status/has-emergency-fund")
-async def has_emergency_fund(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """Check if user has an emergency fund goal."""
-    return {"has_emergency_fund": GoalService.has_emergency_fund(db, current_user.id)}
-
-
-@router.post("/reorder", response_model=list[GoalResponse])
-async def reorder_goals(
-    request: GoalReorderRequest,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """Reorder goals by priority. Emergency fund must remain #1."""
-    try:
-        return GoalService.reorder_goals(db, current_user.id, request.goal_ids)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-@router.get("/templates/{goal_type}", response_model=GoalTemplateResponse)
-async def get_goal_template(
-    goal_type: GoalType,
-    years: int = Query(3, ge=1, le=10, description="Goal timeline in years"),
-    language: str = Query("ja", description="Language for advice (ja, en, vi)"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """Get AI-suggested goal template for a specific goal type."""
-    goal_type_value = goal_type.value  # Extract string value from enum
-
-    try:
-        ai_service = ClaudeAIService()
-        suggestion, _ = ai_service.generate_goal_suggestion(
-            db=db,
-            user_id=current_user.id,
-            goal_type=goal_type_value,
-            years=years,
-            language=language
-        )
-        return GoalTemplateResponse(
-            goal_type=goal_type_value,
-            suggested_target=suggestion.get("suggested_target", 0),
-            suggested_years=years,
-            monthly_required=suggestion.get("monthly_required", 0),
-            achievable=suggestion.get("achievable", False),
-            advice=suggestion.get("advice", "")
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI suggestion failed: {str(e)}")

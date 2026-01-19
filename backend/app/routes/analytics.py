@@ -11,13 +11,11 @@ from ..models.user import User
 from ..schemas.analytics import (
     AnalyticsResponse,
     CategoryBreakdownResponse,
-    ForecastResponse,
     MonthlyCashflowResponse,
     SourceBreakdownResponse,
     SpendingInsightsResponse,
 )
 from ..services.analytics_service import AnalyticsService
-from ..services.forecast_service import ForecastService
 
 router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
@@ -120,23 +118,3 @@ async def get_spending_insights(
         "insights": insights,
         "generated_at": datetime.now().isoformat(),
     }
-
-
-@router.get("/forecast", response_model=ForecastResponse)
-async def get_cashflow_forecast(
-    months: int = Query(6, ge=1, le=12, description="Number of future months to forecast"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    """Get multi-month cash flow forecast.
-
-    Returns:
-        Cash flow forecast with actual historical months + projected future months.
-        Uses recurring transactions and average variable spending for projections.
-    """
-    return ForecastService.get_cashflow_forecast(
-        db=db,
-        user_id=current_user.id,
-        months=months,
-        include_actual=2,
-    )

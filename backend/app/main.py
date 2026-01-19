@@ -1,49 +1,16 @@
 """SmartMoney FastAPI application."""
-
 import logging
-import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import (
-    accounts,
-    ai_categorization,
-    analytics,
-    auth,
-    budgets,
-    categories,
-    category_rules,
-    challenges,
-    chat,
-    credits,
-    crypto,
-    dashboard,
-    gamification,
-    goals,
-    proxy,
-    receipts,
-    recurring,
-    reports,
-    settings,
-    social_learning,
-    rewards,
-    tags,
-    transactions,
-    transfers,
-    upload,
-    exchange_rates,
-    user_categories,
-)
+from .routes import accounts, analytics, auth, budgets, credits, dashboard, goals, settings, tags, transactions, upload, exchange_rates
 from .services.exchange_rate_service import ExchangeRateService
-from .services.recurring_service import RecurringTransactionService
-from .services.defi_snapshot_service import DefiSnapshotService
 
 logger = logging.getLogger(__name__)
 scheduler = BackgroundScheduler()
@@ -98,47 +65,6 @@ def scheduled_rate_update():
         db.close()
 
 
-def scheduled_recurring_transactions():
-    """Background job to process due recurring transactions daily."""
-    db = SessionLocal()
-    try:
-        created = RecurringTransactionService.process_due_recurring(db)
-        logger.info(f"Scheduled recurring processing: created {created} transactions")
-    except Exception as e:
-        logger.error(f"Scheduled recurring processing failed: {e}")
-    finally:
-        db.close()
-
-
-def scheduled_defi_snapshots():
-    """Background job to capture DeFi position snapshots daily."""
-    import asyncio
-
-    db = SessionLocal()
-    try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        stats = loop.run_until_complete(DefiSnapshotService.capture_all_snapshots(db))
-        loop.close()
-        logger.info(f"DeFi snapshots captured: {stats}")
-    except Exception as e:
-        logger.error(f"DeFi snapshot capture failed: {e}")
-    finally:
-        db.close()
-
-
-def scheduled_snapshot_cleanup():
-    """Weekly cleanup of old DeFi snapshots (>365 days)."""
-    db = SessionLocal()
-    try:
-        deleted = DefiSnapshotService.cleanup_old_snapshots(db, retention_days=365)
-        logger.info(f"Snapshot cleanup: deleted {deleted} old records")
-    except Exception as e:
-        logger.error(f"Snapshot cleanup failed: {e}")
-    finally:
-        db.close()
-
-
 # Startup event
 @app.on_event("startup")
 async def startup_event():
@@ -154,42 +80,8 @@ async def startup_event():
         id="exchange_rate_update",
         replace_existing=True,
     )
-
-    # Schedule daily recurring transaction processing at 00:05 JST (15:05 UTC previous day)
-    scheduler.add_job(
-        scheduled_recurring_transactions,
-        trigger="cron",
-        hour=15,
-        minute=5,
-        id="recurring_transactions",
-        replace_existing=True,
-    )
-
-    # Schedule daily DeFi position snapshots at 00:30 UTC
-    scheduler.add_job(
-        scheduled_defi_snapshots,
-        trigger="cron",
-        hour=0,
-        minute=30,
-        id="defi_snapshots",
-        replace_existing=True,
-    )
-
-    # Weekly cleanup of old snapshots (Sundays at 3 AM UTC)
-    scheduler.add_job(
-        scheduled_snapshot_cleanup,
-        trigger="cron",
-        day_of_week="sun",
-        hour=3,
-        minute=0,
-        id="snapshot_cleanup",
-        replace_existing=True,
-    )
-
     scheduler.start()
-    logger.info(
-        "Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)"
-    )
+    logger.info("Exchange rate scheduler started (daily at 4 AM UTC)")
 
 
 @app.on_event("shutdown")
@@ -212,21 +104,6 @@ app.include_router(upload.router)
 app.include_router(exchange_rates.router)
 app.include_router(budgets.router)
 app.include_router(credits.router)
-app.include_router(receipts.router)
-app.include_router(recurring.router)
-app.include_router(category_rules.router)
-app.include_router(challenges.router)
-app.include_router(user_categories.router)
-app.include_router(categories.router)
-app.include_router(ai_categorization.router)
-app.include_router(chat.router)
-app.include_router(transfers.router)
-app.include_router(crypto.router)
-app.include_router(proxy.router)
-app.include_router(reports.router)
-app.include_router(gamification.router)
-app.include_router(social_learning.router)
-app.include_router(rewards.router)
 
 
 # Root endpoints
@@ -236,7 +113,7 @@ async def root():
     return {
         "message": f"Welcome to {app_settings.app_name} API",
         "status": "healthy",
-        "version": "0.1.0",
+        "version": "0.1.0"
     }
 
 
@@ -244,9 +121,3 @@ async def root():
 async def health_check():
     """API health check."""
     return {"status": "ok"}
-
-
-# Mount uploads directory for development (production uses nginx)
-uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
-if os.path.exists(uploads_dir):
-    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")

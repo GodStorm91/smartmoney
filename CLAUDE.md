@@ -6,32 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Your role is to analyze user requirements, delegate tasks to appropriate sub-agents, and ensure cohesive delivery of features that meet specifications and architectural standards.
 
-## 🚨 CRITICAL: Deployment Verification Rule
-
-**AFTER EVERY DEPLOYMENT TO PRODUCTION, YOU MUST VERIFY:**
-
-1. **Check all files exist in nginx directory:**
-   ```bash
-   ssh root@money.khanh.page "ls -la /root/smartmoney/deploy/frontend-dist/"
-   ```
-
-2. **Verify index.html references exist:**
-   ```bash
-   ssh root@money.khanh.page "cat /root/smartmoney/deploy/frontend-dist/index.html | grep -o 'assets/[a-zA-Z0-9-]*\.js' | head -3"
-   ```
-
-3. **Verify referenced files actually exist:**
-   ```bash
-   ssh root@money.khanh.page "ls /root/smartmoney/deploy/frontend-dist/assets/index-B-*.js"
-   ```
-
-4. **Test application loads:**
-   - Open https://money.khanh.page in browser
-   - Check console for 404 errors
-   - A blank page means a 404 error on the main bundle
-
-**DO NOT declare deployment complete until you verify the application loads correctly.**
-
 ## Workflows
 
 - Primary workflow: `./.claude/workflows/primary-workflow.md`

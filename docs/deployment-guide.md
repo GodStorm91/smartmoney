@@ -1,75 +1,6 @@
 # SmartMoney Deployment Guide
-**Version:** 1.3
-**Last Updated:** 2026-01-14
-
----
-
-## 🚨 CRITICAL RULE: Deployment Verification
-
-**THIS IS MANDATORY - NEVER SKIP THIS STEP**
-
-After every deployment to production, you MUST verify:
-
-### 1. Verify All Files Are Copied
-```bash
-# Check files exist in nginx serving directory
-ssh root@money.khanh.page "ls -la /root/frontend-dist/"
-```
-Expected output should include:
-- `index.html`
-- `index.html.br` (brotli)
-- `index.html.gz` (gzip)
-- `assets/` directory with all JS/CSS files
-
-### 2. Verify Main Bundle Exists
-```bash
-# Critical: index.html references specific hashed files
-ssh root@money.khanh.page "cat /root/frontend-dist/index.html | grep -o 'assets/index-[a-zA-Z0-9-]*\.js' | head -1"
-# Example: assets/index-CXhUaumL.js
-
-# Verify the referenced file exists
-ssh root@money.khanh.page "ls /root/frontend-dist/assets/index-C-*.js"
-```
-
-### 3. Verify Nginx Serves Files
-```bash
-# Check nginx container has correct files
-ssh root@money.khanh.page "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/ | head -10"
-
-# Test HTTP response
-curl -I https://money.khanh.page/assets/index-B-DeipIB.js
-# Should return 200 OK, NOT 404
-```
-
-### 4. Test the Application
-```bash
-# Open in browser - check console for 404 errors
-# Visit: https://money.khanh.page
-
-# Check for JavaScript errors
-# - Blank page = missing bundle (404 error)
-# - Console errors = build/integration issue
-```
-
-### Deployment Failure Scenarios
-
-| Error | Cause | Fix |
-|-------|-------|-----|
-| `net::ERR_ABORTED 404` | index.html copied but assets not | Copy entire dist/ directory |
-| `net::ERR_ABORTED 404` for specific .js | File hash mismatch | Ensure index.html matches actual files |
-| Blank page, no console | Missing index.html | Copy index.html to nginx directory |
-| Old code still running | Nginx caching | Restart nginx container |
-| Partial files | Incomplete copy command | Use `cp -r dist/* frontend-dist/` |
-| `Cannot read properties of null (reading 'useState')` | React hook called outside component | Move hooks inside component function |
-
-### Correct Copy Command
-```bash
-# WRONG - will cause 404 errors:
-cp -r /var/www/smartmoney/frontend/dist/assets frontend-dist/
-
-# CORRECT - copies everything:
-rm -rf frontend-dist/* && cp -r /var/www/smartmoney/frontend/dist/* frontend-dist/
-```
+**Version:** 1.0
+**Last Updated:** 2025-11-17
 
 ---
 
@@ -484,82 +415,87 @@ docker-compose up -d
 
 ## Backup & Restore
 
-### Docker PostgreSQL Backup (Production)
-
-SmartMoney includes automated backup scripts for the Docker deployment.
-
-**Backup location:** `/root/smartmoney/backups/`
-**Retention:** 7 days
-**Schedule:** Daily at 3:00 AM (UTC)
-
-#### Manual Backup
-
-```bash
-# Run backup script
-cd /root/smartmoney
-bash deploy/scripts/backup.sh
-
-# Output example:
-# [2026-01-06 12:47:50] Starting backup...
-# [2026-01-06 12:47:50] Backup successful: smartmoney_20260106_124750.sql.gz (532K)
-```
-
-#### List Available Backups
-
-```bash
-bash deploy/scripts/restore.sh
-# Shows all available backups with sizes
-```
-
-#### Restore from Backup
-
-```bash
-# Interactive restore (creates pre-restore backup automatically)
-bash deploy/scripts/restore.sh smartmoney_20260106_124750.sql.gz
-
-# Manual restore (advanced)
-gunzip -c /root/smartmoney/backups/smartmoney_20260106_124750.sql.gz | \
-  docker exec -i smartmoney-db psql -U smartmoney -d smartmoney
-```
-
-#### Verify Backup
-
-```bash
-# Check backup content
-zcat /root/smartmoney/backups/smartmoney_*.sql.gz | head -30
-
-# Check tables in backup
-zcat /root/smartmoney/backups/smartmoney_*.sql.gz | grep -c "COPY public"
-```
-
-#### Cron Configuration
-
-The backup cron job runs daily at 3:00 AM:
-```bash
-# View current cron
-crontab -l | grep smartmoney
-
-# Output:
-# 0 3 * * * /root/smartmoney/deploy/scripts/backup.sh >> /var/log/smartmoney-backup.log 2>&1
-```
-
-#### Backup Logs
-
-```bash
-# View backup logs
-tail -50 /var/log/smartmoney-backup.log
-```
-
-### SQLite Backup (Development)
+### SQLite Backup
 
 **Manual backup:**
 ```bash
+# Copy database file
 cp backend/smartmoney.db backend/smartmoney-backup-$(date +%Y%m%d).db
+```
+
+**Automated backup (cron):**
+```bash
+# Add to crontab
+crontab -e
+
+# Daily backup at 2 AM
+0 2 * * * cp /home/smartmoney/smartmoney/backend/smartmoney.db /home/smartmoney/backups/smartmoney-$(date +\%Y\%m\%d).db
 ```
 
 **Restore:**
 ```bash
+# Stop backend
+sudo systemctl stop smartmoney-backend
+
+# Restore backup
 cp backend/smartmoney-backup-20251117.db backend/smartmoney.db
+
+# Start backend
+sudo systemctl start smartmoney-backend
+```
+
+### PostgreSQL Backup
+
+**Manual backup:**
+```bash
+pg_dump -U smartmoney_user smartmoney > smartmoney-backup-$(date +%Y%m%d).sql
+```
+
+**Automated backup:**
+```bash
+#!/bin/bash
+# /home/smartmoney/scripts/backup.sh
+
+BACKUP_DIR="/home/smartmoney/backups"
+DATE=$(date +%Y%m%d)
+FILENAME="smartmoney-$DATE.sql"
+
+# Dump database
+pg_dump -U smartmoney_user smartmoney > "$BACKUP_DIR/$FILENAME"
+
+# Compress
+gzip "$BACKUP_DIR/$FILENAME"
+
+# Delete backups older than 30 days
+find "$BACKUP_DIR" -name "smartmoney-*.sql.gz" -mtime +30 -delete
+
+# Optional: Upload to remote storage
+# rclone copy "$BACKUP_DIR/$FILENAME.gz" remote:backups/
+```
+
+**Cron job:**
+```bash
+0 2 * * * /home/smartmoney/scripts/backup.sh
+```
+
+**Restore:**
+```bash
+# Stop backend
+sudo systemctl stop smartmoney-backend
+
+# Drop and recreate database
+sudo -u postgres psql
+DROP DATABASE smartmoney;
+CREATE DATABASE smartmoney;
+GRANT ALL PRIVILEGES ON DATABASE smartmoney TO smartmoney_user;
+\q
+
+# Restore backup
+gunzip smartmoney-20251117.sql.gz
+psql -U smartmoney_user smartmoney < smartmoney-20251117.sql
+
+# Start backend
+sudo systemctl start smartmoney-backend
 ```
 
 ---
@@ -894,48 +830,6 @@ npm run build
 
 # Nginx serves new dist/ automatically
 ```
-
-## Quick Frontend Deployment (Docker Server)
-
-**CRITICAL:** The docker-compose file runs from `/root` directory, so the volume mount uses `/root/frontend-dist`, NOT `/root/smartmoney/deploy/frontend-dist/`
-
-**Deployment Steps:**
-```bash
-cd frontend
-
-# 1. Build locally
-npm run build
-
-# 2. Upload dist to server (correct path for docker volume mount)
-cd dist && tar cf - . | ssh root@<server-ip> "cd /root/frontend-dist && tar xf -"
-
-# 3. Fix file permissions (IMPORTANT - nginx needs read+execute on directories)
-ssh root@<server-ip> "chmod -R 755 /root/frontend-dist/"
-
-# 4. Also copy to deploy directory for backup
-ssh root@<server-ip> "cp -r /root/frontend-dist/* /root/smartmoney/deploy/frontend-dist/"
-
-# 5. Restart nginx to pick up new files
-ssh root@<server-ip> "docker restart smartmoney-nginx"
-```
-
-**Verify deployment:**
-```bash
-# Check files are on server
-ssh root@<server-ip> "ls -la /root/frontend-dist/assets/index-*.js"
-
-# Check files in nginx container
-ssh root@<server-ip> "docker exec smartmoney-nginx ls -la /usr/share/nginx/html/assets/index-*.js"
-```
-
-**Volume Mount Configuration** (from `deploy/docker-compose.yml`):
-```yaml
-volumes:
-  - ./frontend-dist:/usr/share/nginx/html:ro
-```
-The `./frontend-dist` path is relative to where docker-compose is run. Since we run it from `/root`, it mounts `/root/frontend-dist`.
-
-**Why permissions matter:** `tar` preserves original file permissions. If local files have restrictive permissions (e.g., `600`), nginx won't be able to read them, resulting in 403 Forbidden errors.
 
 ### Zero-Downtime Updates (Future)
 

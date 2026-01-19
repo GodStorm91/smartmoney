@@ -119,7 +119,6 @@ class AccountService:
                     date=today,
                     description="Balance Adjustment",
                     amount=abs(adjustment_amount),
-                    currency=account.currency or "JPY",
                     is_income=adjustment_amount > 0,
                     is_adjustment=True,
                     is_transfer=False,
@@ -205,10 +204,12 @@ class AccountService:
             query = query.filter(Transaction.date <= as_of_date)
 
         # Calculate balance from transactions
-        # Note: amounts already have correct sign (positive=income, negative=expense)
         transactions = query.all()
         for txn in transactions:
-            balance += txn.amount
+            if txn.is_income:
+                balance += txn.amount
+            else:
+                balance -= txn.amount
 
         return balance
 
@@ -228,76 +229,3 @@ class AccountService:
             Transaction.account_id == account_id,
             Transaction.user_id == user_id
         ).scalar() or 0
-
-    @staticmethod
-    def get_or_create_crypto_income_account(db: Session, user_id: int) -> Account:
-        """Get or create dedicated Crypto Income account for user.
-
-        Args:
-            db: Database session
-            user_id: User ID
-
-        Returns:
-            Account instance
-        """
-        # Try to find existing account
-        account = db.query(Account).filter(
-            Account.user_id == user_id,
-            Account.name == "Crypto Income",
-            Account.type == "crypto"
-        ).first()
-
-        if account:
-            return account
-
-        # Create new account
-        # Use far past date to capture all historical reward transactions
-        account = Account(
-            user_id=user_id,
-            name="Crypto Income",
-            type="crypto",
-            currency="USD",
-            initial_balance=0,
-            initial_balance_date=date(2020, 1, 1),
-            is_active=True,
-            notes="Auto-created for LP reward tracking"
-        )
-
-        db.add(account)
-        db.commit()
-        db.refresh(account)
-
-        return account
-
-    @staticmethod
-    def create_savings_account_for_goal(
-        db: Session,
-        user_id: int,
-        goal_name: str,
-        currency: str = "JPY"
-    ) -> Account:
-        """Create a dedicated savings account for a financial goal.
-
-        Args:
-            db: Database session
-            user_id: User ID
-            goal_name: Name of the goal (used to generate account name)
-            currency: Currency code (default JPY)
-
-        Returns:
-            Created Account object
-        """
-        account = Account(
-            user_id=user_id,
-            name=f"{goal_name} Savings",
-            type="savings",
-            initial_balance=0,
-            initial_balance_date=date.today(),
-            currency=currency,
-            is_active=True,
-            notes=f"Auto-created for goal: {goal_name}"
-        )
-        db.add(account)
-        db.commit()
-        db.refresh(account)
-        return account

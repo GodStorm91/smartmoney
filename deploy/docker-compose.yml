@@ -31,11 +31,6 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
-      ZERION_API_KEY: ${ZERION_API_KEY}
-      POLYGONSCAN_API_KEY: ${POLYGONSCAN_API_KEY}
-      UPLOAD_DIR: /app/uploads/receipts
-    volumes:
-      - ../uploads:/app/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -51,8 +46,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./frontend-dist:/usr/share/nginx/html:ro
-      - ../uploads:/usr/share/nginx/uploads:ro
+      - ../frontend/dist:/usr/share/nginx/html:ro
       - ./certbot/conf:/etc/letsencrypt:ro
       - ./certbot/www:/var/www/certbot:ro
     depends_on:

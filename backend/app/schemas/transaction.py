@@ -1,6 +1,6 @@
 """Transaction schemas for API validation."""
-import datetime
-from typing import Union
+from datetime import date
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -8,19 +8,16 @@ from pydantic import BaseModel, Field
 class TransactionBase(BaseModel):
     """Base transaction schema."""
 
-    date: datetime.date
+    date: date
     description: str = Field(..., max_length=500)
-    amount: int = Field(..., description="Amount in account's native currency")
-    currency: str = Field(default="JPY", max_length=3, description="ISO currency code (JPY, USD, VND)")
+    amount: int = Field(..., description="Amount in JPY as integer")
     category: str = Field(..., max_length=100)
-    subcategory: Union[str, None] = Field(None, max_length=100)
+    subcategory: Optional[str] = Field(None, max_length=100)
     source: str = Field(..., max_length=100)
-    payment_method: Union[str, None] = Field(None, max_length=100)
-    notes: Union[str, None] = Field(None, max_length=1000)
+    payment_method: Optional[str] = Field(None, max_length=100)
+    notes: Optional[str] = Field(None, max_length=1000)
     is_income: bool = False
     is_transfer: bool = False
-    account_id: Union[int, None] = Field(None, description="Account ID for balance tracking")
-    receipt_url: Union[str, None] = Field(None, max_length=500, description="Receipt image URL")
 
 
 class TransactionCreate(TransactionBase):
@@ -32,19 +29,16 @@ class TransactionCreate(TransactionBase):
 class TransactionUpdate(BaseModel):
     """Schema for updating a transaction."""
 
-    date: Union[datetime.date, None] = None
-    description: Union[str, None] = Field(None, max_length=500)
-    amount: Union[int, None] = Field(None, description="Amount in account's native currency")
-    currency: Union[str, None] = Field(None, max_length=3, description="ISO currency code (JPY, USD, VND)")
-    category: Union[str, None] = Field(None, max_length=100)
-    subcategory: Union[str, None] = Field(None, max_length=100)
-    source: Union[str, None] = Field(None, max_length=100)
-    payment_method: Union[str, None] = Field(None, max_length=100)
-    notes: Union[str, None] = Field(None, max_length=1000)
-    is_income: Union[bool, None] = None
-    is_transfer: Union[bool, None] = None
-    account_id: Union[int, None] = None
-    receipt_url: Union[str, None] = None
+    date: Optional[date] = None
+    description: Optional[str] = Field(None, max_length=500)
+    amount: Optional[int] = Field(None, description="Amount in JPY as integer")
+    category: Optional[str] = Field(None, max_length=100)
+    subcategory: Optional[str] = Field(None, max_length=100)
+    source: Optional[str] = Field(None, max_length=100)
+    payment_method: Optional[str] = Field(None, max_length=100)
+    notes: Optional[str] = Field(None, max_length=1000)
+    is_income: Optional[bool] = None
+    is_transfer: Optional[bool] = None
 
 
 class TransactionResponse(TransactionBase):
@@ -73,14 +67,4 @@ class TransactionSummaryResponse(BaseModel):
     income: int
     expenses: int
     net: int
-    count: int
-
-
-class TransactionSuggestion(BaseModel):
-    """Schema for autocomplete suggestion."""
-
-    description: str
-    amount: int
-    category: str
-    is_income: bool
     count: int

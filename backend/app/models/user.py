@@ -1,5 +1,4 @@
 """User model for authentication."""
-
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Integer, String, func
@@ -38,39 +37,3 @@ class User(Base):
     credit_transactions: Mapped[list["CreditTransaction"]] = relationship(
         "CreditTransaction", back_populates="user", cascade="all, delete-orphan"
     )
-
-    # Recurring transactions relationship
-    recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
-        "RecurringTransaction", back_populates="user", cascade="all, delete-orphan"
-    )
-
-    # Receipts relationship
-    receipts: Mapped[list["Receipt"]] = relationship(
-        "Receipt", back_populates="user", cascade="all, delete-orphan"
-    )
-
-    # Category rules relationship
-    category_rules: Mapped[list["CategoryRule"]] = relationship(
-        "CategoryRule", back_populates="user", cascade="all, delete-orphan"
-    )
-
-    # Crypto wallet relationships
-    crypto_wallets: Mapped[list["CryptoWallet"]] = relationship(
-        "CryptoWallet", back_populates="user", cascade="all, delete-orphan"
-    )
-    reward_contracts: Mapped[list["RewardContract"]] = relationship(
-        "RewardContract", back_populates="user", cascade="all, delete-orphan"
-    )
-    reward_claims: Mapped[list["RewardClaim"]] = relationship(
-        "RewardClaim", back_populates="user", cascade="all, delete-orphan"
-    )
-
-    # Dismissed recurring suggestions
-    dismissed_suggestions: Mapped[list["DismissedSuggestion"]] = relationship(
-        "DismissedSuggestion", back_populates="user", cascade="all, delete-orphan"
-    )
-
-    # Gamification relationship
-    # gamification: Mapped["UserGamification"] = relationship(
-    #     "UserGamification", back_populates="user", uselist=False, cascade="all, delete-orphan"
-    # )

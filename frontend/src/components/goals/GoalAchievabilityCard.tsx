@@ -1,12 +1,13 @@
-import { useState } from 'react'
 import type { GoalAchievability } from '@/types'
 import { useTranslation } from 'react-i18next'
+import { Card } from '@/components/ui/Card'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { formatCurrencyPrivacy, formatCurrencyCompactPrivacy } from '@/utils/formatCurrency'
+import { RadialBarChart, RadialBar, ResponsiveContainer } from 'recharts'
 import { cn } from '@/utils/cn'
-import { Pencil, Trash2, ChevronDown, ChevronUp, Check, AlertCircle } from 'lucide-react'
 
 interface GoalAchievabilityCardProps {
   goalId: number
@@ -15,12 +16,43 @@ interface GoalAchievabilityCardProps {
   targetAmount: number
   currentAmount: number
   onEdit?: (goalId: number) => void
-  onDelete?: (goalId: number) => void
-  topExpenseCategory?: {
-    name: string
-    monthlyAmount: number
-  }
 }
+
+// Simplified status config based on capped percentage
+const STATUS_CONFIG = {
+  on_track: {
+    color: '#10b981', // emerald-500
+    textColor: 'text-emerald-500',
+    bgColor: 'bg-emerald-50',
+    borderColor: 'border-l-emerald-500',
+    labelKey: 'goal.status.onTrack',
+    emoji: '🟢',
+  },
+  achievable: {
+    color: '#3b82f6', // blue-500
+    textColor: 'text-blue-500',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-l-blue-500',
+    labelKey: 'goal.status.achievable',
+    emoji: '🔵',
+  },
+  challenging: {
+    color: '#f97316', // orange-500
+    textColor: 'text-orange-500',
+    bgColor: 'bg-orange-50',
+    borderColor: 'border-l-orange-500',
+    labelKey: 'goal.status.challenging',
+    emoji: '🟠',
+  },
+  severe: {
+    color: '#dc2626', // red-600
+    textColor: 'text-red-600',
+    bgColor: 'bg-red-50',
+    borderColor: 'border-l-red-600',
+    labelKey: 'goal.status.severe',
+    emoji: '🔴',
+  },
+} as const
 
 export function GoalAchievabilityCard({
   goalId,
@@ -29,232 +61,221 @@ export function GoalAchievabilityCard({
   targetAmount,
   currentAmount,
   onEdit,
-  onDelete,
-  topExpenseCategory,
 }: GoalAchievabilityCardProps) {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
-  const [showDetails, setShowDetails] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const isMobile = useMediaQuery('(max-width: 768px)')
 
-  // Calculate progress percentage
+  // Cap achievability percentage at 0-200%
+  const cappedPercentage = Math.max(0, Math.min(200, achievability.achievable_percentage))
+
+  // Calculate progress percentage (current vs target)
   const progressPercentage = targetAmount > 0 ? Math.min(100, (currentAmount / targetAmount) * 100) : 0
 
-  // Determine if on pace
-  const isOnPace = achievability.current_monthly_net >= achievability.required_monthly
-  const isCompleted = progressPercentage >= 100
-
-  // Generate simple insight
-  const getInsight = (): string => {
-    if (isCompleted) {
-      return t('goal.insight.achieved')
-    }
-
-    if (isOnPace) {
-      return t('goal.insight.onTrackMonths', { months: achievability.months_remaining })
-    }
-
-    const gap = achievability.monthly_gap
-    if (gap > 0) {
-      const formattedGap = formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
-      return t('goal.insight.saveMore', { amount: formattedGap })
-    }
-
-    return t('goal.insight.everyBitCounts')
+  // Determine status based on capped percentage
+  const getStatus = (percentage: number) => {
+    if (percentage >= 100) return STATUS_CONFIG.on_track
+    if (percentage >= 75) return STATUS_CONFIG.achievable
+    if (percentage >= 50) return STATUS_CONFIG.challenging
+    return STATUS_CONFIG.severe
   }
 
-  // Get status color
-  const statusColor = isCompleted
-    ? 'text-emerald-600 dark:text-emerald-400'
-    : isOnPace
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-amber-600 dark:text-amber-400'
+  const status = getStatus(cappedPercentage)
 
-  const statusBg = isCompleted
-    ? 'bg-emerald-50 dark:bg-emerald-900/20'
-    : isOnPace
-      ? 'bg-emerald-50 dark:bg-emerald-900/20'
-      : 'bg-amber-50 dark:bg-amber-900/20'
+  // Generate insight message
+  const getInsightMessage = (): { emoji: string; message: string } => {
+    const gap = achievability.monthly_gap
 
-  const progressColor = isCompleted
-    ? 'bg-emerald-500'
-    : isOnPace
-      ? 'bg-emerald-500'
-      : 'bg-amber-500'
+    // Already on track or ahead
+    if (gap <= 0 || achievability.current_monthly_net >= achievability.required_monthly) {
+      return {
+        emoji: '🎉',
+        message: t('goal.insight.onPace'),
+      }
+    }
+
+    // Small gap (<¥10,000)
+    if (gap < 10000) {
+      return {
+        emoji: '💡',
+        message: t('goal.insight.smallGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
+      }
+    }
+
+    // Medium gap (<¥50,000)
+    if (gap < 50000) {
+      return {
+        emoji: '⚠️',
+        message: t('goal.insight.mediumGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
+      }
+    }
+
+    // Large gap
+    return {
+      emoji: '🔴',
+      message: t('goal.insight.largeGap', { gap: formatCurrencyPrivacy(gap, currency, exchangeRates?.rates || {}, false, isPrivacyMode) }),
+    }
+  }
+
+  const insight = getInsightMessage()
+
+  // Calculate monthly savings ratio percentage
+  const monthlySavingsPercentage =
+    achievability.required_monthly > 0
+      ? (achievability.current_monthly_net / achievability.required_monthly) * 100
+      : 0
+
+  const cappedMonthlySavingsPercentage = Math.min(100, monthlySavingsPercentage)
+
+  // Get color for monthly savings progress bar
+  const getMonthlySavingsBarColor = () => {
+    if (monthlySavingsPercentage >= 100) return 'bg-green-500'
+    if (monthlySavingsPercentage >= 75) return 'bg-blue-500'
+    if (monthlySavingsPercentage >= 50) return 'bg-orange-500'
+    return 'bg-red-500'
+  }
+
+  const handleCardClick = () => {
+    if (isMobile && onEdit) {
+      onEdit(goalId)
+    }
+  }
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (onEdit) {
+      onEdit(goalId)
+    }
+  }
 
   return (
-    <div className={cn(
-      'rounded-xl border overflow-hidden transition-all',
-      'bg-white dark:bg-gray-800',
-      'border-gray-200 dark:border-gray-700',
-      'hover:shadow-md'
-    )}>
-      {/* Main Card - Always Visible */}
-      <div className="p-4">
-        {/* Header Row */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🎯</span>
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {goalName}
-            </h3>
+    <div
+      className={cn(
+        'border-l-4',
+        status.borderColor,
+        'transition-all hover:shadow-lg',
+        isMobile && onEdit && 'cursor-pointer active:scale-[0.98]'
+      )}
+      onClick={handleCardClick}
+      role={isMobile && onEdit ? 'button' : undefined}
+      tabIndex={isMobile && onEdit ? 0 : undefined}
+    >
+      <Card>
+        {/* Header */}
+        <div className="relative mb-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{goalName}</h3>
+            <span
+              className={cn(
+                'text-xs font-semibold uppercase px-2.5 py-1 rounded-full',
+                status.bgColor,
+                status.textColor
+              )}
+            >
+              {status.emoji} {t(status.labelKey)}
+            </span>
           </div>
-          <div className={cn(
-            'flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
-            isCompleted || isOnPace
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400'
-              : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
-          )}>
-            {isCompleted ? '🎉' : isOnPace ? <Check className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-            {isCompleted ? t('goal.status.completed') : isOnPace ? t('goal.status.onTrack') : t('goal.status.behind')}
+
+          {/* Desktop edit button */}
+          {!isMobile && onEdit && (
+            <button
+              onClick={handleEditClick}
+              className="absolute -top-2 -right-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              aria-label={t('goal.editGoal')}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="w-5 h-5 text-gray-600 dark:text-gray-400"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Hero Section: Progress Ring */}
+        <div className="mb-6">
+          <div className="relative w-[200px] h-[200px] mx-auto">
+            <ResponsiveContainer width="100%" height="100%">
+              <RadialBarChart
+                cx="50%"
+                cy="50%"
+                innerRadius="70%"
+                outerRadius="90%"
+                data={[{ value: progressPercentage, fill: status.color }]}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <RadialBar
+                  dataKey="value"
+                  background={{ fill: '#e5e7eb' }}
+                  cornerRadius={10}
+                />
+              </RadialBarChart>
+            </ResponsiveContainer>
+
+            {/* Center text overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className={cn('text-3xl font-bold font-mono', status.textColor)}>
+                {Math.round(progressPercentage)}%
+              </div>
+              <div className="text-sm font-mono mt-1 text-gray-700 dark:text-gray-300">
+                {formatCurrencyCompactPrivacy(currentAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
+              </div>
+              <div className="text-xs text-gray-400 dark:text-gray-500 my-1">─────</div>
+              <div className="text-sm font-mono text-gray-700 dark:text-gray-300">
+                {formatCurrencyCompactPrivacy(targetAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Progress Bar & Amount */}
-        <div className="mb-3">
-          <div className="flex justify-between items-end mb-1.5">
-            <div>
-              <span className={cn('text-2xl font-bold', statusColor)}>
-                {Math.round(progressPercentage)}%
-              </span>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                {formatCurrencyCompactPrivacy(currentAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)} / {formatCurrencyCompactPrivacy(targetAmount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {achievability.months_remaining} {t('goal.months', 'months')}
-              </p>
-              {!isCompleted && (
-                <p className="text-xs text-gray-400 dark:text-gray-500">
-                  {isOnPace ? t('goal.onTrack', 'On track') : t('goal.behind', 'Behind')}
-                </p>
-              )}
+        {/* Monthly Savings Section */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-xs text-gray-500 dark:text-gray-400">{t('goal.monthlySavings')}</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500">
+              {t('goal.basedOnPeriod', {
+                months: achievability.trend_months_actual,
+                source: achievability.data_source
+              })}
             </div>
           </div>
-          <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="text-lg font-mono font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {formatCurrencyPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)} /{' '}
+            {formatCurrencyPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
+            <span className="text-sm ml-2 text-gray-600 dark:text-gray-400">
+              ({Math.round(monthlySavingsPercentage)}%)
+            </span>
+          </div>
+          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
             <div
-              className={cn('h-full rounded-full transition-all duration-500', progressColor)}
-              style={{ width: `${Math.min(100, progressPercentage)}%` }}
+              className={cn(getMonthlySavingsBarColor(), 'h-2 rounded-full transition-all duration-500')}
+              style={{ width: `${cappedMonthlySavingsPercentage}%` }}
             />
           </div>
         </div>
 
-        {/* Insight */}
-        <div className={cn('rounded-lg p-2.5', statusBg)}>
-          <p className={cn('text-xs', statusColor)}>
-            💡 {getInsight()}
-          </p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-          >
-          {showDetails ? (
-            <>
-              <ChevronUp className="w-3.5 h-3.5" />
-              {t('button.hideDetails', 'Hide Details')}
-            </>
-          ) : (
-            <>
-              <ChevronDown className="w-3.5 h-3.5" />
-              {t('button.showDetails', 'Show Details')}
-            </>
-          )}
-          </button>
-          {onEdit && (
-            <button
-              onClick={() => onEdit(goalId)}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              <Pencil className="w-3.5 h-3.5" />
-              {t('button.edit', 'Edit')}
-            </button>
-          )}
-          {onDelete && !showDeleteConfirm && (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              {t('button.delete', 'Delete')}
-            </button>
-          )}
-        </div>
-
-        {/* Delete Confirmation */}
-        {showDeleteConfirm && onDelete && (
-          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
-            <p className="text-xs text-center text-gray-600 dark:text-gray-400 mb-2">
-              {t('goal.deleteConfirm')}
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 py-1.5 text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-              >
-                {t('button.cancel', 'Cancel')}
-              </button>
-              <button
-                onClick={() => {
-                  onDelete(goalId)
-                  setShowDeleteConfirm(false)
-                }}
-                className="flex-1 py-1.5 text-xs text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-              >
-                {t('button.delete', 'Delete')}
-              </button>
-            </div>
+        {/* Insight Section */}
+        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4">
+          <div className="text-sm text-blue-900 dark:text-blue-200">
+            {insight.emoji} {insight.message}
           </div>
-        )}
-      </div>
-
-      {/* Expandable Details */}
-      {showDetails && (
-        <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 animate-in slide-in-from-top-2">
-          {/* Monthly Breakdown */}
-          <div className="grid grid-cols-2 gap-3 text-center">
-            <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                {t('goal.savingNow', 'Saving now')}
-              </p>
-              <p className={cn(
-                'text-sm font-semibold',
-                isOnPace ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
-              )}>
-                {formatCurrencyCompactPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-                <span className="text-xs font-normal text-gray-400">/mo</span>
-              </p>
-            </div>
-            <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
-                {t('goal.needed', 'Needed')}
-              </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {formatCurrencyCompactPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-                <span className="text-xs font-normal text-gray-400">/mo</span>
-              </p>
-            </div>
-          </div>
-
-          {/* Category tip when behind */}
-          {!isOnPace && !isCompleted && topExpenseCategory && topExpenseCategory.monthlyAmount > 0 && (
-            <div className="mt-3 p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-              <p className="text-xs text-amber-700 dark:text-amber-300">
-                💰 {t('goal.insight.topExpenseTip', {
-                  category: t(`categories.${topExpenseCategory.name}`, { defaultValue: topExpenseCategory.name }),
-                  amount: formatCurrencyPrivacy(topExpenseCategory.monthlyAmount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
-                })}
-              </p>
-            </div>
-          )}
         </div>
-      )}
+
+        {/* Footer */}
+        <div className="text-xs text-gray-400 dark:text-gray-500">{t('goal.monthsRemaining', { months: achievability.months_remaining })}</div>
+      </Card>
     </div>
   )
 }

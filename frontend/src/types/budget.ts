@@ -11,8 +11,6 @@ export interface Budget {
   monthly_income: number
   savings_target?: number
   advice?: string
-  language?: string  // Language used for AI advice ('ja', 'en', 'vi')
-  carry_over?: number
   allocations: BudgetAllocation[]
   created_at: string
 }
@@ -45,20 +43,5 @@ export interface BudgetTracking {
   total_budgeted: number
   total_spent: number
   savings_target?: number
-  carry_over?: number
-  effective_budget?: number
   categories: BudgetTrackingItem[]
-}
-
-export interface BudgetAllocationSuggestion {
-  category: string
-  amount: number
-}
-
-export interface BudgetSuggestions {
-  has_previous: boolean
-  previous_month: string | null
-  previous_income: number | null
-  previous_allocations: BudgetAllocationSuggestion[] | null
-  carry_over: number
 }

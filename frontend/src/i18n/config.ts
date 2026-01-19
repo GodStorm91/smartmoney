@@ -11,7 +11,7 @@ i18n
     fallbackLng: 'ja', // Default to Japanese
     supportedLngs: ['ja', 'en', 'vi'],
     defaultNS: 'common',
-    ns: ['common', 'landing'], // Only list namespaces that have actual files
+    ns: ['common', 'dashboard', 'goals', 'transactions', 'analytics', 'errors'],
 
     // Backend configuration
     backend: {

@@ -1,52 +1,34 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Card } from '@/components/ui/Card'
 import { UploadDropZone } from '@/components/upload/UploadDropZone'
 import { UploadHistoryList } from '@/components/upload/UploadHistoryList'
 import { UploadFAQ } from '@/components/upload/UploadFAQ'
 import { MultipleFileUploadList } from '@/components/upload/MultipleFileUploadList'
-import { uploadCSV, uploadPayPayImage, fetchUploadHistory } from '@/services/upload-service'
-import { fetchAccounts } from '@/services/account-service'
+import { uploadCSV, fetchUploadHistory } from '@/services/upload-service'
 import type { FileUploadItem } from '@/types'
-
-type UploadMode = 'csv' | 'paypay'
 
 export function Upload() {
   const { t } = useTranslation('common')
-  const [uploadMode, setUploadMode] = useState<UploadMode>('csv')
   const [isDragOver, setIsDragOver] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [fileItems, setFileItems] = useState<FileUploadItem[]>([])
-  const [selectedAccountId, setSelectedAccountId] = useState<number | undefined>()
   const queryClient = useQueryClient()
-
-  const { data: accounts } = useQuery({
-    queryKey: ['accounts'],
-    queryFn: () => fetchAccounts(),
-  })
 
   const { data: history, isLoading } = useQuery({
     queryKey: ['upload-history'],
     queryFn: fetchUploadHistory,
   })
 
-  const invalidateAfterUpload = () => {
-    queryClient.invalidateQueries({ queryKey: ['upload-history'] })
-    queryClient.invalidateQueries({ queryKey: ['transactions'] })
-    queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
-  }
-
-  // File validation based on mode
-  const isValidFile = (file: File): boolean => {
-    if (uploadMode === 'csv') {
-      return file.name.endsWith('.csv')
-    }
-    return /\.(png|jpg|jpeg)$/i.test(file.name)
-  }
-
-  const maxFileSize = uploadMode === 'csv' ? 50 * 1024 * 1024 : 10 * 1024 * 1024
-  const acceptedTypes = uploadMode === 'csv' ? '.csv' : '.png,.jpg,.jpeg'
+  const uploadMutation = useMutation({
+    mutationFn: uploadCSV,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['upload-history'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['dashboard-summary'] })
+    },
+  })
 
   const handleFilesSelect = (files: FileList) => {
     const newFiles: FileUploadItem[] = []
@@ -54,14 +36,13 @@ export function Upload() {
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
 
-      // Validate file type based on mode
-      if (!isValidFile(file)) {
-        const alertKey = uploadMode === 'csv' ? 'upload.alertSelectCSV' : 'upload.alertSelectImage'
-        alert(t(alertKey, { filename: file.name }))
+      // Validate file
+      if (!file.name.endsWith('.csv')) {
+        alert(t('upload.alertSelectCSV', { filename: file.name }))
         continue
       }
 
-      if (file.size > maxFileSize) {
+      if (file.size > 50 * 1024 * 1024) {
         alert(t('upload.alertMaxSize', { filename: file.name }))
         continue
       }
@@ -103,10 +84,7 @@ export function Upload() {
     )
 
     try {
-      // For CSV uploads, pass accountId; for PayPay, just pass file
-      const result = uploadMode === 'csv'
-        ? await uploadCSV(item.file, selectedAccountId)
-        : await uploadPayPayImage(item.file)
+      const result = await uploadMutation.mutateAsync(item.file)
 
       // Update status to success
       setFileItems(prev =>
@@ -125,7 +103,6 @@ export function Upload() {
           backendResult: result
         } : f)
       )
-      invalidateAfterUpload()
     } catch (error) {
       console.error('Upload failed:', error)
 
@@ -175,69 +152,16 @@ export function Upload() {
     setIsDragOver(false)
   }
 
-  const handleModeChange = (mode: UploadMode) => {
-    if (mode !== uploadMode) {
-      setUploadMode(mode)
-      setFileItems([]) // Clear files when switching modes
-    }
-  }
-
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Title */}
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t('upload.title')}</h2>
-        <p className="text-gray-600 dark:text-gray-400">{t('upload.subtitle')}</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('upload.title')}</h2>
+        <p className="text-gray-600">{t('upload.subtitle')}</p>
       </div>
 
       {/* Upload Zone */}
       <Card className="mb-8">
-        {/* Tab Switcher */}
-        <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6">
-          <button
-            onClick={() => handleModeChange('csv')}
-            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-              uploadMode === 'csv'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            {t('upload.tabCSV')}
-          </button>
-          <button
-            onClick={() => handleModeChange('paypay')}
-            className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
-              uploadMode === 'paypay'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            {t('upload.tabPayPay')}
-          </button>
-        </div>
-
-        {/* Account Selection for CSV */}
-        {uploadMode === 'csv' && accounts && accounts.length > 0 && (
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('upload.selectAccount')}
-            </label>
-            <select
-              value={selectedAccountId || ''}
-              onChange={(e) => setSelectedAccountId(e.target.value ? Number(e.target.value) : undefined)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">{t('upload.noAccountSelected')}</option>
-              {accounts.map((account) => (
-                <option key={account.id} value={account.id}>
-                  {account.name} ({account.type})
-                </option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t('upload.accountHint')}</p>
-          </div>
-        )}
-
         <UploadDropZone
           isDragOver={isDragOver}
           uploading={uploading}
@@ -246,8 +170,6 @@ export function Upload() {
           onDragLeave={handleDragLeave}
           onFileSelect={handleFilesSelect}
           hasFiles={fileItems.length > 0}
-          acceptedTypes={acceptedTypes}
-          uploadMode={uploadMode}
         />
 
         {/* Multiple File Upload List */}
@@ -262,13 +184,13 @@ export function Upload() {
 
       {/* Upload History */}
       <Card>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">{t('upload.history')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">{t('upload.history')}</h3>
         <UploadHistoryList history={history} isLoading={isLoading} />
       </Card>
 
       {/* FAQ Section */}
       <Card className="mt-8">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('upload.faq')}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('upload.faq')}</h3>
         <UploadFAQ />
       </Card>
     </div>
