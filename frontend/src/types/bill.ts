@@ -128,3 +128,45 @@ export interface MarkBillPaidResponse {
   next_due_date: string;
   history_id: number | null;
 }
+
+// === Reminder Schedule Types ===
+
+export interface ReminderSchedule {
+  id: number;
+  bill_id: number;
+  reminder_type: 'days_before' | 'specific_date' | 'recurring';
+  days_before: number | null;
+  reminder_time: string;
+  is_sent: boolean;
+  sent_at: string | null;
+  created_at: string;
+}
+
+export interface ReminderScheduleCreate {
+  reminder_type?: 'days_before' | 'specific_date' | 'recurring';
+  days_before?: number;
+  reminder_time?: string; // HH:MM format
+  recurrence_config?: Record<string, unknown>;
+}
+
+export interface ReminderScheduleListResponse {
+  success: boolean;
+  schedules: ReminderSchedule[];
+}
+
+export interface ReminderScheduleDeleteResponse {
+  success: boolean;
+  message: string;
+}
+
+// === Partial Payment Types ===
+
+export interface PartialPaymentStatusResponse {
+  success: boolean;
+  bill_id: number;
+  total_amount: number;
+  paid_amount: number;
+  remaining_amount: number;
+  is_fully_paid: boolean;
+  has_partial_payment: boolean;
+}

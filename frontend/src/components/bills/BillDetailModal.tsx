@@ -1,11 +1,15 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ResponsiveModal } from '@/components/ui/ResponsiveModal'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Calendar, Repeat, Bell, Edit, Trash2, CheckCircle, Clock } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { Calendar, Repeat, Bell, Edit, Trash2, CheckCircle, Clock, Settings2, ChevronDown, ChevronUp } from 'lucide-react'
 import { format, differenceInDays, isPast, isToday } from 'date-fns'
 import type { Bill } from '@/types'
 import { cn } from '@/utils/cn'
+import { BillReminderSettings } from './BillReminderSettings'
+import { PartialPaymentDisplay } from './PartialPaymentDisplay'
 
 interface BillDetailModalProps {
   isOpen: boolean
@@ -25,6 +29,7 @@ export function BillDetailModal({
   onMarkPaid
 }: BillDetailModalProps) {
   const { t } = useTranslation('common')
+  const [showReminderSettings, setShowReminderSettings] = useState(false)
 
   if (!bill) return null
 
@@ -86,10 +91,9 @@ export function BillDetailModal({
           <Badge
             variant={
               statusInfo.color === 'green' ? 'success' :
-              statusInfo.color === 'red' ? 'danger' :
+              statusInfo.color === 'red' ? 'error' :
               statusInfo.color === 'orange' ? 'warning' : 'default'
             }
-            size="lg"
           >
             <StatusIcon className="w-4 h-4 mr-1" />
             {statusInfo.label}
@@ -152,10 +156,39 @@ export function BillDetailModal({
           </div>
         )}
 
+        {/* Reminder Settings Toggle */}
+        <Card className="p-4">
+          <button
+            onClick={() => setShowReminderSettings(!showReminderSettings)}
+            className="w-full flex items-center justify-between"
+          >
+            <div className="flex items-center gap-3">
+              <Settings2 className="w-5 h-5 text-gray-400" />
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                {t('bills.tabs.reminders')}
+              </span>
+            </div>
+            {showReminderSettings ? (
+              <ChevronUp className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-gray-400" />
+            )}
+          </button>
+
+          {showReminderSettings && (
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <BillReminderSettings bill={bill} />
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <PartialPaymentDisplay billId={bill.id} />
+              </div>
+            </div>
+          )}
+        </Card>
+
         <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           {!bill.is_paid && onMarkPaid && (
             <Button
-              variant="success"
+              variant="primary"
               onClick={() => {
                 onMarkPaid(bill)
                 onClose()

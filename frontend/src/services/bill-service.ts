@@ -1,4 +1,4 @@
-import type { Bill, BillCreate, BillUpdate, BillCalendarResponse, UpcomingBillsResponse, MarkBillPaidRequest } from '@/types'
+import type { Bill, BillCreate, BillUpdate, BillCalendarResponse, UpcomingBillsResponse, MarkBillPaidRequest, ReminderSchedule, ReminderScheduleCreate, ReminderScheduleListResponse, PartialPaymentStatusResponse } from '@/types'
 import { apiClient } from '@/services/api-client'
 
 export const billService = {
@@ -54,6 +54,35 @@ export const billService = {
 
   async markAsUnpaid(billId: number): Promise<Bill> {
     const response = await apiClient.post<Bill>(`/api/bills/${billId}/mark-unpaid`)
+    return response.data
+  },
+
+  // === Reminder Schedule Methods ===
+
+  async createReminderSchedule(billId: number, data: ReminderScheduleCreate): Promise<ReminderSchedule> {
+    const response = await apiClient.post<ReminderSchedule>(`/api/bills/${billId}/schedules`, data)
+    return response.data
+  },
+
+  async getReminderSchedules(billId: number): Promise<ReminderScheduleListResponse> {
+    const response = await apiClient.get<ReminderScheduleListResponse>(`/api/bills/${billId}/schedules`)
+    return response.data
+  },
+
+  async deleteReminderSchedule(billId: number, scheduleId: number): Promise<{ success: boolean; message: string }> {
+    const response = await apiClient.delete<{ success: boolean; message: string }>(`/api/bills/${billId}/schedules/${scheduleId}`)
+    return response.data
+  },
+
+  // === Partial Payment Methods ===
+
+  async getPartialPaymentStatus(billId: number): Promise<PartialPaymentStatusResponse> {
+    const response = await apiClient.get<PartialPaymentStatusResponse>(`/api/bills/${billId}/partial-payment`)
+    return response.data
+  },
+
+  async triggerPartialPaymentAlert(billId: number): Promise<{ success: boolean; message: string; alert_sent: boolean }> {
+    const response = await apiClient.post<{ success: boolean; message: string; alert_sent: boolean }>(`/api/bills/${billId}/trigger-partial-payment-alert`, {})
     return response.data
   },
 }

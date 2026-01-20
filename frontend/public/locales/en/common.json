@@ -811,6 +811,7 @@
       "categories": "Categories",
       "sources": "Sources",
       "recurring": "Recurring",
+      "notifications": "Notifications",
       "crypto": "Crypto"
     }
   },
@@ -1421,7 +1422,48 @@
     "quick_stats": "Quick Stats",
     "total_bills": "Total Bills",
     "paid": "Paid",
-    "unpaid": "Unpaid"
+    "unpaid": "Unpaid",
+    "tabs": {
+      "details": "Details",
+      "reminders": "Reminders"
+    },
+    "reminder": {
+      "no_reminder": "No reminder",
+      "one_day": "1 day before",
+      "two_days": "2 days before",
+      "three_days": "3 days before",
+      "five_days": "5 days before",
+      "one_week": "1 week before",
+      "two_weeks": "2 weeks before",
+      "enable": "Enable Reminder",
+      "enableDescription": "Get notified before this bill is due",
+      "daysBefore": "Remind me",
+      "time": "Reminder Time",
+      "customSchedules": "Custom Reminder Schedules",
+      "addSchedule": "Add Schedule",
+      "noSchedules": "No custom schedules",
+      "editSchedule": "Edit Schedule",
+      "deleteConfirm": "Are you sure you want to delete this schedule?",
+      "scheduleType": "Schedule Type",
+      "daysBeforeValue": "{{count}} days before",
+      "type": {
+        "daysBefore": "Days Before Due",
+        "specificDate": "Specific Date",
+        "recurring": "Recurring"
+      }
+    },
+    "partialPayment": {
+      "title": "Partial Payment",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "total": "Total Amount",
+      "inProgress": "In Progress",
+      "triggerAlert": "Send Payment Reminder",
+      "alertTitle": "Send Payment Reminder",
+      "alertInfo": "Payment Reminder",
+      "alertDescription": "Send a reminder about the remaining balance of {{amount}} for this bill.",
+      "sendAlert": "Send Reminder"
+    }
   },
   "alerts": {
     "title": "Alerts",
@@ -1460,6 +1502,109 @@
     "thresholds": {
       "next": "Next threshold",
       "at_threshold": "At {{percentage}}%"
+    }
+  },
+  "anomaly": {
+    "title": "Anomaly Alerts",
+    "noAlerts": "No anomalies detected",
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "type": {
+      "large_transaction": "Large Transaction",
+      "category_shift": "Category Shift",
+      "duplicate": "Duplicate",
+      "recurring_change": "Recurring Change",
+      "ml_detected": "AI Detected"
+    },
+    "config": {
+      "title": "Anomaly Detection Settings",
+      "sensitivity": "Sensitivity",
+      "sensitivityOptions": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "largeTransactionThreshold": "Large Transaction Threshold",
+      "unusualSpendingPercent": "Unusual Spending %",
+      "recurringChangePercent": "Recurring Change %",
+      "duplicateChargeHours": "Duplicate Detection Hours",
+      "enabledTypes": "Enabled Detection Types",
+      "save": "Save Settings",
+      "saved": "Settings saved"
+    }
+  },
+  "insights": {
+    "title": "Spending Insights",
+    "noInsights": "No notable spending patterns detected",
+    "insightsHint": "Keep tracking to see personalized insights",
+    "viewTransactions": "View Transactions",
+    "viewBreakdown": "View Breakdown",
+    "learnMore": "Learn More",
+    "type": {
+      "spending_trend": "Spending Trend",
+      "budget_warning": "Budget Warning",
+      "budget_info": "Budget Info",
+      "goal_progress": "Goal Progress",
+      "forecast": "Forecast",
+      "savings_alert": "Savings Alert",
+      "savings_positive": "Great Savings"
+    }
+  },
+  "savings": {
+    "title": "Savings Opportunities",
+    "potential": "potential",
+    "noRecommendations": "No savings opportunities found",
+    "checkBack": "Check back later for personalized suggestions",
+    "totalPotential": "Total Potential Savings",
+    "type": {
+      "subscription_cancel": "Subscription",
+      "reduce_spending": "Reduce Spending",
+      "negotiate": "Negotiate Bill",
+      "switch_provider": "Switch Provider",
+      "optimize_payment": "Payment Optimization"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "noUnread": "No unread notifications",
+    "empty": "No notifications yet",
+    "loadMore": "Load more",
+    "viewAll": "View all notifications",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark read",
+    "view": "View",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}d ago",
+    "channels": {
+      "title": "Notification Channels",
+      "push": "Push Notifications",
+      "pushDescription": "Receive notifications on your device",
+      "email": "Email Notifications",
+      "emailDescription": "Receive notifications via email",
+      "inApp": "In-App Notifications",
+      "inAppDescription": "See notifications within the app"
+    },
+    "types": {
+      "title": "Notification Types",
+      "budget": "Budget Alerts",
+      "bills": "Bill Reminders",
+      "anomalies": "Anomaly Alerts",
+      "goals": "Goal Milestones",
+      "savings": "Savings Tips",
+      "burnRate": "Burn Rate Warnings"
+    },
+    "quietHours": {
+      "title": "Quiet Hours",
+      "description": "Mute non-critical notifications during set hours",
+      "configure": "Configure"
     }
   }
 }
