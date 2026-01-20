@@ -13,7 +13,7 @@ const DEFAULT_RATES: Record<string, number> = {
  * Zero-decimal currencies (JPY, VND, KRW) have no sub-units
  * Decimal currencies (USD, EUR) have cents/sub-units
  */
-const CURRENCY_DECIMALS: Record<string, number> = {
+export const CURRENCY_DECIMALS: Record<string, number> = {
   JPY: 0,  // Japanese Yen - no sen/rin in modern use
   VND: 0,  // Vietnamese Dong - no decimal places
   KRW: 0,  // Korean Won - no decimal places
@@ -230,4 +230,17 @@ export function formatCurrencyCompactPrivacy(
     return maskCurrencyValue(currency)
   }
   return formatCurrencyCompact(amount, currency, rates, isNativeCurrency)
+}
+
+/**
+ * Convert display amount to storage format
+ * For zero-decimal currencies (JPY, VND, KRW): stored as-is
+ * For decimal currencies (USD, EUR): stored in cents/sub-units
+ * @param amount - Display amount (already formatted by user)
+ * @param currency - Currency code
+ * @returns Storage amount (integer for storage)
+ */
+export function toStorageAmount(amount: number, currency: string): number {
+  const decimals = CURRENCY_DECIMALS[currency] ?? 0
+  return Math.round(amount * Math.pow(10, decimals))
 }
