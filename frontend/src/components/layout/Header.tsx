@@ -48,6 +48,8 @@ export function Header() {
             <NavLink to="/analytics">{t('header.analytics')}</NavLink>
             <NavLink to="/goals">{t('header.goals')}</NavLink>
             <NavLink to="/budget">{t('header.budget')}</NavLink>
+            <NavLink to="/gamification">{t('header.gamification')}</NavLink>
+            <NavLink to="/profile">{t('header.profile')}</NavLink>
             <NavLink to="/settings">{t('header.settings')}</NavLink>
 
             {/* Privacy Toggle - Desktop */}

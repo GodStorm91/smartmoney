@@ -8,6 +8,7 @@
     "analytics": "Analytics",
     "goals": "Goals",
     "budget": "Budget",
+    "profile": "Profile",
     "gamification": "Achievements",
     "settings": "Settings"
   },
@@ -19,6 +20,8 @@
     "goals": "Goals",
     "settings": "Settings",
     "analytics": "Analytics",
+    "profile": "Profile",
+    "gamification": "Achievements",
     "more": "More"
   },
   "button": {

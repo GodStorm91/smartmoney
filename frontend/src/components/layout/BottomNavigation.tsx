@@ -3,6 +3,7 @@ import { Link, useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
+import { useGamificationStats } from '@/services/gamification-service'
 
 // Icons as inline SVGs for smaller bundle
 const HomeIcon = ({ className }: { className?: string }) => (
@@ -66,6 +67,18 @@ const LogoutIcon = ({ className }: { className?: string }) => (
   </svg>
 )
 
+const ProfileIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+)
+
+const TrophyIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+  </svg>
+)
+
 const navItems = [
   { path: '/', icon: HomeIcon, labelKey: 'nav.dashboard' },
   { path: '/transactions', icon: TransactionsIcon, labelKey: 'nav.transactions' },
@@ -75,6 +88,8 @@ const navItems = [
 ]
 
 const moreMenuItems = [
+  { path: '/profile', icon: ProfileIcon, labelKey: 'header.profile' },
+  { path: '/gamification', icon: TrophyIcon, labelKey: 'header.gamification' },
   { path: '/upload', icon: UploadIcon, labelKey: 'header.upload' },
   { path: '/accounts', icon: AccountsIcon, labelKey: 'header.accounts' },
   { path: '/goals', icon: GoalsIcon, labelKey: 'header.goals' },
@@ -84,8 +99,9 @@ const moreMenuItems = [
 export function BottomNavigation() {
   const { t } = useTranslation('common')
   const location = useLocation()
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const { data: gamificationStats } = useGamificationStats()
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/'
@@ -93,6 +109,9 @@ export function BottomNavigation() {
   }
 
   const isMoreActive = moreMenuItems.some(item => isActive(item.path))
+
+  const level = gamificationStats?.current_level || 1
+  const totalXP = gamificationStats?.total_xp || 0
 
   return (
     <>
@@ -107,7 +126,37 @@ export function BottomNavigation() {
       {/* More Menu Sheet */}
       {isMoreOpen && (
         <div className="fixed bottom-16 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 md:hidden rounded-t-2xl shadow-lg animate-slide-up">
-          <div className="p-4 space-y-2">
+          {/* Profile Section */}
+          <Link
+            to="/profile"
+            onClick={() => setIsMoreOpen(false)}
+            className="flex items-center gap-3 px-4 py-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+          >
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl shadow-sm">
+              😊
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+                {user?.email || t('gamification.profile.newUser')}
+              </p>
+              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span className="inline-flex items-center gap-1">
+                  <svg className="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  Lv.{level}
+                </span>
+                <span className="text-gray-300 dark:text-gray-600">|</span>
+                <span>{totalXP.toLocaleString()} XP</span>
+              </div>
+            </div>
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+
+          {/* Menu Items */}
+          <div className="p-4 space-y-1">
             {moreMenuItems.map((item) => (
               <Link
                 key={item.path}
