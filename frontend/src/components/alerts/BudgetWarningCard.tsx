@@ -27,13 +27,6 @@ export function BudgetWarningCard({
 
   const { data: thresholdStatus } = useThresholdStatus(Number(budgetId))
 
-  const getProgressColor = () => {
-    if (isOverBudget) return 'bg-red-600'
-    if (percentage >= 80) return 'bg-orange-500'
-    if (percentage >= 50) return 'bg-yellow-500'
-    return 'bg-blue-600'
-  }
-
   const getWarningLevel = () => {
     if (isOverBudget) {
       return {

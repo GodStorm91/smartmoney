@@ -67,7 +67,7 @@ export function BillCard({
             <Badge
               variant={
                 status.color === 'green' ? 'success' :
-                status.color === 'red' ? 'danger' :
+                status.color === 'red' ? 'error' :
                 status.color === 'orange' ? 'warning' : 'default'
               }
             >

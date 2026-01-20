@@ -38,7 +38,7 @@ export function BudgetFeedbackForm({ onSubmit, onCancel, isLoading }: BudgetFeed
             {isLoading ? t('budget.regenerating') : t('budget.submitFeedback')}
           </Button>
           <Button type="button" variant="outline" onClick={onCancel}>
-            {t('common.cancel')}
+            {t('cancel')}
           </Button>
         </div>
       </form>

@@ -97,7 +97,7 @@ export function SpendingInsights() {
           {t('analytics.spendingInsights', 'Spending Insights')}
         </h3>
         <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-          {t('common.error', 'Failed to load insights')}
+          {t('error', 'Failed to load insights')}
         </p>
       </Card>
     )

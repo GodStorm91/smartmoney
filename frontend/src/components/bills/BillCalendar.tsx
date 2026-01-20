@@ -8,11 +8,10 @@ import type { Bill } from '@/types'
 
 interface BillCalendarProps {
   onDayClick?: (day: number, bills: Bill[]) => void
-  onBillClick?: (bill: Bill) => void
   className?: string
 }
 
-export function BillCalendar({ onDayClick, onBillClick, className }: BillCalendarProps) {
+export function BillCalendar({ onDayClick, className }: BillCalendarProps) {
   const { t } = useTranslation('common')
   const [currentDate, setCurrentDate] = useState(new Date())
 

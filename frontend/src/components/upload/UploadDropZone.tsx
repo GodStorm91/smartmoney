@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
+type UploadMode = 'csv' | 'paypay'
+
 interface UploadDropZoneProps {
   isDragOver: boolean
   uploading: boolean
@@ -11,6 +13,8 @@ interface UploadDropZoneProps {
   onDragLeave: () => void
   onFileSelect: (files: FileList) => void
   hasFiles?: boolean
+  acceptedTypes?: string
+  uploadMode?: UploadMode
 }
 
 export function UploadDropZone({
@@ -21,6 +25,8 @@ export function UploadDropZone({
   onDragLeave,
   onFileSelect,
   hasFiles = false,
+  acceptedTypes = '.csv',
+  uploadMode = 'csv',
 }: UploadDropZoneProps) {
   const { t } = useTranslation('common')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -49,7 +55,7 @@ export function UploadDropZone({
         <input
           ref={fileInputRef}
           type="file"
-          accept=".csv"
+          accept={acceptedTypes}
           multiple
           className="hidden"
           onChange={(e) => {
@@ -88,7 +94,9 @@ export function UploadDropZone({
               {hasFiles ? t('button.addMore') : t('button.selectFile')}
             </Button>
 
-            <p className="text-xs text-gray-500 mt-4">{t('upload.supportedFormats')}</p>
+            <p className="text-xs text-gray-500 mt-4">
+              {uploadMode === 'csv' ? t('upload.supportedFormats') : t('upload.supportedImageFormats')}
+            </p>
           </>
         )}
       </div>
@@ -101,11 +109,19 @@ export function UploadDropZone({
           </svg>
           <div>
             <h4 className="text-sm font-semibold text-blue-900 mb-1">{t('upload.requirements')}</h4>
-            <ul className="text-sm text-blue-800 space-y-1">
-              <li>• {t('upload.requiredColumns')}</li>
-              <li>• {t('upload.supportedApps')}</li>
-              <li>• {t('upload.encoding')}</li>
-            </ul>
+            {uploadMode === 'csv' ? (
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• {t('upload.requiredColumns')}</li>
+                <li>• {t('upload.supportedApps')}</li>
+                <li>• {t('upload.encoding')}</li>
+              </ul>
+            ) : (
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• {t('upload.paypayRequirement1')}</li>
+                <li>• {t('upload.paypayRequirement2')}</li>
+                <li>• {t('upload.paypayRequirement3')}</li>
+              </ul>
+            )}
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ export interface GoalFormErrors {
 
 /**
  * Validate goal form inputs
+ * Returns i18n keys for error messages, not hardcoded strings
  */
 export function validateGoalForm(
   years: number,
@@ -25,21 +26,21 @@ export function validateGoalForm(
   // Years validation (only if not preselected)
   if (!preselectedYears) {
     if (years < 1 || years > 10) {
-      errors.years = '期間は1年から10年の間で設定してください'
+      errors.years = 'goals.errors.yearsRange'
     }
   }
 
-  // Target amount validation
-  const amount = parseInt(targetAmount.replace(/,/g, ''), 10)
+  // Target amount validation - remove both commas and periods
+  const amount = parseInt(targetAmount.replace(/[,.\s]/g, ''), 10)
   if (!targetAmount || isNaN(amount)) {
-    errors.targetAmount = '目標金額を入力してください'
+    errors.targetAmount = 'goals.errors.amountRequired'
   } else if (amount < 10000) {
-    errors.targetAmount = '目標金額は¥10,000以上で設定してください'
+    errors.targetAmount = 'goals.errors.amountMinimum'
   }
 
   // Custom date validation
   if (startDateOption === 'custom' && !customDate) {
-    errors.customDate = '開始日を選択してください'
+    errors.customDate = 'goals.errors.dateRequired'
   }
 
   return errors
@@ -65,9 +66,12 @@ export function calculateStartDate(
 
 /**
  * Format number input with thousand separators
+ * Always uses comma as thousand separator for consistency across locales
  */
-export function formatAmountInput(value: string): string {
-  const cleanValue = value.replace(/,/g, '')
+export function formatAmountInput(value: string, _locale: string = 'ja-JP'): string {
+  // Remove both commas and periods (thousand separators vary by locale)
+  const cleanValue = value.replace(/[,.\s]/g, '')
   if (!/^\d*$/.test(cleanValue)) return value
-  return cleanValue ? parseInt(cleanValue, 10).toLocaleString('ja-JP') : ''
+  // Always use en-US locale for consistent comma separator
+  return cleanValue ? parseInt(cleanValue, 10).toLocaleString('en-US') : ''
 }

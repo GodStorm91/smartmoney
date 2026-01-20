@@ -14,6 +14,7 @@ export const EXPENSE_CATEGORIES: CategoryOption[] = [
   { id: 'entertainment', labelKey: 'category.entertainment', icon: '🎬', value: 'Entertainment' },
   { id: 'shopping', labelKey: 'category.shopping', icon: '🛍️', value: 'Shopping' },
   { id: 'health', labelKey: 'category.health', icon: '🏥', value: 'Health' },
+  { id: 'proxy_purchase', labelKey: 'category.proxy_purchase', icon: '🛒', value: 'Proxy Purchase' },
   { id: 'other', labelKey: 'category.other', icon: '📦', value: 'Other' },
 ]
 
@@ -23,5 +24,6 @@ export const INCOME_CATEGORIES: CategoryOption[] = [
   { id: 'investment', labelKey: 'category.investment', icon: '📈', value: 'Income' },
   { id: 'freelance', labelKey: 'category.freelance', icon: '💼', value: 'Income' },
   { id: 'refund', labelKey: 'category.refund', icon: '🔄', value: 'Income' },
+  { id: 'proxy_income', labelKey: 'category.proxy_income', icon: '🤝', value: 'Proxy Income' },
   { id: 'other_income', labelKey: 'category.other', icon: '📦', value: 'Income' },
 ]

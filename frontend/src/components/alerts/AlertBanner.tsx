@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Info, X, TrendingUp, CreditCard } from 'lucide-react'
+import { AlertTriangle, Info, X, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/ui/Card'
 import { useBudgetAlerts } from '@/hooks/useBudgetAlerts'
@@ -74,7 +74,6 @@ export function AlertBanner({ onDismiss, onViewDetails, className }: AlertBanner
 
   const getAlertDescription = (alert: BudgetAlert) => {
     const amount = alert.current_spending
-    const budget = alert.budget_amount
     const percentage = alert.threshold_percentage
 
     switch (alert.alert_type) {

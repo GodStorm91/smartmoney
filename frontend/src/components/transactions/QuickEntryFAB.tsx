@@ -1,0 +1,643 @@
+/**
+ * Quick Entry FAB - Floating Action Button for rapid transaction entry
+ *
+ * Features:
+ * - Calculator-style numpad for amount entry
+ * - Quick category selection (icons grid)
+ * - Account selector
+ * - Currency selector with auto-conversion
+ * - 3-4 taps to save: Amount → Category → Account → Save
+ * - Always defaults to expense type
+ */
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { Plus, X, Delete, Mic, Search, Receipt, CreditCard } from 'lucide-react'
+import { cn } from '@/utils/cn'
+import { createTransaction } from '@/services/transaction-service'
+import { useAccounts } from '@/hooks/useAccounts'
+import { useOfflineCreate } from '@/hooks/use-offline-mutation'
+import { useRatesMap } from '@/hooks/useExchangeRates'
+import { useVoiceInput } from '@/hooks/useVoiceInput'
+import { parseVoiceTransaction } from '@/utils/parseVoiceTransaction'
+import { toStorageAmount } from '@/utils/formatCurrency'
+import { EXPENSE_CATEGORIES } from './constants/categories'
+
+// Currency symbols map
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  JPY: '¥',
+  USD: '$',
+  VND: '₫',
+}
+
+// Supported currencies for quick entry
+const SUPPORTED_CURRENCIES = ['JPY', 'USD', 'VND'] as const
+type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number]
+
+// Numpad keys
+const NUMPAD_KEYS = [
+  '1', '2', '3',
+  '4', '5', '6',
+  '7', '8', '9',
+  '00', '0', 'DEL',
+]
+
+type Step = 'closed' | 'amount' | 'category' | 'account'
+
+export function QuickEntryFAB() {
+  const { t } = useTranslation('common')
+  const navigate = useNavigate()
+  const { data: accounts } = useAccounts()
+  const rates = useRatesMap()
+
+  const [step, setStep] = useState<Step>('closed')
+  const [amount, setAmount] = useState('')
+  const [categoryId, setCategoryId] = useState('')
+  const [accountId, setAccountId] = useState<number | null>(null)
+  const [inputCurrency, setInputCurrency] = useState<SupportedCurrency>('JPY')
+  const [voiceDescription, setVoiceDescription] = useState('')
+  const [accountSearch, setAccountSearch] = useState('')
+
+  // Long press state
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isLongPress = useRef(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [pressProgress, setPressProgress] = useState(0) // 0-100 for scale animation
+
+  // Voice input hook
+  const {
+    status: voiceStatus,
+    transcript,
+    isSupported: voiceSupported,
+    startListening,
+    stopListening,
+  } = useVoiceInput({
+    language: 'ja-JP',
+    onResult: (text) => {
+      const parsed = parseVoiceTransaction(text)
+      if (parsed) {
+        setAmount(parsed.amount.toString())
+        setInputCurrency(parsed.currency)
+        setVoiceDescription(parsed.description)
+
+        // If category was auto-detected, skip category selection
+        if (parsed.suggestedCategoryId) {
+          setCategoryId(parsed.suggestedCategoryId)
+          // If only one account, save immediately
+          if (accounts?.length === 1) {
+            // Delay to ensure state is set
+            setTimeout(() => {
+              handleSave(parsed.suggestedCategoryId)
+            }, 100)
+          } else {
+            setStep('account')
+          }
+        } else {
+          // No category detected, go to category selection
+          setStep('category')
+        }
+      }
+    },
+  })
+
+  // Get selected account
+  const selectedAccount = accounts?.find(a => a.id === accountId)
+
+  // Filter accounts by search term
+  const filteredAccounts = useMemo(() => {
+    if (!accounts) return []
+    if (!accountSearch.trim()) return accounts
+    const search = accountSearch.toLowerCase()
+    return accounts.filter(a => a.name.toLowerCase().includes(search))
+  }, [accounts, accountSearch])
+
+  // Set default account and currency when accounts load
+  useEffect(() => {
+    if (accounts?.length && !accountId) {
+      setAccountId(accounts[0].id)
+      // Default input currency to first account's currency
+      const firstAccountCurrency = accounts[0].currency as SupportedCurrency
+      if (SUPPORTED_CURRENCIES.includes(firstAccountCurrency)) {
+        setInputCurrency(firstAccountCurrency)
+      }
+    }
+  }, [accounts, accountId])
+
+  // Update input currency when account changes
+  useEffect(() => {
+    if (selectedAccount) {
+      const accountCurrency = selectedAccount.currency as SupportedCurrency
+      if (SUPPORTED_CURRENCIES.includes(accountCurrency)) {
+        setInputCurrency(accountCurrency)
+      }
+    }
+  }, [selectedAccount])
+
+  // Get currency symbol for input
+  const currencySymbol = CURRENCY_SYMBOLS[inputCurrency] || inputCurrency
+
+  // Calculate converted amount when currencies differ
+  const convertedAmount = useMemo(() => {
+    if (!amount || !selectedAccount) return null
+
+    const accountCurrency = selectedAccount.currency
+    if (inputCurrency === accountCurrency) return null
+
+    const inputValue = parseInt(amount)
+    if (isNaN(inputValue)) return null
+
+    // Convert: input currency → account currency
+    // rates are relative to JPY (e.g., VND: 160 means 1 JPY = 160 VND)
+    const inputRate = rates[inputCurrency] || 1 // JPY = 1
+    const accountRate = rates[accountCurrency] || 1
+
+    // Convert input to JPY first (divide by rate), then to account currency (multiply by rate)
+    // Example: 10,000,000 VND / 160 = 62,500 JPY
+    // Example: 62,500 JPY * 0.00667 = 417 USD
+    const inJPY = inputValue / inputRate
+    const converted = Math.round(inJPY * accountRate)
+
+    return {
+      value: converted,
+      formatted: converted.toLocaleString(),
+      currency: accountCurrency,
+      symbol: CURRENCY_SYMBOLS[accountCurrency] || accountCurrency
+    }
+  }, [amount, inputCurrency, selectedAccount, rates])
+
+  // Offline-aware mutation
+  const createMutation = useOfflineCreate(
+    createTransaction,
+    'transaction',
+    [['transactions'], ['analytics']]
+  )
+
+  // Format amount with commas
+  const formattedAmount = amount
+    ? parseInt(amount).toLocaleString()
+    : '0'
+
+  // Handle numpad key press
+  const handleKeyPress = (key: string) => {
+    if (key === 'DEL') {
+      setAmount(prev => prev.slice(0, -1))
+    } else {
+      // Limit to reasonable amount (10 digits)
+      if (amount.length < 10) {
+        setAmount(prev => prev + key)
+      }
+    }
+  }
+
+  // Handle category selection
+  const handleCategorySelect = (catId: string) => {
+    setCategoryId(catId)
+    // If only one account, skip to save
+    if (accounts?.length === 1) {
+      handleSave(catId)
+    } else {
+      setStep('account')
+    }
+  }
+
+  // Handle account selection and save
+  const handleAccountSelect = (accId: number) => {
+    setAccountId(accId)
+    handleSave(categoryId, accId)
+  }
+
+  // Save transaction
+  const handleSave = async (catId?: string, accId?: number) => {
+    const finalCategoryId = catId || categoryId
+    const finalAccountId = accId || accountId
+
+    const selectedCategory = EXPENSE_CATEGORIES.find(c => c.id === finalCategoryId)
+    const account = accounts?.find(a => a.id === finalAccountId)
+
+    if (!amount || !selectedCategory || !account) return
+
+    const currency = account.currency || 'JPY'
+    // Use converted amount if currencies differ, otherwise use input amount
+    // Then convert to storage format (cents for decimal currencies like USD)
+    const rawAmount = convertedAmount?.value ?? parseInt(amount)
+    const finalAmount = toStorageAmount(rawAmount, currency)
+
+    try {
+      await createMutation.mutateAsync({
+        date: new Date().toISOString().split('T')[0],
+        description: voiceDescription || selectedCategory.value, // Use voice description if available
+        amount: -finalAmount, // Negative for expense
+        currency,
+        category: selectedCategory.value,
+        source: account.name,
+        type: 'expense',
+      })
+
+      // Reset and close
+      resetForm()
+    } catch {
+      // Error handled by mutation
+    }
+  }
+
+  // Reset form state
+  const resetForm = () => {
+    setStep('closed')
+    setAmount('')
+    setCategoryId('')
+    setVoiceDescription('')
+    setAccountSearch('')
+    // Reset currency to default (will be set by account effect)
+  }
+
+  // Open quick entry
+  const handleOpen = () => {
+    setStep('amount')
+    setAmount('')
+    setCategoryId('')
+    setAccountSearch('')
+  }
+
+  // Close quick entry
+  const handleClose = () => {
+    resetForm()
+  }
+
+  // Proceed to next step
+  const handleNext = () => {
+    if (step === 'amount' && amount) {
+      setStep('category')
+    }
+  }
+
+  // Go back
+  const handleBack = () => {
+    if (step === 'category') {
+      setStep('amount')
+    } else if (step === 'account') {
+      setStep('category')
+    }
+  }
+
+  // Long press handlers
+  const LONG_PRESS_DURATION = 600
+
+  const startPress = () => {
+    isLongPress.current = false
+    setPressProgress(0)
+    const startTime = Date.now()
+
+    pressTimer.current = setTimeout(() => {
+      isLongPress.current = true
+      setShowMenu(true)
+      setPressProgress(100)
+    }, LONG_PRESS_DURATION)
+
+    // Animate progress
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min((elapsed / LONG_PRESS_DURATION) * 100, 100)
+      setPressProgress(progress)
+      if (progress >= 100) clearInterval(interval)
+    }, 16)
+  }
+
+  const endPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+    setPressProgress(0)
+
+    if (!isLongPress.current) {
+      // Short tap - open quick entry
+      handleOpen()
+    }
+  }
+
+  const cancelPress = () => {
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current)
+      pressTimer.current = null
+    }
+    setPressProgress(0)
+    isLongPress.current = false
+  }
+
+  const handleMenuAction = (action: 'transaction' | 'receipt') => {
+    setShowMenu(false)
+    isLongPress.current = false
+    if (action === 'transaction') {
+      navigate({ to: '/transactions', search: { action: 'add-transaction' } })
+    } else if (action === 'receipt') {
+      navigate({ to: '/transactions', search: { action: 'scan-receipt' } })
+    }
+  }
+
+  // Calculate scale based on press progress
+  const scale = 1 + (pressProgress / 100) * 0.15 // Scale from 1 to 1.15
+
+  // Closed state - show FAB
+  if (step === 'closed') {
+    return createPortal(
+      <>
+        {/* Action Menu Backdrop */}
+        {showMenu && (
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setShowMenu(false)}
+          />
+        )}
+
+        {/* Action Menu */}
+        {showMenu && (
+          <div className="fixed bottom-36 right-4 z-50 flex flex-col-reverse gap-2 animate-in fade-in slide-in-from-bottom-2">
+            <button
+              onClick={() => handleMenuAction('receipt')}
+              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-purple-500 hover:bg-purple-600 text-white shadow-lg"
+            >
+              <Receipt size={20} />
+              <span className="text-sm font-medium">{t('receipt.scanReceipt', 'Scan Receipt')}</span>
+            </button>
+            <button
+              onClick={() => handleMenuAction('transaction')}
+              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg"
+            >
+              <CreditCard size={20} />
+              <span className="text-sm font-medium">{t('transaction.addTransaction', 'Add Transaction')}</span>
+            </button>
+          </div>
+        )}
+
+        {/* FAB Button */}
+        <button
+          onPointerDown={startPress}
+          onPointerUp={endPress}
+          onPointerLeave={cancelPress}
+          onPointerCancel={cancelPress}
+          className={cn(
+            'fixed bottom-28 right-4 sm:bottom-6 sm:right-6 z-50',
+            'w-14 h-14 rounded-full',
+            'bg-gradient-to-r from-blue-500 to-purple-500',
+            'text-white shadow-lg',
+            'flex items-center justify-center',
+            'transition-transform duration-75',
+            showMenu && 'rotate-45' // X icon when menu open
+          )}
+          style={{ transform: `scale(${scale})` }}
+          aria-label={t('quickEntry.add', 'Quick Add')}
+        >
+          <Plus size={28} />
+        </button>
+      </>,
+      document.body
+    )
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 bg-black/50" onClick={handleClose}>
+      <div
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50',
+          'bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl',
+          'transform transition-transform duration-300',
+          'max-h-[85vh] overflow-hidden'
+        )}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+          <button
+            onClick={step === 'amount' ? handleClose : handleBack}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+          >
+            <X size={20} className="text-gray-500" />
+          </button>
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+            {step === 'amount' && t('quickEntry.enterAmount', 'Enter Amount')}
+            {step === 'category' && t('quickEntry.selectCategory', 'Select Category')}
+            {step === 'account' && t('quickEntry.selectAccount', 'Select Account')}
+          </h3>
+          <div className="w-9" /> {/* Spacer */}
+        </div>
+
+        {/* Amount Entry */}
+        {step === 'amount' && (
+          <div className="p-4">
+            {/* Currency Selector Pills */}
+            <div className="flex justify-center gap-2 mb-4">
+              {SUPPORTED_CURRENCIES.map((currency) => (
+                <button
+                  key={currency}
+                  onClick={() => setInputCurrency(currency)}
+                  className={cn(
+                    'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                    inputCurrency === currency
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  {CURRENCY_SYMBOLS[currency]} {currency}
+                </button>
+              ))}
+            </div>
+
+            {/* Amount Display */}
+            <div className="text-center py-4">
+              <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
+                {currencySymbol}{formattedAmount}
+              </div>
+              {/* Conversion Preview */}
+              {convertedAmount && (
+                <div className="text-lg text-blue-500 dark:text-blue-400 mt-2 font-numbers">
+                  ≈ {convertedAmount.symbol}{convertedAmount.formatted}
+                </div>
+              )}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                {t('quickEntry.expense', 'Expense')}
+              </p>
+            </div>
+
+            {/* Numpad */}
+            <div className="grid grid-cols-3 gap-2 max-w-xs mx-auto">
+              {NUMPAD_KEYS.map((key) => (
+                <button
+                  key={key}
+                  onClick={() => handleKeyPress(key)}
+                  className={cn(
+                    'h-14 rounded-xl text-xl font-medium transition-colors',
+                    key === 'DEL'
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                >
+                  {key === 'DEL' ? <Delete size={20} className="mx-auto" /> : key}
+                </button>
+              ))}
+            </div>
+
+            {/* Next Button with Voice Input */}
+            <div className="flex gap-3 mt-4">
+              {/* Voice Input Button - Press and Hold to Talk */}
+              {voiceSupported && (
+                <button
+                  onMouseDown={startListening}
+                  onMouseUp={stopListening}
+                  onMouseLeave={voiceStatus === 'listening' ? stopListening : undefined}
+                  onTouchStart={startListening}
+                  onTouchEnd={stopListening}
+                  onTouchCancel={stopListening}
+                  className={cn(
+                    'h-14 w-14 rounded-xl flex items-center justify-center transition-all select-none touch-none',
+                    voiceStatus === 'listening'
+                      ? 'bg-red-500 text-white animate-pulse scale-110'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  )}
+                  title={t('voiceInput.holdToTalk', 'Hold to talk')}
+                >
+                  <Mic size={24} />
+                </button>
+              )}
+
+              {/* Next Button */}
+              <button
+                onClick={handleNext}
+                disabled={!amount}
+                className={cn(
+                  'flex-1 h-14 rounded-xl font-medium text-white transition-all',
+                  amount
+                    ? 'bg-blue-500 hover:bg-blue-600'
+                    : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                )}
+              >
+                {t('next', 'Next')}
+              </button>
+            </div>
+
+            {/* Voice Transcript Preview */}
+            {voiceStatus === 'listening' && (
+              <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border-2 border-red-300 dark:border-red-700">
+                <p className="text-sm text-red-600 dark:text-red-400 text-center font-medium">
+                  {transcript || t('voiceInput.listening', 'Listening...')}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Category Selection */}
+        {step === 'category' && (
+          <div className="p-4">
+            {/* Amount reminder with conversion */}
+            <div className="text-center py-2 mb-4">
+              <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
+                {currencySymbol}{formattedAmount}
+              </span>
+              {convertedAmount && (
+                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                  → {convertedAmount.symbol}{convertedAmount.formatted}
+                </span>
+              )}
+            </div>
+
+            {/* Category Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              {EXPENSE_CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => handleCategorySelect(category.id)}
+                  className={cn(
+                    'flex flex-col items-center p-4 rounded-xl transition-all',
+                    'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600',
+                    'active:scale-95'
+                  )}
+                >
+                  <span className="text-2xl mb-1">{category.icon}</span>
+                  <span className="text-xs text-gray-700 dark:text-gray-300 text-center">
+                    {t(category.labelKey, category.value)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Account Selection */}
+        {step === 'account' && (
+          <div className="p-4 overflow-x-hidden">
+            {/* Amount + Category reminder with conversion */}
+            <div className="text-center py-2 mb-4">
+              <span className="text-2xl font-bold text-gray-900 dark:text-gray-100 font-numbers">
+                {currencySymbol}{formattedAmount}
+              </span>
+              {convertedAmount && (
+                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                  → {convertedAmount.symbol}{convertedAmount.formatted}
+                </span>
+              )}
+              <span className="ml-2 text-gray-500">
+                {EXPENSE_CATEGORIES.find(c => c.id === categoryId)?.icon}
+              </span>
+            </div>
+
+            {/* Account Search */}
+            <div className="relative mb-3">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={accountSearch}
+                onChange={(e) => setAccountSearch(e.target.value)}
+                placeholder={t('account.searchPlaceholder', 'Search accounts...')}
+                className={cn(
+                  'w-full h-10 pl-9 pr-4 rounded-lg text-sm',
+                  'bg-gray-100 dark:bg-gray-700 border-0',
+                  'text-gray-900 dark:text-gray-100',
+                  'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+                  'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                )}
+                autoFocus
+              />
+            </div>
+
+            {/* Account List */}
+            <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden">
+              {filteredAccounts.map((account) => (
+                <button
+                  key={account.id}
+                  onClick={() => handleAccountSelect(account.id)}
+                  className={cn(
+                    'w-full flex items-center justify-between p-4 rounded-xl transition-all',
+                    'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600',
+                    'active:scale-[0.98]'
+                  )}
+                >
+                  <span className="font-medium text-gray-900 dark:text-gray-100">
+                    {account.name}
+                  </span>
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {CURRENCY_SYMBOLS[account.currency] || account.currency}
+                  </span>
+                </button>
+              ))}
+              {filteredAccounts.length === 0 && (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+                  {t('account.noResults', 'No accounts found')}
+                </p>
+              )}
+            </div>
+
+            {/* Saving indicator */}
+            {createMutation.isPending && (
+              <div className="flex items-center justify-center gap-2 mt-4 text-gray-500">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />
+                <span>{t('saving', 'Saving...')}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>,
+      document.body
+    )
+}

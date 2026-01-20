@@ -42,15 +42,15 @@ export function LanguageSwitcher() {
       {/* Dropdown trigger */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-ring"
+        className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-ring"
         aria-label={t('language.selectLanguage')}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <span className="text-xl" aria-hidden="true">{currentLang.flag}</span>
+        <span className="text-lg sm:text-xl" aria-hidden="true">{currentLang.flag}</span>
         <span className="text-sm font-medium hidden sm:inline text-gray-700 dark:text-gray-200">{currentLang.name}</span>
         <svg
-          className={cn('w-4 h-4 transition-transform', isOpen && 'rotate-180')}
+          className={cn('w-4 h-4 transition-transform hidden sm:block', isOpen && 'rotate-180')}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

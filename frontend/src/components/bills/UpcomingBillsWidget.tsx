@@ -1,16 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
 import { useUpcomingBills } from '@/hooks/useBills'
 import { cn } from '@/utils/cn'
-import type { Bill } from '@/types'
-import { format, differenceInDays, isToday } from 'date-fns'
+import type { UpcomingBill } from '@/types'
+import { differenceInDays, isToday } from 'date-fns'
 
 interface UpcomingBillsWidgetProps {
   limit?: number
   onViewAll?: () => void
-  onBillClick?: (bill: Bill) => void
+  onBillClick?: (bill: UpcomingBill) => void
   className?: string
 }
 
@@ -23,9 +22,9 @@ export function UpcomingBillsWidget({
   const { t } = useTranslation('common')
   const { data: upcomingBills, isLoading } = useUpcomingBills(limit + 2)
 
-  const sortedBills = (upcomingBills?.bills || []).slice(0, limit)
+  const sortedBills = (upcomingBills?.upcoming_bills || []).slice(0, limit)
 
-  const getUrgencyColor = (bill: Bill) => {
+  const getUrgencyColor = (bill: UpcomingBill) => {
     const dueDate = new Date(bill.due_date)
     if (bill.is_paid) return 'bg-green-500'
     if (isToday(dueDate)) return 'bg-orange-500'
@@ -35,7 +34,7 @@ export function UpcomingBillsWidget({
     return 'bg-blue-500'
   }
 
-  const totalDue = sortedBills.reduce((sum, bill) => {
+  const totalDue = sortedBills.reduce((sum: number, bill: UpcomingBill) => {
     if (!bill.is_paid) return sum + Number(bill.amount)
     return sum
   }, 0)
@@ -92,7 +91,7 @@ export function UpcomingBillsWidget({
       ) : (
         <>
           <div className="space-y-3">
-            {sortedBills.map(bill => {
+            {sortedBills.map((bill: UpcomingBill) => {
               const dueDate = new Date(bill.due_date)
               const daysUntil = differenceInDays(dueDate, new Date())
               const isDueToday = isToday(dueDate)

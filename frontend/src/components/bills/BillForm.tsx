@@ -4,7 +4,7 @@ import { ResponsiveModal } from '@/components/ui/ResponsiveModal'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
-import type { Bill, BillCreate } from '@/types'
+import type { Bill, BillCreate, BillUpdate } from '@/types'
 import { billService } from '@/services/bill-service'
 
 interface BillFormProps {
@@ -21,10 +21,10 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
   const [formData, setFormData] = useState<Partial<BillCreate>>({
     name: '',
     amount: 0,
-    due_date: new Date().toISOString().split('T')[0],
+    next_due_date: new Date().toISOString().split('T')[0],
     is_paid: false,
     recurrence_type: 'none',
-    recurrence_day: null,
+    due_day: 1,
     reminder_days_before: 1,
     category: '',
     notes: '',
@@ -39,10 +39,10 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
       setFormData({
         name: bill.name,
         amount: Number(bill.amount),
-        due_date: bill.due_date.split('T')[0],
+        next_due_date: bill.next_due_date.split('T')[0],
         is_paid: bill.is_paid,
         recurrence_type: bill.recurrence_type || 'none',
-        recurrence_day: bill.recurrence_day || null,
+        due_day: bill.due_day,
         reminder_days_before: bill.reminder_days_before || 1,
         category: bill.category || '',
         notes: bill.notes || '',
@@ -52,10 +52,10 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
       setFormData({
         name: '',
         amount: 0,
-        due_date: new Date().toISOString().split('T')[0],
+        next_due_date: new Date().toISOString().split('T')[0],
         is_paid: false,
         recurrence_type: 'none',
-        recurrence_day: null,
+        due_day: 1,
         reminder_days_before: 1,
         category: '',
         notes: '',
@@ -75,11 +75,11 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
   ]
 
   const reminderOptions = [
-    { value: 0, label: t('bills.reminder.no_reminder') },
-    { value: 1, label: t('bills.reminder.one_day') },
-    { value: 3, label: t('bills.reminder.three_days') },
-    { value: 5, label: t('bills.reminder.five_days') },
-    { value: 7, label: t('bills.reminder.one_week') }
+    { value: '0', label: t('bills.reminder.no_reminder') },
+    { value: '1', label: t('bills.reminder.one_day') },
+    { value: '3', label: t('bills.reminder.three_days') },
+    { value: '5', label: t('bills.reminder.five_days') },
+    { value: '7', label: t('bills.reminder.one_week') }
   ]
 
   const categoryOptions = [
@@ -105,8 +105,8 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
       newErrors.amount = t('bills.validation.amount_required')
     }
 
-    if (!formData.due_date) {
-      newErrors.due_date = t('bills.validation.due_date_required')
+    if (!formData.next_due_date) {
+      newErrors.next_due_date = t('bills.validation.due_date_required')
     }
 
     setErrors(newErrors)
@@ -122,7 +122,11 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
     try {
       let savedBill: Bill
       if (isEditing && bill) {
-        savedBill = await billService.updateBill(bill.id, formData as BillCreate)
+        const updateData = { ...formData } as Partial<BillCreate>
+        if (updateData.recurrence_type === 'none') {
+          delete (updateData as Record<string, unknown>)['recurrence_type']
+        }
+        savedBill = await billService.updateBill(bill.id, updateData as unknown as BillUpdate)
       } else {
         savedBill = await billService.createBill(formData as BillCreate)
       }
@@ -174,15 +178,15 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
           </div>
 
           <div>
-            <label htmlFor="due_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label htmlFor="next_due_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               {t('bills.field.due_date')}
             </label>
             <Input
-              id="due_date"
+              id="next_due_date"
               type="date"
-              value={formData.due_date}
-              onChange={(e) => setFormData(prev => ({ ...prev, due_date: e.target.value }))}
-              error={errors.due_date}
+              value={formData.next_due_date}
+              onChange={(e) => setFormData(prev => ({ ...prev, next_due_date: e.target.value }))}
+              error={errors.next_due_date}
             />
           </div>
 
@@ -205,8 +209,8 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
             <Select
               id="reminder_days_before"
               options={reminderOptions}
-              value={formData.reminder_days_before}
-              onChange={(e) => setFormData(prev => ({ ...prev, reminder_days_before: parseInt(e.target.value) }))}
+              value={String(formData.reminder_days_before ?? 0)}
+              onChange={(e) => setFormData(prev => ({ ...prev, reminder_days_before: parseInt(e.target.value) || 0 }))}
             />
           </div>
 
@@ -279,7 +283,7 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
           <Button type="button" variant="secondary" onClick={onClose}>
             {t('common.cancel')}
           </Button>
-          <Button type="submit" isLoading={isSubmitting}>
+          <Button type="submit" loading={isSubmitting}>
             {isEditing ? t('common.save') : t('common.create')}
           </Button>
         </div>
