@@ -25,8 +25,7 @@ export default function Bills() {
   const [selectedBill, setSelectedBill] = useState<Bill | null>(null)
   const [detailBill, setDetailBill] = useState<Bill | null>(null)
 
-  const { data: billsResponse, isLoading } = useBills()
-  const bills = billsResponse?.bills || []
+  const { bills, isLoading } = useBills()
 
   const handleBillClick = (bill: Bill) => {
     setDetailBill(bill)
@@ -128,7 +127,6 @@ export default function Bills() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <BillCalendar
-              onBillClick={handleBillClick}
               className="h-full"
             />
           </div>
@@ -151,7 +149,7 @@ export default function Bills() {
                     {t('bills.paid')}
                   </span>
                   <span className="font-semibold text-green-600 dark:text-green-400">
-                    {bills.filter(b => b.is_paid).length}
+                    {bills.filter((b: Bill) => b.is_paid).length}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -159,7 +157,7 @@ export default function Bills() {
                     {t('bills.unpaid')}
                   </span>
                   <span className="font-semibold text-red-600 dark:text-red-400">
-                    {bills.filter(b => !b.is_paid).length}
+                    {bills.filter((b: Bill) => !b.is_paid).length}
                   </span>
                 </div>
               </div>

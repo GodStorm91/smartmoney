@@ -1,6 +1,5 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { alertService } from '@/services/alert-service'
-import type { BudgetAlert } from '@/types'
 
 export function useBudgetAlerts(options?: { unreadOnly?: boolean; limit?: number }) {
   const { data, isLoading, error, refetch } = useQuery({

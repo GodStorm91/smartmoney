@@ -1,21 +1,19 @@
 import { HeroSection } from '@/components/landing/HeroSection'
-import { HowItWorksSection } from '@/components/landing/HowItWorksSection'
 import { FeatureShowcaseSection } from '@/components/landing/FeatureShowcaseSection'
-import { AIBudgetSection } from '@/components/landing/AIBudgetSection'
-import { PricingSection } from '@/components/landing/PricingSection'
-import { FAQSection } from '@/components/landing/FAQSection'
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection'
 import { FinalCTASection } from '@/components/landing/FinalCTASection'
+import { LandingHeader } from '@/components/landing/LandingHeader'
+import { LandingFooter } from '@/components/landing/LandingFooter'
 
 export function Landing() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white">
+      <LandingHeader />
       <HeroSection />
-      <HowItWorksSection />
       <FeatureShowcaseSection />
-      <AIBudgetSection />
-      <PricingSection />
-      <FAQSection />
+      <HowItWorksSection />
       <FinalCTASection />
+      <LandingFooter />
     </div>
   )
 }

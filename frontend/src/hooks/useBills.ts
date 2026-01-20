@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { billService } from '@/services/bill-service'
-import type { Bill, BillCreate, BillUpdate, BillCalendarResponse, UpcomingBillsResponse, MarkBillPaidRequest } from '@/types'
+import type { BillCreate, BillUpdate, MarkBillPaidRequest } from '@/types'
 
 export function useBills(options?: { category?: string; recurringOnly?: boolean }) {
   const { data, isLoading, error, refetch } = useQuery({

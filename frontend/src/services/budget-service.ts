@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest, BudgetTracking } from '@/types'
+import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest, BudgetTracking, BudgetSuggestions } from '@/types'
 
 /**
  * Generate new budget using AI
@@ -51,5 +51,41 @@ export async function getBudgetByMonth(month: string): Promise<Budget> {
  */
 export async function getBudgetTracking(): Promise<BudgetTracking> {
   const response = await apiClient.get<BudgetTracking>('/api/budgets/tracking/current')
+  return response.data
+}
+
+/**
+ * Get budget suggestions based on previous month
+ */
+export async function getBudgetSuggestions(): Promise<BudgetSuggestions> {
+  const response = await apiClient.get<BudgetSuggestions>('/api/budgets/suggestions')
+  return response.data
+}
+
+/**
+ * Update a single allocation amount
+ */
+export async function updateAllocation(
+  budgetId: number,
+  category: string,
+  amount: number
+): Promise<Budget> {
+  const response = await apiClient.patch<Budget>(
+    `/api/budgets/${budgetId}/allocations/${encodeURIComponent(category)}`,
+    { amount }
+  )
+  return response.data
+}
+
+/**
+ * Delete a single allocation
+ */
+export async function deleteAllocation(
+  budgetId: number,
+  category: string
+): Promise<Budget> {
+  const response = await apiClient.delete<Budget>(
+    `/api/budgets/${budgetId}/allocations/${encodeURIComponent(category)}`
+  )
   return response.data
 }
