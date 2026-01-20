@@ -2,7 +2,7 @@
 export interface MonthlyData {
   month: string
   income: number
-  expense: number
+  expenses: number  // Note: backend returns 'expenses' (plural)
   net: number
 }
 
@@ -11,6 +11,20 @@ export interface CategoryBreakdown {
   amount: number
   percentage: number
   emoji?: string
+  previous_amount?: number | null  // Amount in previous period
+  change_percent?: number | null   // Percentage change vs previous
+}
+
+export interface ComparisonData {
+  income_change: number | null
+  expense_change: number | null
+  net_change: number | null
+}
+
+export interface TopCategory {
+  name: string
+  amount: number
+  percentage: number
 }
 
 export interface Analytics {
@@ -19,6 +33,8 @@ export interface Analytics {
   total_income: number
   total_expense: number
   net_cashflow: number
+  comparison: ComparisonData | null
+  top_category: TopCategory | null
 }
 
 export interface SpendingInsight {
@@ -34,4 +50,31 @@ export interface SpendingInsight {
 export interface SpendingInsightsResponse {
   insights: SpendingInsight[]
   generated_at: string
+}
+
+// Forecast types
+export interface ForecastMonth {
+  month: string
+  income: number
+  expense: number
+  net: number
+  balance: number
+  is_actual: boolean
+  recurring_income?: number
+  recurring_expense?: number
+  variable_expense?: number
+}
+
+export interface ForecastSummary {
+  avg_monthly_net: number
+  end_balance: number
+  months_until_negative: number | null
+  total_projected_income: number
+  total_projected_expense: number
+}
+
+export interface ForecastResponse {
+  current_balance: number
+  months: ForecastMonth[]
+  summary: ForecastSummary
 }
