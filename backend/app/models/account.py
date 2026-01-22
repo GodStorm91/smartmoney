@@ -1,11 +1,28 @@
 """Account database model."""
-from datetime import date, datetime
 
-from sqlalchemy import BigInteger, Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, String
+from datetime import date, datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from .transaction import Base
+
+if TYPE_CHECKING:
+    from .transaction import Transaction
+    from .crypto_wallet import CryptoWallet
+    from .recurring_transaction import RecurringTransaction
 
 
 class Account(Base):
@@ -20,12 +37,16 @@ class Account(Base):
         nullable=False,
         index=True,
     )
-    initial_balance: Mapped[int] = mapped_column(BigInteger, nullable=False, default=0)  # in cents/smallest unit
+    initial_balance: Mapped[int] = mapped_column(
+        BigInteger, nullable=False, default=0
+    )  # in cents/smallest unit
     initial_balance_date: Mapped[date] = mapped_column(Date, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, index=True)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")
     notes: Mapped[str | None] = mapped_column(String(1000), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now(), nullable=False
+    )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now(), nullable=False
     )
@@ -38,6 +59,12 @@ class Account(Base):
     # Relationships
     transactions: Mapped[list["Transaction"]] = relationship(
         "Transaction", back_populates="account", lazy="select"
+    )
+    crypto_wallet: Mapped["CryptoWallet | None"] = relationship(
+        "CryptoWallet", back_populates="accounts", lazy="select"
+    )
+    recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
+        "RecurringTransaction", back_populates="account", lazy="select"
     )
 
     __table_args__ = (

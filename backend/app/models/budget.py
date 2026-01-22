@@ -1,13 +1,20 @@
 """Budget database models."""
+
 from datetime import datetime
+from typing import TYPE_CHECKING
+
 from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from .transaction import Base
 
+if TYPE_CHECKING:
+    from .budget_alert import BudgetAlert
+
 
 class Budget(Base):
     """Monthly budget for a user."""
+
     __tablename__ = "budgets"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -29,14 +36,16 @@ class Budget(Base):
     feedback_history: Mapped[list["BudgetFeedback"]] = relationship(
         back_populates="budget", cascade="all, delete-orphan"
     )
-
-    __table_args__ = (
-        Index("ix_budget_user_month_unique", "user_id", "month", unique=True),
+    alerts: Mapped[list["BudgetAlert"]] = relationship(
+        "BudgetAlert", back_populates="budget", cascade="all, delete-orphan"
     )
+
+    __table_args__ = (Index("ix_budget_user_month_unique", "user_id", "month", unique=True),)
 
 
 class BudgetAllocation(Base):
     """Budget allocation per category."""
+
     __tablename__ = "budget_allocations"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -53,6 +62,7 @@ class BudgetAllocation(Base):
 
 class BudgetFeedback(Base):
     """User feedback for budget regeneration."""
+
     __tablename__ = "budget_feedback"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
