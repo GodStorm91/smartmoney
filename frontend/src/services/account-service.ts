@@ -12,7 +12,8 @@ export async function fetchAccounts(params?: {
     queryParams.append('include_inactive', 'true')
   }
 
-  const url = `/api/accounts/${queryParams.toString() ? `?${queryParams.toString()}` : '/'}`
+  const queryString = queryParams.toString() ? `?${queryParams.toString()}` : ''
+  const url = `/api/accounts/${queryString}`
   const response = await apiClient.get<AccountWithBalance[]>(url)
   return response.data
 }
