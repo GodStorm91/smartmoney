@@ -120,6 +120,29 @@ frontend/src/
 - Imports: sorted, grouped (stdlib, third-party, local)
 - Docstrings: Google style
 
+### Import Style
+
+**Always use relative imports** (not absolute `from app.xxx` imports):
+
+```python
+# Good - relative imports
+from ..database import get_db
+from ..models.user import User
+from ..services.transaction_service import TransactionService
+from ..auth.dependencies import get_current_user
+
+# Bad - absolute imports (will fail in production)
+from app.database import get_db
+from app.models.user import User
+```
+
+**Why:** Absolute imports like `from app.database` fail when the app is imported as a module in Docker containers or when running tests. Relative imports work in all contexts.
+
+**Import order (within each group):**
+1. Standard library
+2. Third-party packages  
+3. Relative imports (using `..` prefix)
+
 ### Type Hints
 **Required for:**
 - All function parameters

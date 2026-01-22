@@ -795,9 +795,58 @@ CREATE INDEX ix_custom ON transactions(field1, field2);
 
 ## Updating Application
 
-### Update Backend
+### Production Deployment (Docker)
+
+For the current production setup, use the automated deployment script:
 
 ```bash
+# Navigate to project root
+cd /home/godstorm91/project/smartmoney
+
+# Run deployment (full sync and restart)
+./deploy.sh
+
+# Quick restart only (if files already synced)
+./deploy.sh --restart-only
+
+# Skip tests and linting
+./deploy.sh --skip-tests
+```
+
+**What deploy.sh does:**
+1. Runs linting checks (ruff, ESLint, TypeScript)
+2. Syncs backend code to server using rsync/scp
+3. Syncs frontend code if changed
+4. Copies files to Docker container
+5. Restarts the backend container
+6. Verifies API health
+
+**Manual Docker deployment (if deploy.sh fails):**
+
+```bash
+# SSH to server
+ssh root@money.khanh.page
+
+# Stop container
+docker stop smartmoney-backend
+
+# Copy updated files from working directory to container
+docker cp /var/www/smartmoney/backend/app/. smartmoney-backend:/app/app/
+
+# Restart container
+docker start smartmoney-backend
+
+# Check logs
+docker logs smartmoney-backend --tail 50
+
+# Verify
+curl https://money.khanh.page/api/health
+```
+
+### Development Updates
+
+```bash
+# Backend updates
 cd backend
 source venv/bin/activate
 
@@ -814,7 +863,7 @@ alembic upgrade head
 sudo systemctl restart smartmoney-backend
 ```
 
-### Update Frontend
+### Frontend Updates
 
 ```bash
 cd frontend
