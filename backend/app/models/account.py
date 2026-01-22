@@ -60,9 +60,6 @@ class Account(Base):
     transactions: Mapped[list["Transaction"]] = relationship(
         "Transaction", back_populates="account", lazy="select"
     )
-    crypto_wallet: Mapped["CryptoWallet | None"] = relationship(
-        "CryptoWallet", back_populates="accounts", lazy="select"
-    )
     recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
         "RecurringTransaction", back_populates="account", lazy="select"
     )
