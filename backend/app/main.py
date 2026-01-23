@@ -10,44 +10,45 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
+from fastapi.exceptions import RequestValidationError
+import logging
+from fastapi.exceptions import RequestValidationError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
-from .routes import (
-    accounts,
-    ai_categorization,
-    analytics,
-    anomalies,
-    auth,
-    budgets,
-    budget_alerts,
-    bills,
-    categories,
-    category_rules,
-    challenges,
-    chat,
-    credits,
-    crypto,
-    dashboard,
-    gamification,
-    goals,
-    insights,
-    notifications,
-    proxy,
-    receipts,
-    recurring,
-    reports,
-    savings,
-    settings,
-    social_learning,
-    rewards,
-    tags,
-    transactions,
-    transfers,
-    upload,
-    exchange_rates,
-    user_categories,
-)
+from .routes.accounts import router as accounts_router
+from .routes.ai_categorization import router as ai_categorization_router
+from .routes.analytics import router as analytics_router
+from .routes.anomalies import router as anomalies_router
+from .routes.auth import router as auth_router
+from .routes.budgets import router as budgets_router
+from .routes.budget_alerts import router as budget_alerts_router
+from .routes.bills import router as bills_router
+from .routes.categories import router as categories_router
+from .routes.category_rules import router as category_rules_router
+from .routes.challenges import router as challenges_router
+from .routes.chat import router as chat_router
+from .routes.credits import router as credits_router
+from .routes.crypto import router as crypto_router
+from .routes.dashboard import router as dashboard_router
+from .routes.gamification import router as gamification_router
+from .routes.goals import router as goals_router
+from .routes.insights import router as insights_router
+from .routes.notifications import router as notifications_router
+from .routes.proxy import router as proxy_router
+from .routes.receipts import router as receipts_router
+from .routes.recurring import router as recurring_router
+from .routes.reports import router as reports_router
+from .routes.savings import router as savings_router
+from .routes.settings import router as settings_router
+from .routes.social_learning import router as social_learning_router
+from .routes.rewards import router as rewards_router
+from .routes.tags import router as tags_router
+from .routes.transactions import router as transactions_router
+from .routes.transfers import router as transfers_router
+from .routes.upload import router as upload_router
+from .routes.exchange_rates import router as exchange_rates_router
+from .routes.user_categories import router as user_categories_router
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
 from .services.defi_snapshot_service import DefiSnapshotService
@@ -102,9 +103,20 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     )
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """Handle validation errors with detailed output."""
+    logger.error(f"[Validation Error] Path: {request.url.path}, Errors: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": "Validation error", "errors": exc.errors()},
+    )
+
+
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions."""
+    logger.error(f"[General Error] Path: {request.url.path}, Error: {str(exc)}")
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error", "error": str(exc)},
@@ -361,39 +373,39 @@ async def shutdown_event():
 
 
 # Include routers
-app.include_router(auth.router)
-app.include_router(accounts.router)
-app.include_router(anomalies.router)
-app.include_router(tags.router)
-app.include_router(transactions.router)
-app.include_router(analytics.router)
-app.include_router(dashboard.router)
-app.include_router(goals.router)
-app.include_router(settings.router)
-app.include_router(upload.router)
-app.include_router(exchange_rates.router)
-app.include_router(budgets.router)
-app.include_router(budget_alerts.router)
-app.include_router(bills.router)
-app.include_router(credits.router)
-app.include_router(receipts.router)
-app.include_router(recurring.router)
-app.include_router(category_rules.router)
-app.include_router(challenges.router)
-app.include_router(user_categories.router)
-app.include_router(categories.router)
-app.include_router(ai_categorization.router)
-app.include_router(chat.router)
-app.include_router(transfers.router)
-app.include_router(crypto.router)
-app.include_router(proxy.router)
-app.include_router(reports.router)
-app.include_router(gamification.router)
-app.include_router(social_learning.router)
-app.include_router(rewards.router)
-app.include_router(insights.router)
-app.include_router(savings.router)
-app.include_router(notifications.router)
+app.include_router(auth_router)
+app.include_router(accounts_router)
+app.include_router(anomalies_router)
+app.include_router(tags_router)
+app.include_router(transactions_router)
+app.include_router(analytics_router)
+app.include_router(dashboard_router)
+app.include_router(goals_router)
+app.include_router(settings_router)
+app.include_router(upload_router)
+app.include_router(exchange_rates_router)
+app.include_router(budgets_router)
+app.include_router(budget_alerts_router)
+app.include_router(bills_router)
+app.include_router(credits_router)
+app.include_router(receipts_router)
+app.include_router(recurring_router)
+app.include_router(category_rules_router)
+app.include_router(challenges_router)
+app.include_router(user_categories_router)
+app.include_router(categories_router)
+app.include_router(ai_categorization_router)
+app.include_router(chat_router)
+app.include_router(transfers_router)
+app.include_router(crypto_router)
+app.include_router(proxy_router)
+app.include_router(reports_router)
+app.include_router(gamification_router)
+app.include_router(social_learning_router)
+app.include_router(rewards_router)
+app.include_router(insights_router)
+app.include_router(savings_router)
+app.include_router(notifications_router)
 
 
 # Root endpoints

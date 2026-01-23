@@ -1,4 +1,5 @@
 """Application configuration."""
+
 from pydantic_settings import BaseSettings
 
 
@@ -36,6 +37,10 @@ class Settings(BaseSettings):
     sepay_api_key: str = ""
     sepay_secret_key: str = ""
     sepay_base_url: str = "https://api.sepay.vn"
+
+    # DeFi API Keys
+    zerion_api_key: str = ""
+    polygonscan_api_key: str = ""
 
     class Config:
         env_file = ".env"

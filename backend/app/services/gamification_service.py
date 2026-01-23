@@ -7,8 +7,8 @@ from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from app.models.gamification import UserGamification, Achievement, UserAchievement, XPEvent
-from app.models.user import User
+from ..models.gamification import UserGamification, Achievement, UserAchievement, XPEvent
+from ..models.user import User
 
 
 class GamificationService:

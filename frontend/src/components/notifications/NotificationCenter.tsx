@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Bell, Check, Settings, X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -20,19 +20,26 @@ export function NotificationCenter({ onClose, onViewAll }: NotificationCenterPro
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all')
 
-  // Fetch notifications
+  // Fetch notifications with infinite query
   const {
     data: notificationsData,
     isLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useQuery({
+  } = useInfiniteQuery({
     queryKey: ['notifications', activeTab],
-    queryFn: () => notificationService.getNotifications({
+    queryFn: ({ pageParam = 1 }) => notificationService.getNotifications({
+      page: pageParam,
       unreadOnly: activeTab === 'unread',
       limit: 20,
     }),
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length === 20) {
+        return (lastPage[lastPage.length - 1]?.id ?? 0) - 1
+      }
+      return undefined
+    },
   })
 
   // Fetch unread count for badge

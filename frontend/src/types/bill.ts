@@ -71,6 +71,7 @@ export interface BillUpdate {
   next_due_date?: string;
   last_paid_date?: string;
   reminder_days_before?: number;
+  reminder_time?: string;
   reminder_enabled?: boolean;
   sync_with_recurring?: boolean;
 }

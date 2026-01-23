@@ -244,3 +244,28 @@ export function toStorageAmount(amount: number, currency: string): number {
   const decimals = CURRENCY_DECIMALS[currency] ?? 0
   return Math.round(amount * Math.pow(10, decimals))
 }
+
+/**
+ * Format currency with both native and JPY equivalent
+ * @param amount - Amount to format
+ * @param currency - Native currency code
+ * @param rates - Exchange rates
+ * @param isNativeCurrency - Whether amount is already in native currency
+ * @param isPrivacyMode - Whether to mask the value
+ * @returns Formatted string with native currency and JPY equivalent
+ */
+export function formatCurrencyWithJPY(
+  amount: number,
+  currency: string,
+  rates: Record<string, number> = DEFAULT_RATES,
+  isNativeCurrency: boolean = false,
+  isPrivacyMode: boolean = false
+): string {
+  const nativeFormatted = formatCurrencyPrivacy(amount, currency, rates, isNativeCurrency, isPrivacyMode)
+  
+  // Calculate JPY equivalent for display
+  const jpyAmount = isNativeCurrency ? convertCurrency(amount, currency, rates) : amount
+  const jpyFormatted = formatCurrencyPrivacy(jpyAmount, 'JPY', rates, true, isPrivacyMode)
+  
+  return `${nativeFormatted} (~${jpyFormatted})`
+}

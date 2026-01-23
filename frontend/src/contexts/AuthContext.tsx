@@ -75,6 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const token = localStorage.getItem(TOKEN_KEY)
         if (token) {
           config.headers.Authorization = `Bearer ${token}`
+          console.log('[AuthInterceptor] Added auth header to request:', config.url);
+        } else {
+          console.log('[AuthInterceptor] No token found for:', config.url);
         }
         return config
       },

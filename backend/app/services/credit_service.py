@@ -1,16 +1,18 @@
 """Credit service for managing user credits with atomic transactions."""
+
 from decimal import Decimal
 from datetime import datetime
 from typing import Optional, Dict, Any
 
 from sqlalchemy.orm import Session
 
-from app.models.user_credit import UserCredit
-from app.models.credit_transaction import CreditTransaction
+from ..models.user_credit import UserCredit
+from ..models.credit_transaction import CreditTransaction
 
 
 class InsufficientCreditsError(Exception):
     """Raised when user doesn't have enough credits for an operation."""
+
     pass
 
 
@@ -31,9 +33,12 @@ class CreditService:
         Returns:
             The current credit balance
         """
-        account = self.db.query(UserCredit).filter(
-            UserCredit.user_id == user_id
-        ).with_for_update().first()
+        account = (
+            self.db.query(UserCredit)
+            .filter(UserCredit.user_id == user_id)
+            .with_for_update()
+            .first()
+        )
 
         if not account:
             account = UserCredit(user_id=user_id, balance=Decimal("0.0000"))
@@ -53,9 +58,7 @@ class CreditService:
         Returns:
             The UserCredit account object
         """
-        account = self.db.query(UserCredit).filter(
-            UserCredit.user_id == user_id
-        ).first()
+        account = self.db.query(UserCredit).filter(UserCredit.user_id == user_id).first()
 
         if not account:
             account = UserCredit(user_id=user_id, balance=Decimal("0.0000"))
@@ -71,7 +74,7 @@ class CreditService:
         transaction_type: str,
         reference_id: Optional[str] = None,
         description: str = "",
-        extra_data: Optional[Dict[str, Any]] = None
+        extra_data: Optional[Dict[str, Any]] = None,
     ) -> CreditTransaction:
         """
         Add credits to user account (purchase, refund, adjustment).
@@ -95,9 +98,12 @@ class CreditService:
             raise ValueError(f"Amount must be positive, got {amount}")
 
         # Lock user credit row for update
-        account = self.db.query(UserCredit).filter(
-            UserCredit.user_id == user_id
-        ).with_for_update().first()
+        account = (
+            self.db.query(UserCredit)
+            .filter(UserCredit.user_id == user_id)
+            .with_for_update()
+            .first()
+        )
 
         if not account:
             account = UserCredit(user_id=user_id)
@@ -122,7 +128,7 @@ class CreditService:
             balance_after=account.balance,
             description=description or f"Added {amount} credits",
             reference_id=reference_id,
-            extra_data=extra_data
+            extra_data=extra_data,
         )
         transaction.id = transaction.generate_id()
 
@@ -138,7 +144,7 @@ class CreditService:
         transaction_type: str,
         reference_id: Optional[str] = None,
         description: str = "",
-        extra_data: Optional[Dict[str, Any]] = None
+        extra_data: Optional[Dict[str, Any]] = None,
     ) -> CreditTransaction:
         """
         Deduct credits from user account (usage).
@@ -164,14 +170,15 @@ class CreditService:
             raise ValueError(f"Amount must be positive, got {amount}")
 
         # Lock user credit row for update
-        account = self.db.query(UserCredit).filter(
-            UserCredit.user_id == user_id
-        ).with_for_update().first()
+        account = (
+            self.db.query(UserCredit)
+            .filter(UserCredit.user_id == user_id)
+            .with_for_update()
+            .first()
+        )
 
         if not account:
-            raise InsufficientCreditsError(
-                f"User {user_id} has no credit account"
-            )
+            raise InsufficientCreditsError(f"User {user_id} has no credit account")
 
         # Check sufficient balance
         if account.balance < amount:
@@ -196,7 +203,7 @@ class CreditService:
             balance_after=account.balance,
             description=description or f"Used {amount} credits",
             reference_id=reference_id,
-            extra_data=extra_data
+            extra_data=extra_data,
         )
         transaction.id = transaction.generate_id()
 
@@ -206,11 +213,7 @@ class CreditService:
         return transaction
 
     def get_transaction_history(
-        self,
-        user_id: int,
-        transaction_type: Optional[str] = None,
-        limit: int = 20,
-        offset: int = 0
+        self, user_id: int, transaction_type: Optional[str] = None, limit: int = 20, offset: int = 0
     ) -> list[CreditTransaction]:
         """
         Get user's transaction history with optional filtering.
@@ -224,24 +227,18 @@ class CreditService:
         Returns:
             List of credit transactions, ordered by created_at DESC
         """
-        query = self.db.query(CreditTransaction).filter(
-            CreditTransaction.user_id == user_id
-        )
+        query = self.db.query(CreditTransaction).filter(CreditTransaction.user_id == user_id)
 
         if transaction_type and transaction_type != "all":
             query = query.filter(CreditTransaction.type == transaction_type)
 
-        transactions = query.order_by(
-            CreditTransaction.created_at.desc()
-        ).offset(offset).limit(limit).all()
+        transactions = (
+            query.order_by(CreditTransaction.created_at.desc()).offset(offset).limit(limit).all()
+        )
 
         return transactions
 
-    def count_transactions(
-        self,
-        user_id: int,
-        transaction_type: Optional[str] = None
-    ) -> int:
+    def count_transactions(self, user_id: int, transaction_type: Optional[str] = None) -> int:
         """
         Count total transactions for a user.
 
@@ -252,9 +249,7 @@ class CreditService:
         Returns:
             Total number of transactions
         """
-        query = self.db.query(CreditTransaction).filter(
-            CreditTransaction.user_id == user_id
-        )
+        query = self.db.query(CreditTransaction).filter(CreditTransaction.user_id == user_id)
 
         if transaction_type and transaction_type != "all":
             query = query.filter(CreditTransaction.type == transaction_type)

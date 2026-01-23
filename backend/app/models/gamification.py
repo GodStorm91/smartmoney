@@ -16,7 +16,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
-from app.models.transaction import Base
+from ..models.transaction import Base
 
 
 class UserGamification(Base):

@@ -7,10 +7,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
-from app.database import get_db
-from app.services.gamification_service import GamificationService
-from app.auth.dependencies import get_current_user
-from app.models.user import User
+from ..database import get_db
+from ..services.gamification_service import GamificationService
+from ..auth.dependencies import get_current_user
+from ..models.user import User
 
 
 router = APIRouter(prefix="/api/gamification", tags=["gamification"])
@@ -85,7 +85,7 @@ async def get_achievements(
     current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """Get all achievements and user's progress"""
-    from app.models.gamification import Achievement, UserAchievement
+    from ..models.gamification import Achievement, UserAchievement
 
     # Get all achievements
     all_achievements = db.query(Achievement).all()

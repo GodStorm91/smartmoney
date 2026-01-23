@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Crown, Star, Edit2, Check, Upload, X } from 'lucide-react';
+import { User, Crown, Star, Edit2, Check, Upload, X, Loader2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { useProfile, useAvatars, useGamificationStats, useActivateAvatar, useUploadCustomAvatar } from '@/services/rewards-service';
 import { toast } from 'sonner';
+import { convertHeicToJpeg, isHeicFile } from '@/utils/heic-converter';
 
 const rarityColors: Record<string, string> = {
   common: 'bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300',
@@ -21,16 +22,24 @@ export const ProfilePage: React.FC = () => {
   const { data: gamificationStats } = useGamificationStats ? useGamificationStats() : { data: null };
   const { data: avatars = [] } = useAvatars(1);
   const { mutate: activateAvatar, isPending: activatingAvatar } = useActivateAvatar();
-  const { mutate: uploadCustomAvatar, isPending: uploadingAvatar } = useUploadCustomAvatar();
+  const { mutate: uploadCustomAvatar, isPending: uploadingAvatar, isSuccess: uploadSuccess } = useUploadCustomAvatar();
 
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [isConverting, setIsConverting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const level = gamificationStats?.current_level || profile?.level || 1;
   const totalXP = gamificationStats?.total_xp || profile?.total_xp || 0;
   const activeAvatar = profile?.active_avatar;
+
+  // Close modal after successful upload
+  useEffect(() => {
+    if (uploadSuccess) {
+      setShowUploadModal(false);
+    }
+  }, [uploadSuccess]);
 
   const handleSave = () => {
     toast.success(t('common.saving') + '...');
@@ -45,33 +54,51 @@ export const ProfilePage: React.FC = () => {
     });
   };
 
-  const handleCustomAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCustomAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
-      return;
+    console.log('[Avatar Upload] File selected:', file.name, file.type, file.size);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
 
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error('Image must be less than 2MB');
-      return;
-    }
+    try {
+      // Check if file is HEIC and convert if needed
+      let fileToUpload = file;
+      if (isHeicFile(file)) {
+        console.log('[Avatar Upload] Detected HEIC file, starting conversion...');
+        setIsConverting(true);
+        toast.info('Converting HEIC image...');
+        fileToUpload = await convertHeicToJpeg(file);
+        setIsConverting(false);
+        console.log('[Avatar Upload] HEIC conversion complete:', fileToUpload.name, fileToUpload.type, fileToUpload.size);
+        toast.success('HEIC image converted successfully!');
+      }
 
-    uploadCustomAvatar(file, {
-      onSuccess: (data) => {
-        toast.success('Custom avatar uploaded!');
-        setShowUploadModal(false);
-        // Auto-select the new custom avatar
-        if (data.avatar?.id) {
-          handleAvatarSelect(data.avatar.id);
-        }
-      },
-      onError: () => toast.error('Failed to upload avatar'),
-    });
+      // Validate file type after conversion
+      console.log('[Avatar Upload] Validating file type:', fileToUpload.type);
+      if (!fileToUpload.type.startsWith('image/')) {
+        toast.error('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      console.log('[Avatar Upload] Validating file size:', fileToUpload.size);
+      if (fileToUpload.size > 5 * 1024 * 1024) {
+        toast.error('Image must be less than 5MB');
+        return;
+      }
+
+      console.log('[Avatar Upload] Starting upload...');
+      uploadCustomAvatar(fileToUpload);
+    } catch (error) {
+      setIsConverting(false);
+      console.error('[Avatar Upload] Error:', error);
+      toast.error('Failed to process image. Please try a different file.');
+    }
   };
 
   return (
@@ -216,24 +243,36 @@ export const ProfilePage: React.FC = () => {
                     type="file"
                     ref={fileInputRef}
                     onChange={handleCustomAvatarUpload}
-                    accept="image/*"
+                    accept="image/*,.heic,.heif"
                     className="hidden"
                   />
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingAvatar}
+                    disabled={uploadingAvatar || isConverting}
                     className="flex flex-col items-center gap-2 mx-auto"
                   >
-                    <Upload className="w-10 h-10 text-gray-400" />
-                    <span className="text-sm text-gray-500">
-                      {uploadingAvatar ? 'Uploading...' : 'Click to upload image'}
-                    </span>
+                    {isConverting ? (
+                      <>
+                        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                        <span className="text-sm text-blue-500">Converting HEIC...</span>
+                      </>
+                    ) : uploadingAvatar ? (
+                      <>
+                        <Loader2 className="w-10 h-10 text-gray-400 animate-spin" />
+                        <span className="text-sm text-gray-500">Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-10 h-10 text-gray-400" />
+                        <span className="text-sm text-gray-500">Click to upload image</span>
+                      </>
+                    )}
                   </button>
                 </div>
                 
                 <div className="text-xs text-gray-500 text-center">
-                  <p>Supported formats: JPG, PNG, GIF, WebP</p>
-                  <p>Maximum file size: 2MB</p>
+                  <p>Supported formats: JPG, PNG, GIF, WebP, HEIC</p>
+                  <p>Maximum file size: 5MB</p>
                 </div>
               </div>
             </div>

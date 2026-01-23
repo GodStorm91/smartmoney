@@ -93,7 +93,7 @@ export const notificationService = {
   },
 
   // Subscribe to push notifications
-  async subscribePush(subscription: PushSubscriptionInit): Promise<{ success: boolean; subscription: PushSubscription }> {
+  async subscribePush(subscription: PushSubscription): Promise<{ success: boolean; subscription: PushSubscription }> {
     const response = await apiClient.post<{ success: boolean; subscription: PushSubscription }>(
       '/api/notifications/push/subscribe',
       subscription

@@ -1,0 +1,59 @@
+{
+  "hero": {
+    "headline": "あなたのお金、あなたのデータ",
+    "subheadline": "プライバシー重視の家計簿アプリ。AI予算機能付き。クラウド不要、サブスク不要。",
+    "cta": "無料で始める",
+    "seeLiveDemo": "デモを見る",
+    "valueProp1": "セルフホスト対応",
+    "valueProp2": "AI予算生成",
+    "valueProp3": "多通貨対応"
+  },
+  "features": {
+    "title": "必要な機能がすべて揃う",
+    "subtitle": "お金を効果的に管理するシンプルなツール",
+    "dashboard": {
+      "title": "美しいダッシュボード",
+      "description": "総資産、収入、支出をインタラクティブなチャートで一目で確認"
+    },
+    "transactions": {
+      "title": "簡単な取引入力",
+      "description": "クイック入力、レシートスキャン、MoneyForward・Zaimからのインポート"
+    },
+    "budget": {
+      "title": "AI予算生成",
+      "description": "Claude AIがあなたの支出パターンを分析し、最適な予算を提案"
+    },
+    "analytics": {
+      "title": "詳細な分析",
+      "description": "月次トレンド、カテゴリ別内訳、支出インサイト"
+    }
+  },
+  "howItWorks": {
+    "title": "使い方",
+    "subtitle": "3つのステップで簡単スタート",
+    "step1": {
+      "title": "データをインポート",
+      "description": "銀行や家計簿アプリからCSVをアップロード"
+    },
+    "step2": {
+      "title": "支出を分析",
+      "description": "毎月のお金の流れを把握"
+    },
+    "step3": {
+      "title": "予算を生成",
+      "description": "AIがあなた専用の予算を作成"
+    }
+  },
+  "cta": {
+    "title": "今日からお金の管理を始めよう",
+    "subtitle": "無料で使える。セルフホスト。オープンソース。",
+    "button": "無料で始める",
+    "openSource": "GitHubでオープンソース公開中",
+    "noAccount": "クレジットカード不要"
+  },
+  "footer": {
+    "copyright": "© 2025 SmartMoney. All rights reserved.",
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約"
+  }
+}

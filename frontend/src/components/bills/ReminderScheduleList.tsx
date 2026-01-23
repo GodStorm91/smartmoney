@@ -72,7 +72,7 @@ export function ReminderScheduleList({ billId }: ReminderScheduleListProps) {
         </div>
       ) : !data?.schedules || data.schedules.length === 0 ? (
         <EmptyState
-          message={t('bills.reminder.noSchedules')}
+          title={t('bills.reminder.noSchedules')}
           className="py-6"
         />
       ) : (

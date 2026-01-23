@@ -6,6 +6,8 @@ import { SettingsProvider } from './contexts/SettingsContext'
 import { PrivacyProvider } from './contexts/PrivacyContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { SyncProvider } from './contexts/SyncContext'
+import { ToastProvider } from './components/ui/Toast'
+import { XPToastProvider } from './components/gamification/XPToast'
 import { queryClient, shouldPersistQuery } from './lib/query-client'
 import { persister } from './lib/persister'
 import { initializeDB } from './db'
@@ -37,15 +39,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           },
         }}
       >
-        <SyncProvider>
-          <AuthProvider>
-            <SettingsProvider>
-              <PrivacyProvider>
-                <App />
-              </PrivacyProvider>
-            </SettingsProvider>
-          </AuthProvider>
-        </SyncProvider>
+        <XPToastProvider>
+          <ToastProvider>
+            <SyncProvider>
+              <AuthProvider>
+                <SettingsProvider>
+                  <PrivacyProvider>
+                    <App />
+                  </PrivacyProvider>
+                </SettingsProvider>
+              </AuthProvider>
+            </SyncProvider>
+          </ToastProvider>
+        </XPToastProvider>
       </PersistQueryClientProvider>
     </ThemeProvider>
   </React.StrictMode>,

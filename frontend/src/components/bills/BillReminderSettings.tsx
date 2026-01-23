@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Switch } from '@/components/ui/Switch'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
-import { Card } from '@/components/ui/Card'
-import { Bell, Clock, Plus } from 'lucide-react'
 import { billService } from '@/services/bill-service'
-import type { Bill, BillUpdate, ReminderSchedule } from '@/types'
+import type { Bill, BillUpdate } from '@/types'
 import { ReminderScheduleList } from './ReminderScheduleList'
 
 interface BillReminderSettingsProps {
