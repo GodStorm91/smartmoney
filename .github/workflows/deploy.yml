@@ -39,13 +39,6 @@ jobs:
       - name: Build frontend
         run: cd frontend && npm run build
 
-      - name: Upload frontend build
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-          retention-days: 1
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -92,15 +85,6 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download frontend build
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend-dist
-
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -116,28 +100,36 @@ jobs:
           docker tag ${{ env.BACKEND_IMAGE }}:main ${{ env.BACKEND_IMAGE }}:$VERSION
           docker push ${{ env.BACKEND_IMAGE }}:$VERSION
 
-      - name: Copy frontend files to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "frontend-dist/*"
-          target: "/root/smartmoney/deploy/"
-          strip_components: 0
-          overwrite: true
-
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: VERSION
           script: |
             set -e
-            VERSION=${{ env.VERSION }}
+            VERSION="${GITHUB_REF#refs/tags/}"
             DEPLOY_DIR="/root/smartmoney/deploy"
+            REPO_DIR="/root/smartmoney"
+
+            echo "=== Deploying version: $VERSION ==="
+
+            # Pull latest code (for frontend)
+            cd $REPO_DIR
+            git fetch origin main
+            git checkout main
+            git pull origin main
+
+            # Build frontend
+            echo "Building frontend..."
+            cd frontend
+            npm ci
+            npm run build
+
+            # Copy frontend to deploy dir
+            echo "Copying frontend files..."
+            rm -rf $DEPLOY_DIR/frontend-dist/*
+            cp -r dist/* $DEPLOY_DIR/frontend-dist/
 
             cd $DEPLOY_DIR
 
