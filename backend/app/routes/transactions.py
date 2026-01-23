@@ -55,6 +55,7 @@ async def get_transactions(
     source: Optional[str] = Query(None, description="Filter by source"),
     is_income: Optional[bool] = Query(None, description="Filter by income flag"),
     is_transfer: Optional[bool] = Query(None, description="Filter by transfer flag"),
+    account_id: Optional[int] = Query(None, description="Filter by account ID"),
     limit: int = Query(100, ge=1, le=1000, description="Results per page"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     db: Session = Depends(get_db),
@@ -70,6 +71,7 @@ async def get_transactions(
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,
+        account_id=account_id,
         limit=limit,
         offset=offset,
     )
@@ -83,6 +85,7 @@ async def get_transactions(
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,
+        account_id=account_id,
     )
 
     return {

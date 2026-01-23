@@ -86,6 +86,7 @@ class TransactionService:
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
+        account_id: Optional[int] = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[Transaction]:
@@ -100,6 +101,7 @@ class TransactionService:
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
+            account_id: Filter by account ID
             limit: Maximum results
             offset: Pagination offset
 
@@ -120,6 +122,8 @@ class TransactionService:
             query = query.filter(Transaction.is_income == is_income)
         if is_transfer is not None:
             query = query.filter(Transaction.is_transfer == is_transfer)
+        if account_id is not None:
+            query = query.filter(Transaction.account_id == account_id)
 
         return query.order_by(Transaction.date.desc()).limit(limit).offset(offset).all()
 
@@ -133,6 +137,7 @@ class TransactionService:
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
+        account_id: Optional[int] = None,
     ) -> int:
         """Count transactions matching filters for a specific user.
 
@@ -145,6 +150,7 @@ class TransactionService:
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
+            account_id: Filter by account ID
 
         Returns:
             Count of matching transactions
@@ -163,6 +169,8 @@ class TransactionService:
             query = query.filter(Transaction.is_income == is_income)
         if is_transfer is not None:
             query = query.filter(Transaction.is_transfer == is_transfer)
+        if account_id is not None:
+            query = query.filter(Transaction.account_id == account_id)
 
         return query.scalar()
 
