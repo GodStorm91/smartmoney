@@ -64,6 +64,7 @@ export async function fetchTransactions(
   if (filters?.search) params.append('search', filters.search)
   if (filters?.min_amount !== undefined) params.append('min_amount', filters.min_amount.toString())
   if (filters?.max_amount !== undefined) params.append('max_amount', filters.max_amount.toString())
+  if (filters?.account_id) params.append('account_id', filters.account_id.toString())
 
   // Request transactions (backend max is 1000)
   params.append('limit', '1000')
