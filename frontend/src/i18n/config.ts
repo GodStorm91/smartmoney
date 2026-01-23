@@ -11,7 +11,7 @@ i18n
     fallbackLng: 'ja', // Default to Japanese
     supportedLngs: ['ja', 'en', 'vi'],
     defaultNS: 'common',
-    ns: ['common', 'dashboard', 'goals', 'transactions', 'analytics', 'errors'],
+    ns: ['common'], // All translations are in common.json
 
     // Backend configuration
     backend: {
