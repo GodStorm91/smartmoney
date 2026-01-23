@@ -4,12 +4,71 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models.transaction import Transaction
 from ..models.budget import Budget
+from ..models.category import Category
 from ..models.settings import AppSettings
 from ..services.email_service import EmailService
 
 
 class BudgetTrackingService:
     """Service for tracking budget spending and sending alerts."""
+
+    @staticmethod
+    def _build_category_hierarchy(db: Session, user_id: int) -> dict[str, list[str]]:
+        """Build mapping of parent category names to child category names.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Dict mapping parent category name -> list of child category names
+        """
+        hierarchy = {}
+
+        # Get all parent categories (system + user's custom)
+        parent_categories = db.query(Category).filter(
+            Category.parent_id.is_(None),
+            Category.type == "expense",
+            (Category.is_system == True) | (Category.user_id == user_id)
+        ).all()
+
+        for parent in parent_categories:
+            # Get all children for this parent
+            children = db.query(Category).filter(
+                Category.parent_id == parent.id,
+                (Category.is_system == True) | (Category.user_id == user_id)
+            ).all()
+
+            child_names = [child.name for child in children]
+            # Include parent name itself in case transactions use parent category directly
+            hierarchy[parent.name] = [parent.name] + child_names
+
+        return hierarchy
+
+    @staticmethod
+    def _get_spending_for_category(
+        category_spending: dict[str, int],
+        category_name: str,
+        hierarchy: dict[str, list[str]]
+    ) -> int:
+        """Get total spending for a category including all its children.
+
+        Args:
+            category_spending: Dict of category name -> spending amount
+            category_name: The budget allocation category name
+            hierarchy: Parent -> children mapping
+
+        Returns:
+            Total spending amount for category and all children
+        """
+        # Get all category names to sum (parent + children)
+        categories_to_sum = hierarchy.get(category_name, [category_name])
+
+        total = 0
+        for cat_name in categories_to_sum:
+            total += category_spending.get(cat_name, 0)
+
+        return total
 
     @staticmethod
     def get_budget_tracking(db: Session, user_id: int) -> dict | None:
@@ -62,13 +121,19 @@ class BudgetTrackingService:
         for row in spending_data:
             category_spending[row.category] = abs(row.total)
 
+        # Build category hierarchy for parent -> children mapping
+        hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)
+
         # Build tracking items
         categories = []
         total_budgeted = 0
         total_spent = 0
 
         for allocation in budget.allocations:
-            spent = category_spending.get(allocation.category, 0)
+            # Sum spending from parent category + all child categories
+            spent = BudgetTrackingService._get_spending_for_category(
+                category_spending, allocation.category, hierarchy
+            )
             remaining = allocation.amount - spent
             percentage = (spent / allocation.amount * 100) if allocation.amount > 0 else 0
 
