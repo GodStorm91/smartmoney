@@ -2,6 +2,7 @@
  * Receipt Scanner Modal - Main modal for scanning receipts
  */
 import { useState, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { Camera, X, AlertCircle, Check } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
@@ -178,5 +179,6 @@ export function ReceiptScannerModal({
     </div>
   )
 
-  return modalContent
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }

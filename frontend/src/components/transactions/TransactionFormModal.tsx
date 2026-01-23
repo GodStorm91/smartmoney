@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Receipt, RefreshCw, Camera, X } from 'lucide-react'
@@ -572,5 +573,6 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
     </div>
   )
 
-  return modalContent
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
