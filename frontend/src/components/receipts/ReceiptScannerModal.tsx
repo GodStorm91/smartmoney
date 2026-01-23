@@ -72,12 +72,14 @@ export function ReceiptScannerModal({
   const modalContent = (
     <div
       className="fixed inset-0 z-[100001] flex items-center justify-center p-4"
-
       onClick={(e) => {
         if (e.target === e.currentTarget) handleClose()
       }}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={handleClose} />
+
+      <div className="relative bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">

@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Calendar, TrendingDown } from 'lucide-react'
 import { format } from 'date-fns'
@@ -40,7 +41,7 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
     return formatCurrencyPrivacy(amount, targetCurrency, rates, true, isPrivacyMode)
   }
 
-  return (
+  const modalContent = (
     <>
       <div
         className="fixed inset-0 z-40 bg-black/50 animate-in fade-in"
@@ -134,6 +135,9 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
       </div>
     </>
   )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(modalContent, document.body)
 }
 
 export default DayTransactionsModal
