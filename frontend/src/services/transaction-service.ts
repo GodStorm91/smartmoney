@@ -65,8 +65,8 @@ export async function fetchTransactions(
   if (filters?.min_amount !== undefined) params.append('min_amount', filters.min_amount.toString())
   if (filters?.max_amount !== undefined) params.append('max_amount', filters.max_amount.toString())
 
-  // Request all transactions (up to 5000) to show complete filtered results
-  params.append('limit', '5000')
+  // Request transactions (backend max is 1000)
+  params.append('limit', '1000')
 
   const response = await apiClient.get<TransactionListResponse>(`/api/transactions/?${params.toString()}`)
   return response.data.transactions.map(transformTransaction)
