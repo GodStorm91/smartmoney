@@ -49,6 +49,7 @@ class Transaction(Base):
     is_income: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_transfer: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_adjustment: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")  # ISO 4217 currency code
     month_key: Mapped[str] = mapped_column(String(7), nullable=False, index=True)  # YYYY-MM
     tx_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)  # SHA-256
     transfer_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)  # UUID for linking transfer transactions

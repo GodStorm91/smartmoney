@@ -31,7 +31,8 @@ class TransactionUpdate(BaseModel):
 
     date: Optional[date] = None
     description: Optional[str] = Field(None, max_length=500)
-    amount: Optional[int] = Field(None, description="Amount in JPY as integer")
+    amount: Optional[int] = Field(None, description="Amount in currency minor units")
+    currency: Optional[str] = Field(None, max_length=3, description="ISO 4217 currency code")
     category: Optional[str] = Field(None, max_length=100)
     subcategory: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = Field(None, max_length=100)
@@ -39,6 +40,8 @@ class TransactionUpdate(BaseModel):
     notes: Optional[str] = Field(None, max_length=1000)
     is_income: Optional[bool] = None
     is_transfer: Optional[bool] = None
+    account_id: Optional[int] = None
+    receipt_url: Optional[str] = Field(None, max_length=500)
 
 
 class TransactionResponse(TransactionBase):
@@ -47,6 +50,8 @@ class TransactionResponse(TransactionBase):
     id: int
     month_key: str
     tx_hash: str
+    currency: str = "JPY"
+    account_id: Optional[int] = None
 
     class Config:
         from_attributes = True
