@@ -241,9 +241,16 @@ export function Transactions() {
   const [isBulkRecategorizeOpen, setIsBulkRecategorizeOpen] = useState(false)
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false)
 
+  // Merge accountId from URL directly into filters for the query
+  // This ensures the query always uses the current URL accountId, not stale state
+  const effectiveFilters = useMemo(() => ({
+    ...filters,
+    account_id: accountId ? Number(accountId) : filters.account_id,
+  }), [filters, accountId])
+
   const { data: transactions, isLoading } = useQuery({
-    queryKey: ['transactions', filters],
-    queryFn: () => fetchTransactions(filters),
+    queryKey: ['transactions', effectiveFilters],
+    queryFn: () => fetchTransactions(effectiveFilters),
   })
 
   useEffect(() => {
