@@ -325,15 +325,16 @@ class GoalService:
         achievable_amount = current_monthly_net * months_remaining
 
         # Calculate achievable percentage
+        target_amount = float(goal.target_amount)
         achievable_percentage = (
-            (achievable_amount / goal.target_amount * 100)
-            if goal.target_amount > 0
+            (achievable_amount / target_amount * 100)
+            if target_amount > 0
             else 0
         )
 
         # Calculate required monthly savings
         total_saved = GoalService._calculate_net_savings(db, user_id, start_date)
-        needed_remaining = goal.target_amount - total_saved
+        needed_remaining = float(goal.target_amount) - float(total_saved)
         required_monthly = needed_remaining / months_remaining
 
         # Calculate monthly gap
