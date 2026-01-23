@@ -1,17 +1,131 @@
-name: Deploy to Production
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
+env:
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/godstorm91/smartmoney-backend
+
 jobs:
-  deploy:
+  # ====================
+  # BUILD & TEST
+  # ====================
+  build-and-test:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: cd frontend && npm ci
+
+      - name: Build frontend
+        run: cd frontend && npm run build
+
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          pip install -e .
+
+      - name: Login to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: deploy/Dockerfile.backend
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:main
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          no-cache: true
+          pull: true
+
+  # ====================
+  # DEPLOY TO PRODUCTION
+  # ====================
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag image with version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          docker pull ${{ env.BACKEND_IMAGE }}:main
+          docker tag ${{ env.BACKEND_IMAGE }}:main ${{ env.BACKEND_IMAGE }}:$VERSION
+          docker push ${{ env.BACKEND_IMAGE }}:$VERSION
+
+      - name: Copy frontend files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "frontend-dist/*"
+          target: "/root/smartmoney/deploy/"
+          strip_components: 0
+          overwrite: true
 
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
@@ -19,9 +133,37 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: VERSION
           script: |
-            cd /home/godstorm91/project/smartmoney
-            git pull origin main
-            cd frontend && npm ci && npm run build
-            cd ../deploy
-            docker compose restart frontend
+            set -e
+            VERSION=${{ env.VERSION }}
+            DEPLOY_DIR="/root/smartmoney/deploy"
+
+            cd $DEPLOY_DIR
+
+            # Pull new backend image
+            echo "Pulling backend image: $VERSION"
+            docker pull ghcr.io/godstorm91/smartmoney-backend:$VERSION
+
+            # Update .env with new version
+            sed -i "s/^BACKEND_IMAGE_TAG=.*/BACKEND_IMAGE_TAG=$VERSION/" .env || echo "BACKEND_IMAGE_TAG=$VERSION" >> .env
+
+            # Run migrations (separate step)
+            echo "Running migrations..."
+            docker compose run --rm backend alembic upgrade head
+
+            # Restart backend with new image
+            echo "Restarting backend..."
+            docker compose up -d --force-recreate backend
+
+            # Restart nginx to pick up new frontend files
+            echo "Restarting nginx..."
+            docker compose restart nginx
+
+            # Cleanup old images (older than 7 days)
+            echo "Cleaning up old images..."
+            docker image prune -af --filter "until=168h" || true
+
+            # Show status
+            echo "=== Deploy complete: $VERSION ==="
+            docker compose ps
