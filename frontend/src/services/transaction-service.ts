@@ -69,6 +69,7 @@ export async function fetchTransactions(
   // Request transactions (backend max is 1000)
   params.append('limit', '1000')
 
+  console.log('[fetchTransactions] filters:', filters, 'params:', params.toString())
   const response = await apiClient.get<TransactionListResponse>(`/api/transactions/?${params.toString()}`)
   return response.data.transactions.map(transformTransaction)
 }
