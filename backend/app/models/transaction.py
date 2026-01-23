@@ -51,6 +51,8 @@ class Transaction(Base):
     is_adjustment: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     month_key: Mapped[str] = mapped_column(String(7), nullable=False, index=True)  # YYYY-MM
     tx_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)  # SHA-256
+    transfer_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)  # UUID for linking transfer transactions
+    transfer_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # outgoing, incoming, fee
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
