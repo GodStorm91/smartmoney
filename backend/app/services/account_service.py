@@ -204,12 +204,10 @@ class AccountService:
             query = query.filter(Transaction.date <= as_of_date)
 
         # Calculate balance from transactions
+        # Amount is already signed: positive for income, negative for expense
         transactions = query.all()
         for txn in transactions:
-            if txn.is_income:
-                balance += txn.amount
-            else:
-                balance -= txn.amount
+            balance += txn.amount
 
         return balance
 
