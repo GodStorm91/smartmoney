@@ -84,7 +84,9 @@ export function UploadDropZone({
               {hasFiles ? t('upload.addMoreFiles') : t('upload.dropOrClick')}
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              {hasFiles ? t('upload.addMoreDescription') : t('upload.dropDescription')}
+              {hasFiles
+                ? (uploadMode === 'csv' ? t('upload.addMoreDescription') : t('upload.addMoreImageDescription'))
+                : (uploadMode === 'csv' ? t('upload.dropDescription') : t('upload.dropImageDescription'))}
             </p>
 
             <Button variant="primary">
