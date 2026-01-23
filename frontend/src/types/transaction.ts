@@ -24,6 +24,7 @@ export interface TransactionFilters {
   search?: string
   min_amount?: number
   max_amount?: number
+  account_id?: number
 }
 
 export interface DateRange {

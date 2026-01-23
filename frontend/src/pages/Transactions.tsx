@@ -67,6 +67,7 @@ export function Transactions() {
     categories: parsedCategories,
     source: '',
     type: typeParam || 'all',
+    account_id: accountId ? Number(accountId) : undefined,
   })
   const [searchInput, setSearchInput] = useState('')
   const debouncedSearch = useDebouncedValue(searchInput, 300)
@@ -205,7 +206,7 @@ export function Transactions() {
   }, [debouncedSearch])
 
   useEffect(() => {
-    if (categoriesParam || monthParam || typeParam !== undefined) {
+    if (categoriesParam || monthParam || typeParam !== undefined || accountId) {
       const dateRange = monthParam ? getMonthDateRange(monthParam) : monthRange
       const categories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : []
       setFilters(prev => ({
@@ -214,9 +215,10 @@ export function Transactions() {
         start_date: dateRange.start,
         end_date: dateRange.end,
         type: typeParam || 'all',
+        account_id: accountId ? Number(accountId) : undefined,
       }))
     }
-  }, [categoriesParam, monthParam, typeParam])
+  }, [categoriesParam, monthParam, typeParam, accountId])
 
   const handleTypeFilter = (type: 'income' | 'expense') => {
     const newType = typeParam === type ? undefined : type
