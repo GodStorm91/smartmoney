@@ -400,10 +400,13 @@ export function Transactions() {
 
   const accountFilteredTransactions = useMemo(() => {
     if (!transactions) return []
+    // When account_id is in effectiveFilters, the API already filters server-side
+    // No need for additional client-side filtering which may fail if account_id isn't in response
+    if (effectiveFilters.account_id) return transactions
     if (!accountId) return transactions
     const targetAccountId = Number(accountId)
     return transactions.filter(tx => tx.account_id != null && Number(tx.account_id) === targetAccountId)
-  }, [transactions, accountId])
+  }, [transactions, accountId, effectiveFilters.account_id])
 
   const selectedAccount = useMemo(() => {
     if (!accountId || !accounts) return null
