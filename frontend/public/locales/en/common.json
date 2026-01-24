@@ -1039,7 +1039,44 @@
       "overBudgetStatus": "Over budget"
     },
     "undo": "Undo",
-    "export": "Export"
+    "export": "Export",
+    "tabs": {
+      "overview": "Overview",
+      "categories": "Categories",
+      "transactions": "Transactions",
+      "forecast": "Forecast",
+      "navigation": "Budget navigation",
+      "selectTab": "Select tab"
+    },
+    "forecast": {
+      "title": "Spending Forecast",
+      "subtitle": "AI-powered predictions based on your spending patterns",
+      "noData": "No tracking data available for predictions",
+      "predictedWarnings": "Predicted Warnings",
+      "overBudgetProjected": "Over Budget Projected",
+      "approachingLimit": "Approaching Limit",
+      "onTrack": "On Track",
+      "projectedSpending": "Projected: {{amount}} of {{budget}}",
+      "ofBudget": "of budget",
+      "categoryForecasts": "Category Forecasts",
+      "allClear": "All Clear",
+      "allClearDescription": "No spending issues predicted for this month",
+      "moreAlerts": "+{{count}} more alerts",
+      "predictedOverspend": "Predicted Overspend",
+      "anomalyDetected": "Unusual Spending Detected",
+      "willExceedBy": "will exceed by",
+      "currentPace": "Current pace",
+      "safePace": "Safe pace",
+      "adjustBudget": "Adjust Budget",
+      "confidenceLabel": "Confidence",
+      "confidence": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "selectCategoryHint": "Select a category to view details",
+    "noAllocations": "No budget allocations yet"
   },
   "credits": {
     "balance": "Credit Balance",

@@ -994,7 +994,44 @@
       "overBudgetStatus": "予算超過"
     },
     "undo": "取り消し",
-    "export": "エクスポート"
+    "export": "エクスポート",
+    "tabs": {
+      "overview": "概要",
+      "categories": "カテゴリ",
+      "transactions": "取引",
+      "forecast": "予測",
+      "navigation": "予算ナビゲーション",
+      "selectTab": "タブを選択"
+    },
+    "forecast": {
+      "title": "支出予測",
+      "subtitle": "支出パターンに基づくAI予測",
+      "noData": "予測に必要なデータがありません",
+      "predictedWarnings": "予測される警告",
+      "overBudgetProjected": "予算超過の見込み",
+      "approachingLimit": "上限に近づいています",
+      "onTrack": "順調",
+      "projectedSpending": "予測: {{amount}} / {{budget}}",
+      "ofBudget": "予算の",
+      "categoryForecasts": "カテゴリ別予測",
+      "allClear": "問題なし",
+      "allClearDescription": "今月の支出に問題は予測されていません",
+      "moreAlerts": "他{{count}}件のアラート",
+      "predictedOverspend": "超過予測",
+      "anomalyDetected": "異常な支出を検出",
+      "willExceedBy": "超過予測額",
+      "currentPace": "現在のペース",
+      "safePace": "安全なペース",
+      "adjustBudget": "予算を調整",
+      "confidenceLabel": "信頼度",
+      "confidence": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      }
+    },
+    "selectCategoryHint": "詳細を表示するにはカテゴリを選択",
+    "noAllocations": "予算配分がまだありません"
   },
   "credits": {
     "balance": "クレジット残高",

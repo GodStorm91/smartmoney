@@ -993,7 +993,44 @@
       "overBudgetStatus": "Vượt ngân sách"
     },
     "undo": "Hoàn tác",
-    "export": "Xuất"
+    "export": "Xuất",
+    "tabs": {
+      "overview": "Tổng quan",
+      "categories": "Danh mục",
+      "transactions": "Giao dịch",
+      "forecast": "Dự báo",
+      "navigation": "Điều hướng ngân sách",
+      "selectTab": "Chọn tab"
+    },
+    "forecast": {
+      "title": "Dự Báo Chi Tiêu",
+      "subtitle": "Dự đoán AI dựa trên mô hình chi tiêu của bạn",
+      "noData": "Không có dữ liệu để dự đoán",
+      "predictedWarnings": "Cảnh Báo Dự Đoán",
+      "overBudgetProjected": "Dự kiến vượt ngân sách",
+      "approachingLimit": "Đang tiến gần giới hạn",
+      "onTrack": "Đúng tiến độ",
+      "projectedSpending": "Dự kiến: {{amount}} / {{budget}}",
+      "ofBudget": "của ngân sách",
+      "categoryForecasts": "Dự Báo Theo Danh Mục",
+      "allClear": "Tất cả ổn",
+      "allClearDescription": "Không có vấn đề chi tiêu nào được dự đoán cho tháng này",
+      "moreAlerts": "+{{count}} cảnh báo khác",
+      "predictedOverspend": "Dự đoán vượt chi",
+      "anomalyDetected": "Phát hiện chi tiêu bất thường",
+      "willExceedBy": "sẽ vượt",
+      "currentPace": "Tốc độ hiện tại",
+      "safePace": "Tốc độ an toàn",
+      "adjustBudget": "Điều chỉnh ngân sách",
+      "confidenceLabel": "Độ tin cậy",
+      "confidence": {
+        "high": "Cao",
+        "medium": "Trung bình",
+        "low": "Thấp"
+      }
+    },
+    "selectCategoryHint": "Chọn danh mục để xem chi tiết",
+    "noAllocations": "Chưa có phân bổ ngân sách"
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",

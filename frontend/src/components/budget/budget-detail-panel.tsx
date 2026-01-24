@@ -36,6 +36,8 @@ interface BudgetDetailPanelProps {
   trackingItem?: BudgetTrackingItem
   isOpen: boolean
   onClose: () => void
+  /** 'overlay' = slide-in panel (default), 'inline' = static panel for split-view */
+  mode?: 'overlay' | 'inline'
   className?: string
 }
 
@@ -45,6 +47,7 @@ export function BudgetDetailPanel({
   trackingItem,
   isOpen,
   onClose,
+  mode = 'overlay',
   className
 }: BudgetDetailPanelProps) {
   const { t } = useTranslation('common')
@@ -216,6 +219,59 @@ export function BudgetDetailPanel({
 
   if (!isOpen) return null
 
+  // Inline mode: static panel for split-view on desktop
+  if (mode === 'inline') {
+    return (
+      <div className={cn('flex flex-col h-full', className)}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{category}</h2>
+        </div>
+        {/* Summary */}
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('budget.savingsTarget')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(trackingItem?.budgeted || 0)}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.expenses')}</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(currentSpent)}</p>
+            </div>
+          </div>
+          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
+            <div className={cn('h-full rounded-full transition-all duration-500', trackingItem?.status === 'red' ? 'bg-red-500' : trackingItem?.status === 'orange' ? 'bg-orange-500' : trackingItem?.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500')} style={{ width: `${Math.min(100, trackingItem?.percentage || 0)}%` }} />
+          </div>
+          {changePercent !== null && (
+            <div className={cn('flex items-center gap-2 text-sm', changePercent > 0 ? 'text-red-600 dark:text-red-400' : changePercent < 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500')}>
+              {changePercent > 0 ? <TrendingUp className="w-4 h-4" /> : changePercent < 0 ? <TrendingDown className="w-4 h-4" /> : null}
+              <span>{changePercent > 0 ? '+' : ''}{changePercent}% vs last month ({formatCurrency(previousMonthSpent || 0)})</span>
+            </div>
+          )}
+        </div>
+        {/* Transactions */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">{t('dashboard.recentTransactions')}</h3>
+          {isLoading ? <div className="flex items-center justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-gray-400" /></div>
+           : error ? <div className="flex items-center gap-2 text-red-500 py-4"><AlertTriangle className="w-5 h-5" /><span>{error}</span></div>
+           : transactions.length === 0 ? <p className="text-sm text-gray-500 text-center py-4">{t('transactions.noData')}</p>
+           : <div className="space-y-3">{transactions.map(tx => (
+               <div key={tx.id} className="flex items-center justify-between py-2">
+                 <div className="flex-1 min-w-0"><p className="text-sm text-gray-900 dark:text-gray-100 truncate">{tx.description}</p><p className="text-xs text-gray-500 dark:text-gray-400">{formatTxDate(tx.date)}</p></div>
+                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">{formatCurrency(tx.amount)}</span>
+               </div>
+             ))}{transactions.length >= 10 && <Button variant="ghost" size="sm" onClick={handleViewAll} className="w-full flex items-center justify-center gap-1 mt-2"><span>{t('dashboard.viewAllCategories')}</span><ExternalLink className="w-3 h-3" /></Button>}</div>}
+        </div>
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+          <Button onClick={handleAddTransaction} className="w-full flex items-center justify-center gap-2"><Plus className="w-4 h-4" /><span>{t('transaction.addTransaction')}</span></Button>
+          <Button variant="outline" onClick={handleViewAll} className="w-full"><span>{t('transactions.viewAll')}</span></Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Overlay mode: slide-in panel
   return (
     <>
       {/* Backdrop */}
