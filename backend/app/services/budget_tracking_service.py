@@ -7,6 +7,8 @@ from ..models.budget import Budget
 from ..models.category import Category
 from ..models.settings import AppSettings
 from ..services.email_service import EmailService
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 
 class BudgetTrackingService:
@@ -99,12 +101,16 @@ class BudgetTrackingService:
         else:
             month_end = date(year, month + 1, 1) - timedelta(days=1)
 
-        # Calculate spending per category for current month
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Calculate spending per category for current month (with currency conversion)
         category_spending = {}
         spending_data = (
             db.query(
                 Transaction.category,
-                func.sum(Transaction.amount).label("total")
+                Transaction.amount,
+                Transaction.currency
             )
             .filter(
                 Transaction.user_id == user_id,
@@ -114,12 +120,13 @@ class BudgetTrackingService:
                 Transaction.date >= month_start,
                 Transaction.date <= month_end
             )
-            .group_by(Transaction.category)
             .all()
         )
 
+        # Sum amounts with currency conversion to JPY
         for row in spending_data:
-            category_spending[row.category] = abs(row.total)
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            category_spending[row.category] = category_spending.get(row.category, 0) + amount_jpy
 
         # Build category hierarchy for parent -> children mapping
         hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)

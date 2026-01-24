@@ -7,6 +7,8 @@ from sqlalchemy.orm import Session
 
 from ..models.transaction import Transaction
 from ..models.budget import Budget
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 
 class AnalyticsService:
@@ -25,27 +27,23 @@ class AnalyticsService:
             end_date: Filter by end date
 
         Returns:
-            List of monthly cashflow dictionaries
+            List of monthly cashflow dictionaries (amounts converted to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query individual transactions to convert currencies
         query = (
             db.query(
                 Transaction.month_key,
-                func.sum(
-                    case(
-                        (Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("income"),
-                func.sum(
-                    case(
-                        (~Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("expenses"),
+                Transaction.amount,
+                Transaction.currency,
+                Transaction.is_income
             )
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer
             )
-            .group_by(Transaction.month_key)
             .order_by(Transaction.month_key)
         )
 
@@ -56,18 +54,29 @@ class AnalyticsService:
 
         results = query.all()
 
-        monthly_data = []
+        # Aggregate by month with currency conversion
+        monthly_totals: dict[str, dict] = {}
         for row in results:
-            income = row.income or 0
-            expenses = abs(row.expenses or 0)
-            monthly_data.append(
-                {
-                    "month": row.month_key,
-                    "income": income,
-                    "expenses": expenses,
-                    "net": income - expenses,
-                }
-            )
+            month = row.month_key
+            if month not in monthly_totals:
+                monthly_totals[month] = {"income": 0, "expenses": 0}
+
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            if row.is_income:
+                monthly_totals[month]["income"] += amount_jpy
+            else:
+                monthly_totals[month]["expenses"] += amount_jpy
+
+        # Build sorted result list
+        monthly_data = []
+        for month in sorted(monthly_totals.keys()):
+            data = monthly_totals[month]
+            monthly_data.append({
+                "month": month,
+                "income": data["income"],
+                "expenses": data["expenses"],
+                "net": data["income"] - data["expenses"],
+            })
 
         return monthly_data
 
@@ -84,21 +93,22 @@ class AnalyticsService:
             end_date: Filter by end date
 
         Returns:
-            List of category breakdown dictionaries
+            List of category breakdown dictionaries (amounts converted to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
         query = (
             db.query(
                 Transaction.category,
-                func.sum(Transaction.amount).label("total"),
-                func.count(Transaction.id).label("count"),
+                Transaction.amount,
+                Transaction.currency
             )
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer,
                 ~Transaction.is_income
             )
-            .group_by(Transaction.category)
-            .order_by(func.sum(Transaction.amount).asc())  # Most negative first
         )
 
         if start_date:
@@ -108,15 +118,23 @@ class AnalyticsService:
 
         results = query.all()
 
-        categories = []
+        # Aggregate by category with currency conversion
+        category_totals: dict[str, dict] = {}
         for row in results:
-            categories.append(
-                {
-                    "category": row.category,
-                    "amount": abs(row.total),  # Convert to positive
-                    "count": row.count,
-                }
-            )
+            cat = row.category
+            if cat not in category_totals:
+                category_totals[cat] = {"amount": 0, "count": 0}
+
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            category_totals[cat]["amount"] += amount_jpy
+            category_totals[cat]["count"] += 1
+
+        # Build sorted result list (highest amount first)
+        categories = [
+            {"category": cat, "amount": data["amount"], "count": data["count"]}
+            for cat, data in category_totals.items()
+        ]
+        categories.sort(key=lambda x: x["amount"], reverse=True)
 
         return categories
 
@@ -132,47 +150,66 @@ class AnalyticsService:
             months: Number of months to include
 
         Returns:
-            List of monthly trend data
+            List of monthly trend data (amounts converted to JPY)
         """
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Get distinct months first, then query transactions
+        month_query = (
+            db.query(Transaction.month_key)
+            .filter(Transaction.user_id == user_id, ~Transaction.is_transfer)
+            .distinct()
+            .order_by(Transaction.month_key.desc())
+            .limit(months)
+        )
+        target_months = [m[0] for m in month_query.all()]
+
+        if not target_months:
+            return []
+
+        # Query transactions for those months
         query = (
             db.query(
                 Transaction.month_key,
-                func.sum(
-                    case(
-                        (Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("income"),
-                func.sum(
-                    case(
-                        (~Transaction.is_income, Transaction.amount), else_=0
-                    )
-                ).label("expenses"),
+                Transaction.amount,
+                Transaction.currency,
+                Transaction.is_income
             )
             .filter(
                 Transaction.user_id == user_id,
-                ~Transaction.is_transfer
+                ~Transaction.is_transfer,
+                Transaction.month_key.in_(target_months)
             )
-            .group_by(Transaction.month_key)
-            .order_by(Transaction.month_key.desc())
-            .limit(months)
         )
 
         results = query.all()
 
-        trend_data = []
+        # Aggregate by month with currency conversion
+        monthly_totals: dict[str, dict] = {}
         for row in results:
-            income = row.income or 0
-            expenses = abs(row.expenses or 0)
-            trend_data.append(
-                {
-                    "month": row.month_key,
-                    "income": income,
-                    "expenses": expenses,
-                    "net": income - expenses,
-                }
-            )
+            month = row.month_key
+            if month not in monthly_totals:
+                monthly_totals[month] = {"income": 0, "expenses": 0}
 
-        return list(reversed(trend_data))  # Return chronological order
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            if row.is_income:
+                monthly_totals[month]["income"] += amount_jpy
+            else:
+                monthly_totals[month]["expenses"] += amount_jpy
+
+        # Build sorted result list (chronological order)
+        trend_data = []
+        for month in sorted(monthly_totals.keys()):
+            data = monthly_totals[month]
+            trend_data.append({
+                "month": month,
+                "income": data["income"],
+                "expenses": data["expenses"],
+                "net": data["income"] - data["expenses"],
+            })
+
+        return trend_data
 
     @staticmethod
     def get_sources_breakdown(
@@ -393,11 +430,15 @@ class AnalyticsService:
     def _get_category_spending(
         db: Session, user_id: int, start_date: date, end_date: date
     ) -> dict:
-        """Get spending totals by category for a date range."""
+        """Get spending totals by category for a date range (converted to JPY)."""
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
         results = (
             db.query(
                 Transaction.category,
-                func.sum(Transaction.amount).label("total"),
+                Transaction.amount,
+                Transaction.currency
             )
             .filter(
                 Transaction.user_id == user_id,
@@ -406,7 +447,13 @@ class AnalyticsService:
                 ~Transaction.is_transfer,
                 ~Transaction.is_income,
             )
-            .group_by(Transaction.category)
             .all()
         )
-        return {row.category: abs(row.total) for row in results}
+
+        # Aggregate with currency conversion
+        category_totals: dict[str, int] = {}
+        for row in results:
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            category_totals[row.category] = category_totals.get(row.category, 0) + amount_jpy
+
+        return category_totals

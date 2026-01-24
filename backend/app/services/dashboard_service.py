@@ -7,6 +7,8 @@ from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from ..models.transaction import Transaction
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 
 class DashboardService:
@@ -64,7 +66,7 @@ class DashboardService:
 
     @staticmethod
     def _get_month_data(db: Session, user_id: int, month_key: str) -> dict:
-        """Get income, expense, and net for a specific month.
+        """Get income, expense, and net for a specific month (converted to JPY).
 
         Args:
             db: Database session
@@ -72,30 +74,36 @@ class DashboardService:
             month_key: Month in YYYY-MM format
 
         Returns:
-            Dictionary with income, expense, and net
+            Dictionary with income, expense, and net (in JPY)
         """
-        result = (
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query individual transactions to convert currencies
+        results = (
             db.query(
-                func.sum(
-                    case((Transaction.is_income, Transaction.amount), else_=0)
-                ).label("income"),
-                func.sum(
-                    case((~Transaction.is_income, Transaction.amount), else_=0)
-                ).label("expenses"),
+                Transaction.amount,
+                Transaction.currency,
+                Transaction.is_income
             )
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer,
                 Transaction.month_key == month_key
             )
-            .first()
+            .all()
         )
 
-        income = result.income or 0
-        expense = abs(result.expenses or 0)
-        net = income - expense
+        income = 0
+        expense = 0
+        for row in results:
+            amount_jpy = convert_to_jpy(abs(row.amount), row.currency, rates)
+            if row.is_income:
+                income += amount_jpy
+            else:
+                expense += amount_jpy
 
-        return {"income": income, "expense": expense, "net": net}
+        return {"income": income, "expense": expense, "net": income - expense}
 
     @staticmethod
     def _calculate_change(previous: int, current: int) -> float:
