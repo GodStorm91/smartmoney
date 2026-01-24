@@ -960,9 +960,16 @@
     "draft": "Draft",
     "save": "Save Budget",
     "saving": "Saving...",
+    "confirmDialog": {
+      "title": "Save Budget?",
+      "unallocated": "Unallocated",
+      "categoriesConfigured": "{{count}} categories configured",
+      "overAllocatedWarning": "Your allocations exceed your income minus savings. Consider adjusting before saving."
+    },
     "tapToEdit": "Tap amount to edit",
     "spent": "Spent",
-    "remaining": "remaining",
+    "remaining": "{{amount}} left",
+    "exceeded": "{{amount}} over",
     "overBudget": "Over Budget",
     "overBy": "Over by {{amount}}",
     "editAmount": "Edit amount",
@@ -976,13 +983,15 @@
     "previousIncome": "Previous",
     "languageMismatchNotice": "This advice was generated in a different language. Click 'Regenerate' to get advice in your current language.",
     "projection": {
-      "title": "Spending Forecast",
+      "title": "Daily Pace",
       "daysLeft": "{{count}} days left",
       "spent": "Spent",
       "dailyRate": "Daily Rate",
+      "currentPace": "Current",
+      "safePace": "Safe",
       "projected": "Projected",
       "percentOfBudget": "{{percent}}% of budget",
-      "ofBudget": "of budget",
+      "ofBudget": "Budget",
       "budget": "budget",
       "status": {
         "onTrack": "On Track",
@@ -990,8 +999,18 @@
         "overBudget": "Over Budget"
       },
       "atPace": "At this pace, you'll spend {{amount}}",
-      "overBy": "You'll exceed by {{amount}}",
-      "underBy": "You'll save {{amount}}"
+      "overBy": "You'll exceed budget by {{amount}}",
+      "underBy": "You'll save {{amount}} this month"
+    },
+    "donutChart": {
+      "title": "Budget Composition",
+      "remaining": "Remaining",
+      "other": "Other"
+    },
+    "alerts": {
+      "exceededBy": "{{category}} exceeded by {{amount}}",
+      "approaching": "{{category}} at limit — {{amount}} left for {{days}} days",
+      "allOnTrack": "{{count}} categories on track. Keep it up!"
     },
     "addCategory": "Add Category",
     "selectCategory": "Select category",

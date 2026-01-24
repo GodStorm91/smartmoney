@@ -914,9 +914,16 @@
     "draft": "Bản Nháp",
     "save": "Lưu Ngân Sách",
     "saving": "Đang lưu...",
+    "confirmDialog": {
+      "title": "Lưu Ngân Sách?",
+      "unallocated": "Chưa phân bổ",
+      "categoriesConfigured": "{{count}} danh mục đã cấu hình",
+      "overAllocatedWarning": "Phân bổ vượt quá thu nhập trừ tiết kiệm. Hãy điều chỉnh trước khi lưu."
+    },
     "tapToEdit": "Nhấn vào số tiền để chỉnh sửa",
     "spent": "Đã chi",
-    "remaining": "còn lại",
+    "remaining": "Còn {{amount}}",
+    "exceeded": "Vượt {{amount}}",
     "overBudget": "Vượt Ngân Sách",
     "overBy": "Vượt {{amount}}",
     "editAmount": "Chỉnh sửa số tiền",
@@ -930,13 +937,15 @@
     "previousIncome": "Tháng trước",
     "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại.",
     "projection": {
-      "title": "Dự Báo Chi Tiêu",
+      "title": "Tốc Độ Chi Tiêu",
       "daysLeft": "Còn {{count}} ngày",
       "spent": "Đã chi",
       "dailyRate": "Mỗi ngày",
+      "currentPace": "Hiện tại",
+      "safePace": "An toàn",
       "projected": "Dự kiến",
       "percentOfBudget": "{{percent}}% ngân sách",
-      "ofBudget": "ngân sách",
+      "ofBudget": "Ngân sách",
       "budget": "ngân sách",
       "status": {
         "onTrack": "Đúng tiến độ",
@@ -944,8 +953,18 @@
         "overBudget": "Vượt ngân sách"
       },
       "atPace": "Với tốc độ này, bạn sẽ tiêu {{amount}}",
-      "overBy": "Bạn sẽ vượt {{amount}}",
-      "underBy": "Bạn sẽ tiết kiệm {{amount}}"
+      "overBy": "Bạn sẽ vượt ngân sách {{amount}}",
+      "underBy": "Bạn sẽ tiết kiệm {{amount}} tháng này"
+    },
+    "donutChart": {
+      "title": "Cấu Trúc Ngân Sách",
+      "remaining": "Còn lại",
+      "other": "Khác"
+    },
+    "alerts": {
+      "exceededBy": "{{category}} vượt {{amount}}",
+      "approaching": "{{category}} gần hết — còn {{amount}} cho {{days}} ngày",
+      "allOnTrack": "{{count}} danh mục đang đúng tiến độ. Tiếp tục phát huy!"
     },
     "addCategory": "Thêm Danh Mục",
     "selectCategory": "Chọn danh mục",

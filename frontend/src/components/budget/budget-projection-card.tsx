@@ -31,18 +31,27 @@ export function BudgetProjectionCard({
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   // Calculate date-related values
-  const { daysRemaining, dailyRate, projectedTotal, projectedPercent, status } = useMemo(() => {
+  const { daysRemaining, daysElapsed, dailyRate, safeDaily, projectedTotal, projectedPercent, overUnderAmount, status } = useMemo(() => {
     const [year, monthNum] = month.split('-').map(Number)
     const totalDays = new Date(year, monthNum, 0).getDate()
     const today = new Date()
     const currentDay = today.getDate()
-    const daysElapsed = Math.max(1, currentDay) // Avoid division by zero
+    const elapsed = Math.max(1, currentDay) // Avoid division by zero
     const remaining = Math.max(0, totalDays - currentDay)
 
-    // Calculate rates
-    const rate = totalSpent / daysElapsed
-    const projected = totalSpent + (rate * remaining)
+    // Calculate current daily rate (trend-based)
+    const currentRate = totalSpent / elapsed
+
+    // Calculate safe daily rate (what's needed to stay on budget)
+    const remainingBudget = totalBudget - totalSpent
+    const safeDailyRate = remaining > 0 ? remainingBudget / remaining : 0
+
+    // Project total based on current trend
+    const projected = totalSpent + (currentRate * remaining)
     const percent = totalBudget > 0 ? (projected / totalBudget) * 100 : 0
+
+    // Calculate over/under amount
+    const overUnder = projected - totalBudget
 
     // Determine status
     let statusResult: 'good' | 'warning' | 'danger'
@@ -52,9 +61,12 @@ export function BudgetProjectionCard({
 
     return {
       daysRemaining: remaining,
-      dailyRate: rate,
+      daysElapsed: elapsed,
+      dailyRate: currentRate,
+      safeDaily: safeDailyRate,
       projectedTotal: projected,
       projectedPercent: percent,
+      overUnderAmount: overUnder,
       status: statusResult
     }
   }, [month, totalSpent, totalBudget])
@@ -120,48 +132,49 @@ export function BudgetProjectionCard({
           <span>{t('budget.projection.daysLeft', { count: daysRemaining })}</span>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3">
-          {/* Spent */}
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+        {/* Daily Pace Comparison */}
+        <div className="grid grid-cols-2 gap-3">
+          {/* Current Daily Rate */}
+          <div className={cn(
+            'p-3 rounded-lg',
+            dailyRate > safeDaily && safeDaily > 0
+              ? 'bg-amber-50 dark:bg-amber-900/20'
+              : 'bg-gray-50 dark:bg-gray-800/50'
+          )}>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {t('budget.projection.spent')}
+              {t('budget.projection.currentPace')}
             </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(totalSpent)}
-            </p>
-          </div>
-
-          {/* Daily Rate */}
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {t('budget.projection.dailyRate')}
-            </p>
-            <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <p className={cn(
+              'text-xl font-bold',
+              dailyRate > safeDaily && safeDaily > 0
+                ? 'text-amber-700 dark:text-amber-400'
+                : 'text-gray-900 dark:text-gray-100'
+            )}>
               {formatCurrency(dailyRate)}
               <span className="text-xs font-normal text-gray-500">/{t('day')}</span>
             </p>
           </div>
 
-          {/* Projected */}
-          <div className={cn(
-            'text-center p-3 rounded-lg',
-            status === 'danger' ? 'bg-red-50 dark:bg-red-900/20' :
-            status === 'warning' ? 'bg-amber-50 dark:bg-amber-900/20' :
-            'bg-green-50 dark:bg-green-900/20'
-          )}>
+          {/* Safe Daily Rate */}
+          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {t('budget.projection.projected')}
+              {t('budget.projection.safePace')}
             </p>
-            <p className={cn(
-              'text-lg font-bold',
-              status === 'danger' ? 'text-red-700 dark:text-red-400' :
-              status === 'warning' ? 'text-amber-700 dark:text-amber-400' :
-              'text-green-700 dark:text-green-400'
-            )}>
-              {formatCurrency(projectedTotal)}
+            <p className="text-xl font-bold text-green-700 dark:text-green-400">
+              {safeDaily > 0 ? formatCurrency(safeDaily) : '—'}
+              {safeDaily > 0 && <span className="text-xs font-normal text-gray-500">/{t('day')}</span>}
             </p>
           </div>
+        </div>
+
+        {/* Spending Summary */}
+        <div className="flex items-center justify-between text-sm px-1">
+          <span className="text-gray-600 dark:text-gray-400">
+            {t('budget.projection.spent')}: {formatCurrency(totalSpent)}
+          </span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {t('budget.projection.ofBudget')}: {formatCurrency(totalBudget)}
+          </span>
         </div>
 
         {/* Progress Bar */}
@@ -185,15 +198,19 @@ export function BudgetProjectionCard({
           </div>
         </div>
 
-        {/* Message */}
+        {/* Actionable Message */}
         <div className={cn(
           'flex items-start gap-2 p-3 rounded-lg text-sm',
           statusInfo.bg
-        )}>
-          <Info className={cn('w-4 h-4 mt-0.5 flex-shrink-0', statusInfo.text)} />
-          <p className={statusInfo.text}>
-            {statusInfo.message}
-          </p>
+        )}
+        role="alert"
+        aria-live="polite"
+        >
+          <StatusIcon className={cn('w-4 h-4 mt-0.5 flex-shrink-0', statusInfo.text)} aria-hidden="true" />
+          <div className={statusInfo.text}>
+            <p className="font-medium">{statusInfo.label}</p>
+            <p className="mt-0.5 opacity-90">{statusInfo.message}</p>
+          </div>
         </div>
       </div>
     </Card>

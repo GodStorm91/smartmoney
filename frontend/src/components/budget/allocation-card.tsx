@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ChevronUp, Info, AlertTriangle } from 'lucide-react'
+import { ChevronDown, ChevronUp, Info } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { TransactionSection } from './transaction-section'
+import { StatusBadge, getBudgetStatus } from './status-badge'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -44,7 +45,8 @@ export function AllocationCard({
   const percentOfTotal = totalBudget > 0 ? (allocation.amount / totalBudget) * 100 : 0
   const spentPercent = budgeted > 0 ? (spent / budgeted) * 100 : 0
 
-  const hasWarning = trackingItem && (trackingItem.status === 'red' || trackingItem.status === 'orange')
+  // Determine budget status based on spent percentage
+  const budgetStatus = getBudgetStatus(spentPercent)
 
   return (
     <Card
@@ -53,6 +55,8 @@ export function AllocationCard({
         isExpanded && 'border-blue-300 dark:border-blue-700',
         className
       )}
+      role="article"
+      aria-label={`${allocation.category} budget: ${formatCurrency(spent)} of ${formatCurrency(budgeted)} spent, ${spentPercent.toFixed(0)}% used`}
     >
       {/* Card Header - Clickable */}
       <button
@@ -64,8 +68,11 @@ export function AllocationCard({
             <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">
               {allocation.category}
             </h4>
-            {hasWarning && (
-              <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            {/* Status Badge - 44x44px touch target via padding */}
+            {trackingItem && (
+              <div className="flex-shrink-0 -my-2 py-2 -mx-1 px-1">
+                <StatusBadge status={budgetStatus} percentage={spentPercent} />
+              </div>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -82,7 +89,14 @@ export function AllocationCard({
 
         {/* Allocation Progress Bar */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={Math.min(100, percentOfTotal)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Allocation progress: ${percentOfTotal.toFixed(0)}% of total budget`}
+          >
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-500',
@@ -103,18 +117,27 @@ export function AllocationCard({
         <div className="px-4 pb-3">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600 dark:text-gray-400">
-              {t('budget.spentOfBudgeted', { budgeted: formatCurrency(budgeted) })}
+              {formatCurrency(spent)} / {formatCurrency(budgeted)}
             </span>
             <span className={cn(
-              'font-medium',
+              'font-semibold',
               remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
             )}>
-              {remaining >= 0 ? formatCurrency(remaining) : `-${formatCurrency(Math.abs(remaining))}`}
+              {remaining >= 0
+                ? t('budget.remaining', { amount: formatCurrency(remaining) })
+                : t('budget.exceeded', { amount: formatCurrency(Math.abs(remaining)) })}
             </span>
           </div>
 
           {/* Spent Progress Bar */}
-          <div className="mt-1.5 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div
+            className="mt-1.5 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+            role="progressbar"
+            aria-valuenow={Math.min(100, spentPercent)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Spending progress: ${spentPercent.toFixed(0)}% of budget used`}
+          >
             <div
               className={cn(
                 'h-full rounded-full transition-all duration-500',

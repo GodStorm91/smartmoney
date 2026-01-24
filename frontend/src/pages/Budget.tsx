@@ -23,6 +23,9 @@ import { AddCategoryModal } from '@/components/budget/add-category-modal'
 import { AllocationCard } from '@/components/budget/allocation-card'
 import { BudgetDetailPanel } from '@/components/budget/budget-detail-panel'
 import { BudgetProjectionCard } from '@/components/budget/budget-projection-card'
+import { BudgetConfirmDialog } from '@/components/budget/budget-confirm-dialog'
+import { BudgetDonutChart } from '@/components/budget/budget-donut-chart'
+import { SpendingAlert } from '@/components/budget/spending-alert'
 import { generateBudget, regenerateBudget, getBudgetByMonth, getBudgetTracking, getBudgetSuggestions } from '@/services/budget-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -47,6 +50,7 @@ export function BudgetPage() {
   })
   const [undoStack, setUndoStack] = useState<{ action: string; data: Budget }[]>([])
   const [showAddCategory, setShowAddCategory] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
   // Category interaction state
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
@@ -198,9 +202,14 @@ export function BudgetPage() {
     setUndoStack(prev => prev.slice(0, -1))
   }, [undoStack])
 
-  const handleSave = async () => {
+  const handleSaveClick = () => {
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmSave = async () => {
     await queryClient.refetchQueries({ queryKey: ['budget'] })
     setDraftBudget(null)
+    setShowConfirmDialog(false)
   }
 
   const displayBudget = draftBudget || savedBudget
@@ -366,6 +375,15 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
               month={selectedMonth}
             />
 
+            {/* Budget Composition Donut Chart */}
+            {displayBudget && displayBudget.allocations.length > 0 && (
+              <BudgetDonutChart
+                allocations={displayBudget.allocations}
+                totalBudget={totalBudget}
+                totalAllocated={totalAllocated}
+              />
+            )}
+
             {/* Quick Stats Row */}
             <div className="grid grid-cols-3 gap-3">
               {/* Income Card */}
@@ -472,29 +490,65 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('budget.spendingByCategory')}
                 </h3>
-                <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
-                  {tracking.categories.slice(0, 10).map((cat, idx) => (
-                    <div
-                      key={idx}
-                      className="flex-shrink-0 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg min-w-[120px]"
-                    >
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{cat.category}</p>
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">
-                        {formatCurrency(cat.spent)}
-                      </p>
-                      <div className="mt-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className={cn(
-                            'h-full rounded-full',
-                            cat.status === 'red' ? 'bg-red-500' :
-                            cat.status === 'orange' ? 'bg-orange-500' :
-                            cat.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
-                          )}
-                          style={{ width: `${Math.min(100, cat.percentage)}%` }}
-                        />
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+                  {tracking.categories.slice(0, 10).map((cat, idx) => {
+                    const statusIcon = cat.status === 'red' ? '🚨' :
+                      cat.status === 'orange' ? '⚠️' : '✅'
+                    return (
+                      <div
+                        key={idx}
+                        className="flex-shrink-0 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg min-w-[160px]"
+                        role="article"
+                        aria-label={`${cat.category}: ${Math.round(cat.percentage)}% used, ${formatCurrency(cat.remaining)} remaining`}
+                      >
+                        {/* Category name with status */}
+                        <div className="flex items-center justify-between gap-1 mb-1">
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">
+                            {cat.category}
+                          </p>
+                          <span className="flex-shrink-0 text-sm" aria-hidden="true">{statusIcon}</span>
+                        </div>
+                        {/* Spent amount */}
+                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                          {formatCurrency(cat.spent)}
+                        </p>
+                        {/* Progress bar with percentage */}
+                        <div className="flex items-center gap-2 mt-1">
+                          <div
+                            className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+                            role="progressbar"
+                            aria-valuenow={Math.min(100, cat.percentage)}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <div
+                              className={cn(
+                                'h-full rounded-full transition-all',
+                                cat.status === 'red' ? 'bg-red-500' :
+                                cat.status === 'orange' ? 'bg-orange-500' :
+                                cat.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'
+                              )}
+                              style={{ width: `${Math.min(100, cat.percentage)}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
+                            {Math.round(cat.percentage)}%
+                          </span>
+                        </div>
+                        {/* Remaining amount */}
+                        <p className={cn(
+                          'text-xs mt-1',
+                          cat.remaining >= 0
+                            ? 'text-gray-500 dark:text-gray-400'
+                            : 'text-red-600 dark:text-red-400'
+                        )}>
+                          {cat.remaining >= 0
+                            ? `${formatCurrency(cat.remaining)} ${t('budget.remaining', { amount: '' }).trim()}`
+                            : `${formatCurrency(Math.abs(cat.remaining))} ${t('budget.exceeded', { amount: '' }).trim()}`}
+                        </p>
                       </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </Card>
             )}
@@ -510,7 +564,7 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                   <RefreshCcw className="w-4 h-4 mr-2" />
                   {t('budget.regenerate')}
                 </Button>
-                <Button onClick={handleSave} className="flex-1">
+                <Button onClick={handleSaveClick} className="flex-1">
                   <Check className="w-4 h-4 mr-2" />
                   {t('budget.save')}
                 </Button>
@@ -523,6 +577,15 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                 onSubmit={(feedback) => regenerateMutation.mutate(feedback)}
                 onCancel={() => setShowFeedbackForm(false)}
                 isLoading={regenerateMutation.isPending}
+              />
+            )}
+
+            {/* Smart Spending Alerts */}
+            {tracking && tracking.categories && tracking.categories.length > 0 && (
+              <SpendingAlert
+                categories={tracking.categories}
+                daysRemaining={tracking.days_remaining}
+                onViewCategory={(category) => setSelectedCategory(category)}
               />
             )}
 
@@ -629,6 +692,17 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
         trackingItem={selectedCategory ? tracking?.categories?.find(c => c.category === selectedCategory) : undefined}
         isOpen={!!selectedCategory}
         onClose={handleCloseDetail}
+      />
+
+      {/* Save Confirmation Dialog */}
+      <BudgetConfirmDialog
+        isOpen={showConfirmDialog}
+        onConfirm={handleConfirmSave}
+        onCancel={() => setShowConfirmDialog(false)}
+        monthlyIncome={displayBudget?.monthly_income || 0}
+        totalAllocated={totalAllocated}
+        savingsTarget={displayBudget?.savings_target || 0}
+        categoryCount={displayBudget?.allocations.length || 0}
       />
     </div>
   )

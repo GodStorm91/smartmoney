@@ -915,9 +915,16 @@
     "draft": "下書き",
     "save": "予算を保存",
     "saving": "保存中...",
+    "confirmDialog": {
+      "title": "予算を保存しますか？",
+      "unallocated": "未配分",
+      "categoriesConfigured": "{{count}}カテゴリを設定済み",
+      "overAllocatedWarning": "配分が収入から貯蓄を引いた額を超えています。保存前に調整してください。"
+    },
     "tapToEdit": "金額をタップして編集",
     "spent": "支出",
-    "remaining": "残り",
+    "remaining": "{{amount}} 残り",
+    "exceeded": "{{amount}} 超過",
     "overBudget": "予算オーバー",
     "overBy": "{{amount}} オーバー",
     "editAmount": "金額を編集",
@@ -931,10 +938,12 @@
     "previousIncome": "前月",
     "languageMismatchNotice": "このアドバイスは別の言語で生成されました。現在の言語でアドバイスを取得するには「再生成」をクリックしてください。",
     "projection": {
-      "title": "支出予測",
+      "title": "日次ペース",
       "daysLeft": "残り{{count}}日",
       "spent": "支出",
       "dailyRate": "1日あたり",
+      "currentPace": "現在",
+      "safePace": "目安",
       "projected": "予測",
       "percentOfBudget": "予算の{{percent}}%",
       "ofBudget": "予算",
@@ -945,8 +954,18 @@
         "overBudget": "予算超過"
       },
       "atPace": "このペースでは{{amount}}使います",
-      "overBy": "{{amount}}超過します",
-      "underBy": "{{amount}}節約できます"
+      "overBy": "{{amount}}超過する見込み",
+      "underBy": "今月{{amount}}節約できます"
+    },
+    "donutChart": {
+      "title": "予算構成",
+      "remaining": "残り",
+      "other": "その他"
+    },
+    "alerts": {
+      "exceededBy": "{{category}}が{{amount}}超過",
+      "approaching": "{{category}}が上限に到達 — 残り{{days}}日で{{amount}}",
+      "allOnTrack": "{{count}}カテゴリが順調です。この調子で！"
     },
     "addCategory": "カテゴリを追加",
     "selectCategory": "カテゴリを選択",
