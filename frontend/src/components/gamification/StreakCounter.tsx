@@ -1,3 +1,7 @@
+/**
+ * @deprecated Use HeroProgressCard instead. This component is merged into the new single-page gamification layout.
+ * Will be removed in future version.
+ */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Flame, Award } from 'lucide-react';
