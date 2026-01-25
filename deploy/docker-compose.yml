@@ -27,6 +27,8 @@ services:
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
       SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+      ZERION_API_KEY: ${ZERION_API_KEY}
+      POLYGONSCAN_API_KEY: ${POLYGONSCAN_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
