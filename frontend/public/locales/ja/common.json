@@ -19,6 +19,7 @@
     "goals": "目標",
     "settings": "設定",
     "analytics": "分析",
+    "proxy": "代行",
     "more": "その他"
   },
   "button": {
@@ -1282,6 +1283,55 @@
     "items": "件",
     "oldestDays": "最古{{days}}日前",
     "total": "合計",
+    "cartTitle": "代行購入カート",
+    "itemList": "商品リスト",
+    "addItem": "商品を追加",
+    "totalCost": "合計原価",
+    "totalMarkup": "合計販売価格",
+    "margin": "利益率",
+    "creating": "作成中...",
+    "createPurchases": "購入を作成",
+    "pageTitle": "代行購入ビジネス",
+    "tabs": {
+      "outstanding": "未回収",
+      "history": "履歴",
+      "profit": "利益",
+      "clients": "クライアント"
+    },
+    "sort": {
+      "oldest": "古い順",
+      "amount": "金額順",
+      "name": "名前順"
+    },
+    "filter": {
+      "all": "すべて",
+      "outstanding": "未回収",
+      "settled": "回収済み"
+    },
+    "noOutstanding": "未回収の売掛金はありません",
+    "noOutstandingDesc": "すべての支払いが回収されました。",
+    "totalOutstanding": "未回収合計",
+    "overdue": "期限超過",
+    "noHistory": "購入履歴なし",
+    "noHistoryDesc": "代行購入の履歴がここに表示されます。",
+    "settled": "回収済み",
+    "pending": "未回収",
+    "showingCount": "{{total}}件中{{count}}件表示",
+    "noProfit": "利益データなし",
+    "noProfitDesc": "代行購入を開始すると利益分析が表示されます。",
+    "totalProfit": "合計利益",
+    "avgMargin": "平均利益率",
+    "totalItems": "合計商品数",
+    "monthlyBreakdown": "月別内訳",
+    "currentMonth": "今月",
+    "noClientsDesc": "売掛金アカウントを作成して最初のクライアントを追加してください。",
+    "addClient": "クライアントを追加",
+    "activeClient": "アクティブ",
+    "inactiveClient": "非アクティブ",
+    "allSettled": "全て回収済み",
+    "totalClients": "クライアント数",
+    "withOutstanding": "未回収あり",
+    "addNewClient": "新規クライアントを追加",
     "errors": {
       "clientRequired": "クライアントを選択してください",
       "itemRequired": "商品説明は必須です",
@@ -1291,7 +1341,9 @@
       "rateRequired": "為替レートは必須です",
       "selectItems": "少なくとも1件選択してください",
       "receiveRequired": "入金先を選択してください",
-      "amountRequired": "受取金額は必須です"
+      "amountRequired": "受取金額は必須です",
+      "itemsRequired": "少なくとも1つの商品が必要です",
+      "submitFailed": "購入の作成に失敗しました"
     }
   },
   "gamification": {

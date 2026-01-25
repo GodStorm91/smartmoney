@@ -15,6 +15,7 @@ import {
   Flame,
   Zap,
   LogOut,
+  ShoppingCart,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
@@ -37,6 +38,7 @@ const NAV_CONFIG: Record<string, NavItemConfig> = {
   gamification: { path: '/gamification', icon: Trophy, labelKey: 'header.gamification', activeColor: 'text-yellow-500', badge: 'level' },
   analytics: { path: '/analytics', icon: BarChart3, labelKey: 'nav.analytics', activeColor: 'text-indigo-600 dark:text-indigo-400' },
   goals: { path: '/goals', icon: Target, labelKey: 'nav.goals', activeColor: 'text-pink-600 dark:text-pink-400' },
+  proxy: { path: '/proxy', icon: ShoppingCart, labelKey: 'nav.proxy', activeColor: 'text-orange-600 dark:text-orange-400' },
   settings: { path: '/settings', icon: Settings, labelKey: 'nav.settings', activeColor: 'text-gray-600 dark:text-gray-400' },
   upload: { path: '/upload', icon: Upload, labelKey: 'header.upload', activeColor: 'text-cyan-600 dark:text-cyan-400' },
 }
@@ -52,6 +54,7 @@ const primaryMenuItems: NavItemConfig[] = [
   NAV_CONFIG.gamification,
   NAV_CONFIG.analytics,
   NAV_CONFIG.goals,
+  NAV_CONFIG.proxy,
 ]
 
 const secondaryMenuItems: NavItemConfig[] = [

@@ -19,6 +19,7 @@
     "goals": "Mục tiêu",
     "settings": "Cài đặt",
     "analytics": "Phân tích",
+    "proxy": "Mua hộ",
     "more": "Thêm"
   },
   "button": {
@@ -1281,6 +1282,55 @@
     "items": "mục",
     "oldestDays": "cũ nhất {{days}} ngày",
     "total": "Tổng",
+    "cartTitle": "Giỏ hàng mua hộ",
+    "itemList": "Danh sách sản phẩm",
+    "addItem": "Thêm sản phẩm",
+    "totalCost": "Tổng giá gốc",
+    "totalMarkup": "Tổng giá bán",
+    "margin": "Tỷ suất lợi nhuận",
+    "creating": "Đang tạo...",
+    "createPurchases": "Tạo đơn mua",
+    "pageTitle": "Kinh doanh mua hộ",
+    "tabs": {
+      "outstanding": "Chưa thu",
+      "history": "Lịch sử",
+      "profit": "Lợi nhuận",
+      "clients": "Khách hàng"
+    },
+    "sort": {
+      "oldest": "Cũ nhất",
+      "amount": "Số tiền",
+      "name": "Tên"
+    },
+    "filter": {
+      "all": "Tất cả",
+      "outstanding": "Chưa thu",
+      "settled": "Đã thu"
+    },
+    "noOutstanding": "Không có khoản thu nào",
+    "noOutstandingDesc": "Tất cả các khoản thanh toán đã được thu.",
+    "totalOutstanding": "Tổng chưa thu",
+    "overdue": "Quá hạn",
+    "noHistory": "Chưa có lịch sử mua hàng",
+    "noHistoryDesc": "Lịch sử mua hộ sẽ hiển thị ở đây.",
+    "settled": "Đã thu",
+    "pending": "Chờ thu",
+    "showingCount": "Hiển thị {{count}} / {{total}} giao dịch",
+    "noProfit": "Chưa có dữ liệu lợi nhuận",
+    "noProfitDesc": "Bắt đầu mua hộ để xem phân tích lợi nhuận.",
+    "totalProfit": "Tổng lợi nhuận",
+    "avgMargin": "Tỷ suất TB",
+    "totalItems": "Tổng sản phẩm",
+    "monthlyBreakdown": "Theo tháng",
+    "currentMonth": "Tháng này",
+    "noClientsDesc": "Tạo tài khoản phải thu để thêm khách hàng đầu tiên.",
+    "addClient": "Thêm khách hàng",
+    "activeClient": "Hoạt động",
+    "inactiveClient": "Không hoạt động",
+    "allSettled": "Đã thu hết",
+    "totalClients": "Tổng khách hàng",
+    "withOutstanding": "Còn chưa thu",
+    "addNewClient": "Thêm khách hàng mới",
     "errors": {
       "clientRequired": "Vui lòng chọn khách hàng",
       "itemRequired": "Mô tả sản phẩm là bắt buộc",
@@ -1290,7 +1340,9 @@
       "rateRequired": "Tỷ giá là bắt buộc",
       "selectItems": "Vui lòng chọn ít nhất một mục",
       "receiveRequired": "Vui lòng chọn tài khoản nhận",
-      "amountRequired": "Số tiền nhận là bắt buộc"
+      "amountRequired": "Số tiền nhận là bắt buộc",
+      "itemsRequired": "Cần ít nhất một sản phẩm",
+      "submitFailed": "Không thể tạo đơn mua"
     }
   },
   "bills": {

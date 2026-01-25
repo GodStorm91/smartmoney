@@ -22,6 +22,7 @@ import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { SpendingCalendar } from '@/components/dashboard/SpendingCalendar'
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
+import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
 import { AnomalyAlertList } from '@/components/anomalies/AnomalyAlertList'
 import { InsightCardList } from '@/components/insights/InsightCardList'
 import { SavingsRecommendations } from '@/components/savings/SavingsRecommendations'
@@ -199,6 +200,9 @@ export function Dashboard() {
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Onboarding */}
         <OnboardingChecklist />
+
+        {/* Proxy Receivables - prominent position for business tracking */}
+        <ProxyReceivablesWidget />
 
         {/* Net Worth Hero */}
         <NetWorthHero summary={summary} />

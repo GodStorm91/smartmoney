@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Plus, X, Receipt, Upload, CreditCard } from 'lucide-react'
+import { Plus, X, Receipt, Upload, CreditCard, ShoppingCart } from 'lucide-react'
+import { ProxyCartWizard } from '@/components/proxy/ProxyCartWizard'
 import { cn } from '@/utils/cn'
 
 interface FABAction {
@@ -23,6 +24,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
   const navigate = useNavigate()
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
+  const [showProxyWizard, setShowProxyWizard] = useState(false)
 
   // Hide on pages that have their own FAB
   if (PAGES_WITH_OWN_FAB.includes(location.pathname)) {
@@ -60,6 +62,15 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
         navigate({ to: '/upload' })
       },
       color: 'bg-blue-500 hover:bg-blue-600',
+    },
+    {
+      icon: <ShoppingCart size={20} />,
+      label: t('proxy.title', 'Proxy Purchase'),
+      onClick: () => {
+        setIsOpen(false)
+        setShowProxyWizard(true)
+      },
+      color: 'bg-orange-500 hover:bg-orange-600',
     },
   ]
 
@@ -120,6 +131,12 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
           )}
         </button>
       </div>
+
+      {/* Proxy Cart Wizard */}
+      <ProxyCartWizard
+        isOpen={showProxyWizard}
+        onClose={() => setShowProxyWizard(false)}
+      />
     </>
   )
 }
