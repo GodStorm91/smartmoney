@@ -523,10 +523,6 @@ class RewardService:
             is_adjustment=False,
             month_key=month_key,
             tx_hash=tx_hash,
-            # Crypto fields
-            token_symbol=reward.reward_token_symbol,
-            token_amount=reward.reward_amount,
-            chain_id=reward.chain_id
         )
 
         db.add(transaction)
