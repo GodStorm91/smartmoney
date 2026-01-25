@@ -1,5 +1,6 @@
 import { apiClient } from './api-client'
 import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest, BudgetTracking, BudgetSuggestions } from '@/types'
+import type { CategoryHistory } from '@/utils/spending-prediction'
 
 /**
  * Generate new budget using AI
@@ -86,6 +87,20 @@ export async function deleteAllocation(
 ): Promise<Budget> {
   const response = await apiClient.delete<Budget>(
     `/api/budgets/${budgetId}/allocations/${encodeURIComponent(category)}`
+  )
+  return response.data
+}
+
+/**
+ * Get category spending history for predictions
+ */
+export async function getCategoryHistory(
+  category: string,
+  months: number = 3
+): Promise<CategoryHistory> {
+  const response = await apiClient.get<CategoryHistory>(
+    `/api/budgets/category-history/${encodeURIComponent(category)}`,
+    { params: { months } }
   )
   return response.data
 }

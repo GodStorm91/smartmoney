@@ -3,7 +3,7 @@ from datetime import date
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
@@ -14,7 +14,8 @@ from ..schemas.budget import (
     BudgetGenerateRequest,
     BudgetRegenerateRequest,
     BudgetResponse,
-    BudgetTrackingResponse
+    BudgetTrackingResponse,
+    CategoryHistoryResponse
 )
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
@@ -348,4 +349,40 @@ def check_budget_alerts(
         current_user.id,
         current_user.email
     )
+    return result
+
+
+@router.get("/category-history/{category}", response_model=CategoryHistoryResponse)
+def get_category_spending_history(
+    category: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+    months: int = Query(default=3, ge=1, le=12)
+):
+    """Get daily spending history for a category.
+
+    Used for ML-lite prediction calculations.
+
+    Args:
+        category: Category name
+        db: Database session
+        current_user: Authenticated user
+        months: Number of months to look back (1-12, default 3)
+
+    Returns:
+        Historical spending data with daily/monthly aggregates
+    """
+    result = BudgetTrackingService.get_category_history(
+        db,
+        current_user.id,
+        category,
+        months
+    )
+
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No spending history found for category {category}"
+        )
+
     return result

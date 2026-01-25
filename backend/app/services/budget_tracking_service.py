@@ -1,5 +1,7 @@
 """Budget tracking service for monitoring spending vs budget."""
+import statistics
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models.transaction import Transaction
@@ -243,4 +245,122 @@ class BudgetTrackingService:
         return {
             'alerts_sent': alerts_sent,
             'message': f'Sent {alerts_sent} budget alerts'
+        }
+
+    @staticmethod
+    def get_category_history(
+        db: Session,
+        user_id: int,
+        category: str,
+        months: int = 3
+    ) -> dict | None:
+        """Get daily spending history for a category.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            category: Category name (parent category)
+            months: Number of months to look back (1-12, default 3)
+
+        Returns:
+            Dict with daily spending, monthly totals, avg daily, std deviation
+        """
+        # Calculate date range
+        today = date.today()
+        start_date = today - relativedelta(months=months)
+
+        # Build category hierarchy to include children
+        hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)
+        categories_to_query = hierarchy.get(category, [category])
+
+        # Get exchange rates for currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+
+        # Query transactions for the category and its children
+        transactions = (
+            db.query(
+                Transaction.date,
+                Transaction.amount,
+                Transaction.currency
+            )
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.category.in_(categories_to_query),
+                Transaction.is_income == False,
+                Transaction.is_transfer == False,
+                Transaction.is_adjustment == False,
+                Transaction.date >= start_date,
+                Transaction.date <= today
+            )
+            .all()
+        )
+
+        if not transactions:
+            return {
+                'category': category,
+                'daily_spending': [],
+                'monthly_totals': [],
+                'overall_avg_daily': 0.0,
+                'std_deviation': 0.0
+            }
+
+        # Aggregate by day with currency conversion
+        daily_data: dict[date, dict] = {}
+        for tx in transactions:
+            tx_date = tx.date
+            amount_jpy = convert_to_jpy(abs(tx.amount), tx.currency, rates)
+
+            if tx_date not in daily_data:
+                daily_data[tx_date] = {'amount': 0, 'count': 0}
+            daily_data[tx_date]['amount'] += amount_jpy
+            daily_data[tx_date]['count'] += 1
+
+        # Build daily spending list
+        daily_spending = [
+            {
+                'date': d.strftime('%Y-%m-%d'),
+                'amount': data['amount'],
+                'transaction_count': data['count']
+            }
+            for d, data in sorted(daily_data.items(), reverse=True)
+        ]
+
+        # Aggregate by month
+        monthly_data: dict[str, dict] = {}
+        for d, data in daily_data.items():
+            month_key = d.strftime('%Y-%m')
+            if month_key not in monthly_data:
+                monthly_data[month_key] = {'total': 0, 'count': 0, 'days': set()}
+            monthly_data[month_key]['total'] += data['amount']
+            monthly_data[month_key]['count'] += data['count']
+            monthly_data[month_key]['days'].add(d)
+
+        # Build monthly totals with avg daily calculation
+        monthly_totals = []
+        for month_key in sorted(monthly_data.keys(), reverse=True):
+            data = monthly_data[month_key]
+            days_with_spending = len(data['days'])
+            avg_daily = data['total'] // days_with_spending if days_with_spending > 0 else 0
+            monthly_totals.append({
+                'month': month_key,
+                'total': data['total'],
+                'avg_daily': avg_daily,
+                'transaction_count': data['count']
+            })
+
+        # Calculate overall average daily and standard deviation
+        daily_amounts = [data['amount'] for data in daily_data.values()]
+        overall_avg_daily = sum(daily_amounts) / len(daily_amounts) if daily_amounts else 0.0
+
+        if len(daily_amounts) >= 2:
+            std_deviation = statistics.stdev(daily_amounts)
+        else:
+            std_deviation = 0.0
+
+        return {
+            'category': category,
+            'daily_spending': daily_spending,
+            'monthly_totals': monthly_totals,
+            'overall_avg_daily': round(overall_avg_daily, 2),
+            'std_deviation': round(std_deviation, 2)
         }

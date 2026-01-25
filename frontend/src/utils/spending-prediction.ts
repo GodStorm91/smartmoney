@@ -18,12 +18,22 @@ export interface SpendingPrediction {
 export interface DailySpending {
   date: string
   amount: number
+  transaction_count: number
+}
+
+export interface MonthlyTotal {
+  month: string
+  total: number
+  avg_daily: number
+  transaction_count: number
 }
 
 export interface CategoryHistory {
   category: string
-  dailySpending: DailySpending[]
-  monthlyTotals: { month: string; total: number }[]
+  daily_spending: DailySpending[]
+  monthly_totals: MonthlyTotal[]
+  overall_avg_daily: number
+  std_deviation: number
 }
 
 /**
@@ -77,7 +87,7 @@ export function predictCategorySpending(
   trackingItem: BudgetTrackingItem,
   daysRemaining: number,
   daysElapsed: number,
-  historicalData?: DailySpending[]
+  historicalData?: { date: string; amount: number }[]
 ): SpendingPrediction {
   const { category, budgeted, spent } = trackingItem
 
@@ -162,11 +172,16 @@ export function generatePredictions(
   return tracking.categories
     .map(trackingItem => {
       const history = historicalData?.find(h => h.category === trackingItem.category)
+      // Convert to legacy format for predictCategorySpending
+      const dailySpending = history?.daily_spending.map(d => ({
+        date: d.date,
+        amount: d.amount
+      }))
       return predictCategorySpending(
         trackingItem,
         days_remaining,
         daysElapsed,
-        history?.dailySpending
+        dailySpending
       )
     })
     .filter(p => p.status !== 'safe' || p.anomalyDetected) // Only return concerning predictions

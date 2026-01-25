@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Plus, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
@@ -33,21 +34,60 @@ export function CategoryListPanel({
   const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
 
+  const listRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([])
+
+  // Track focused index for keyboard navigation
+  const [focusedIndex, setFocusedIndex] = useState(() => {
+    const idx = allocations.findIndex(a => a.category === selectedCategory)
+    return idx >= 0 ? idx : 0
+  })
+
+  // Update focused index when selectedCategory changes externally
+  useEffect(() => {
+    const idx = allocations.findIndex(a => a.category === selectedCategory)
+    if (idx >= 0) {
+      setFocusedIndex(idx)
+    }
+  }, [selectedCategory, allocations])
+
+  // Scroll focused item into view
+  useEffect(() => {
+    const item = itemRefs.current[focusedIndex]
+    item?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [focusedIndex])
+
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
   const getTrackingItem = (category: string) =>
     trackingItems?.find(item => item.category === category)
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      const nextIndex = index < allocations.length - 1 ? index + 1 : 0
-      onSelectCategory(allocations[nextIndex].category)
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      const prevIndex = index > 0 ? index - 1 : allocations.length - 1
-      onSelectCategory(allocations[prevIndex].category)
+  const handleListKeyDown = (e: React.KeyboardEvent) => {
+    if (allocations.length === 0) return
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault()
+        setFocusedIndex(prev => (prev < allocations.length - 1 ? prev + 1 : 0))
+        break
+      case 'ArrowUp':
+        e.preventDefault()
+        setFocusedIndex(prev => (prev > 0 ? prev - 1 : allocations.length - 1))
+        break
+      case 'Home':
+        e.preventDefault()
+        setFocusedIndex(0)
+        break
+      case 'End':
+        e.preventDefault()
+        setFocusedIndex(allocations.length - 1)
+        break
+      case 'Enter':
+      case ' ':
+        e.preventDefault()
+        onSelectCategory(allocations[focusedIndex].category)
+        break
     }
   }
 
@@ -70,9 +110,13 @@ export function CategoryListPanel({
 
       {/* Category List */}
       <div
-        className="flex-1 overflow-y-auto scrollbar-hide"
+        ref={listRef}
+        className="flex-1 overflow-y-auto scrollbar-hide focus:outline-none"
         role="listbox"
+        tabIndex={0}
         aria-label={t('budget.allocations')}
+        aria-activedescendant={allocations.length > 0 ? `category-${focusedIndex}` : undefined}
+        onKeyDown={handleListKeyDown}
       >
         {allocations.map((allocation, index) => {
           const tracking = getTrackingItem(allocation.category)
@@ -80,19 +124,25 @@ export function CategoryListPanel({
           const spent = tracking?.spent || 0
           const status = getBudgetStatus(percentage)
           const isSelected = selectedCategory === allocation.category
+          const isFocused = focusedIndex === index
 
           return (
             <button
               key={allocation.category}
+              ref={(el) => { itemRefs.current[index] = el }}
+              id={`category-${index}`}
               role="option"
               aria-selected={isSelected}
-              onClick={() => onSelectCategory(allocation.category)}
-              onKeyDown={(e) => handleKeyDown(e, index)}
+              tabIndex={-1}
+              onClick={() => {
+                setFocusedIndex(index)
+                onSelectCategory(allocation.category)
+              }}
               className={cn(
                 'w-full flex items-center justify-between px-4 py-3',
                 'text-left transition-all',
                 'hover:bg-gray-50 dark:hover:bg-gray-800',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500',
+                isFocused && 'ring-2 ring-inset ring-green-500',
                 isSelected && 'bg-green-50 dark:bg-green-900/20 border-l-3 border-green-500'
               )}
             >

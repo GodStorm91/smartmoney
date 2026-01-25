@@ -194,6 +194,20 @@ export function BudgetDetailPanel({
     }
   }, [category, month, isOpen, searchCategories])
 
+  // Escape key closes overlay panel
+  useEffect(() => {
+    if (mode !== 'overlay' || !isOpen) return
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [isOpen, mode, onClose])
+
   const formatTxDate = (dateStr: string) => {
     return formatDate(dateStr, 'MMM d')
   }

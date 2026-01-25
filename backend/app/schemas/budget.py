@@ -57,3 +57,29 @@ class BudgetTrackingResponse(BaseModel):
     total_spent: int
     savings_target: int | None = None
     categories: list[BudgetTrackingItem]
+
+
+# --- Historical Spending Schemas for Predictions ---
+
+class DailySpendingSchema(BaseModel):
+    """Daily spending data for a category."""
+    date: str  # YYYY-MM-DD
+    amount: int  # JPY
+    transaction_count: int
+
+
+class MonthlyTotalSchema(BaseModel):
+    """Monthly total spending for a category."""
+    month: str  # YYYY-MM
+    total: int
+    avg_daily: int
+    transaction_count: int
+
+
+class CategoryHistoryResponse(BaseModel):
+    """Historical spending data for a category."""
+    category: str
+    daily_spending: list[DailySpendingSchema]
+    monthly_totals: list[MonthlyTotalSchema]
+    overall_avg_daily: float
+    std_deviation: float
