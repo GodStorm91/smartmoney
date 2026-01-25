@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { Gift, TrendingUp, Calendar, RefreshCw, Check } from 'lucide-react'
-import { fetchStakingRewards, scanRewards } from '@/services/crypto-service'
+import { Gift, TrendingUp, Calendar, RefreshCw, Check, Plus, Loader2, X } from 'lucide-react'
+import { fetchStakingRewards, scanRewards, fetchPositionRewards, batchCreateTransactions } from '@/services/crypto-service'
 
 interface StakingRewardsTabProps {
   source?: string
@@ -12,18 +12,52 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [scanResult, setScanResult] = useState<{ scanned: number; new: number } | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { data: rewards, isLoading } = useQuery({
     queryKey: ['staking-rewards', source],
     queryFn: () => fetchStakingRewards(source),
   })
 
+  // Fetch all rewards to find unlinked ones for batch creation
+  const { data: allRewards = [] } = useQuery({
+    queryKey: ['all-rewards'],
+    queryFn: fetchPositionRewards,
+  })
+
+  // Filter unlinked rewards (no transaction_id) with USD value
+  const unlinkedRewards = allRewards.filter(
+    (r: any) => !r.transaction_id && r.reward_usd && Number(r.reward_usd) > 0
+  )
+
   const scanMutation = useMutation({
     mutationFn: () => scanRewards(90),
     onSuccess: (result) => {
       setScanResult({ scanned: result.scanned_claims, new: result.new_claims })
       queryClient.invalidateQueries({ queryKey: ['staking-rewards'] })
+      queryClient.invalidateQueries({ queryKey: ['all-rewards'] })
       setTimeout(() => setScanResult(null), 5000)
+    },
+  })
+
+  const batchCreateMutation = useMutation({
+    mutationFn: (rewardIds: number[]) => batchCreateTransactions(rewardIds),
+    onSuccess: (result) => {
+      const msg = t('crypto.batchTransactionsCreated', 'Created {{created}} transactions (${{total}}). Skipped: {{skipped}}', {
+        created: result.created,
+        total: result.total_usd.toFixed(2),
+        skipped: result.skipped,
+      })
+      setSuccessMessage(msg)
+      queryClient.invalidateQueries({ queryKey: ['all-rewards'] })
+      queryClient.invalidateQueries({ queryKey: ['staking-rewards'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      setTimeout(() => setSuccessMessage(null), 8000)
+    },
+    onError: (error: Error) => {
+      setErrorMessage(error.message || t('crypto.batchTransactionError', 'Failed to create transactions'))
+      setTimeout(() => setErrorMessage(null), 5000)
     },
   })
 
@@ -108,6 +142,46 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
         <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300">
           <Check className="h-4 w-4" />
           {t('crypto.scanComplete', 'Scanned {{scanned}} claims, found {{new}} new', scanResult)}
+        </div>
+      )}
+
+      {/* Success/Error Messages */}
+      {successMessage && (
+        <div className="flex items-center gap-2 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg text-sm text-green-700 dark:text-green-300">
+          <Check className="h-4 w-4" />
+          {successMessage}
+        </div>
+      )}
+      {errorMessage && (
+        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm text-red-700 dark:text-red-300">
+          <X className="h-4 w-4" />
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Create All Transactions Button */}
+      {unlinkedRewards.length > 0 && (
+        <div className="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            {t('crypto.unlinkedRewardsHint', '{{count}} rewards ready to convert to transactions', { count: unlinkedRewards.length })}
+          </div>
+          <button
+            onClick={() => batchCreateMutation.mutate(unlinkedRewards.map((r: any) => r.id))}
+            disabled={batchCreateMutation.isPending}
+            className="flex items-center gap-2 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-400 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            {batchCreateMutation.isPending ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t('crypto.creating', 'Creating...')}
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                {t('crypto.createAllTransactions', 'Create All Txns')} ({unlinkedRewards.length})
+              </>
+            )}
+          </button>
         </div>
       )}
 
