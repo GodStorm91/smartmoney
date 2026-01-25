@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Edit2, Check, Upload, Loader2, Crown, Star } from 'lucide-react'
-import { BottomSheet } from '@/components/ui/BottomSheet'
+import { Edit2, Check, Upload, Loader2, Crown, Star, ZoomIn, ZoomOut, RotateCw, X, Crop } from 'lucide-react'
+import { ResponsiveModal } from '@/components/ui/ResponsiveModal'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useProfile, useAvatars, useGamificationStats, useActivateAvatar, useUploadCustomAvatar, useUpdateProfile } from '@/services/rewards-service'
@@ -109,7 +109,7 @@ export function ProfileBottomSheet({ isOpen, onClose }: ProfileBottomSheetProps)
   }
 
   return (
-    <BottomSheet isOpen={isOpen} onClose={onClose} title={t('gamification.profile.title') || 'Profile'}>
+    <ResponsiveModal isOpen={isOpen} onClose={onClose} title={t('gamification.profile.title') || 'Profile'} size="lg">
       <div className="space-y-6">
         {/* Profile header */}
         <div className="flex items-center gap-4">
@@ -217,7 +217,7 @@ export function ProfileBottomSheet({ isOpen, onClose }: ProfileBottomSheetProps)
           </div>
         </div>
       </div>
-    </BottomSheet>
+    </ResponsiveModal>
   )
 }
 
