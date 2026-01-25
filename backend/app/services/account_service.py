@@ -227,3 +227,39 @@ class AccountService:
             Transaction.account_id == account_id,
             Transaction.user_id == user_id
         ).scalar() or 0
+
+    @staticmethod
+    def get_or_create_crypto_income_account(db: Session, user_id: int) -> Account:
+        """Get or create the default Crypto Income account for reward transactions.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Crypto Income account
+        """
+        # Look for existing Crypto Income account
+        account = db.query(Account).filter(
+            Account.user_id == user_id,
+            Account.name == "Crypto Income",
+            Account.is_active == True
+        ).first()
+
+        if account:
+            return account
+
+        # Create new Crypto Income account
+        account = Account(
+            user_id=user_id,
+            name="Crypto Income",
+            type="income",
+            currency="USD",
+            initial_balance=0,
+            initial_balance_date=date.today(),
+            is_active=True,
+        )
+        db.add(account)
+        db.commit()
+        db.refresh(account)
+        return account
