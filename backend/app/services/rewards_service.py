@@ -119,6 +119,17 @@ class RewardsService:
 
         return avatar
 
+    def get_active_avatar(self, user_id: int) -> Optional[Avatar]:
+        """Get the currently active avatar for a user."""
+        user_avatar = (
+            self.db.query(UserAvatar)
+            .filter_by(user_id=user_id, is_active=True)
+            .first()
+        )
+        if user_avatar:
+            return self.db.query(Avatar).filter_by(id=user_avatar.avatar_id).first()
+        return None
+
     # Profile
     def get_profile(self, user_id: int) -> Optional[UserProfile]:
         return self.db.query(UserProfile).filter_by(user_id=user_id).first()

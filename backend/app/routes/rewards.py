@@ -173,12 +173,26 @@ async def get_profile(user: User = Depends(get_current_user), db: Session = Depe
     service = RewardsService(db)
     profile = service.get_profile(user.id)
     user_gam = service.gamification.get_or_create_user_gamification(user.id)
+    active_avatar = service.get_active_avatar(user.id)
+
+    avatar_data = None
+    if active_avatar:
+        avatar_data = {
+            "id": active_avatar.id,
+            "code": active_avatar.code,
+            "name": active_avatar.name,
+            "emoji": active_avatar.emoji,
+            "image_url": get_avatar_url(active_avatar.image_url),
+            "rarity": active_avatar.rarity,
+        }
+
     return {
         "display_name": profile.display_name if profile else user.email.split("@")[0],
         "bio": profile.bio if profile else None,
         "title": profile.title if profile else None,
         "level": user_gam.calculate_level(),
         "total_xp": user_gam.total_xp,
+        "active_avatar": avatar_data,
     }
 
 
