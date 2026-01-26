@@ -84,8 +84,12 @@ class RewardsService {
     const formData = new FormData();
     formData.append('avatar', file);
     console.log('[uploadCustomAvatar] FormData created, token exists:', !!localStorage.getItem('smartmoney_access_token'));
-    // Note: Don't set Content-Type manually - axios will set it with boundary
-    const response = await apiClient.post('/api/rewards/avatars/upload', formData);
+    // Must override Content-Type to let axios set multipart/form-data with boundary
+    const response = await apiClient.post('/api/rewards/avatars/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     console.log('[uploadCustomAvatar] Upload response:', response.data);
     return response.data;
   }
