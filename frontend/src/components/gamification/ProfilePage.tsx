@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { User, Crown, Star, Edit2, Check, Upload, X, Loader2 } from 'lucide-react';
+import { User, Crown, Star, Edit2, Check, Upload, X, Loader2, Trash2 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { useProfile, useAvatars, useGamificationStats, useActivateAvatar, useUploadCustomAvatar } from '@/services/rewards-service';
+import { useProfile, useAvatars, useGamificationStats, useActivateAvatar, useUploadCustomAvatar, useDeleteAvatar } from '@/services/rewards-service';
 import { toast } from 'sonner';
 import { convertHeicToJpeg, isHeicFile } from '@/utils/heic-converter';
 
@@ -23,11 +23,13 @@ export const ProfilePage: React.FC = () => {
   const { data: avatars = [] } = useAvatars(1);
   const { mutate: activateAvatar, isPending: activatingAvatar } = useActivateAvatar();
   const { mutate: uploadCustomAvatar, isPending: uploadingAvatar, isSuccess: uploadSuccess } = useUploadCustomAvatar();
+  const { mutate: deleteAvatar, isPending: deletingAvatar } = useDeleteAvatar();
 
   const [isEditing, setIsEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || '');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
+  const [avatarToDelete, setAvatarToDelete] = useState<{ id: number; name: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const level = gamificationStats?.current_level || profile?.level || 1;
@@ -51,6 +53,13 @@ export const ProfilePage: React.FC = () => {
     activateAvatar(avatarId, {
       onSuccess: () => toast.success(t('gamification.profile.avatarSelected') || 'Avatar selected!'),
       onError: () => toast.error(t('gamification.profile.avatarError') || 'Failed to select avatar'),
+    });
+  };
+
+  const handleDeleteAvatar = () => {
+    if (!avatarToDelete || deletingAvatar) return;
+    deleteAvatar(avatarToDelete.id, {
+      onSuccess: () => setAvatarToDelete(null),
     });
   };
 
@@ -191,16 +200,22 @@ export const ProfilePage: React.FC = () => {
             {avatars.map((avatar: any) => {
               const isAvailable = avatar.unlock_level <= level;
               const isActive = avatar.id === profile?.active_avatar?.id;
+              const isCustom = avatar.rarity === 'custom';
               return (
                 <div
                   key={avatar.id}
-                  onClick={() => isAvailable && handleAvatarSelect(avatar.id)}
-                  className={`aspect-square rounded-xl flex items-center justify-center text-3xl cursor-pointer transition-all relative ${
-                    isAvailable ? rarityColors[avatar.rarity] : 'opacity-50 bg-gray-100'
+                  className={`aspect-square rounded-xl flex items-center justify-center text-3xl cursor-pointer transition-all relative group ${
+                    isAvailable ? rarityColors[avatar.rarity] || 'bg-pink-100 text-pink-700 border-pink-300' : 'opacity-50 bg-gray-100'
                   } ${isActive ? 'ring-2 ring-green-500 ring-offset-2' : ''}`}
                   title={isAvailable ? `${avatar.name} - ${isActive ? 'Selected' : 'Click to select'}` : `Unlock at level ${avatar.unlock_level}`}
                 >
-                  {avatar.emoji || '😊'}
+                  <div onClick={() => isAvailable && handleAvatarSelect(avatar.id)} className="w-full h-full flex items-center justify-center">
+                    {avatar.image_url ? (
+                      <img src={avatar.image_url} alt={avatar.name} className="w-full h-full object-cover rounded-xl" />
+                    ) : (
+                      avatar.emoji || '😊'
+                    )}
+                  </div>
                   {isActive && (
                     <div className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5">
                       <Check className="w-3 h-3" />
@@ -210,6 +225,18 @@ export const ProfilePage: React.FC = () => {
                     <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-gray-900/60 rounded-xl">
                       <span className="text-xs font-medium">Lv{avatar.unlock_level}</span>
                     </div>
+                  )}
+                  {isCustom && isAvailable && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setAvatarToDelete({ id: avatar.id, name: avatar.name });
+                      }}
+                      className="absolute -top-1 -left-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Delete avatar"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                   )}
                 </div>
               );
@@ -221,7 +248,7 @@ export const ProfilePage: React.FC = () => {
       {/* Custom Avatar Upload Modal */}
       {showUploadModal && (
         <>
-          <div 
+          <div
             className="fixed inset-0 z-50 bg-black/50 animate-in fade-in"
             onClick={() => setShowUploadModal(false)}
           />
@@ -229,14 +256,14 @@ export const ProfilePage: React.FC = () => {
             <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-semibold">Upload Custom Avatar</h3>
-                <button 
+                <button
                   onClick={() => setShowUploadModal(false)}
                   className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 text-center">
                   <input
@@ -269,10 +296,51 @@ export const ProfilePage: React.FC = () => {
                     )}
                   </button>
                 </div>
-                
+
                 <div className="text-xs text-gray-500 text-center">
                   <p>Supported formats: JPG, PNG, GIF, WebP, HEIC</p>
                   <p>Maximum file size: 5MB</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Delete Avatar Confirmation Modal */}
+      {avatarToDelete && (
+        <>
+          <div
+            className="fixed inset-0 z-50 bg-black/50 animate-in fade-in"
+            onClick={() => setAvatarToDelete(null)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in zoom-in-95 duration-200">
+            <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-sm p-6">
+              <div className="text-center">
+                <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                  <Trash2 className="w-6 h-6 text-red-500" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Delete Avatar?</h3>
+                <p className="text-sm text-gray-500 mb-6">
+                  This will permanently delete your custom avatar. This action cannot be undone.
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setAvatarToDelete(null)}
+                    disabled={deletingAvatar}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1 bg-red-500 hover:bg-red-600"
+                    onClick={handleDeleteAvatar}
+                    disabled={deletingAvatar}
+                  >
+                    {deletingAvatar ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
+                  </Button>
                 </div>
               </div>
             </div>

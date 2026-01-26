@@ -95,6 +95,11 @@ class RewardsService {
     return response.data;
   }
 
+  async deleteAvatar(avatarId: number): Promise<{ message: string }> {
+    const response = await apiClient.delete(`/api/rewards/avatars/${avatarId}`);
+    return response.data;
+  }
+
   async getProfile(): Promise<any> {
     const response = await apiClient.get('/api/rewards/profile');
     return response.data;
@@ -201,6 +206,21 @@ export const useUploadCustomAvatar = () => {
       console.error('[useUploadCustomAvatar] Upload error:', error);
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
       toast.error('Failed to upload avatar: ' + (error?.message || 'Unknown error'));
+    },
+  });
+};
+
+export const useDeleteAvatar = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (avatarId: number) => rewardsService.deleteAvatar(avatarId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['avatars'] });
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      toast.success('Avatar deleted');
+    },
+    onError: (error: any) => {
+      toast.error('Failed to delete avatar: ' + (error?.response?.data?.detail || 'Unknown error'));
     },
   });
 };

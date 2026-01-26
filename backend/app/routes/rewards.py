@@ -96,6 +96,17 @@ async def activate_avatar(
     raise HTTPException(status_code=400, detail="Cannot activate avatar")
 
 
+@router.delete("/avatars/{avatar_id}")
+async def delete_avatar(
+    avatar_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)
+):
+    service = RewardsService(db)
+    result = service.delete_custom_avatar(user.id, avatar_id)
+    if result["success"]:
+        return {"message": result["message"]}
+    raise HTTPException(status_code=400, detail=result["error"])
+
+
 @router.post("/avatars/upload")
 async def upload_custom_avatar(
     avatar: UploadFile = File(...),

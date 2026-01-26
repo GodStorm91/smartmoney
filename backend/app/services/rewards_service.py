@@ -130,6 +130,63 @@ class RewardsService:
             return self.db.query(Avatar).filter_by(id=user_avatar.avatar_id).first()
         return None
 
+    def delete_custom_avatar(self, user_id: int, avatar_id: int) -> Dict[str, Any]:
+        """Delete a custom avatar uploaded by the user."""
+        import os
+
+        # Find the user_avatar link
+        user_avatar = (
+            self.db.query(UserAvatar)
+            .filter_by(user_id=user_id, avatar_id=avatar_id)
+            .first()
+        )
+        if not user_avatar:
+            return {"success": False, "error": "Avatar not found or not owned by user"}
+
+        # Get the avatar record
+        avatar = self.db.query(Avatar).filter_by(id=avatar_id).first()
+        if not avatar:
+            return {"success": False, "error": "Avatar not found"}
+
+        # Only allow deleting custom avatars
+        if avatar.rarity != "custom":
+            return {"success": False, "error": "Cannot delete non-custom avatar"}
+
+        # If this avatar is active, switch to default first
+        if user_avatar.is_active:
+            default_avatar = self.db.query(Avatar).filter_by(code="default").first()
+            if default_avatar:
+                default_user_avatar = (
+                    self.db.query(UserAvatar)
+                    .filter_by(user_id=user_id, avatar_id=default_avatar.id)
+                    .first()
+                )
+                if default_user_avatar:
+                    default_user_avatar.is_active = True
+
+        # Delete image file if exists
+        if avatar.image_url:
+            upload_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "uploads",
+                "avatars",
+            )
+            file_path = os.path.join(upload_dir, avatar.image_url)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except OSError:
+                    pass  # File deletion failed, but continue with DB cleanup
+
+        # Delete UserAvatar link
+        self.db.delete(user_avatar)
+
+        # Delete Avatar record (custom avatars are user-specific)
+        self.db.delete(avatar)
+
+        self.db.commit()
+        return {"success": True, "message": "Avatar deleted successfully"}
+
     # Profile
     def get_profile(self, user_id: int) -> Optional[UserProfile]:
         return self.db.query(UserProfile).filter_by(user_id=user_id).first()
