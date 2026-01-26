@@ -62,6 +62,7 @@ async def get_avatars(level: int = 1, db: Session = Depends(get_db)):
             "code": a.code,
             "name": a.name,
             "emoji": a.emoji,
+            "image_url": a.image_url,
             "unlock_level": a.unlock_level,
             "rarity": a.rarity,
         }
@@ -73,7 +74,7 @@ async def get_avatars(level: int = 1, db: Session = Depends(get_db)):
 async def get_my_avatars(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     service = RewardsService(db)
     return [
-        {"id": a.id, "code": a.code, "name": a.name, "emoji": a.emoji, "rarity": a.rarity}
+        {"id": a.id, "code": a.code, "name": a.name, "emoji": a.emoji, "image_url": a.image_url, "rarity": a.rarity}
         for a in service.get_user_avatars(user.id)
     ]
 

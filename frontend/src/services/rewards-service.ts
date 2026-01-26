@@ -19,6 +19,7 @@ export interface Avatar {
   code: string;
   name: string;
   emoji?: string;
+  image_url?: string;
   unlock_level: number;
   rarity: string;
 }
