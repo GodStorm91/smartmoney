@@ -272,6 +272,7 @@ class RecurringTransactionService:
                     recurring.amount if recurring.is_income else -recurring.amount,
                     recurring.description,
                     f"recurring_{recurring.id}",
+                    recurring.user_id,
                 )
 
                 # Get account name for source

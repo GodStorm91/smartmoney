@@ -8,6 +8,7 @@ from ..database import get_db
 from ..models.user import User
 from ..services.transaction_service import TransactionService
 from ..utils.csv_parser import CSVParseError, parse_csv
+from ..utils.transaction_hasher import generate_tx_hash
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
 
@@ -59,9 +60,16 @@ async def upload_csv(
         # Parse CSV
         transactions_data = parse_csv(file.file, file.filename)
 
-        # Add user_id to each transaction
+        # Add user_id and regenerate tx_hash with user scope
         for tx_data in transactions_data:
             tx_data["user_id"] = current_user.id
+            tx_data["tx_hash"] = generate_tx_hash(
+                str(tx_data["date"]),
+                tx_data["amount"],
+                tx_data["description"],
+                tx_data["source"],
+                current_user.id,
+            )
 
         # Bulk create transactions
         created, skipped = TransactionService.bulk_create_transactions(

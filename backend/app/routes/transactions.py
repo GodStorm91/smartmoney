@@ -38,6 +38,7 @@ async def create_transaction(
             transaction.amount,
             transaction.description,
             transaction.source,
+            current_user.id,
         )
 
         created = TransactionService.create_transaction(db, tx_data)

@@ -296,6 +296,7 @@ async def create_transaction_from_receipt(
         amount if is_income else -amount,
         description,
         f"receipt_{receipt.id}",
+        current_user.id,
     )
 
     # Create transaction
