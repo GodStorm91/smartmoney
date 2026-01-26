@@ -38,12 +38,14 @@ export function TransactionEditModal({
   const [category, setCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
+  const [isAdjustment, setIsAdjustment] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
   const [newReceiptFile, setNewReceiptFile] = useState<File | null>(null)
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [showReceiptViewer, setShowReceiptViewer] = useState(false)
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
+  const [currencyManuallyEdited, setCurrencyManuallyEdited] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Currency options
@@ -102,10 +104,12 @@ export function TransactionEditModal({
       setCategory(transaction.category)
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
+      setIsAdjustment(transaction.is_adjustment || false)
       setShowDeleteConfirm(false)
       setReceiptUrl(transaction.receipt_url || null)
       setNewReceiptFile(null)
       setReceiptPreview(null)
+      setCurrencyManuallyEdited(false)
     }
   }, [transaction?.id, isOpen])
 
@@ -129,15 +133,15 @@ export function TransactionEditModal({
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  // Update currency when account changes
+  // Update currency when account changes (only if not manually edited)
   useEffect(() => {
-    if (accountId) {
+    if (accountId && !currencyManuallyEdited) {
       const selectedAccount = accounts.find(a => a.id === accountId)
       if (selectedAccount?.currency) {
         setCurrency(selectedAccount.currency)
       }
     }
-  }, [accountId, accounts])
+  }, [accountId, accounts, currencyManuallyEdited])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -170,6 +174,7 @@ export function TransactionEditModal({
       type,
       account_id: accountId,
       receipt_url: finalReceiptUrl,
+      is_adjustment: isAdjustment,
     })
   }
 
@@ -265,7 +270,10 @@ export function TransactionEditModal({
                   <Select
                     label={t('transaction.currency', 'Currency')}
                     value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
+                    onChange={(e) => {
+                      setCurrency(e.target.value)
+                      setCurrencyManuallyEdited(true)
+                    }}
                     options={currencyOptions}
                   />
                 </div>
@@ -305,6 +313,24 @@ export function TransactionEditModal({
                   })),
                 ]}
               />
+
+              {/* Balance Adjustment Checkbox */}
+              <label className="flex items-center gap-3 cursor-pointer py-2">
+                <input
+                  type="checkbox"
+                  checked={isAdjustment}
+                  onChange={(e) => setIsAdjustment(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('transaction.balanceAdjustment', 'Balance adjustment')}
+                  </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('transaction.balanceAdjustmentHint', "Won't count toward budget")}
+                  </p>
+                </div>
+              </label>
 
               {/* Receipt Attachment */}
               <div>

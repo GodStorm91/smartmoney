@@ -64,6 +64,9 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // Adjustment state (balance correction, excluded from budget)
+  const [isAdjustment, setIsAdjustment] = useState(false)
+
   // Recurring state
   const [isRecurring, setIsRecurring] = useState(false)
   const [frequency, setFrequency] = useState<FrequencyType>('monthly')
@@ -98,7 +101,8 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
       // Reset receipt state
       setReceiptFile(null)
       setReceiptPreview(null)
-      // Reset recurring state
+      // Reset adjustment and recurring state
+      setIsAdjustment(false)
       setIsRecurring(false)
       setFrequency('monthly')
       setDayOfWeek(0)
@@ -261,6 +265,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
         type: isIncome ? 'income' : 'expense',
         account_id: accountId,
         receipt_url,
+        is_adjustment: isAdjustment,
       })
 
       // If recurring is checked, also set up recurring for future transactions
@@ -503,6 +508,24 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               <p className="mt-1 text-sm text-red-500">{errors.source}</p>
             )}
           </div>
+
+          {/* Balance Adjustment Checkbox */}
+          <label className="flex items-center gap-3 cursor-pointer py-2">
+            <input
+              type="checkbox"
+              checked={isAdjustment}
+              onChange={(e) => setIsAdjustment(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <div>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {t('transaction.balanceAdjustment', 'Balance adjustment')}
+              </span>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('transaction.balanceAdjustmentHint', "Won't count toward budget")}
+              </p>
+            </div>
+          </label>
 
           {/* Recurring Toggle */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">

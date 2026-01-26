@@ -11,6 +11,7 @@ export interface Transaction {
   created_at: string
   account_id?: number | null
   is_transfer?: boolean  // True for transfer transactions between accounts
+  is_adjustment?: boolean  // True for balance adjustments (excluded from budget)
   receipt_url?: string | null  // Receipt image URL
 }
 

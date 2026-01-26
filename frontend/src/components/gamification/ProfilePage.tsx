@@ -334,8 +334,8 @@ export const ProfilePage: React.FC = () => {
                     Cancel
                   </Button>
                   <Button
-                    variant="destructive"
-                    className="flex-1 bg-red-500 hover:bg-red-600"
+                    variant="danger"
+                    className="flex-1"
                     onClick={handleDeleteAvatar}
                     disabled={deletingAvatar}
                   >

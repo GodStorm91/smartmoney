@@ -18,6 +18,7 @@ class TransactionBase(BaseModel):
     notes: Optional[str] = Field(None, max_length=1000)
     is_income: bool = False
     is_transfer: bool = False
+    is_adjustment: bool = False
 
 
 class TransactionCreate(TransactionBase):
@@ -40,6 +41,7 @@ class TransactionUpdate(BaseModel):
     notes: Optional[str] = Field(None, max_length=1000)
     is_income: Optional[bool] = None
     is_transfer: Optional[bool] = None
+    is_adjustment: Optional[bool] = None
     account_id: Optional[int] = None
     receipt_url: Optional[str] = Field(None, max_length=500)
 
@@ -52,6 +54,8 @@ class TransactionResponse(TransactionBase):
     tx_hash: str
     currency: str = "JPY"
     account_id: Optional[int] = None
+    is_adjustment: bool = False
+    receipt_url: Optional[str] = None
 
     class Config:
         from_attributes = True
