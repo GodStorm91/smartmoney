@@ -106,7 +106,6 @@ class RewardsService:
             image_url=image_filename,
             unlock_level=1,
             rarity="custom",
-            is_premium=False,
             is_active=True,
         )
         self.db.add(avatar)
