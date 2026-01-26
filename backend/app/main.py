@@ -425,7 +425,7 @@ async def health_check():
     return {"status": "ok"}
 
 
-# Mount uploads directory for development (production uses nginx)
+# Mount uploads directory - accessible via /api/uploads due to nginx proxy
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 if os.path.exists(uploads_dir):
-    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+    app.mount("/api/uploads", StaticFiles(directory=uploads_dir), name="uploads")
