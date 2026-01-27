@@ -57,6 +57,7 @@ class TransactionResponse(TransactionBase):
     account_id: Optional[int] = None
     is_adjustment: bool = False
     receipt_url: Optional[str] = None
+    transfer_type: Optional[str] = None  # outgoing, incoming, fee, proxy_*
 
     class Config:
         from_attributes = True
