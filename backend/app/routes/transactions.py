@@ -164,3 +164,26 @@ async def get_summary(
         end_date=end_date,
     )
     return summary
+
+
+@router.delete("/cleanup/orphaned")
+async def cleanup_orphaned_transactions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Delete orphaned transactions (account_id is NULL) for current user."""
+    from ..models.transaction import Transaction
+
+    orphaned = db.query(Transaction).filter(
+        Transaction.user_id == current_user.id,
+        Transaction.account_id.is_(None),
+    ).all()
+
+    deleted_ids = [tx.id for tx in orphaned]
+    count = len(orphaned)
+
+    for tx in orphaned:
+        db.delete(tx)
+    db.commit()
+
+    return {"deleted_count": count, "deleted_ids": deleted_ids}
