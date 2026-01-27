@@ -11,6 +11,8 @@ interface BackendTransaction {
   source: string
   is_income: boolean
   is_transfer: boolean
+  is_adjustment: boolean
+  transfer_type?: string | null
   month_key: string
   tx_hash: string
   account_id?: number | null
@@ -40,6 +42,8 @@ function transformTransaction(tx: BackendTransaction): Transaction {
     created_at: tx.date, // Use date as created_at fallback
     account_id: tx.account_id,
     is_transfer: tx.is_transfer,
+    is_adjustment: tx.is_adjustment,
+    transfer_type: tx.transfer_type,
     receipt_url: tx.receipt_url,
   }
 }
