@@ -24,7 +24,8 @@ class TransactionBase(BaseModel):
 class TransactionCreate(TransactionBase):
     """Schema for creating a transaction."""
 
-    pass
+    currency: Optional[str] = Field("JPY", max_length=3, description="ISO 4217 currency code")
+    account_id: Optional[int] = Field(None, description="Associated account ID")
 
 
 class TransactionUpdate(BaseModel):
