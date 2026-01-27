@@ -88,7 +88,10 @@ export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProp
       if (tx.type === 'income') return
       if (tx.is_transfer) return
       if (tx.is_adjustment) return // Exclude balance adjustments (not counting towards budget)
-      if (tx.category === 'Proxy Purchase') return // Exclude proxy purchases
+      // Exclude all proxy-related transactions
+      if (tx.category === 'Proxy Purchase') return
+      if (tx.category === 'Proxy Income') return
+      if (tx.transfer_type?.startsWith('proxy_')) return
 
       const dateKey = format(new Date(tx.date), 'yyyy-MM-dd')
       const existing = spendingMap.get(dateKey) || {
