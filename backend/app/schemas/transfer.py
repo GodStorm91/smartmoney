@@ -45,3 +45,31 @@ class TransferListItem(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class ExchangeCreate(BaseModel):
+    """Schema for creating a currency exchange."""
+
+    date: datetime.date = Field(..., description="Exchange date")
+    from_account_id: int = Field(..., description="Source account ID")
+    from_amount: int = Field(..., gt=0, description="Amount in source currency (smallest unit)")
+    to_account_id: int = Field(..., description="Destination account ID")
+    to_amount: int = Field(..., gt=0, description="Amount in target currency (smallest unit)")
+    exchange_rate: Optional[float] = Field(
+        None,
+        gt=0.0000001,
+        lt=100000000,
+        description="Exchange rate (auto-calc if not provided)",
+    )
+    link_to_transaction_id: Optional[int] = Field(None, description="Link to existing income transaction")
+    notes: Optional[str] = Field(None, max_length=500, description="Exchange notes")
+
+
+class ExchangeResponse(BaseModel):
+    """Response after creating currency exchange."""
+
+    transfer_id: str
+    from_transaction_id: int
+    to_transaction_id: int
+    exchange_rate: float
+    linked_income_id: Optional[int] = None

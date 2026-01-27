@@ -1245,6 +1245,8 @@
   },
   "transfer": {
     "title": "Transfer Between Accounts",
+    "exchangeTitle": "Currency Exchange",
+    "exchangeMode": "Currency Exchange",
     "fromAccount": "From Account",
     "toAccount": "To Account",
     "selectAccount": "Select account",
@@ -1254,6 +1256,9 @@
     "date": "Date",
     "description": "Description",
     "descriptionPlaceholder": "e.g., Monthly savings transfer",
+    "linkToIncome": "Link to Income",
+    "linkToIncomeHelp": "Link this exchange to an income transaction for tracking",
+    "noLink": "None",
     "create": "Create Transfer",
     "error": "Failed to create transfer",
     "errors": {

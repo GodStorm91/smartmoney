@@ -3,6 +3,8 @@
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
+from decimal import Decimal
+
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -12,6 +14,7 @@ from sqlalchemy import (
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     String,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -54,6 +57,18 @@ class Transaction(Base):
     tx_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)  # SHA-256
     transfer_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)  # UUID for linking transfer transactions
     transfer_type: Mapped[str | None] = mapped_column(String(20), nullable=True)  # outgoing, incoming, fee
+
+    # Currency exchange fields
+    linked_transaction_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("transactions.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    exchange_rate: Mapped[Decimal | None] = mapped_column(
+        Numeric(18, 8), nullable=True
+    )  # Rate used at transaction time (to_amount / from_amount)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
     )
@@ -78,6 +93,14 @@ class Transaction(Base):
     )
     receipt: Mapped["Receipt | None"] = relationship(
         "Receipt", back_populates="transaction", cascade="all, delete-orphan", uselist=False
+    )
+
+    # Self-referential relationship for linked transactions (exchange pairs)
+    linked_transaction: Mapped["Transaction | None"] = relationship(
+        "Transaction",
+        remote_side="Transaction.id",
+        foreign_keys="Transaction.linked_transaction_id",
+        lazy="select",
     )
 
     __table_args__ = (

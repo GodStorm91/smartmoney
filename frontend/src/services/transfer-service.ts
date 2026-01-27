@@ -1,11 +1,25 @@
 import { apiClient } from './api-client'
-import type { TransferCreate, TransferResponse, Transfer } from '@/types/transfer'
+import type {
+  ExchangeCreate,
+  ExchangeResponse,
+  Transfer,
+  TransferCreate,
+  TransferResponse,
+} from '@/types/transfer'
 
 /**
  * Create a transfer between accounts
  */
 export async function createTransfer(data: TransferCreate): Promise<TransferResponse> {
   const response = await apiClient.post<TransferResponse>('/api/transfers/', data)
+  return response.data
+}
+
+/**
+ * Create a currency exchange with linked transactions
+ */
+export async function createExchange(data: ExchangeCreate): Promise<ExchangeResponse> {
+  const response = await apiClient.post<ExchangeResponse>('/api/transfers/exchange', data)
   return response.data
 }
 

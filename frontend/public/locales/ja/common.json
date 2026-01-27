@@ -1200,6 +1200,8 @@
   },
   "transfer": {
     "title": "口座間振替",
+    "exchangeTitle": "通貨両替",
+    "exchangeMode": "通貨両替",
     "fromAccount": "振替元",
     "toAccount": "振替先",
     "selectAccount": "口座を選択",
@@ -1209,6 +1211,9 @@
     "date": "日付",
     "description": "説明",
     "descriptionPlaceholder": "例: 月次貯蓄振替",
+    "linkToIncome": "収入に関連付け",
+    "linkToIncomeHelp": "この両替を収入取引に関連付けて追跡",
+    "noLink": "なし",
     "create": "振替を作成",
     "error": "振替の作成に失敗しました",
     "errors": {

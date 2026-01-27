@@ -1,15 +1,17 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, X } from 'lucide-react'
+import { ArrowRight, X, RefreshCw } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Button } from '@/components/ui/Button'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useRatesMap } from '@/hooks/useExchangeRates'
-import { createTransfer } from '@/services/transfer-service'
-import { toStorageAmount } from '@/utils/formatCurrency'
-import type { TransferCreate } from '@/types/transfer'
+import { createTransfer, createExchange } from '@/services/transfer-service'
+import { fetchTransactions } from '@/services/transaction-service'
+import { toStorageAmount, formatCurrency } from '@/utils/formatCurrency'
+import type { TransferCreate, ExchangeCreate } from '@/types/transfer'
+import type { Transaction } from '@/types/transaction'
 
 interface TransferFormModalProps {
   isOpen: boolean
@@ -51,6 +53,10 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
   const [description, setDescription] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
 
+  // Exchange mode state
+  const [isExchangeMode, setIsExchangeMode] = useState(false)
+  const [linkToIncomeId, setLinkToIncomeId] = useState<number | null>(null)
+
   // Get selected accounts
   const fromAccount = useMemo(
     () => accounts?.find(a => a.id === fromAccountId),
@@ -66,6 +72,15 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
     () => accounts?.filter(a => a.id !== fromAccountId) || [],
     [accounts, fromAccountId]
   )
+
+  // Fetch income transactions for exchange mode linking
+  const { data: incomeTransactions } = useQuery({
+    queryKey: ['transactions', 'income', fromAccount?.currency],
+    queryFn: () => fetchTransactions({ type: 'income' }),
+    enabled: isExchangeMode && !!fromAccount,
+    select: (data: Transaction[]) =>
+      data.filter(tx => tx.currency === fromAccount?.currency),
+  })
 
   // Auto-calculate converted amount
   useEffect(() => {
@@ -102,11 +117,13 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
       setDate(new Date().toISOString().split('T')[0])
       setDescription('')
       setErrors({})
+      setIsExchangeMode(false)
+      setLinkToIncomeId(null)
     }
   }, [isOpen, accounts])
 
-  // Mutation
-  const mutation = useMutation({
+  // Mutation for regular transfer
+  const transferMutation = useMutation({
     mutationFn: createTransfer,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
@@ -116,6 +133,20 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
       onClose()
     },
   })
+
+  // Mutation for currency exchange
+  const exchangeMutation = useMutation({
+    mutationFn: createExchange,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['transfers'] })
+      queryClient.invalidateQueries({ queryKey: ['analytics'] })
+      onClose()
+    },
+  })
+
+  const mutation = isExchangeMode ? exchangeMutation : transferMutation
 
   // Validation
   const validate = (): boolean => {
@@ -150,22 +181,37 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
     const fromCurrency = fromAccount?.currency || 'JPY'
     const toCurrency = toAccount?.currency || 'JPY'
 
-    const data: TransferCreate = {
-      from_account_id: fromAccountId!,
-      to_account_id: toAccountId!,
-      from_amount: toStorageAmount(parseNumber(fromAmount), fromCurrency),
-      to_amount: toStorageAmount(parseNumber(toAmount), toCurrency),
-      fee_amount: toStorageAmount(parseNumber(feeAmount) || 0, fromCurrency),
-      date,
-      description: description.trim() || undefined,
-    }
+    if (isExchangeMode) {
+      // Exchange mode - use exchange API
+      const exchangeData: ExchangeCreate = {
+        date,
+        from_account_id: fromAccountId!,
+        from_amount: toStorageAmount(parseNumber(fromAmount), fromCurrency),
+        to_account_id: toAccountId!,
+        to_amount: toStorageAmount(parseNumber(toAmount), toCurrency),
+        link_to_transaction_id: linkToIncomeId || undefined,
+        notes: description.trim() || undefined,
+      }
+      exchangeMutation.mutate(exchangeData)
+    } else {
+      // Regular transfer mode
+      const data: TransferCreate = {
+        from_account_id: fromAccountId!,
+        to_account_id: toAccountId!,
+        from_amount: toStorageAmount(parseNumber(fromAmount), fromCurrency),
+        to_amount: toStorageAmount(parseNumber(toAmount), toCurrency),
+        fee_amount: toStorageAmount(parseNumber(feeAmount) || 0, fromCurrency),
+        date,
+        description: description.trim() || undefined,
+      }
 
-    // Calculate exchange rate if cross-currency
-    if (fromAccount && toAccount && fromAccount.currency !== toAccount.currency) {
-      data.exchange_rate = parseNumber(toAmount) / parseNumber(fromAmount)
-    }
+      // Calculate exchange rate if cross-currency
+      if (fromAccount && toAccount && fromAccount.currency !== toAccount.currency) {
+        data.exchange_rate = parseNumber(toAmount) / parseNumber(fromAmount)
+      }
 
-    mutation.mutate(data)
+      transferMutation.mutate(data)
+    }
   }
 
   if (!isOpen) return null
@@ -184,7 +230,7 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 px-6 py-4">
           <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {t('transfer.title')}
+            {isExchangeMode ? t('transfer.exchangeTitle', 'Currency Exchange') : t('transfer.title')}
           </h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full">
             <X className="w-5 h-5" />
@@ -193,6 +239,20 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Exchange Mode Toggle */}
+          <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 dark:text-gray-400">
+              <input
+                type="checkbox"
+                checked={isExchangeMode}
+                onChange={e => setIsExchangeMode(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <RefreshCw className="w-4 h-4" />
+              {t('transfer.exchangeMode', 'Currency Exchange')}
+            </label>
+          </div>
+
           {/* From Account */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -306,25 +366,51 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
             </p>
           )}
 
-          {/* Fee */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('transfer.fee')} ({t('optional')})
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
-                {fromAccount ? CURRENCY_SYMBOLS[fromAccount.currency] || fromAccount.currency : '¥'}
-              </span>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={feeAmount}
-                onChange={e => setFeeAmount(formatWithCommas(e.target.value))}
-                className="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-                placeholder="0"
-              />
+          {/* Link to Income (Exchange mode only) */}
+          {isExchangeMode && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('transfer.linkToIncome', 'Link to Income')} ({t('optional')})
+              </label>
+              <select
+                value={linkToIncomeId || ''}
+                onChange={e => setLinkToIncomeId(e.target.value ? parseInt(e.target.value) : null)}
+                className="w-full h-12 px-4 border border-gray-300 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+              >
+                <option value="">{t('transfer.noLink', 'None')}</option>
+                {incomeTransactions?.map(tx => (
+                  <option key={tx.id} value={tx.id}>
+                    {tx.date} - {tx.description} ({formatCurrency(tx.amount, tx.currency)})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {t('transfer.linkToIncomeHelp', 'Link this exchange to an income transaction for tracking')}
+              </p>
             </div>
-          </div>
+          )}
+
+          {/* Fee (not shown in exchange mode) */}
+          {!isExchangeMode && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('transfer.fee')} ({t('optional')})
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  {fromAccount ? CURRENCY_SYMBOLS[fromAccount.currency] || fromAccount.currency : '¥'}
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={feeAmount}
+                  onChange={e => setFeeAmount(formatWithCommas(e.target.value))}
+                  className="w-full h-12 pl-10 pr-4 border border-gray-300 rounded-lg text-right dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Date */}
           <div>

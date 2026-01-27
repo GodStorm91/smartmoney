@@ -32,3 +32,23 @@ export interface Transfer {
   date: string
   description?: string
 }
+
+// Currency exchange types
+export interface ExchangeCreate {
+  date: string
+  from_account_id: number
+  from_amount: number
+  to_account_id: number
+  to_amount: number
+  exchange_rate?: number
+  link_to_transaction_id?: number
+  notes?: string
+}
+
+export interface ExchangeResponse {
+  transfer_id: string
+  from_transaction_id: number
+  to_transaction_id: number
+  exchange_rate: number
+  linked_income_id?: number
+}
