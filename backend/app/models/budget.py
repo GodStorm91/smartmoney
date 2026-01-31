@@ -1,9 +1,9 @@
 """Budget database models."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from .transaction import Base
@@ -29,6 +29,13 @@ class Budget(Base):
         DateTime, server_default=func.now(), nullable=False
     )
 
+    # Version tracking fields
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    copied_from_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("budgets.id", ondelete="SET NULL"), nullable=True
+    )
+
     # Relationships
     allocations: Mapped[list["BudgetAllocation"]] = relationship(
         back_populates="budget", cascade="all, delete-orphan"
@@ -39,8 +46,17 @@ class Budget(Base):
     alerts: Mapped[list["BudgetAlert"]] = relationship(
         "BudgetAlert", back_populates="budget", cascade="all, delete-orphan"
     )
+    # Self-referential relationship for copy source
+    copied_from: Mapped[Optional["Budget"]] = relationship(
+        "Budget", remote_side=[id], foreign_keys=[copied_from_id]
+    )
 
-    __table_args__ = (Index("ix_budget_user_month_unique", "user_id", "month", unique=True),)
+    __table_args__ = (
+        # Only one active budget per user per month
+        Index("ix_budget_user_month_active", "user_id", "month", unique=True, postgresql_where=(is_active == True)),
+        # Keep the old index for backward compatibility during migration
+        Index("ix_budget_user_month", "user_id", "month"),
+    )
 
 
 class BudgetAllocation(Base):

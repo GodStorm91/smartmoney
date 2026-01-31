@@ -1,5 +1,14 @@
 import { apiClient } from './api-client'
-import type { Budget, BudgetGenerateRequest, BudgetRegenerateRequest, BudgetTracking, BudgetSuggestions } from '@/types'
+import type {
+  Budget,
+  BudgetGenerateRequest,
+  BudgetRegenerateRequest,
+  BudgetTracking,
+  BudgetSuggestions,
+  BudgetCopyRequest,
+  BudgetCopyPreview,
+  BudgetVersion
+} from '@/types'
 import type { CategoryHistory } from '@/utils/spending-prediction'
 
 /**
@@ -102,5 +111,50 @@ export async function getCategoryHistory(
     `/api/budgets/category-history/${encodeURIComponent(category)}`,
     { params: { months } }
   )
+  return response.data
+}
+
+/**
+ * Get the most recent budget (any month)
+ */
+export async function getLatestBudget(): Promise<Budget> {
+  const response = await apiClient.get<Budget>('/api/budgets/latest')
+  return response.data
+}
+
+/**
+ * Copy budget from one month to another
+ */
+export async function copyBudget(data: BudgetCopyRequest): Promise<Budget> {
+  const response = await apiClient.post<Budget>('/api/budgets/copy', data)
+  return response.data
+}
+
+/**
+ * Preview budget copy with spending data
+ */
+export async function previewBudgetCopy(
+  sourceMonth: string,
+  targetMonth: string
+): Promise<BudgetCopyPreview> {
+  const response = await apiClient.get<BudgetCopyPreview>('/api/budgets/copy/preview', {
+    params: { source_month: sourceMonth, target_month: targetMonth }
+  })
+  return response.data
+}
+
+/**
+ * Get all versions of a budget for a month
+ */
+export async function getBudgetVersions(month: string): Promise<BudgetVersion[]> {
+  const response = await apiClient.get<BudgetVersion[]>(`/api/budgets/${month}/versions`)
+  return response.data
+}
+
+/**
+ * Restore a previous budget version
+ */
+export async function restoreBudgetVersion(budgetId: number): Promise<Budget> {
+  const response = await apiClient.post<Budget>(`/api/budgets/${budgetId}/restore`)
   return response.data
 }

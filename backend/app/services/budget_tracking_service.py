@@ -75,33 +75,35 @@ class BudgetTrackingService:
         return total
 
     @staticmethod
-    def get_budget_tracking(db: Session, user_id: int) -> dict | None:
-        """Get current month's budget tracking data.
+    def get_budget_tracking(db: Session, user_id: int, month: str | None = None) -> dict | None:
+        """Get budget tracking data for a specific month.
 
         Args:
             db: Database session
             user_id: User ID
+            month: Optional month string (YYYY-MM), defaults to current month
 
         Returns:
             Budget tracking dict or None if no budget exists
         """
-        # Get current month budget
-        current_month = date.today().strftime("%Y-%m")
+        # Get month budget
+        target_month = month or date.today().strftime("%Y-%m")
         budget = db.query(Budget).filter(
             Budget.user_id == user_id,
-            Budget.month == current_month
+            Budget.month == target_month,
+            Budget.is_active == True
         ).first()
 
         if not budget:
             return None
 
-        # Get current month start/end dates
-        year, month = map(int, current_month.split('-'))
-        month_start = date(year, month, 1)
-        if month == 12:
+        # Get month start/end dates
+        year, month_num = map(int, target_month.split('-'))
+        month_start = date(year, month_num, 1)
+        if month_num == 12:
             month_end = date(year + 1, 1, 1) - timedelta(days=1)
         else:
-            month_end = date(year, month + 1, 1) - timedelta(days=1)
+            month_end = date(year, month_num + 1, 1) - timedelta(days=1)
 
         # Get exchange rates for currency conversion
         rates = ExchangeRateService.get_cached_rates(db)

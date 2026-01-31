@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, Download, History, Plus, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download, Plus, Check } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -10,12 +10,24 @@ import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { AddCategoryModal } from '@/components/budget/add-category-modal'
 import { BudgetConfirmDialog } from '@/components/budget/budget-confirm-dialog'
 import { BudgetTabsContainer } from '@/components/budget/budget-tabs-container'
+import { BudgetCopyPreview } from '@/components/budget/budget-copy-preview'
+import { BudgetVersionDropdown } from '@/components/budget/budget-version-dropdown'
 import { OverviewTab } from '@/components/budget/tabs/overview-tab'
 import { CategoriesTab } from '@/components/budget/tabs/categories-tab'
 import { TransactionsTab } from '@/components/budget/tabs/transactions-tab'
 import { ForecastTab } from '@/components/budget/tabs/forecast-tab'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
-import { generateBudget, regenerateBudget, getBudgetByMonth, getBudgetTracking, getBudgetSuggestions } from '@/services/budget-service'
+import {
+  generateBudget,
+  regenerateBudget,
+  getBudgetByMonth,
+  getBudgetTracking,
+  getBudgetSuggestions,
+  previewBudgetCopy,
+  copyBudget,
+  getBudgetVersions,
+  restoreBudgetVersion
+} from '@/services/budget-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -141,6 +153,33 @@ export function BudgetPage() {
     enabled: !savedBudget && !isLoading,
   })
 
+  // Get previous month string for copy preview
+  const getPrevMonthStr = (month: string) => {
+    const [year, m] = month.split('-').map(Number)
+    let prevYear = year
+    let prevMonth = m - 1
+    if (prevMonth < 1) {
+      prevMonth = 12
+      prevYear -= 1
+    }
+    return `${prevYear}-${String(prevMonth).padStart(2, '0')}`
+  }
+
+  // Auto-fetch copy preview when no budget exists
+  const { data: copyPreview, isLoading: isCopyPreviewLoading } = useQuery({
+    queryKey: ['budget', 'copy-preview', selectedMonth],
+    queryFn: () => previewBudgetCopy(getPrevMonthStr(selectedMonth), selectedMonth),
+    enabled: !savedBudget && !isLoading && !draftBudget,
+    retry: false,
+  })
+
+  // Fetch budget versions for current month
+  const { data: versions } = useQuery({
+    queryKey: ['budget', 'versions', selectedMonth],
+    queryFn: () => getBudgetVersions(selectedMonth),
+    enabled: !!savedBudget,
+  })
+
   const generateMutation = useMutation({
     mutationFn: (income: number) => generateBudget({
       monthly_income: income,
@@ -165,6 +204,28 @@ export function BudgetPage() {
       pushUndo('regenerate', data)
     },
   })
+
+  // Copy budget from previous month
+  const copyMutation = useMutation({
+    mutationFn: () => copyBudget({
+      source_month: getPrevMonthStr(selectedMonth),
+      target_month: selectedMonth
+    }),
+    onSuccess: (data) => {
+      setDraftBudget(data)
+      queryClient.invalidateQueries({ queryKey: ['budget'] })
+    },
+  })
+
+  // Restore previous version
+  const restoreMutation = useMutation({
+    mutationFn: (budgetId: number) => restoreBudgetVersion(budgetId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['budget'] })
+    },
+  })
+
+  const [showGenerateForm, setShowGenerateForm] = useState(false)
 
   const pushUndo = useCallback((action: string, data: Budget) => {
     setUndoStack(prev => [...prev.slice(-9), { action, data }])
@@ -256,14 +317,15 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {undoStack.length > 0 && (
-                <button
-                  onClick={handleUndo}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-                  title={t('undo')}
-                >
-                  <History className="w-5 h-5" />
-                </button>
+              {/* Version Dropdown */}
+              {versions && versions.length > 1 && displayBudget && (
+                <BudgetVersionDropdown
+                  versions={versions}
+                  currentVersion={displayBudget.version || 1}
+                  formatCurrency={formatCurrency}
+                  onRestore={(id) => restoreMutation.mutate(id)}
+                  isRestoring={restoreMutation.isPending}
+                />
               )}
               {displayBudget && (
                 <button
@@ -281,14 +343,48 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-        {/* Empty State / Generate Form */}
+        {/* Empty State - Copy Preview or Generate Form */}
         {!displayBudget && !error && (
-          <BudgetGenerateForm
-            onGenerate={(income) => generateMutation.mutate(income)}
-            isLoading={generateMutation.isPending}
-            error={generateMutation.isError}
-            suggestions={suggestions}
-          />
+          <>
+            {/* Show copy preview when previous month budget exists */}
+            {copyPreview && !showGenerateForm && (
+              <BudgetCopyPreview
+                preview={copyPreview}
+                formatCurrency={formatCurrency}
+                formatMonth={formatMonth}
+                onCopy={() => copyMutation.mutate()}
+                onGenerateAI={() => setShowGenerateForm(true)}
+                onStartEmpty={() => {
+                  // Create empty draft with just income from previous
+                  setDraftBudget({
+                    id: 0,
+                    month: selectedMonth,
+                    monthly_income: copyPreview.source_budget.monthly_income,
+                    allocations: [],
+                    created_at: new Date().toISOString()
+                  })
+                }}
+                isLoading={copyMutation.isPending}
+              />
+            )}
+
+            {/* Show generate form when no previous budget or user wants AI */}
+            {(!copyPreview || showGenerateForm) && !isCopyPreviewLoading && (
+              <BudgetGenerateForm
+                onGenerate={(income) => generateMutation.mutate(income)}
+                isLoading={generateMutation.isPending}
+                error={generateMutation.isError}
+                suggestions={suggestions}
+              />
+            )}
+
+            {/* Loading state for copy preview */}
+            {isCopyPreviewLoading && (
+              <Card className="p-6 flex items-center justify-center">
+                <LoadingSpinner />
+              </Card>
+            )}
+          </>
         )}
 
         {/* Budget exists - Tabbed Interface */}

@@ -32,6 +32,46 @@ class BudgetResponse(BaseModel):
     advice: str | None = None
     allocations: list[BudgetAllocationSchema]
     created_at: datetime
+    version: int = 1
+    is_active: bool = True
+    copied_from_id: int | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class BudgetCopyRequest(BaseModel):
+    """Request to copy budget from one month to another."""
+    source_month: str = Field(..., pattern=r"^\d{4}-\d{2}$", description="Source month (YYYY-MM)")
+    target_month: str = Field(..., pattern=r"^\d{4}-\d{2}$", description="Target month (YYYY-MM)")
+    monthly_income: int | None = Field(None, gt=0, description="Override monthly income (optional)")
+
+
+class BudgetCopyPreview(BaseModel):
+    """Preview of budget copy with spending data."""
+    source_budget: "BudgetResponse"
+    target_month: str
+    spending_summary: list["AllocationSpendingSummary"]
+
+
+class AllocationSpendingSummary(BaseModel):
+    """Allocation with spending summary for preview."""
+    category: str
+    budgeted: int
+    spent: int
+    remaining: int
+    over_budget: bool
+
+
+class BudgetVersionResponse(BaseModel):
+    """Budget version info for history list."""
+    id: int
+    version: int
+    is_active: bool
+    created_at: datetime
+    monthly_income: int
+    total_allocated: int
+    copied_from_id: int | None = None
 
     class Config:
         from_attributes = True

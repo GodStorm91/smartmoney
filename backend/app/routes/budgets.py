@@ -15,7 +15,11 @@ from ..schemas.budget import (
     BudgetRegenerateRequest,
     BudgetResponse,
     BudgetTrackingResponse,
-    CategoryHistoryResponse
+    CategoryHistoryResponse,
+    BudgetCopyRequest,
+    BudgetCopyPreview,
+    AllocationSpendingSummary,
+    BudgetVersionResponse
 )
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
@@ -386,3 +390,180 @@ def get_category_spending_history(
         )
 
     return result
+
+
+@router.get("/latest", response_model=BudgetResponse)
+def get_latest_budget(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get the most recent active budget (any month).
+
+    Returns:
+        Most recent budget or 404
+    """
+    budget = BudgetService.get_latest_budget(db, current_user.id)
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No budgets found"
+        )
+
+    return budget
+
+
+@router.post("/copy", response_model=BudgetResponse, status_code=status.HTTP_201_CREATED)
+def copy_budget(
+    request: BudgetCopyRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Copy budget from one month to another.
+
+    Args:
+        request: Copy request with source and target months
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Newly created budget
+    """
+    try:
+        budget = BudgetService.copy_budget(
+            db=db,
+            user_id=current_user.id,
+            source_month=request.source_month,
+            target_month=request.target_month,
+            monthly_income=request.monthly_income
+        )
+        return budget
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to copy budget: {str(e)}"
+        )
+
+
+@router.get("/copy/preview", response_model=BudgetCopyPreview)
+def preview_budget_copy(
+    source_month: str,
+    target_month: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Preview budget copy with spending data from source month.
+
+    Args:
+        source_month: Month to copy from (YYYY-MM)
+        target_month: Month to copy to (YYYY-MM)
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Preview with source budget and spending summary
+    """
+    # Get source budget
+    source_budget = BudgetService.get_budget_by_month(db, current_user.id, source_month)
+    if not source_budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No budget found for month {source_month}"
+        )
+
+    # Get spending data for source month
+    tracking = BudgetTrackingService.get_budget_tracking(
+        db, current_user.id, month=source_month
+    )
+
+    # Build spending summary
+    spending_summary = []
+    if tracking:
+        for item in tracking.get("categories", []):
+            spending_summary.append(AllocationSpendingSummary(
+                category=item["category"],
+                budgeted=item["budgeted"],
+                spent=item["spent"],
+                remaining=item["remaining"],
+                over_budget=item["spent"] > item["budgeted"]
+            ))
+    else:
+        # No tracking data, just use allocations with 0 spent
+        for alloc in source_budget.allocations:
+            spending_summary.append(AllocationSpendingSummary(
+                category=alloc.category,
+                budgeted=alloc.amount,
+                spent=0,
+                remaining=alloc.amount,
+                over_budget=False
+            ))
+
+    return BudgetCopyPreview(
+        source_budget=source_budget,
+        target_month=target_month,
+        spending_summary=spending_summary
+    )
+
+
+@router.get("/{month}/versions", response_model=list[BudgetVersionResponse])
+def get_budget_versions(
+    month: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get all versions of a budget for a specific month.
+
+    Args:
+        month: Month string (YYYY-MM)
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        List of all budget versions for the month
+    """
+    versions = BudgetService.get_versions(db, current_user.id, month)
+
+    return [
+        BudgetVersionResponse(
+            id=v.id,
+            version=v.version,
+            is_active=v.is_active,
+            created_at=v.created_at,
+            monthly_income=v.monthly_income,
+            total_allocated=sum(a.amount for a in v.allocations),
+            copied_from_id=v.copied_from_id
+        )
+        for v in versions
+    ]
+
+
+@router.post("/{budget_id}/restore", response_model=BudgetResponse)
+def restore_budget_version(
+    budget_id: int,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Restore a previous budget version as active.
+
+    Args:
+        budget_id: Budget ID to restore
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Restored budget
+    """
+    try:
+        budget = BudgetService.restore_version(db, current_user.id, budget_id)
+        return budget
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )

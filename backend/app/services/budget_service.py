@@ -2,6 +2,7 @@
 from datetime import date
 from typing import Optional
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from ..models.budget import Budget, BudgetAllocation, BudgetFeedback
 
 
@@ -16,9 +17,10 @@ class BudgetService:
         monthly_income: int,
         allocations: list[dict],
         savings_target: int | None = None,
-        advice: str | None = None
+        advice: str | None = None,
+        copied_from_id: int | None = None
     ) -> Budget:
-        """Create or replace budget for a month.
+        """Create new budget version for a month (soft-deactivates existing).
 
         Args:
             db: Database session
@@ -28,26 +30,37 @@ class BudgetService:
             allocations: List of allocation dicts with category, amount, reasoning
             savings_target: Optional savings target
             advice: Optional AI advice
+            copied_from_id: Optional ID of budget this was copied from
 
         Returns:
             Created budget
         """
-        # Delete existing budget for this month
-        existing = db.query(Budget).filter(
+        # Get current max version for this month
+        max_version = db.query(func.max(Budget.version)).filter(
             Budget.user_id == user_id,
             Budget.month == month
+        ).scalar() or 0
+
+        # Soft-deactivate existing active budget for this month
+        existing = db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.month == month,
+            Budget.is_active == True
         ).first()
         if existing:
-            db.delete(existing)
+            existing.is_active = False
             db.flush()
 
-        # Create new budget
+        # Create new budget with incremented version
         budget = Budget(
             user_id=user_id,
             month=month,
             monthly_income=monthly_income,
             savings_target=savings_target,
-            advice=advice
+            advice=advice,
+            version=max_version + 1,
+            is_active=True,
+            copied_from_id=copied_from_id
         )
         db.add(budget)
         db.flush()
@@ -67,8 +80,136 @@ class BudgetService:
         return budget
 
     @staticmethod
+    def copy_budget(
+        db: Session,
+        user_id: int,
+        source_month: str,
+        target_month: str,
+        monthly_income: int | None = None
+    ) -> Budget:
+        """Copy budget from one month to another.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            source_month: Source month to copy from
+            target_month: Target month to create
+            monthly_income: Override income (uses source if None)
+
+        Returns:
+            Newly created budget
+
+        Raises:
+            ValueError: If source budget not found
+        """
+        # Get active source budget
+        source = db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.month == source_month,
+            Budget.is_active == True
+        ).first()
+
+        if not source:
+            raise ValueError(f"No active budget found for month {source_month}")
+
+        # Copy allocations
+        allocations = [
+            {
+                "category": alloc.category,
+                "amount": alloc.amount,
+                "reasoning": alloc.reasoning
+            }
+            for alloc in source.allocations
+        ]
+
+        # Create new budget in target month
+        return BudgetService.create_budget(
+            db=db,
+            user_id=user_id,
+            month=target_month,
+            monthly_income=monthly_income or source.monthly_income,
+            allocations=allocations,
+            savings_target=source.savings_target,
+            advice=f"Copied from {source_month}",
+            copied_from_id=source.id
+        )
+
+    @staticmethod
+    def get_versions(db: Session, user_id: int, month: str) -> list[Budget]:
+        """Get all budget versions for a month.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            month: Month string
+
+        Returns:
+            List of all budget versions, newest first
+        """
+        return db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.month == month
+        ).order_by(Budget.version.desc()).all()
+
+    @staticmethod
+    def restore_version(db: Session, user_id: int, budget_id: int) -> Budget:
+        """Restore a previous budget version as active.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            budget_id: Budget ID to restore
+
+        Returns:
+            Restored budget
+
+        Raises:
+            ValueError: If budget not found or doesn't belong to user
+        """
+        # Get the budget to restore
+        budget = db.query(Budget).filter(
+            Budget.id == budget_id,
+            Budget.user_id == user_id
+        ).first()
+
+        if not budget:
+            raise ValueError("Budget not found")
+
+        # Deactivate current active budget for this month
+        current_active = db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.month == budget.month,
+            Budget.is_active == True
+        ).first()
+
+        if current_active and current_active.id != budget_id:
+            current_active.is_active = False
+
+        # Activate the restored budget
+        budget.is_active = True
+        db.commit()
+        db.refresh(budget)
+        return budget
+
+    @staticmethod
+    def get_latest_budget(db: Session, user_id: int) -> Optional[Budget]:
+        """Get the most recent active budget for any month.
+
+        Args:
+            db: Database session
+            user_id: User ID
+
+        Returns:
+            Most recent budget or None
+        """
+        return db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.is_active == True
+        ).order_by(Budget.month.desc()).first()
+
+    @staticmethod
     def get_current_budget(db: Session, user_id: int) -> Optional[Budget]:
-        """Get current month's budget.
+        """Get current month's active budget.
 
         Args:
             db: Database session
@@ -80,12 +221,13 @@ class BudgetService:
         current_month = date.today().strftime("%Y-%m")
         return db.query(Budget).filter(
             Budget.user_id == user_id,
-            Budget.month == current_month
+            Budget.month == current_month,
+            Budget.is_active == True
         ).first()
 
     @staticmethod
     def get_budget_by_month(db: Session, user_id: int, month: str) -> Optional[Budget]:
-        """Get budget for specific month.
+        """Get active budget for specific month.
 
         Args:
             db: Database session
@@ -97,7 +239,8 @@ class BudgetService:
         """
         return db.query(Budget).filter(
             Budget.user_id == user_id,
-            Budget.month == month
+            Budget.month == month,
+            Budget.is_active == True
         ).first()
 
     @staticmethod
@@ -120,7 +263,7 @@ class BudgetService:
 
     @staticmethod
     def get_budget_history(db: Session, user_id: int, limit: int = 12) -> list[Budget]:
-        """Get budget history for user.
+        """Get active budget history for user.
 
         Args:
             db: Database session
@@ -128,8 +271,9 @@ class BudgetService:
             limit: Maximum budgets to return
 
         Returns:
-            List of budgets ordered by month desc
+            List of active budgets ordered by month desc
         """
         return db.query(Budget).filter(
-            Budget.user_id == user_id
+            Budget.user_id == user_id,
+            Budget.is_active == True
         ).order_by(Budget.month.desc()).limit(limit).all()
