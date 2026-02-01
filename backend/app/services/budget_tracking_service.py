@@ -179,7 +179,7 @@ class BudgetTrackingService:
         safe_to_spend_today = remaining_budget // days_remaining if days_remaining > 0 else 0
 
         return {
-            'month': current_month,
+            'month': target_month,
             'monthly_income': budget.monthly_income,
             'days_remaining': days_remaining,
             'safe_to_spend_today': safe_to_spend_today,
