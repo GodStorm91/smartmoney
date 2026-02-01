@@ -177,19 +177,19 @@ export function AllocationCard({
           {!isEditing && (
             <button
               onClick={handleEditClick}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
               aria-label={t('budget.editAmount', 'Edit amount')}
             >
-              <Pencil className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <Pencil className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </button>
           )}
 
           <button
             onClick={handleDeleteClick}
-            className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+            className="p-2 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 rounded-lg transition-colors"
             aria-label={t('budget.deleteAllocation', 'Delete')}
           >
-            <Trash2 className="w-4 h-4 text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400" />
+            <Trash2 className="w-5 h-5 text-red-500 dark:text-red-400" />
           </button>
         </div>
       </div>
