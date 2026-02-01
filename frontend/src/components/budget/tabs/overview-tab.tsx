@@ -183,7 +183,7 @@ export function OverviewTab({
               <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             </div>
             <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {t('budget.remaining')}
+              {t('budget.remainingBudget')}
             </span>
           </div>
           <p className={cn(
