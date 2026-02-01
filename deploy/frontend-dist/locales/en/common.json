@@ -8,6 +8,7 @@
     "analytics": "Analytics",
     "goals": "Goals",
     "budget": "Budget",
+    "profile": "Profile",
     "gamification": "Achievements",
     "settings": "Settings"
   },
@@ -19,6 +20,8 @@
     "goals": "Goals",
     "settings": "Settings",
     "analytics": "Analytics",
+    "profile": "Profile",
+    "gamification": "Achievements",
     "more": "More"
   },
   "button": {
@@ -119,6 +122,14 @@
     "createFirstGoal": "Create your first goal",
     "goalMotivation": "Track your savings progress",
     "noTransactions": "No transactions yet"
+  },
+  "spendingCalendar": {
+    "title": "Spending Calendar",
+    "monthlyTotal": "Monthly",
+    "dailyAvg": "Daily Avg",
+    "highestDay": "Highest",
+    "transactionCount": "{{count}} transactions",
+    "noSpending": "No spending this day"
   },
   "health": {
     "title": "Financial Health",
@@ -796,7 +807,16 @@
     "largeTransactionThreshold": "Large Transaction Threshold",
     "largeTransactionThresholdDescription": "Exclude transactions above this amount from goal achievability calculations",
     "largeTransactionThresholdHint": "Set to 0 to disable. Large one-time expenses (medical, etc.) can skew monthly averages.",
-    "saveFailed": "Failed to save settings"
+    "saveFailed": "Failed to save settings",
+    "sections": {
+      "general": "General",
+      "budget": "Budget",
+      "categories": "Categories",
+      "sources": "Sources",
+      "recurring": "Recurring",
+      "notifications": "Notifications",
+      "crypto": "Crypto"
+    }
   },
   "crypto": {
     "wallets": "Crypto Wallets",
@@ -1259,6 +1279,335 @@
       "selectItems": "Please select at least one item",
       "receiveRequired": "Please select receiving account",
       "amountRequired": "Amount received is required"
+    }
+  },
+  "gamification": {
+    "title": "Achievements & Rewards",
+    "subtitle": "Track your progress, earn XP, and unlock achievements as you manage your finances!",
+    "loading": "Loading gamification data...",
+    "level": "Level",
+    "dayStreak": "Day Streak",
+    "best": "Best",
+    "badgesEarned": "Badges Earned",
+    "badgesRemaining": "{{count}} badges remaining",
+    "allBadges": "All Badges",
+    "noBadges": "No badges in this category yet.",
+    "keepUsing": "Keep using SmartMoney to unlock more badges!",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity",
+    "startEarningXP": "Start logging transactions to earn XP!",
+    "tabs": {
+      "badges": "Badges",
+      "profile": "Profile",
+      "activity": "Activity"
+    },
+    "categories": {
+      "all": "All",
+      "consistency": "Consistency",
+      "transactions": "Transactions",
+      "savings": "Savings",
+      "budgeting": "Budgeting",
+      "goals": "Goals",
+      "accounts": "Accounts",
+      "special": "Special",
+      "levels": "Levels"
+    },
+    "stats": {
+      "unlocked": "Unlocked",
+      "remaining": "Remaining",
+      "legendary": "Legendary",
+      "xpEarned": "XP Earned"
+    }
+  },
+  "bills": {
+    "pageTitle": "Bills & Reminders",
+    "pageSubtitle": "Track and manage your recurring bills",
+    "add_bill": "Add Bill",
+    "edit_bill": "Edit Bill",
+    "tabs": {
+      "list": "List",
+      "calendar": "Calendar"
+    },
+    "status": {
+      "paid": "Paid",
+      "due_today": "Due Today",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "recurrence": {
+      "none": "One-time",
+      "weekly": "Weekly",
+      "biweekly": "Biweekly",
+      "monthly": "Monthly",
+      "quarterly": "Quarterly",
+      "yearly": "Yearly",
+      "custom": "Custom"
+    },
+    "reminder": {
+      "no_reminder": "No reminder",
+      "one_day": "1 day before",
+      "three_days": "3 days before",
+      "five_days": "5 days before",
+      "one_week": "1 week before"
+    },
+    "reminder_days": "{{count}} day before",
+    "reminder_days_notice": "{{count}} day notice",
+    "category": {
+      "select": "Select category",
+      "utilities": "Utilities",
+      "rent_mortgage": "Rent/Mortgage",
+      "insurance": "Insurance",
+      "subscriptions": "Subscriptions",
+      "phone_internet": "Phone/Internet",
+      "loan": "Loan",
+      "credit_card": "Credit Card",
+      "other": "Other"
+    },
+    "due_today": "Due today",
+    "tomorrow": "Tomorrow",
+    "in_days": "In {{count}} days",
+    "days_until_due": "{{count}} days left",
+    "field": {
+      "name": "Bill Name",
+      "amount": "Amount",
+      "due_date": "Due Date",
+      "recurrence": "Recurrence",
+      "reminder": "Reminder",
+      "category": "Category",
+      "color": "Color",
+      "notes": "Notes",
+      "already_paid": "Mark as already paid"
+    },
+    "placeholder": {
+      "name": "e.g., Electricity, Internet",
+      "notes": "Additional notes..."
+    },
+    "validation": {
+      "name_required": "Bill name is required",
+      "amount_required": "Please enter a valid amount",
+      "due_date_required": "Due date is required",
+      "submit_failed": "Failed to save bill. Please try again."
+    },
+    "actions": {
+      "mark_paid": "Mark as Paid",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "delete_confirm": "Are you sure you want to delete \"{{name}}\"?",
+    "search_placeholder": "Search bills...",
+    "no_bills_found": "No bills found",
+    "showing_count": "Showing {{count}} of {{total}} bills",
+    "sort": {
+      "due_date": "Due Date",
+      "amount": "Amount",
+      "name": "Name",
+      "created_at": "Date Added"
+    },
+    "filter": {
+      "all": "All",
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "overdue": "Overdue",
+      "upcoming": "Upcoming"
+    },
+    "calendar": {
+      "title": "Bill Calendar",
+      "total_due": "Total Due"
+    },
+    "upcoming": {
+      "title": "Upcoming Bills",
+      "empty": "No upcoming bills",
+      "total_due": "Total Due"
+    },
+    "detail": {
+      "title": "Bill Details"
+    },
+    "quick_stats": "Quick Stats",
+    "total_bills": "Total Bills",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "tabs": {
+      "details": "Details",
+      "reminders": "Reminders"
+    },
+    "reminder": {
+      "no_reminder": "No reminder",
+      "one_day": "1 day before",
+      "two_days": "2 days before",
+      "three_days": "3 days before",
+      "five_days": "5 days before",
+      "one_week": "1 week before",
+      "two_weeks": "2 weeks before",
+      "enable": "Enable Reminder",
+      "enableDescription": "Get notified before this bill is due",
+      "daysBefore": "Remind me",
+      "time": "Reminder Time",
+      "customSchedules": "Custom Reminder Schedules",
+      "addSchedule": "Add Schedule",
+      "noSchedules": "No custom schedules",
+      "editSchedule": "Edit Schedule",
+      "deleteConfirm": "Are you sure you want to delete this schedule?",
+      "scheduleType": "Schedule Type",
+      "daysBeforeValue": "{{count}} days before",
+      "type": {
+        "daysBefore": "Days Before Due",
+        "specificDate": "Specific Date",
+        "recurring": "Recurring"
+      }
+    },
+    "partialPayment": {
+      "title": "Partial Payment",
+      "paid": "Paid",
+      "remaining": "Remaining",
+      "total": "Total Amount",
+      "inProgress": "In Progress",
+      "triggerAlert": "Send Payment Reminder",
+      "alertTitle": "Send Payment Reminder",
+      "alertInfo": "Payment Reminder",
+      "alertDescription": "Send a reminder about the remaining balance of {{amount}} for this bill.",
+      "sendAlert": "Send Reminder"
+    }
+  },
+  "alerts": {
+    "title": "Alerts",
+    "view_details": "View details",
+    "over_budget": {
+      "title": "Over Budget",
+      "message": "{{budget}} is over budget by {{amount}}"
+    },
+    "threshold_80": {
+      "title": "Near Limit",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "threshold_50": {
+      "title": "Halfway There",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "near_limit": {
+      "title": "Approaching Limit"
+    },
+    "halfway": {
+      "title": "Halfway Through Budget"
+    },
+    "bill_due": {
+      "title": "Bill Due",
+      "message": "{{bill}} is due ({{amount}})"
+    },
+    "default": {
+      "message": "You have a new alert"
+    },
+    "budget_progress": {
+      "message": "{{budget}}: {{spent}} of {{limit}}"
+    },
+    "remaining": "Remaining",
+    "left": "Left",
+    "over_by": "Over by {{amount}}",
+    "thresholds": {
+      "next": "Next threshold",
+      "at_threshold": "At {{percentage}}%"
+    }
+  },
+  "anomaly": {
+    "title": "Anomaly Alerts",
+    "noAlerts": "No anomalies detected",
+    "severity": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "type": {
+      "large_transaction": "Large Transaction",
+      "category_shift": "Category Shift",
+      "duplicate": "Duplicate",
+      "recurring_change": "Recurring Change",
+      "ml_detected": "AI Detected"
+    },
+    "config": {
+      "title": "Anomaly Detection Settings",
+      "sensitivity": "Sensitivity",
+      "sensitivityOptions": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "largeTransactionThreshold": "Large Transaction Threshold",
+      "unusualSpendingPercent": "Unusual Spending %",
+      "recurringChangePercent": "Recurring Change %",
+      "duplicateChargeHours": "Duplicate Detection Hours",
+      "enabledTypes": "Enabled Detection Types",
+      "save": "Save Settings",
+      "saved": "Settings saved"
+    }
+  },
+  "insights": {
+    "title": "Spending Insights",
+    "noInsights": "No notable spending patterns detected",
+    "insightsHint": "Keep tracking to see personalized insights",
+    "viewTransactions": "View Transactions",
+    "viewBreakdown": "View Breakdown",
+    "learnMore": "Learn More",
+    "type": {
+      "spending_trend": "Spending Trend",
+      "budget_warning": "Budget Warning",
+      "budget_info": "Budget Info",
+      "goal_progress": "Goal Progress",
+      "forecast": "Forecast",
+      "savings_alert": "Savings Alert",
+      "savings_positive": "Great Savings"
+    }
+  },
+  "savings": {
+    "title": "Savings Opportunities",
+    "potential": "potential",
+    "noRecommendations": "No savings opportunities found",
+    "checkBack": "Check back later for personalized suggestions",
+    "totalPotential": "Total Potential Savings",
+    "type": {
+      "subscription_cancel": "Subscription",
+      "reduce_spending": "Reduce Spending",
+      "negotiate": "Negotiate Bill",
+      "switch_provider": "Switch Provider",
+      "optimize_payment": "Payment Optimization"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "all": "All",
+    "unread": "Unread",
+    "noUnread": "No unread notifications",
+    "empty": "No notifications yet",
+    "loadMore": "Load more",
+    "viewAll": "View all notifications",
+    "markAllRead": "Mark all read",
+    "markRead": "Mark read",
+    "view": "View",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}d ago",
+    "channels": {
+      "title": "Notification Channels",
+      "push": "Push Notifications",
+      "pushDescription": "Receive notifications on your device",
+      "email": "Email Notifications",
+      "emailDescription": "Receive notifications via email",
+      "inApp": "In-App Notifications",
+      "inAppDescription": "See notifications within the app"
+    },
+    "types": {
+      "title": "Notification Types",
+      "budget": "Budget Alerts",
+      "bills": "Bill Reminders",
+      "anomalies": "Anomaly Alerts",
+      "goals": "Goal Milestones",
+      "savings": "Savings Tips",
+      "burnRate": "Burn Rate Warnings"
+    },
+    "quietHours": {
+      "title": "Quiet Hours",
+      "description": "Mute non-critical notifications during set hours",
+      "configure": "Configure"
     }
   }
 }

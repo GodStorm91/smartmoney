@@ -120,6 +120,14 @@
     "goalMotivation": "Theo dõi tiến độ tiết kiệm",
     "noTransactions": "Chưa có giao dịch"
   },
+  "spendingCalendar": {
+    "title": "Lịch chi tiêu",
+    "monthlyTotal": "Hàng tháng",
+    "dailyAvg": "Trung bình/ngày",
+    "highestDay": "Cao nhất",
+    "transactionCount": "{{count}} giao dịch",
+    "noSpending": "Không có chi tiêu"
+  },
   "health": {
     "title": "Sức khỏe tài chính",
     "savingsRate": "Tỷ lệ tiết kiệm",
@@ -754,7 +762,15 @@
     "largeTransactionThreshold": "Ngưỡng Giao Dịch Lớn",
     "largeTransactionThresholdDescription": "Loại trừ giao dịch vượt số tiền này khỏi tính toán khả năng đạt mục tiêu",
     "largeTransactionThresholdHint": "Đặt 0 để tắt. Chi phí lớn một lần (y tế, v.v.) có thể làm sai lệch trung bình tháng.",
-    "saveFailed": "Không thể lưu cài đặt"
+    "saveFailed": "Không thể lưu cài đặt",
+    "sections": {
+      "general": "Chung",
+      "budget": "Ngân sách",
+      "categories": "Danh mục",
+      "sources": "Nguồn tiền",
+      "recurring": "Định kỳ",
+      "crypto": "Tiền điện tử"
+    }
   },
   "crypto": {
     "wallets": "Ví Tiền Điện Tử",
@@ -1217,6 +1233,186 @@
       "selectItems": "Vui lòng chọn ít nhất một mục",
       "receiveRequired": "Vui lòng chọn tài khoản nhận",
       "amountRequired": "Số tiền nhận là bắt buộc"
+    }
+  },
+  "bills": {
+    "pageTitle": "Hóa đơn & Nhắc nhở",
+    "pageSubtitle": "Theo dõi và quản lý hóa đơn định kỳ",
+    "add_bill": "Thêm hóa đơn",
+    "edit_bill": "Chỉnh sửa hóa đơn",
+    "tabs": {
+      "list": "Danh sách",
+      "calendar": "Lịch"
+    },
+    "status": {
+      "paid": "Đã thanh toán",
+      "due_today": "Đến hạn hôm nay",
+      "overdue": "Quá hạn",
+      "upcoming": "Sắp tới"
+    },
+    "recurrence": {
+      "none": "Một lần",
+      "weekly": "Hàng tuần",
+      "biweekly": "Hai tuần một lần",
+      "monthly": "Hàng tháng",
+      "quarterly": "Hàng quý",
+      "yearly": "Hàng năm",
+      "custom": "Tùy chỉnh"
+    },
+    "reminder": {
+      "no_reminder": "Không nhắc nhở",
+      "one_day": "1 ngày trước",
+      "two_days": "2 ngày trước",
+      "three_days": "3 ngày trước",
+      "five_days": "5 ngày trước",
+      "one_week": "1 tuần trước",
+      "two_weeks": "2 tuần trước",
+      "enable": "Bật nhắc nhở",
+      "enableDescription": "Nhận thông báo trước khi hóa đơn đến hạn",
+      "daysBefore": "Nhắc trước",
+      "time": "Thời gian nhắc nhở",
+      "customSchedules": "Lịch nhắc nhở tùy chỉnh",
+      "addSchedule": "Thêm lịch",
+      "noSchedules": "Không có lịch tùy chỉnh",
+      "editSchedule": "Chỉnh sửa lịch",
+      "deleteConfirm": "Bạn có chắc muốn xóa lịch này không?",
+      "scheduleType": "Loại lịch",
+      "daysBeforeValue": "{{count}} ngày trước",
+      "type": {
+        "daysBefore": "Ngày trước hạn thanh toán",
+        "specificDate": "Ngày cụ thể",
+        "recurring": "Lặp lại"
+      }
+    },
+    "reminder_days": "{{count}} ngày trước",
+    "reminder_days_notice": "Thông báo trước {{count}} ngày",
+    "category": {
+      "select": "Chọn danh mục",
+      "utilities": "Tiện ích",
+      "rent_mortgage": "Tiền thuê/Tiền vay",
+      "insurance": "Bảo hiểm",
+      "subscriptions": "Đăng ký",
+      "phone_internet": "Điện thoại/Internet",
+      "loan": "Vay",
+      "credit_card": "Thẻ tín dụng",
+      "other": "Khác"
+    },
+    "due_today": "Đến hạn hôm nay",
+    "tomorrow": "Ngày mai",
+    "in_days": "Trong {{count}} ngày",
+    "days_until_due": "Còn {{count}} ngày",
+    "field": {
+      "name": "Tên hóa đơn",
+      "amount": "Số tiền",
+      "due_date": "Ngày đến hạn",
+      "recurrence": "Tần suất",
+      "reminder": "Nhắc nhở",
+      "category": "Danh mục",
+      "color": "Màu",
+      "notes": "Ghi chú",
+      "already_paid": "Đánh dấu đã thanh toán"
+    },
+    "placeholder": {
+      "name": "VD: Điện, Internet",
+      "notes": "Ghi chú thêm..."
+    },
+    "validation": {
+      "name_required": "Tên hóa đơn là bắt buộc",
+      "amount_required": "Vui lòng nhập số tiền hợp lệ",
+      "due_date_required": "Ngày đến hạn là bắt buộc",
+      "submit_failed": "Lưu hóa đơn thất bại. Vui lòng thử lại."
+    },
+    "actions": {
+      "mark_paid": "Đánh dấu đã thanh toán",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "delete_confirm": "Bạn có chắc muốn xóa \"{{name}}\"?",
+    "search_placeholder": "Tìm kiếm hóa đơn...",
+    "no_bills_found": "Không tìm thấy hóa đơn",
+    "showing_count": "Hiển thị {{count}} / {{total}} hóa đơn",
+    "sort": {
+      "due_date": "Ngày đến hạn",
+      "amount": "Số tiền",
+      "name": "Tên",
+      "created_at": "Ngày thêm"
+    },
+    "filter": {
+      "all": "Tất cả",
+      "unpaid": "Chưa thanh toán",
+      "paid": "Đã thanh toán",
+      "overdue": "Quá hạn",
+      "upcoming": "Sắp tới"
+    },
+    "calendar": {
+      "title": "Lịch hóa đơn",
+      "total_due": "Tổng tiền đến hạn"
+    },
+    "upcoming": {
+      "title": "Hóa đơn sắp tới",
+      "empty": "Không có hóa đơn sắp tới",
+      "total_due": "Tổng tiền đến hạn"
+    },
+    "detail": {
+      "title": "Chi tiết hóa đơn"
+    },
+    "quick_stats": "Thống kê nhanh",
+    "total_bills": "Tổng hóa đơn",
+    "paid": "Đã thanh toán",
+    "unpaid": "Chưa thanh toán",
+    "tabs": {
+      "details": "Chi tiết",
+      "reminders": "Nhắc nhở"
+    },
+    "partialPayment": {
+      "title": "Thanh toán một phần",
+      "paid": "Đã thanh toán",
+      "remaining": "Còn lại",
+      "total": "Tổng tiền",
+      "inProgress": "Đang tiến hành",
+      "triggerAlert": "Gửi nhắc nhở thanh toán",
+      "alertTitle": "Gửi nhắc nhở thanh toán",
+      "alertInfo": "Nhắc nhở thanh toán",
+      "alertDescription": "Gửi nhắc nhở về số tiền còn lại {{amount}} cho hóa đơn này.",
+      "sendAlert": "Gửi nhắc nhở"
+    }
+  },
+  "gamification": {
+    "title": "Thành tựu & Phần thưởng",
+    "subtitle": "Theo dõi tiến độ, kiếm XP và mở khóa thành tựu khi bạn quản lý tài chính!",
+    "loading": "Đang tải dữ liệu...",
+    "level": "Cấp",
+    "dayStreak": "Chuỗi ngày",
+    "best": "Tốt nhất",
+    "badgesEarned": "Huy hiệu đạt được",
+    "badgesRemaining": "còn {{count}} huy hiệu",
+    "allBadges": "Tất cả huy hiệu",
+    "noBadges": "Chưa có huy hiệu nào trong danh mục này.",
+    "keepUsing": "Tiếp tục sử dụng SmartMoney để mở khóa thêm huy hiệu!",
+    "recentActivity": "Hoạt động gần đây",
+    "noActivity": "Không có hoạt động gần đây",
+    "startEarningXP": "Bắt đầu ghi nhận giao dịch để kiếm XP!",
+    "tabs": {
+      "badges": "Huy hiệu",
+      "profile": "Hồ sơ",
+      "activity": "Hoạt động"
+    },
+    "categories": {
+      "all": "Tất cả",
+      "consistency": "Kiên trì",
+      "transactions": "Giao dịch",
+      "savings": "Tiết kiệm",
+      "budgeting": "Ngân sách",
+      "goals": "Mục tiêu",
+      "accounts": "Tài khoản",
+      "special": "Đặc biệt",
+      "levels": "Cấp độ"
+    },
+    "stats": {
+      "unlocked": "Đã mở",
+      "remaining": "Còn lại",
+      "legendary": "Huyền thoại",
+      "xpEarned": "XP kiếm được"
     }
   }
 }

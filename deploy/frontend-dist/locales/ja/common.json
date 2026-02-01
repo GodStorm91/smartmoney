@@ -120,6 +120,14 @@
     "goalMotivation": "貯蓄進捗を追跡",
     "noTransactions": "取引がありません"
   },
+  "spendingCalendar": {
+    "title": "支出カレンダー",
+    "monthlyTotal": "月合計",
+    "dailyAvg": "日平均",
+    "highestDay": "最高",
+    "transactionCount": "{{count}}件の取引",
+    "noSpending": "支出なし"
+  },
   "health": {
     "title": "家計の健康度",
     "savingsRate": "貯蓄率",
@@ -755,7 +763,15 @@
     "largeTransactionThreshold": "大型取引の除外しきい値",
     "largeTransactionThresholdDescription": "目標達成計算から除外する取引の金額しきい値",
     "largeTransactionThresholdHint": "0に設定すると無効。大きな一時的支出（医療費など）が月平均を歪める場合に有効。",
-    "saveFailed": "設定の保存に失敗しました"
+    "saveFailed": "設定の保存に失敗しました",
+    "sections": {
+      "general": "一般",
+      "budget": "予算",
+      "categories": "カテゴリ",
+      "sources": "出金元",
+      "recurring": "定期",
+      "crypto": "暗号資産"
+    }
   },
   "crypto": {
     "wallets": "暗号資産ウォレット",
@@ -1218,6 +1234,305 @@
       "selectItems": "少なくとも1件選択してください",
       "receiveRequired": "入金先を選択してください",
       "amountRequired": "受取金額は必須です"
+    }
+  },
+  "gamification": {
+    "title": "実績と報酬",
+    "subtitle": "進捗を追跡し、XPを獲得して、目標を達成しましょう！",
+    "loading": "データを読み込み中...",
+    "level": "レベル",
+    "dayStreak": "連続日数",
+    "best": "最高",
+    "badgesEarned": "獲得バッジ",
+    "badgesRemaining": "残り{{count}}個",
+    "allBadges": "すべてのバッジ",
+    "noBadges": "このカテゴリにはまだバッジがありません。",
+    "keepUsing": "SmartMoneyを使い続けてバッジを獲得しましょう！",
+    "recentActivity": "最近の活動",
+    "noActivity": "最近の活動はありません",
+    "startEarningXP": "取引を記録してXPを獲得しましょう！",
+    "tabs": {
+      "badges": "バッジ",
+      "profile": "プロフィール",
+      "activity": "活動"
+    },
+    "categories": {
+      "all": "すべて",
+      "consistency": "継続性",
+      "transactions": "取引",
+      "savings": "節約",
+      "budgeting": "予算管理",
+      "goals": "目標",
+      "accounts": "口座",
+      "special": "特別",
+      "levels": "レベル"
+    },
+    "stats": {
+      "unlocked": "解除済み",
+      "remaining": "残り",
+      "legendary": "伝説級",
+      "epic": "エピックス級",
+      "rare": "レア級",
+      "common": "コモン級",
+      "xpEarned": "獲得XP"
+    },
+    "levelProgress": "レベル{{level}}",
+    "xpToNextLevel": "レベル{{next}}まで{{percent}}%",
+    "streak": "{{days}}日連続",
+    "onFire": "🔥 絶好調！",
+    "streakHint": "あと{{days}}日で週間ウォーリアーを解除できます",
+    "xpNeeded": "必要",
+    "profile": {
+      "displayNamePlaceholder": "表示名",
+      "newUser": "新規ユーザー",
+      "avatarSelected": "アバターを選択しました！",
+      "avatarError": "アバターの選択に失敗しました"
+    },
+    "badge": {
+      "levelPrefix": "レベル",
+      "xpReward": "+{{xp}} XP",
+      "unlockedOn": "{{date}}に解除",
+      "achievementUnlocked": "🏆 実績解除: {{name}}! (+{{xp}} XP)",
+      "xpTotal": "{{xp}} XP 合計",
+      "dayStreak": "🔥 {{days}}日連続! +{{xp}} XP"
+    }
+  },
+  "insights": {
+    "title": "支出インサイト",
+    "spendingDecreased": "{{category}}の支出が減少しました",
+    "spendingIncreased": "{{category}}の支出が増加しました",
+    "decreasePercent": "先月比{{percent}}減",
+    "increasePercent": "先月比{{percent}}増"
+  },
+  "transactions": {
+    "today": "今日",
+    "thisWeek": "今週",
+    "thisMonth": "今月",
+    "searchPlaceholder": "取引を検索..."
+  },
+  "transaction": {
+    "today": "今日",
+    "cancel": "キャンセル",
+    "save": "保存"
+  },
+  "bills": {
+    "pageTitle": "請求・医療費",
+    "pageSubtitle": "定期的な請求とリマインダーを追跡・管理",
+    "add_bill": "請求を追加",
+    "edit_bill": "請求を編集",
+    "tabs": {
+      "list": "リスト",
+      "calendar": "カレンダー"
+    },
+    "status": {
+      "paid": "支払い済み",
+      "due_today": "本日支払い期限",
+      "overdue": "期限切れ",
+      "upcoming": "今後"
+    },
+    "recurrence": {
+      "none": "一回限り",
+      "weekly": "毎週",
+      "biweekly": "隔週",
+      "monthly": "毎月",
+      "quarterly": "四半期ごと",
+      "yearly": "毎年",
+      "custom": "カスタム"
+    },
+    "reminder": {
+      "no_reminder": "リマインダーなし",
+      "one_day": "1日前",
+      "three_days": "3日前",
+      "five_days": "5日前",
+      "one_week": "1週間前"
+    },
+    "reminder_days": "{{count}}日前",
+    "reminder_days_notice": "{{count}}日前に通知",
+    "category": {
+      "select": "カテゴリを選択",
+      "utilities": "光熱費",
+      "rent_mortgage": "賃料/ローン",
+      "insurance": "保険",
+      "subscriptions": "サブスクリプション",
+      "phone_internet": "電話/インターネット",
+      "loan": "ローン",
+      "credit_card": "クレジットカード",
+      "other": "その他"
+    },
+    "due_today": "本日支払い期限",
+    "tomorrow": "明日",
+    "in_days": "あと{{count}}日",
+    "days_until_due": "残り{{count}}日",
+    "field": {
+      "name": "請求名",
+      "amount": "金額",
+      "due_date": "支払い期限",
+      "recurrence": "繰り返し",
+      "reminder": "リマインダー",
+      "category": "カテゴリ",
+      "color": "色",
+      "notes": "メモ",
+      "already_paid": "支払い済みとしてマーク"
+    },
+    "placeholder": {
+      "name": "例: 電気代、インターネット",
+      "notes": "追加メモ..."
+    },
+    "validation": {
+      "name_required": "請求名は必須です",
+      "amount_required": "有効な金額を入力してください",
+      "due_date_required": "支払い期限は必須です",
+      "submit_failed": "請求の保存に失敗しました。もう一度お試しください。"
+    },
+    "actions": {
+      "mark_paid": "支払い済みにする",
+      "edit": "編集",
+      "delete": "削除"
+    },
+    "delete_confirm": "「{{name}}」を削除してもよろしいですか？",
+    "search_placeholder": "請求を検索...",
+    "no_bills_found": "請求が見つかりません",
+    "showing_count": "{{total}}件中{{count}}件を表示",
+    "sort": {
+      "due_date": "支払い期限",
+      "amount": "金額",
+      "name": "名前",
+      "created_at": "追加日"
+    },
+    "filter": {
+      "all": "すべて",
+      "unpaid": "未払い",
+      "paid": "支払い済み",
+      "overdue": "期限切れ",
+      "upcoming": "今後"
+    },
+    "calendar": {
+      "title": "請求カレンダー",
+      "total_due": "合計支払い額"
+    },
+    "upcoming": {
+      "title": "今後の請求",
+      "empty": "今後の請求はありません",
+      "total_due": "合計支払い額"
+    },
+    "detail": {
+      "title": "請求詳細"
+    },
+    "quick_stats": "クイック統計",
+    "total_bills": "総請求数",
+    "paid": "支払い済み",
+    "unpaid": "未払い",
+    "tabs": {
+      "details": "詳細",
+      "reminders": "リマインダー"
+    },
+    "reminder": {
+      "no_reminder": "リマインダーなし",
+      "one_day": "1日前",
+      "two_days": "2日前",
+      "three_days": "3日前",
+      "five_days": "5日前",
+      "one_week": "1週間前",
+      "two_weeks": "2週間前",
+      "enable": "リマインダーを有効にする",
+      "enableDescription": "請求の支払い期限前に通知を受け取る",
+      "daysBefore": "通知を受け取る",
+      "time": "通知時間",
+      "customSchedules": "カスタムリマインダースケジュール",
+      "addSchedule": "スケジュールを追加",
+      "noSchedules": "カスタムスケジュールはありません",
+      "editSchedule": "スケジュールを編集",
+      "deleteConfirm": "このスケジュールを削除してもよろしいですか？",
+      "scheduleType": "スケジュールの種類",
+      "daysBeforeValue": "{{count}}日前",
+      "type": {
+        "daysBefore": "支払い期限の何日前",
+        "specificDate": "特定の日付",
+        "recurring": "繰り返し"
+      }
+    },
+    "partialPayment": {
+      "title": "部分支払い",
+      "paid": "支払い済み",
+      "remaining": "残り",
+      "total": "合計金額",
+      "inProgress": "進行中",
+      "triggerAlert": "支払いリマインダーを送信",
+      "alertTitle": "支払いリマインダーの送信",
+      "alertInfo": "支払いリマインダー",
+      "alertDescription": "この請求の残高{{amount}}についてのリマインダーを送信します。",
+      "sendAlert": "リマインダーを送信"
+    }
+  },
+  "dateFormat": {
+    "monthYear": "{{year}}年{{month}}月",
+    "shortDate": "{{month}}月{{day}}日",
+    "shortDateWithWeekday": "{{month}}月{{day}}日 ({{weekday}})",
+    "fullDate": "{{year}}年{{month}}月{{day}}日",
+    "weekdays": ["日", "月", "火", "水", "木", "金", "土"]
+  },
+  "anomaly": {
+    "title": "異常検知",
+    "noAlerts": "異常は検出されませんでした",
+    "severity": {
+      "critical": "重大",
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "type": {
+      "large_transaction": "高額取引",
+      "category_shift": "カテゴリ変動",
+      "duplicate": "重複",
+      "recurring_change": "定期変更",
+      "ml_detected": "AI検出"
+    },
+    "config": {
+      "title": "異常検知設定",
+      "sensitivity": "感度",
+      "sensitivityOptions": {
+        "low": "低",
+        "medium": "中",
+        "high": "高"
+      },
+      "largeTransactionThreshold": "高額取引しきい値",
+      "unusualSpendingPercent": "通常支出逸脱率",
+      "recurringChangePercent": "定期変更率",
+      "duplicateChargeHours": "重複検出時間",
+      "enabledTypes": "有効な検知タイプ",
+      "save": "設定を保存",
+      "saved": "設定を保存しました"
+    }
+  },
+  "insights": {
+    "title": "支出インサイト",
+    "noInsights": "特筆すべき支出パターンは検出されません",
+    "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
+    "viewTransactions": "取引を見る",
+    "viewBreakdown": "内訳を見る",
+    "learnMore": "詳細を見る",
+    "type": {
+      "spending_trend": "支出トレンド",
+      "budget_warning": "予算警告",
+      "budget_info": "予算情報",
+      "goal_progress": "目標進捗",
+      "forecast": "予測",
+      "savings_alert": "貯蓄アラート",
+      "savings_positive": "優れた貯蓄"
+    }
+  },
+  "savings": {
+    "title": "貯蓄機会",
+    "potential": "削減可能",
+    "noRecommendations": "削減機会は見つかりませんでした",
+    "checkBack": "後ほどパーソナライズされた提案を確認してください",
+    "totalPotential": "総削減可能額",
+    "type": {
+      "subscription_cancel": "サブスクリプション",
+      "reduce_spending": "支出削減",
+      "negotiate": "交渉提案",
+      "switch_provider": "プロバイダー変更",
+      "optimize_payment": "支払い最適化"
     }
   }
 }
