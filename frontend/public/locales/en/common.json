@@ -969,6 +969,7 @@
     },
     "tapToEdit": "Tap amount to edit",
     "spent": "Spent",
+    "ofTotalBudget": "of {{total}} budget",
     "remaining": "{{amount}} left",
     "exceeded": "{{amount}} over",
     "overBudget": "Over Budget",

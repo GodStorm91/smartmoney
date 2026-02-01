@@ -40,6 +40,8 @@ export function OverviewTab({
 
   const spentSoFar = tracking?.total_spent || 0
   const spentPercent = totalAllocated > 0 ? (spentSoFar / totalAllocated) * 100 : 0
+  const availableToSpend = totalBudget - spentSoFar
+  const availablePercent = totalBudget > 0 ? Math.max(0, (availableToSpend / totalBudget) * 100) : 0
 
   // Calculate health status
   const getHealthStatus = () => {
@@ -79,36 +81,55 @@ export function OverviewTab({
 
   return (
     <div className="space-y-4">
-      {/* Budget Health Status Banner */}
+      {/* Budget Health Status Banner - Shows Available to Spend prominently */}
       <div className={cn('p-4 rounded-xl border', health.bg, health.color, 'border-current/20')}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        {/* Top row: Available to spend + Health status */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-medium opacity-70 uppercase tracking-wider mb-1">
+              {t('budget.availableToSpend')}
+            </p>
+            <p className={cn(
+              'text-3xl font-bold',
+              availableToSpend < 0 ? 'text-red-600 dark:text-red-400' : ''
+            )}>
+              {availableToSpend < 0 && '-'}{formatCurrency(Math.abs(availableToSpend))}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <div className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center',
+              'w-8 h-8 rounded-full flex items-center justify-center',
               health.status === 'danger' ? 'bg-red-500' :
               health.status === 'warning' ? 'bg-amber-500' :
               health.status === 'caution' ? 'bg-yellow-500' : 'bg-green-500'
             )}>
               {health.status === 'danger' ? (
-                <AlertTriangle className="w-5 h-5 text-white" />
+                <AlertTriangle className="w-4 h-4 text-white" />
               ) : (
-                <TrendingUp className="w-5 h-5 text-white" />
+                <TrendingUp className="w-4 h-4 text-white" />
               )}
             </div>
-            <div>
-              <p className="font-semibold">{health.label}</p>
-              <p className="text-sm opacity-80">
-                {t('budget.usedOfTotal', {
-                  used: formatCurrency(spentSoFar),
-                  total: formatCurrency(totalAllocated)
-                })}
-              </p>
-            </div>
+            <span className="text-sm font-medium">{health.label}</span>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold">{Math.round(spentPercent)}%</p>
-            <p className="text-xs opacity-70">{t('budget.budgetUsed')}</p>
-          </div>
+        </div>
+
+        {/* Progress bar showing remaining */}
+        <div className="h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mb-2">
+          <div
+            className={cn(
+              'h-full rounded-full transition-all duration-500',
+              availableToSpend < 0 ? 'bg-red-500' :
+              availablePercent < 20 ? 'bg-amber-500' :
+              availablePercent < 40 ? 'bg-yellow-500' : 'bg-green-500'
+            )}
+            style={{ width: `${Math.min(100, Math.max(0, availablePercent))}%` }}
+          />
+        </div>
+
+        {/* Bottom row: Spent / Total Budget */}
+        <div className="flex justify-between text-xs opacity-80">
+          <span>{formatCurrency(spentSoFar)} {t('budget.spent')}</span>
+          <span>{t('budget.ofTotalBudget', { total: formatCurrency(totalBudget) })}</span>
         </div>
       </div>
 
