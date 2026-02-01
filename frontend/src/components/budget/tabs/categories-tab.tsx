@@ -2,9 +2,9 @@ import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CategoryListPanel } from '../category-list-panel'
 import { BudgetDetailPanel } from '../budget-detail-panel'
-import { AllocationCard } from '../allocation-card'
+import { BudgetAllocationList } from '../budget-allocation-list'
 import { cn } from '@/utils/cn'
-import type { Budget, BudgetTracking } from '@/types'
+import type { Budget, BudgetTracking, BudgetAllocation } from '@/types'
 
 interface CategoriesTabProps {
   budget: Budget
@@ -12,6 +12,7 @@ interface CategoriesTabProps {
   isDraft?: boolean
   selectedMonth: string
   onAddCategory?: () => void
+  onAllocationChange?: (allocations: BudgetAllocation[]) => void
 }
 
 export function CategoriesTab({
@@ -19,7 +20,8 @@ export function CategoriesTab({
   tracking,
   isDraft,
   selectedMonth,
-  onAddCategory
+  onAddCategory,
+  onAllocationChange
 }: CategoriesTabProps) {
   const { t } = useTranslation('common')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
@@ -72,31 +74,18 @@ export function CategoriesTab({
         </div>
       </div>
 
-      {/* Mobile: Accordion List */}
-      <div className="lg:hidden space-y-3">
-        {budget.allocations.map((allocation) => {
-          const trackingItem = getTrackingItem(allocation.category)
-
-          return (
-            <AllocationCard
-              key={allocation.category}
-              allocation={allocation}
-              trackingItem={trackingItem}
-              totalBudget={totalBudget}
-              month={selectedMonth}
-              isExpanded={expandedCategory === allocation.category}
-              onToggleExpand={handleToggleExpand}
-              onOpenDetail={setSelectedCategory}
-              className={isDraft ? 'border-dashed border-blue-300 dark:border-blue-700' : ''}
-            />
-          )
-        })}
-
-        {budget.allocations.length === 0 && (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            {t('budget.noAllocations')}
-          </div>
-        )}
+      {/* Mobile: Editable Allocation List */}
+      <div className="lg:hidden">
+        <BudgetAllocationList
+          budgetId={budget.id}
+          allocations={budget.allocations}
+          totalBudget={totalBudget}
+          tracking={tracking}
+          month={selectedMonth}
+          isDraft={isDraft}
+          onAddCategory={onAddCategory}
+          onAllocationChange={onAllocationChange}
+        />
       </div>
 
       {/* Mobile Detail Panel (Overlay) */}

@@ -406,6 +406,14 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                 isDraft={isDraft}
                 selectedMonth={selectedMonth}
                 onAddCategory={() => setShowAddCategory(true)}
+                onAllocationChange={(allocations) => {
+                  if (isDraft) {
+                    setDraftBudget({
+                      ...displayBudget,
+                      allocations
+                    })
+                  }
+                }}
               />
             )}
             {activeTab === 'transactions' && (
