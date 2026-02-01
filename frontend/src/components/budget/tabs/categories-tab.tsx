@@ -24,9 +24,8 @@ export function CategoriesTab({
   onAllocationChange
 }: CategoriesTabProps) {
   const { t } = useTranslation('common')
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    budget.allocations[0]?.category || null
-  )
+  // Don't pre-select any category on mobile to avoid showing detail panel overlay immediately
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
 
   const totalBudget = budget.monthly_income - (budget.savings_target || 0)
@@ -74,17 +73,19 @@ export function CategoriesTab({
         </div>
       </div>
 
-      {/* Editable Allocation List - shown on all screen sizes */}
-      <BudgetAllocationList
-        budgetId={budget.id}
-        allocations={budget.allocations}
-        totalBudget={totalBudget}
-        tracking={tracking}
-        month={selectedMonth}
-        isDraft={isDraft}
-        onAddCategory={onAddCategory}
-        onAllocationChange={onAllocationChange}
-      />
+      {/* Mobile: Editable Allocation List */}
+      <div className="lg:hidden">
+        <BudgetAllocationList
+          budgetId={budget.id}
+          allocations={budget.allocations}
+          totalBudget={totalBudget}
+          tracking={tracking}
+          month={selectedMonth}
+          isDraft={isDraft}
+          onAddCategory={onAddCategory}
+          onAllocationChange={onAllocationChange}
+        />
+      </div>
 
       {/* Mobile Detail Panel (Overlay) */}
       <div className="lg:hidden">
