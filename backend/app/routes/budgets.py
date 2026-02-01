@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
-from ..models.budget import Budget
+from ..models.budget import Budget, BudgetAllocation
 from ..models.user import User
 from ..schemas.budget import (
     BudgetGenerateRequest,
@@ -19,7 +19,8 @@ from ..schemas.budget import (
     BudgetCopyRequest,
     BudgetCopyPreview,
     AllocationSpendingSummary,
-    BudgetVersionResponse
+    BudgetVersionResponse,
+    AllocationUpdateRequest
 )
 from ..services.budget_service import BudgetService
 from ..services.claude_ai_service import ClaudeAIService
@@ -368,6 +369,102 @@ def get_current_budget_tracking(
         )
 
     return tracking
+
+
+@router.patch("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
+def update_allocation(
+    budget_id: int,
+    category: str,
+    request: AllocationUpdateRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Update a single allocation amount.
+
+    Args:
+        budget_id: Budget ID
+        category: Category name (URL encoded)
+        request: New amount
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Updated budget
+    """
+    budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.user_id == current_user.id
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Budget not found"
+        )
+
+    allocation = db.query(BudgetAllocation).filter(
+        BudgetAllocation.budget_id == budget_id,
+        BudgetAllocation.category == category
+    ).first()
+
+    if not allocation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Allocation for category '{category}' not found"
+        )
+
+    allocation.amount = request.amount
+    db.commit()
+    db.refresh(budget)
+
+    return budget
+
+
+@router.delete("/{budget_id}/allocations/{category}", response_model=BudgetResponse)
+def delete_allocation(
+    budget_id: int,
+    category: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Delete a single allocation.
+
+    Args:
+        budget_id: Budget ID
+        category: Category name (URL encoded)
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Updated budget
+    """
+    budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.user_id == current_user.id
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Budget not found"
+        )
+
+    allocation = db.query(BudgetAllocation).filter(
+        BudgetAllocation.budget_id == budget_id,
+        BudgetAllocation.category == category
+    ).first()
+
+    if not allocation:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Allocation for category '{category}' not found"
+        )
+
+    db.delete(allocation)
+    db.commit()
+    db.refresh(budget)
+
+    return budget
 
 
 @router.post("/alerts/check")
