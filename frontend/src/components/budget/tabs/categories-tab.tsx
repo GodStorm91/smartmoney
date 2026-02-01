@@ -74,19 +74,17 @@ export function CategoriesTab({
         </div>
       </div>
 
-      {/* Mobile: Editable Allocation List */}
-      <div className="lg:hidden">
-        <BudgetAllocationList
-          budgetId={budget.id}
-          allocations={budget.allocations}
-          totalBudget={totalBudget}
-          tracking={tracking}
-          month={selectedMonth}
-          isDraft={isDraft}
-          onAddCategory={onAddCategory}
-          onAllocationChange={onAllocationChange}
-        />
-      </div>
+      {/* Editable Allocation List - shown on all screen sizes */}
+      <BudgetAllocationList
+        budgetId={budget.id}
+        allocations={budget.allocations}
+        totalBudget={totalBudget}
+        tracking={tracking}
+        month={selectedMonth}
+        isDraft={isDraft}
+        onAddCategory={onAddCategory}
+        onAllocationChange={onAllocationChange}
+      />
 
       {/* Mobile Detail Panel (Overlay) */}
       <div className="lg:hidden">
