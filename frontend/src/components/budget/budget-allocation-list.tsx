@@ -21,6 +21,7 @@ interface BudgetAllocationListProps {
   totalBudget: number
   tracking?: BudgetTracking
   month?: string
+  daysRemaining?: number
   isDraft?: boolean
   onAddCategory?: () => void
   onAllocationChange?: (updatedAllocations: BudgetAllocation[]) => void
@@ -35,6 +36,7 @@ export function BudgetAllocationList({
   totalBudget,
   tracking,
   month,
+  daysRemaining,
   isDraft,
   onAddCategory,
   onAllocationChange
@@ -91,6 +93,26 @@ export function BudgetAllocationList({
     categoryTree.income.forEach(parent => {
       const childNames = parent.children.map(child => child.name)
       map.set(parent.name, childNames)
+    })
+
+    return map
+  }, [categoryTree])
+
+  // Map child category to parent category name
+  const childToParentMap = useMemo(() => {
+    const map = new Map<string, string>()
+    if (!categoryTree) return map
+
+    categoryTree.expense.forEach(parent => {
+      parent.children.forEach(child => {
+        map.set(child.name, parent.name)
+      })
+    })
+
+    categoryTree.income.forEach(parent => {
+      parent.children.forEach(child => {
+        map.set(child.name, parent.name)
+      })
     })
 
     return map
@@ -290,6 +312,8 @@ export function BudgetAllocationList({
                     totalBudget={totalBudget}
                     trackingItem={trackingMap.get(allocation.category)}
                     topTransactions={getTopTransactions(allocation.category)}
+                    daysRemaining={daysRemaining}
+                    parentCategory={childToParentMap.get(allocation.category)}
                     isDraft={isDraft}
                     isUpdating={updateMutation.isPending}
                     isDeleting={deleteMutation.isPending}

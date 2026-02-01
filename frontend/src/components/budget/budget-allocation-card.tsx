@@ -1,9 +1,49 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Pencil, Trash2, ArrowUp, ArrowDown, Flame, Check, X } from 'lucide-react'
+import { AlertTriangle, Pencil, Trash2, ArrowUp, ArrowDown, Flame, Check, X, CheckCircle, AlertCircle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/utils/cn'
 import type { BudgetAllocation, BudgetTrackingItem } from '@/types'
+
+// Status badge types
+type BudgetStatus = 'on-track' | 'caution' | 'over-budget'
+
+function getBudgetStatus(spentPercent: number): BudgetStatus {
+  if (spentPercent >= 100) return 'over-budget'
+  if (spentPercent >= 80) return 'caution'
+  return 'on-track'
+}
+
+function StatusBadge({ status }: { status: BudgetStatus }) {
+  const { t } = useTranslation('common')
+
+  const config = {
+    'on-track': {
+      icon: CheckCircle,
+      label: t('budget.status.onTrack', 'On Track'),
+      className: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+    },
+    'caution': {
+      icon: AlertCircle,
+      label: t('budget.status.caution', 'Caution'),
+      className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+    },
+    'over-budget': {
+      icon: AlertTriangle,
+      label: t('budget.status.overBudget', 'Over Budget'),
+      className: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+    }
+  }
+
+  const { icon: Icon, label, className } = config[status]
+
+  return (
+    <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium', className)}>
+      <Icon className="w-3 h-3" />
+      {label}
+    </span>
+  )
+}
 
 export interface TopTransaction {
   id: number
@@ -20,6 +60,8 @@ interface AllocationCardProps {
   totalBudget: number
   trackingItem?: BudgetTrackingItem
   topTransactions?: TopTransaction[]
+  daysRemaining?: number
+  parentCategory?: string
   isDraft?: boolean
   isUpdating?: boolean
   isDeleting?: boolean
@@ -35,6 +77,8 @@ export function AllocationCard({
   totalBudget,
   trackingItem,
   topTransactions = [],
+  daysRemaining,
+  parentCategory,
   isDraft,
   isUpdating,
   isDeleting,
@@ -119,9 +163,15 @@ export function AllocationCard({
   const spent = trackingItem?.spent || 0
   const budgeted = trackingItem?.budgeted || allocation.amount
   const remaining = budgeted - spent
-  const spentPercent = budgeted > 0 ? Math.min((spent / budgeted) * 100, 100) : 0
+  const spentPercent = budgeted > 0 ? (spent / budgeted) * 100 : 0
   const isOverBudget = spent > budgeted
   const overAmount = spent - budgeted
+  const budgetStatus = getBudgetStatus(spentPercent)
+
+  // Calculate daily pace (how much can be spent per day to stay on budget)
+  const dailyPace = daysRemaining && daysRemaining > 0 && remaining > 0
+    ? Math.round(remaining / daysRemaining)
+    : 0
 
   const getProgressBarColor = () => {
     if (isOverBudget) return 'bg-red-500'
@@ -148,10 +198,15 @@ export function AllocationCard({
       onClick={handleCardClick}
     >
       <div className="flex justify-between items-start mb-2">
-        <div className="flex items-center gap-2 flex-1 min-w-0">
-          <h4 className="font-semibold dark:text-gray-100 truncate">{allocation.category}</h4>
-          {trackingItem && isOverBudget && (
-            <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" aria-label={t('budget.overBudget')} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h4 className="font-semibold dark:text-gray-100 truncate">{allocation.category}</h4>
+            {trackingItem && <StatusBadge status={budgetStatus} />}
+          </div>
+          {parentCategory && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {t('budget.parentGroup', 'Group')}: {parentCategory}
+            </p>
           )}
         </div>
 
@@ -291,6 +346,13 @@ export function AllocationCard({
               )}
             </span>
           </div>
+
+          {/* Pacing indicator */}
+          {daysRemaining !== undefined && daysRemaining > 0 && !isOverBudget && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('budget.pacing', '{{days}} days left', { days: daysRemaining })} • {formatCurrency(dailyPace)}/{t('budget.perDay', 'day')}
+            </p>
+          )}
 
           <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div

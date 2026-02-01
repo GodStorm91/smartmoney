@@ -81,6 +81,7 @@ export function CategoriesTab({
           totalBudget={totalBudget}
           tracking={tracking}
           month={selectedMonth}
+          daysRemaining={tracking?.days_remaining}
           isDraft={isDraft}
           onAddCategory={onAddCategory}
           onAllocationChange={onAllocationChange}

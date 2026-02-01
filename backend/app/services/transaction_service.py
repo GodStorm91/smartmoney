@@ -82,7 +82,7 @@ class TransactionService:
         user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-        category: Optional[str] = None,
+        categories: Optional[list[str]] = None,
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
@@ -97,7 +97,7 @@ class TransactionService:
             user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
-            category: Filter by category
+            categories: Filter by list of category names
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
@@ -114,8 +114,8 @@ class TransactionService:
             query = query.filter(Transaction.date >= start_date)
         if end_date:
             query = query.filter(Transaction.date <= end_date)
-        if category:
-            query = query.filter(Transaction.category == category)
+        if categories:
+            query = query.filter(Transaction.category.in_(categories))
         if source:
             query = query.filter(Transaction.source == source)
         if is_income is not None:
@@ -133,7 +133,7 @@ class TransactionService:
         user_id: int,
         start_date: Optional[date] = None,
         end_date: Optional[date] = None,
-        category: Optional[str] = None,
+        categories: Optional[list[str]] = None,
         source: Optional[str] = None,
         is_income: Optional[bool] = None,
         is_transfer: Optional[bool] = None,
@@ -146,7 +146,7 @@ class TransactionService:
             user_id: User ID
             start_date: Filter by start date
             end_date: Filter by end date
-            category: Filter by category
+            categories: Filter by list of category names
             source: Filter by source
             is_income: Filter by income flag
             is_transfer: Filter by transfer flag
@@ -161,8 +161,8 @@ class TransactionService:
             query = query.filter(Transaction.date >= start_date)
         if end_date:
             query = query.filter(Transaction.date <= end_date)
-        if category:
-            query = query.filter(Transaction.category == category)
+        if categories:
+            query = query.filter(Transaction.category.in_(categories))
         if source:
             query = query.filter(Transaction.source == source)
         if is_income is not None:

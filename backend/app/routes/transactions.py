@@ -52,7 +52,8 @@ async def create_transaction(
 async def get_transactions(
     start_date: Optional[date] = Query(None, description="Filter by start date"),
     end_date: Optional[date] = Query(None, description="Filter by end date"),
-    category: Optional[str] = Query(None, description="Filter by category"),
+    category: Optional[str] = Query(None, description="Filter by single category (deprecated, use categories)"),
+    categories: Optional[str] = Query(None, description="Filter by comma-separated category names"),
     source: Optional[str] = Query(None, description="Filter by source"),
     is_income: Optional[bool] = Query(None, description="Filter by income flag"),
     is_transfer: Optional[bool] = Query(None, description="Filter by transfer flag"),
@@ -63,12 +64,19 @@ async def get_transactions(
     current_user: User = Depends(get_current_user),
 ):
     """Get filtered transactions with pagination."""
+    # Parse categories: support both comma-separated string and single category
+    category_list = None
+    if categories:
+        category_list = [c.strip() for c in categories.split(',') if c.strip()]
+    elif category:
+        category_list = [category]
+
     transactions = TransactionService.get_transactions(
         db=db,
         user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
-        category=category,
+        categories=category_list,
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,
@@ -82,7 +90,7 @@ async def get_transactions(
         user_id=current_user.id,
         start_date=start_date,
         end_date=end_date,
-        category=category,
+        categories=category_list,
         source=source,
         is_income=is_income,
         is_transfer=is_transfer,

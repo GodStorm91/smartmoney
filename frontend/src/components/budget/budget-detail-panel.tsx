@@ -7,7 +7,8 @@ import {
   Plus,
   ExternalLink,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { fetchTransactions } from '@/services/transaction-service'
@@ -88,6 +89,17 @@ export function BudgetDetailPanel({
     const children = parentToChildrenMap.get(category) || []
     return [category, ...children]
   }, [category, parentToChildrenMap])
+
+  // Find parent category for breadcrumb
+  const parentCategory = useMemo(() => {
+    if (!categoryTree) return null
+    for (const parent of [...categoryTree.expense, ...categoryTree.income]) {
+      if (parent.children.some(c => c.name === category)) {
+        return parent.name
+      }
+    }
+    return null
+  }, [category, categoryTree])
 
   // Fetch current month transactions
   useEffect(() => {
@@ -237,8 +249,20 @@ export function BudgetDetailPanel({
   if (mode === 'inline') {
     return (
       <div className={cn('flex flex-col h-full', className)}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+        {/* Header with Breadcrumb */}
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          {/* Breadcrumb */}
+          <nav className="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-1">
+            <span>{t('budget.title', 'Budget')}</span>
+            <ChevronRight className="w-3 h-3 mx-1" />
+            <span>{t('budget.categories', 'Categories')}</span>
+            {parentCategory && (
+              <>
+                <ChevronRight className="w-3 h-3 mx-1" />
+                <span>{parentCategory}</span>
+              </>
+            )}
+          </nav>
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{category}</h2>
         </div>
         {/* Summary */}
@@ -303,17 +327,33 @@ export function BudgetDetailPanel({
           className
         )}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {category}
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
+        {/* Header with Breadcrumb */}
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              {/* Breadcrumb */}
+              <nav className="flex items-center text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <span>{t('budget.title', 'Budget')}</span>
+                <ChevronRight className="w-3 h-3 mx-1" />
+                <span>{t('budget.categories', 'Categories')}</span>
+                {parentCategory && (
+                  <>
+                    <ChevronRight className="w-3 h-3 mx-1" />
+                    <span className="truncate">{parentCategory}</span>
+                  </>
+                )}
+              </nav>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                {category}
+              </h2>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0 ml-2"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
         </div>
 
         {/* Summary Section */}
