@@ -276,6 +276,42 @@ def get_budget_history(
     return budgets
 
 
+@router.get("/suggestions")
+def get_budget_suggestions(
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get budget suggestions based on previous month.
+
+    Returns previous month's budget data to help generate new budget.
+    """
+    # Get latest budget (most recent active budget)
+    latest = BudgetService.get_latest_budget(db, current_user.id)
+
+    if not latest:
+        return {
+            "has_previous": False,
+            "previous_month": None,
+            "previous_income": None,
+            "previous_allocations": None,
+            "carry_over": 0
+        }
+
+    # Build allocations list
+    allocations = [
+        {"category": a.category, "amount": float(a.amount)}
+        for a in latest.allocations
+    ]
+
+    return {
+        "has_previous": True,
+        "previous_month": latest.month,
+        "previous_income": float(latest.monthly_income),
+        "previous_allocations": allocations,
+        "carry_over": 0  # Could calculate from previous month's remaining balance
+    }
+
+
 @router.get("/{month}", response_model=BudgetResponse)
 def get_budget_by_month(
     month: str,
