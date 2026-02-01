@@ -1092,7 +1092,21 @@
       }
     },
     "selectCategoryHint": "Select a category to view details",
-    "noAllocations": "No budget allocations yet"
+    "noAllocations": "No budget allocations yet",
+    "category": "Category",
+    "categories": "Categories",
+    "amount": "Amount",
+    "alreadyAdded": "Added",
+    "available": "available",
+    "parentGroup": "Group",
+    "pacing": "{{days}} days left",
+    "perDay": "day",
+    "topSpending": "Top Spending",
+    "status": {
+      "onTrack": "On Track",
+      "caution": "Caution",
+      "overBudget": "Over Budget"
+    }
   },
   "credits": {
     "balance": "Credit Balance",

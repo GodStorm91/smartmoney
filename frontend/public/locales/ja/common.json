@@ -1046,7 +1046,21 @@
       }
     },
     "selectCategoryHint": "詳細を表示するにはカテゴリを選択",
-    "noAllocations": "予算配分がまだありません"
+    "noAllocations": "予算配分がまだありません",
+    "category": "カテゴリ",
+    "categories": "カテゴリ",
+    "amount": "金額",
+    "alreadyAdded": "追加済み",
+    "available": "利用可能",
+    "parentGroup": "グループ",
+    "pacing": "残り{{days}}日",
+    "perDay": "日",
+    "topSpending": "上位支出",
+    "status": {
+      "onTrack": "順調",
+      "caution": "注意",
+      "overBudget": "予算超過"
+    }
   },
   "credits": {
     "balance": "クレジット残高",

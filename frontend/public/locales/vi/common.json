@@ -1031,7 +1031,21 @@
       }
     },
     "selectCategoryHint": "Chọn danh mục để xem chi tiết",
-    "noAllocations": "Chưa có phân bổ ngân sách"
+    "noAllocations": "Chưa có phân bổ ngân sách",
+    "category": "Danh mục",
+    "categories": "Danh mục",
+    "amount": "Số tiền",
+    "alreadyAdded": "Đã thêm",
+    "available": "khả dụng",
+    "parentGroup": "Nhóm",
+    "pacing": "Còn {{days}} ngày",
+    "perDay": "ngày",
+    "topSpending": "Chi tiêu cao nhất",
+    "status": {
+      "onTrack": "Đúng tiến độ",
+      "caution": "Cần chú ý",
+      "overBudget": "Vượt ngân sách"
+    }
   },
   "credits": {
     "balance": "Số Dư Tín Dụng",
