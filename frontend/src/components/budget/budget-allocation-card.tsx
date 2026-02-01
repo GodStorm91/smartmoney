@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { AlertTriangle, Pencil, Trash2, ArrowUp, ArrowDown, Flame } from 'lucide-react'
+import { AlertTriangle, Pencil, Trash2, ArrowUp, ArrowDown, Flame, Check, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/utils/cn'
 import type { BudgetAllocation, BudgetTrackingItem } from '@/types'
@@ -50,26 +50,51 @@ export function AllocationCard({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setEditValue(String(allocation.amount))
-    setIsEditing(true)
-    setTimeout(() => inputRef.current?.focus(), 0)
+  // Format number with thousand separators
+  const formatWithCommas = (value: string): string => {
+    const num = value.replace(/[^\d]/g, '')
+    if (!num) return ''
+    return parseInt(num, 10).toLocaleString()
   }
 
-  const handleBlur = () => {
-    const newAmount = parseInt(editValue) || 0
+  // Parse formatted string back to number
+  const parseFormattedValue = (value: string): number => {
+    return parseInt(value.replace(/[^\d]/g, ''), 10) || 0
+  }
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setEditValue(allocation.amount.toLocaleString())
+    setIsEditing(true)
+    setTimeout(() => {
+      inputRef.current?.focus()
+      inputRef.current?.select()
+    }, 0)
+  }
+
+  const handleSave = () => {
+    const newAmount = parseFormattedValue(editValue)
     if (newAmount !== allocation.amount) {
       onAmountChange(newAmount)
     }
     setIsEditing(false)
   }
 
+  const handleCancel = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    setIsEditing(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatWithCommas(e.target.value)
+    setEditValue(formatted)
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleBlur()
+      handleSave()
     } else if (e.key === 'Escape') {
-      setIsEditing(false)
+      handleCancel()
     }
   }
 
@@ -132,16 +157,33 @@ export function AllocationCard({
 
         <div className="flex items-center gap-1 flex-shrink-0">
           {isEditing ? (
-            <input
-              ref={inputRef}
-              type="number"
-              value={editValue}
-              onChange={(e) => setEditValue(e.target.value)}
-              onBlur={handleBlur}
-              onKeyDown={handleKeyDown}
-              onClick={(e) => e.stopPropagation()}
-              className="w-24 text-right text-lg font-bold border rounded px-2 py-1 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-            />
+            <div className="flex items-center gap-1">
+              <input
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                value={editValue}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onClick={(e) => e.stopPropagation()}
+                className="w-28 text-right text-lg font-bold border-2 border-blue-400 rounded px-2 py-1 dark:bg-gray-700 dark:border-blue-500 dark:text-gray-100 focus:outline-none focus:border-blue-500 dark:focus:border-blue-400"
+                aria-label={t('budget.editAmount', 'Edit amount')}
+              />
+              <button
+                onClick={(e) => { e.stopPropagation(); handleSave() }}
+                className="p-1.5 bg-green-100 dark:bg-green-900/40 hover:bg-green-200 dark:hover:bg-green-900/60 rounded-lg transition-colors"
+                aria-label={t('save', 'Save')}
+              >
+                <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+              </button>
+              <button
+                onClick={handleCancel}
+                className="p-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                aria-label={t('cancel', 'Cancel')}
+              >
+                <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
           ) : (
             <span className="text-lg font-bold text-blue-600 dark:text-blue-400 whitespace-nowrap">
               {formatCurrency(allocation.amount)}
