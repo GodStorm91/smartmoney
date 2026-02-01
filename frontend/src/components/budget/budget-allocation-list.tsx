@@ -63,12 +63,21 @@ export function BudgetAllocationList({
 
   // Fetch top transactions for all categories
   const categories = useMemo(() => allocations.map(a => a.category), [allocations])
-  const { data: topTransactionsMap } = useTopTransactionsByCategory(
+  const { data: topTransactionsData } = useTopTransactionsByCategory(
     categories,
     month || '',
     budgetMap,
     3 // top 3 transactions per category
   )
+
+  // Helper to safely get from Map (handles case where data might not be a Map)
+  const getTopTransactions = (category: string) => {
+    if (!topTransactionsData) return []
+    if (topTransactionsData instanceof Map) {
+      return topTransactionsData.get(category)?.transactions || []
+    }
+    return []
+  }
 
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -280,7 +289,7 @@ export function BudgetAllocationList({
                     allocation={allocation}
                     totalBudget={totalBudget}
                     trackingItem={trackingMap.get(allocation.category)}
-                    topTransactions={topTransactionsMap?.get(allocation.category)?.transactions || []}
+                    topTransactions={getTopTransactions(allocation.category)}
                     isDraft={isDraft}
                     isUpdating={updateMutation.isPending}
                     isDeleting={deleteMutation.isPending}
