@@ -129,7 +129,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       </div>
 
       {/* Camera / Preview */}
-      <div className="flex-1 relative flex items-center justify-center bg-black">
+      <div className="flex-1 min-h-0 relative flex items-center justify-center bg-black overflow-hidden">
         {isStarting && !capturedImage && (
           <div className="flex flex-col items-center gap-4">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-white" />
@@ -157,7 +157,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
       </div>
 
       {/* Controls */}
-      <div className="p-6 bg-black/50 flex justify-center gap-8 absolute bottom-0 left-0 right-0 safe-area-bottom">
+      <div className="flex-shrink-0 p-6 bg-black/50 flex justify-center gap-8 safe-area-bottom">
         {!capturedImage ? (
           <button
             onClick={capturePhoto}
