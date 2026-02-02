@@ -563,6 +563,7 @@ export function Transactions() {
                 { key: 'today', label: t('date.today', 'Today') },
                 { key: 'thisWeek', label: t('date.thisWeek', 'This Week') },
                 { key: 'thisMonth', label: t('date.thisMonth', 'This Month') },
+                { key: 'last3Months', label: t('date.last3Months', '3 Months') },
               ] as const).map(({ key, label }) => (
                 <button
                   key={key}
