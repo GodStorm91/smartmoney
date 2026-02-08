@@ -365,6 +365,8 @@
   "analytics": {
     "title": "Analytics",
     "subtitle": "Detailed analysis of income and expenses",
+    "tabOverview": "Overview",
+    "tabReport": "Monthly Report",
     "currentMonth": "This Month",
     "3months": "3 Months",
     "6months": "6 Months",
@@ -664,6 +666,7 @@
     "gotoBudget": "Go to Budget",
     "gotoAnalytics": "Go to Analytics",
     "gotoGoals": "Go to Goals",
+    "gotoReport": "Go to Monthly Report",
     "gotoSettings": "Go to Settings",
     "hint": "Press Esc to close"
   },

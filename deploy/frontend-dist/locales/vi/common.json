@@ -300,6 +300,8 @@
   "analytics": {
     "title": "Phân tích",
     "subtitle": "Phân tích chi tiết thu nhập và chi tiêu",
+    "tabOverview": "Tổng quan",
+    "tabReport": "Báo cáo tháng",
     "currentMonth": "Tháng này",
     "3months": "3 tháng",
     "6months": "6 tháng",
@@ -593,6 +595,7 @@
     "gotoBudget": "Đến Ngân sách",
     "gotoAnalytics": "Đến Phân tích",
     "gotoGoals": "Đến Mục tiêu",
+    "gotoReport": "Đến Báo cáo tháng",
     "gotoSettings": "Đến Cài đặt",
     "hint": "Nhấn Esc để đóng"
   },

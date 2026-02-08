@@ -326,6 +326,8 @@
   "analytics": {
     "title": "分析",
     "subtitle": "収支の詳細な分析とトレンド",
+    "tabOverview": "概要",
+    "tabReport": "月次レポート",
     "currentMonth": "今月",
     "3months": "3ヶ月",
     "6months": "6ヶ月",
@@ -593,6 +595,7 @@
     "gotoBudget": "予算へ",
     "gotoAnalytics": "分析へ",
     "gotoGoals": "目標へ",
+    "gotoReport": "月次レポートへ",
     "gotoSettings": "設定へ",
     "hint": "Escで閉じる"
   },
