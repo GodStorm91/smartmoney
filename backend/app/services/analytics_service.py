@@ -359,29 +359,30 @@ class AnalyticsService:
         ).all()
 
         for budget in budgets:
-            spent = current_spending.get(budget.category, 0)
-            if budget.amount > 0:
-                usage = (spent / budget.amount) * 100
-                if usage >= 100:
-                    insights.append({
-                        "type": "budget",
-                        "severity": "warning",
-                        "title": f"{budget.category} budget exceeded",
-                        "message": f"Spent {usage:.0f}% of budget",
-                        "category": budget.category,
-                        "amount": spent,
-                        "percentage_change": round(usage - 100, 1),
-                    })
-                elif usage >= 80:
-                    insights.append({
-                        "type": "budget",
-                        "severity": "info",
-                        "title": f"{budget.category} budget at {usage:.0f}%",
-                        "message": "Approaching budget limit",
-                        "category": budget.category,
-                        "amount": spent,
-                        "percentage_change": round(usage, 1),
-                    })
+            for alloc in budget.allocations:
+                spent = current_spending.get(alloc.category, 0)
+                if alloc.amount > 0:
+                    usage = (spent / alloc.amount) * 100
+                    if usage >= 100:
+                        insights.append({
+                            "type": "budget",
+                            "severity": "warning",
+                            "title": f"{alloc.category} budget exceeded",
+                            "message": f"Spent {usage:.0f}% of budget",
+                            "category": alloc.category,
+                            "amount": spent,
+                            "percentage_change": round(usage - 100, 1),
+                        })
+                    elif usage >= 80:
+                        insights.append({
+                            "type": "budget",
+                            "severity": "info",
+                            "title": f"{alloc.category} budget at {usage:.0f}%",
+                            "message": "Approaching budget limit",
+                            "category": alloc.category,
+                            "amount": spent,
+                            "percentage_change": round(usage, 1),
+                        })
 
         # 3. Overall spending trend
         current_total = sum(current_spending.values())
