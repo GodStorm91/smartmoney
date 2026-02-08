@@ -118,7 +118,7 @@ jobs:
             cd $REPO_DIR
             git fetch origin main
             git checkout main
-            git pull origin main
+            git reset --hard origin/main
 
             # Build frontend
             echo "Building frontend..."
