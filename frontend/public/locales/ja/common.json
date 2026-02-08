@@ -8,6 +8,7 @@
     "analytics": "分析",
     "goals": "目標",
     "gamification": "実績",
+    "report": "レポート",
     "settings": "設定",
     "budget": "予算"
   },
@@ -19,6 +20,7 @@
     "goals": "目標",
     "settings": "設定",
     "analytics": "分析",
+    "report": "レポート",
     "proxy": "代行",
     "more": "その他"
   },
@@ -1127,6 +1129,31 @@
     "lastUpdated": "最終更新",
     "syncNow": "今すぐ同期",
     "syncPending": "{{count}}件の保留中を同期"
+  },
+  "report": {
+    "title": "月次レポート",
+    "loadError": "レポートデータの読み込みに失敗しました。もう一度お試しください。",
+    "noData": "この月のデータはありません。",
+    "savingsRate": "貯蓄率",
+    "savingsRateDesc": "収入に対する貯蓄の割合",
+    "budgetAdherence": "予算達成状況",
+    "categoryBreakdown": "カテゴリ内訳",
+    "spendingTrends": "支出推移",
+    "goalProgress": "目標進捗",
+    "accountSummary": "口座サマリー",
+    "totalNetWorth": "総資産",
+    "insights": "主な分析",
+    "downloadPDF": "PDF ダウンロード",
+    "sendEmail": "メール送信",
+    "comingSoon": "近日公開",
+    "overBudget": "超過",
+    "warning": "注意",
+    "caution": "警告",
+    "onTrack": "順調",
+    "ahead": "前倒し",
+    "behind": "遅延",
+    "goalYears": "{{years}}年目標",
+    "neededPerMonth": "月{{amount}}必要"
   },
   "receipt": {
     "scanReceipt": "レシートをスキャン",

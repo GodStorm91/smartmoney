@@ -10,6 +10,7 @@
     "budget": "Budget",
     "profile": "Profile",
     "gamification": "Achievements",
+    "report": "Report",
     "settings": "Settings"
   },
   "nav": {
@@ -23,6 +24,7 @@
     "profile": "Profile",
     "gamification": "Achievements",
     "proxy": "Proxy",
+    "report": "Report",
     "more": "More"
   },
   "button": {
@@ -248,6 +250,31 @@
     "generatePdf": "Generate PDF",
     "downloading": "Downloading...",
     "download": "Download"
+  },
+  "report": {
+    "title": "Monthly Report",
+    "loadError": "Failed to load report data. Please try again.",
+    "noData": "No data available for this month.",
+    "savingsRate": "Savings Rate",
+    "savingsRateDesc": "% of income saved",
+    "budgetAdherence": "Budget Adherence",
+    "categoryBreakdown": "Category Breakdown",
+    "spendingTrends": "Spending Trends",
+    "goalProgress": "Goal Progress",
+    "accountSummary": "Account Summary",
+    "totalNetWorth": "Total Net Worth",
+    "insights": "Key Insights",
+    "downloadPDF": "Download PDF",
+    "sendEmail": "Send Email",
+    "comingSoon": "Coming soon",
+    "overBudget": "Over",
+    "warning": "Warning",
+    "caution": "Caution",
+    "onTrack": "On Track",
+    "ahead": "Ahead",
+    "behind": "Behind",
+    "goalYears": "{{years}}-Year Goal",
+    "neededPerMonth": "Need {{amount}}/month"
   },
   "receipt": {
     "title": "Receipt Scanner",

@@ -1,0 +1,169 @@
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
+import { fetchMonthlyReport } from '@/services/report-service'
+import { Card } from '@/components/ui/Card'
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { MetricCard } from '@/components/analytics/MetricCard'
+import { MonthPicker } from '@/components/analytics/MonthPicker'
+import { CategoryBarChart } from '@/components/charts/CategoryBarChart'
+import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
+import { ReportHeader } from '@/components/report/ReportHeader'
+import { BudgetAdherenceTable } from '@/components/report/BudgetAdherenceTable'
+import { GoalProgressCard } from '@/components/report/GoalProgressCard'
+import { AccountSummaryCard } from '@/components/report/AccountSummaryCard'
+import { formatCurrency } from '@/utils/formatCurrency'
+
+export function MonthlyReport() {
+  const { t } = useTranslation('common')
+  const [selectedMonth, setSelectedMonth] = useState(new Date())
+
+  const year = selectedMonth.getFullYear()
+  const month = selectedMonth.getMonth() + 1
+
+  const { data: report, isLoading, error } = useQuery({
+    queryKey: ['monthly-report', year, month],
+    queryFn: () => fetchMonthlyReport(year, month),
+    staleTime: 1000 * 60 * 5,
+  })
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+      <ReportHeader year={year} month={month} />
+      <MonthPicker selectedMonth={selectedMonth} onChange={setSelectedMonth} className="mb-6" />
+
+      {isLoading && (
+        <div className="flex justify-center py-20">
+          <LoadingSpinner size="lg" />
+        </div>
+      )}
+
+      {error && (
+        <Card className="text-center py-10">
+          <p className="text-red-500">{t('report.loadError')}</p>
+        </Card>
+      )}
+
+      {report && (
+        <div className="space-y-6">
+          {/* Summary metrics */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <MetricCard
+              label={t('analytics.heroIncome')}
+              value={formatCurrency(report.summary.total_income)}
+              change={report.summary.income_change}
+              trend={report.summary.income_change > 0 ? 'positive' : report.summary.income_change < 0 ? 'negative' : 'neutral'}
+            />
+            <MetricCard
+              label={t('analytics.heroExpense')}
+              value={formatCurrency(report.summary.total_expense)}
+              change={report.summary.expense_change}
+              trend={report.summary.expense_change < 0 ? 'positive' : report.summary.expense_change > 0 ? 'negative' : 'neutral'}
+            />
+            <MetricCard
+              label={t('analytics.heroNet')}
+              value={formatCurrency(report.summary.net_cashflow)}
+              change={report.summary.net_change}
+              trend={report.summary.net_change > 0 ? 'positive' : report.summary.net_change < 0 ? 'negative' : 'neutral'}
+            />
+            <MetricCard
+              label={t('report.savingsRate')}
+              value={`${report.summary.savings_rate.toFixed(1)}%`}
+              subtitle={t('report.savingsRateDesc')}
+            />
+          </div>
+
+          {/* Budget adherence */}
+          {report.budget_adherence && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.budgetAdherence')}
+              </h2>
+              <BudgetAdherenceTable data={report.budget_adherence} />
+            </Card>
+          )}
+
+          {/* Category breakdown */}
+          {report.category_breakdown.length > 0 && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.categoryBreakdown')}
+              </h2>
+              <CategoryBarChart data={report.category_breakdown} />
+            </Card>
+          )}
+
+          {/* Spending trends */}
+          {report.spending_trends.length > 0 && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.spendingTrends')}
+              </h2>
+              <IncomeExpenseBarChart data={report.spending_trends} />
+            </Card>
+          )}
+
+          {/* Goal progress */}
+          {report.goal_progress.length > 0 && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.goalProgress')}
+              </h2>
+              <div className="space-y-4">
+                {report.goal_progress.map((g) => (
+                  <GoalProgressCard key={g.goal_id} goal={g} />
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Account summary */}
+          {report.account_summary.length > 0 && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.accountSummary')}
+              </h2>
+              <AccountSummaryCard
+                accounts={report.account_summary}
+                totalNetWorth={report.total_net_worth}
+              />
+            </Card>
+          )}
+
+          {/* Insights */}
+          {report.insights.length > 0 && (
+            <Card>
+              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                {t('report.insights')}
+              </h2>
+              <div className="space-y-3">
+                {report.insights.map((insight, i) => (
+                  <div
+                    key={i}
+                    className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600"
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {insight.title}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {insight.message}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Empty state */}
+          {report.summary.total_income === 0 && report.summary.total_expense === 0 && (
+            <Card className="text-center py-10">
+              <p className="text-gray-500 dark:text-gray-400">{t('report.noData')}</p>
+            </Card>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}

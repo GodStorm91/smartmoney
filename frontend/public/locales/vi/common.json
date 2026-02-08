@@ -9,6 +9,7 @@
     "goals": "Mục tiêu",
     "budget": "Ngân sách",
     "gamification": "Thành tựu",
+    "report": "Báo cáo",
     "settings": "Cài đặt"
   },
   "nav": {
@@ -19,6 +20,7 @@
     "goals": "Mục tiêu",
     "settings": "Cài đặt",
     "analytics": "Phân tích",
+    "report": "Báo cáo",
     "proxy": "Mua hộ",
     "more": "Thêm"
   },
@@ -1112,6 +1114,31 @@
     "lastUpdated": "Cập nhật lần cuối",
     "syncNow": "Đồng bộ ngay",
     "syncPending": "Đồng bộ {{count}} đang chờ"
+  },
+  "report": {
+    "title": "Báo cáo tháng",
+    "loadError": "Không thể tải dữ liệu báo cáo. Vui lòng thử lại.",
+    "noData": "Không có dữ liệu cho tháng này.",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "savingsRateDesc": "% thu nhập tiết kiệm được",
+    "budgetAdherence": "Tuân thủ ngân sách",
+    "categoryBreakdown": "Phân tích theo danh mục",
+    "spendingTrends": "Xu hướng chi tiêu",
+    "goalProgress": "Tiến độ mục tiêu",
+    "accountSummary": "Tổng hợp tài khoản",
+    "totalNetWorth": "Tổng tài sản ròng",
+    "insights": "Phân tích chính",
+    "downloadPDF": "Tải PDF",
+    "sendEmail": "Gửi Email",
+    "comingSoon": "Sắp ra mắt",
+    "overBudget": "Vượt",
+    "warning": "Cảnh báo",
+    "caution": "Chú ý",
+    "onTrack": "Đúng tiến độ",
+    "ahead": "Vượt tiến độ",
+    "behind": "Chậm tiến độ",
+    "goalYears": "Mục tiêu {{years}} năm",
+    "neededPerMonth": "Cần {{amount}}/tháng"
   },
   "receipt": {
     "scanReceipt": "Quét Hóa Đơn",
