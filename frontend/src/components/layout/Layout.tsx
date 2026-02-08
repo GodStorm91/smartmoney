@@ -29,12 +29,15 @@ export function Layout({ children }: LayoutProps) {
       a: '/accounts',
       b: '/budget',
       n: '/analytics',
+      r: '/analytics?tab=report',
       g: '/goals',
       s: '/settings',
     }
     const route = routes[key.toLowerCase()]
     if (route) {
-      navigate({ to: route })
+      const [path, qs] = route.split('?')
+      const search = qs ? Object.fromEntries(new URLSearchParams(qs)) : undefined
+      navigate({ to: path, search })
     }
     setPendingNavKey(null)
   }, [navigate])
@@ -93,7 +96,7 @@ export function Layout({ children }: LayoutProps) {
       description: 'Navigation prefix',
     },
     // Navigation targets (only work after "G")
-    ...['d', 't', 'a', 'b', 'n', 'g', 's'].map(key => ({
+    ...['d', 't', 'a', 'b', 'n', 'r', 'g', 's'].map(key => ({
       key,
       callback: () => {
         if (pendingNavKey === 'g') {

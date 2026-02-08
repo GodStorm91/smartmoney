@@ -16,7 +16,6 @@ import {
   Zap,
   LogOut,
   ShoppingCart,
-  FileText,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
@@ -42,7 +41,6 @@ const NAV_CONFIG: Record<string, NavItemConfig> = {
   proxy: { path: '/proxy', icon: ShoppingCart, labelKey: 'nav.proxy', activeColor: 'text-orange-600 dark:text-orange-400' },
   settings: { path: '/settings', icon: Settings, labelKey: 'nav.settings', activeColor: 'text-gray-600 dark:text-gray-400' },
   upload: { path: '/upload', icon: Upload, labelKey: 'header.upload', activeColor: 'text-cyan-600 dark:text-cyan-400' },
-  report: { path: '/report', icon: FileText, labelKey: 'nav.report', activeColor: 'text-teal-600 dark:text-teal-400' },
 }
 
 const navItems: NavItemConfig[] = [
@@ -55,7 +53,6 @@ const navItems: NavItemConfig[] = [
 const primaryMenuItems: NavItemConfig[] = [
   NAV_CONFIG.gamification,
   NAV_CONFIG.analytics,
-  NAV_CONFIG.report,
   NAV_CONFIG.goals,
   NAV_CONFIG.proxy,
 ]

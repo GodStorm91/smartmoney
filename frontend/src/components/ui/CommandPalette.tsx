@@ -15,6 +15,7 @@ import {
   Wallet,
   RefreshCcw,
   Receipt,
+  FileText,
   HelpCircle,
   Moon,
   Sun,
@@ -92,7 +93,9 @@ export function CommandPalette({
 
       // Handle navigation
       if (value.startsWith('/')) {
-        navigate({ to: value })
+        const [path, qs] = value.split('?')
+        const search = qs ? Object.fromEntries(new URLSearchParams(qs)) : undefined
+        navigate({ to: path, search })
         return
       }
 
@@ -227,6 +230,13 @@ export function CommandPalette({
                 label={t('nav.analytics')}
                 shortcut="G N"
                 value="/analytics"
+                onSelect={handleSelect}
+              />
+              <CommandItem
+                icon={<FileText className="w-4 h-4" />}
+                label={t('report.title')}
+                shortcut="G R"
+                value="/analytics?tab=report"
                 onSelect={handleSelect}
               />
               <CommandItem

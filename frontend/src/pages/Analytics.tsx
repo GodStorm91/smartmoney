@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useSearch } from '@tanstack/react-router'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
@@ -17,11 +18,14 @@ import {
   PeriodToggle,
 } from '@/components/analytics'
 import type { PeriodType } from '@/components/analytics'
+import { MonthlyReport } from '@/pages/MonthlyReport'
 import { fetchAnalytics, fetchSpendingInsights } from '@/services/analytics-service'
 import { fetchGoals } from '@/services/goal-service'
 import { getCurrentMonthRange } from '@/utils/formatDate'
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns'
 import { cn } from '@/utils/cn'
+
+type AnalyticsTab = 'overview' | 'report'
 
 // Helper function to calculate date range based on period and selected month
 function getDateRangeForPeriod(
@@ -55,6 +59,10 @@ function getDateRangeForPeriod(
 
 export function Analytics() {
   const { t } = useTranslation('common')
+  const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const [activeTab, setActiveTab] = useState<AnalyticsTab>(
+    searchParams?.tab === 'report' ? 'report' : 'overview'
+  )
   const chartSectionRef = useRef<HTMLDivElement>(null)
   const [selectedMonth, setSelectedMonth] = useState(new Date())
   const [activePeriod, setActivePeriod] = useState<PeriodType>('current-month')
@@ -113,6 +121,43 @@ export function Analytics() {
         </p>
       </div>
 
+      {/* Tab Bar */}
+      <div className="flex justify-center mb-6">
+        <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 inline-flex" role="tablist">
+          <button
+            role="tab"
+            aria-selected={activeTab === 'overview'}
+            onClick={() => setActiveTab('overview')}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-full transition-colors',
+              activeTab === 'overview'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            )}
+          >
+            {t('analytics.tabOverview', 'Overview')}
+          </button>
+          <button
+            role="tab"
+            aria-selected={activeTab === 'report'}
+            onClick={() => setActiveTab('report')}
+            className={cn(
+              'px-4 py-2 text-sm font-medium rounded-full transition-colors',
+              activeTab === 'report'
+                ? 'bg-primary-500 text-white'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+            )}
+          >
+            {t('analytics.tabReport', 'Monthly Report')}
+          </button>
+        </div>
+      </div>
+
+      {/* Monthly Report Tab */}
+      {activeTab === 'report' ? (
+        <MonthlyReport embedded />
+      ) : (
+      <>
       {/* Date Selector - Mobile Optimized */}
       <div className="mb-6 space-y-3">
         <MonthPicker
@@ -237,6 +282,8 @@ export function Analytics() {
             )}
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   )

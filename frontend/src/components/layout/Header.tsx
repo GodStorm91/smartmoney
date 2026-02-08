@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { Eye, EyeOff, Menu, LogOut, Home, Receipt, Wallet, Target, BarChart3, TrendingUp, Trophy, Upload, Settings, FileText } from 'lucide-react'
+import { Eye, EyeOff, Menu, LogOut, Home, Receipt, Wallet, Target, BarChart3, TrendingUp, Trophy, Upload, Settings } from 'lucide-react'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeToggle } from './ThemeToggle'
 import { useAuth } from '@/contexts/AuthContext'
@@ -25,7 +25,6 @@ const MOBILE_MENU_ITEMS: MobileMenuItem[] = [
   { path: '/analytics', icon: BarChart3, labelKey: 'header.analytics', activeColor: 'text-indigo-600 dark:text-indigo-400' },
   { path: '/budget', icon: TrendingUp, labelKey: 'header.budget', activeColor: 'text-blue-600 dark:text-blue-400' },
   { path: '/gamification', icon: Trophy, labelKey: 'header.gamification', activeColor: 'text-yellow-500' },
-  { path: '/report', icon: FileText, labelKey: 'header.report', activeColor: 'text-teal-600 dark:text-teal-400' },
   { path: '/upload', icon: Upload, labelKey: 'header.upload', activeColor: 'text-cyan-600 dark:text-cyan-400' },
   { path: '/settings', icon: Settings, labelKey: 'header.settings', activeColor: 'text-gray-600 dark:text-gray-400' },
 ]

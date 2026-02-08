@@ -15,7 +15,7 @@ import { GoalProgressCard } from '@/components/report/GoalProgressCard'
 import { AccountSummaryCard } from '@/components/report/AccountSummaryCard'
 import { formatCurrency } from '@/utils/formatCurrency'
 
-export function MonthlyReport() {
+export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation('common')
   const [selectedMonth, setSelectedMonth] = useState(new Date())
   const [isDownloading, setIsDownloading] = useState(false)
@@ -48,8 +48,8 @@ export function MonthlyReport() {
     }
   }, [year, month, t])
 
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+  const content = (
+    <>
       <ReportHeader year={year} month={month} onDownloadPDF={handleDownloadPDF} isDownloading={isDownloading} />
       <MonthPicker selectedMonth={selectedMonth} onChange={setSelectedMonth} className="mb-6" />
 
@@ -185,6 +185,14 @@ export function MonthlyReport() {
           )}
         </div>
       )}
+    </>
+  )
+
+  if (embedded) return content
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+      {content}
     </div>
   )
 }

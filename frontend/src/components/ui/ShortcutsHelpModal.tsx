@@ -41,6 +41,7 @@ export function ShortcutsHelpModal({ open, onClose }: ShortcutsHelpModalProps) {
         { keys: ['G', 'A'], description: t('shortcuts.gotoAccounts', 'Go to Accounts') },
         { keys: ['G', 'B'], description: t('shortcuts.gotoBudget', 'Go to Budget') },
         { keys: ['G', 'N'], description: t('shortcuts.gotoAnalytics', 'Go to Analytics') },
+        { keys: ['G', 'R'], description: t('shortcuts.gotoReport', 'Go to Monthly Report') },
         { keys: ['G', 'G'], description: t('shortcuts.gotoGoals', 'Go to Goals') },
         { keys: ['G', 'S'], description: t('shortcuts.gotoSettings', 'Go to Settings') },
       ],

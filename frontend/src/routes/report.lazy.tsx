@@ -1,6 +1,5 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
-import { MonthlyReport } from '@/pages/MonthlyReport'
+import { createLazyFileRoute, Navigate } from '@tanstack/react-router'
 
 export const Route = createLazyFileRoute('/report')({
-  component: MonthlyReport,
+  component: () => <Navigate to="/analytics" search={{ tab: 'report' }} />,
 })
