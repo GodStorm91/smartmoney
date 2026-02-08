@@ -11,6 +11,7 @@ from ..models.transaction import Transaction
 from ..models.user import User
 from ..schemas.report import MonthlyUsageReportData
 from ..services.monthly_report_service import MonthlyReportService
+from ..services.monthly_report_pdf_service import get_monthly_report_pdf_service
 from ..services.report_service import get_pdf_service
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
@@ -30,6 +31,29 @@ async def get_monthly_usage_report(
 ):
     """Get comprehensive monthly usage report data."""
     return MonthlyReportService.generate_report(db, current_user.id, year, month)
+
+
+@router.get("/monthly-usage/{year}/{month}/pdf")
+async def download_monthly_usage_pdf(
+    year: int = Path(..., ge=2020, le=2100),
+    month: int = Path(..., ge=1, le=12),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Download monthly usage report as PDF."""
+    data = MonthlyReportService.generate_report(db, current_user.id, year, month)
+    pdf_bytes = get_monthly_report_pdf_service().generate_monthly_usage_pdf(data)
+
+    from fastapi.responses import Response
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="monthly_report_{year}_{month:02d}.pdf"'
+            )
+        },
+    )
 
 
 @router.get("/yearly")

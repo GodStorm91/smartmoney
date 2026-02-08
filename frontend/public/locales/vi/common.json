@@ -1131,6 +1131,8 @@
     "downloadPDF": "Tải PDF",
     "sendEmail": "Gửi Email",
     "comingSoon": "Sắp ra mắt",
+    "downloading": "Đang tải...",
+    "downloadError": "Tải PDF thất bại",
     "overBudget": "Vượt",
     "warning": "Cảnh báo",
     "caution": "Chú ý",

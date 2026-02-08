@@ -1146,6 +1146,8 @@
     "downloadPDF": "PDF ダウンロード",
     "sendEmail": "メール送信",
     "comingSoon": "近日公開",
+    "downloading": "ダウンロード中...",
+    "downloadError": "PDFのダウンロードに失敗しました",
     "overBudget": "超過",
     "warning": "注意",
     "caution": "警告",

@@ -267,6 +267,8 @@
     "downloadPDF": "Download PDF",
     "sendEmail": "Send Email",
     "comingSoon": "Coming soon",
+    "downloading": "Downloading...",
+    "downloadError": "Failed to download PDF",
     "overBudget": "Over",
     "warning": "Warning",
     "caution": "Caution",

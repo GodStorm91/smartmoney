@@ -13,3 +13,17 @@ export async function fetchMonthlyReport(
   )
   return response.data
 }
+
+/**
+ * Download monthly usage report as PDF blob
+ */
+export async function downloadMonthlyReportPDF(
+  year: number,
+  month: number
+): Promise<Blob> {
+  const response = await apiClient.get(
+    `/api/reports/monthly-usage/${year}/${month}/pdf`,
+    { responseType: 'blob' }
+  )
+  return response.data
+}

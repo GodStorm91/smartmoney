@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
-import { fetchMonthlyReport } from '@/services/report-service'
+import { toast } from 'sonner'
+import { fetchMonthlyReport, downloadMonthlyReportPDF } from '@/services/report-service'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { MetricCard } from '@/components/analytics/MetricCard'
@@ -17,6 +18,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 export function MonthlyReport() {
   const { t } = useTranslation('common')
   const [selectedMonth, setSelectedMonth] = useState(new Date())
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const year = selectedMonth.getFullYear()
   const month = selectedMonth.getMonth() + 1
@@ -27,9 +29,28 @@ export function MonthlyReport() {
     staleTime: 1000 * 60 * 5,
   })
 
+  const handleDownloadPDF = useCallback(async () => {
+    setIsDownloading(true)
+    try {
+      const blob = await downloadMonthlyReportPDF(year, month)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `monthly_report_${year}_${String(month).padStart(2, '0')}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch {
+      toast.error(t('report.downloadError'))
+    } finally {
+      setIsDownloading(false)
+    }
+  }, [year, month, t])
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
-      <ReportHeader year={year} month={month} />
+      <ReportHeader year={year} month={month} onDownloadPDF={handleDownloadPDF} isDownloading={isDownloading} />
       <MonthPicker selectedMonth={selectedMonth} onChange={setSelectedMonth} className="mb-6" />
 
       {isLoading && (

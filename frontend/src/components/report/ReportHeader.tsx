@@ -1,13 +1,15 @@
 import { useTranslation } from 'react-i18next'
-import { Download, Mail } from 'lucide-react'
+import { Download, Mail, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface ReportHeaderProps {
   year: number
   month: number
+  onDownloadPDF: () => void
+  isDownloading: boolean
 }
 
-export function ReportHeader({ year, month }: ReportHeaderProps) {
+export function ReportHeader({ year, month, onDownloadPDF, isDownloading }: ReportHeaderProps) {
   const { t } = useTranslation('common')
   const monthName = format(new Date(year, month - 1), 'MMMM yyyy')
 
@@ -21,12 +23,13 @@ export function ReportHeader({ year, month }: ReportHeaderProps) {
       </div>
       <div className="flex gap-2">
         <button
-          disabled
-          className="p-2 rounded-lg text-gray-400 dark:text-gray-600 cursor-not-allowed"
-          aria-label={t('report.downloadPDF')}
-          title={t('report.comingSoon')}
+          onClick={onDownloadPDF}
+          disabled={isDownloading}
+          className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          aria-label={isDownloading ? t('report.downloading') : t('report.downloadPDF')}
+          title={isDownloading ? t('report.downloading') : t('report.downloadPDF')}
         >
-          <Download size={18} />
+          {isDownloading ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
         </button>
         <button
           disabled
