@@ -2,13 +2,15 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
 from ..models.transaction import Transaction
 from ..models.user import User
+from ..schemas.report import MonthlyUsageReportData
+from ..services.monthly_report_service import MonthlyReportService
 from ..services.report_service import get_pdf_service
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
@@ -17,6 +19,17 @@ router = APIRouter(prefix="/api/reports", tags=["reports"])
 def get_month_key(year: int, month: int) -> str:
     """Generate month key for querying."""
     return f"{year}-{month:02d}"
+
+
+@router.get("/monthly-usage/{year}/{month}", response_model=MonthlyUsageReportData)
+async def get_monthly_usage_report(
+    year: int = Path(..., ge=2020, le=2100),
+    month: int = Path(..., ge=1, le=12),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get comprehensive monthly usage report data."""
+    return MonthlyReportService.generate_report(db, current_user.id, year, month)
 
 
 @router.get("/yearly")
