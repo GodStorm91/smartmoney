@@ -773,13 +773,29 @@
     "largeTransactionThresholdHint": "0に設定すると無効。大きな一時的支出（医療費など）が月平均を歪める場合に有効。",
     "saveFailed": "設定の保存に失敗しました",
     "sections": {
+      "appearance": "外観",
       "general": "一般",
       "budget": "予算",
       "categories": "カテゴリ",
       "sources": "出金元",
       "recurring": "定期",
+      "notifications": "通知",
       "crypto": "暗号資産"
     }
+  },
+  "appearance": {
+    "title": "外観",
+    "subtitle": "テーマ、カラー、表示設定",
+    "themeMode": "テーマモード",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム",
+    "accentColor": "アクセントカラー",
+    "displayMode": "表示モード",
+    "pro": "プロ",
+    "proDesc": "すべての機能とアイテムにアクセス",
+    "lite": "ライト",
+    "liteDesc": "シンプルな表示、ページあたりのアイテム数を削減"
   },
   "crypto": {
     "wallets": "暗号資産ウォレット",

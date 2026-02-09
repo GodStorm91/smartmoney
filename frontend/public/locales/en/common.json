@@ -844,6 +844,7 @@
     "largeTransactionThresholdHint": "Set to 0 to disable. Large one-time expenses (medical, etc.) can skew monthly averages.",
     "saveFailed": "Failed to save settings",
     "sections": {
+      "appearance": "Appearance",
       "general": "General",
       "budget": "Budget",
       "categories": "Categories",
@@ -852,6 +853,20 @@
       "notifications": "Notifications",
       "crypto": "Crypto"
     }
+  },
+  "appearance": {
+    "title": "Appearance",
+    "subtitle": "Theme, colors, and display preferences",
+    "themeMode": "Theme Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "accentColor": "Accent Color",
+    "displayMode": "Display Mode",
+    "pro": "Pro",
+    "proDesc": "Full access, all items visible",
+    "lite": "Lite",
+    "liteDesc": "Simplified view, fewer items per page"
   },
   "crypto": {
     "wallets": "Crypto Wallets",

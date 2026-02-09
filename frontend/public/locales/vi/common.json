@@ -772,13 +772,29 @@
     "largeTransactionThresholdHint": "Đặt 0 để tắt. Chi phí lớn một lần (y tế, v.v.) có thể làm sai lệch trung bình tháng.",
     "saveFailed": "Không thể lưu cài đặt",
     "sections": {
+      "appearance": "Giao diện",
       "general": "Chung",
       "budget": "Ngân sách",
       "categories": "Danh mục",
       "sources": "Nguồn tiền",
       "recurring": "Định kỳ",
+      "notifications": "Thông báo",
       "crypto": "Tiền điện tử"
     }
+  },
+  "appearance": {
+    "title": "Giao diện",
+    "subtitle": "Chủ đề, màu sắc và tùy chọn hiển thị",
+    "themeMode": "Chế độ giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống",
+    "accentColor": "Màu chủ đạo",
+    "displayMode": "Chế độ hiển thị",
+    "pro": "Pro",
+    "proDesc": "Truy cập đầy đủ, hiển thị tất cả mục",
+    "lite": "Lite",
+    "liteDesc": "Giao diện đơn giản, ít mục hơn mỗi trang"
   },
   "crypto": {
     "wallets": "Ví Tiền Điện Tử",
