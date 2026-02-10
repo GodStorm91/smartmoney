@@ -1107,6 +1107,12 @@
       "impact": "{{percent}}% ngân sách",
       "overBudget": "Vượt ngân sách"
     },
+    "insight": {
+      "countsToward": "Tính vào ngân sách {{category}}",
+      "left": "Còn {{amount}}",
+      "over": "Vượt {{amount}}",
+      "willExceed": "Giao dịch này sẽ vượt ngân sách"
+    },
     "selectCategoryHint": "Chọn danh mục để xem chi tiết",
     "noAllocations": "Chưa có phân bổ ngân sách",
     "category": "Danh mục",
@@ -1128,6 +1134,14 @@
       "onTrack": "Đúng tiến độ",
       "caution": "Cần chú ý",
       "overBudget": "Vượt ngân sách"
+    },
+    "uncategorized": {
+      "title": "Phát hiện chi tiêu chưa phân loại",
+      "description": "{{amount}} từ {{count}} giao dịch chưa được gán vào danh mục ngân sách",
+      "reviewCta": "Xem lại giao dịch"
+    },
+    "coverage": {
+      "label": "Độ phủ ngân sách trên tổng chi tiêu"
     }
   },
   "credits": {
