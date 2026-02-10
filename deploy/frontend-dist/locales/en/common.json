@@ -1069,6 +1069,15 @@
       "overBy": "You'll exceed budget by {{amount}}",
       "underBy": "You'll save {{amount}} this month"
     },
+    "pulse": {
+      "perDay": "/day"
+    },
+    "flow": {
+      "income": "Income",
+      "allocated": "Allocated",
+      "saved": "Savings",
+      "unallocated": "free"
+    },
     "donutChart": {
       "title": "Budget Composition",
       "remaining": "Remaining",
@@ -1077,7 +1086,9 @@
     "alerts": {
       "exceededBy": "{{category}} exceeded by {{amount}}",
       "approaching": "{{category}} at limit — {{amount}} left for {{days}} days",
-      "allOnTrack": "{{count}} categories on track. Keep it up!"
+      "allOnTrack": "{{count}} categories on track. Keep it up!",
+      "cutToStay": "Cut {{category}} by {{amount}} to get back on track",
+      "reduceDaily": "Keep {{category}} under {{amount}}/day to stay safe"
     },
     "addCategory": "Add Category",
     "selectCategory": "Select category",
@@ -1107,6 +1118,17 @@
     },
     "undo": "Undo",
     "export": "Export",
+    "wizard": {
+      "title": "Create Budget for {{month}}",
+      "subtitle": "How would you like to get started?",
+      "copyTitle": "Copy Last Month",
+      "copyHint": "Reuse your {{month}} budget as a starting point",
+      "copyDescription": "All categories and amounts will be copied. You can edit after.",
+      "aiTitle": "AI Generate",
+      "aiHint": "Let AI create a personalized budget from your spending patterns",
+      "emptyTitle": "Start from Scratch",
+      "emptyHint": "Build your budget manually, one category at a time"
+    },
     "tabs": {
       "overview": "Overview",
       "categories": "Categories",
@@ -1142,6 +1164,17 @@
         "low": "Low"
       }
     },
+    "forecastAlert": {
+      "exceedBy": "At this pace, you'll exceed budget by {{amount}}",
+      "onTrackSave": "On track to save {{amount}} this month",
+      "nearLimit": "Projected to use {{percent}}% of budget",
+      "seeDetails": "See full forecast →"
+    },
+    "budgetContext": {
+      "progress": "{{spent}} / {{budgeted}}",
+      "impact": "{{percent}}% of budget",
+      "overBudget": "Over budget"
+    },
     "selectCategoryHint": "Select a category to view details",
     "noAllocations": "No budget allocations yet",
     "category": "Category",
@@ -1153,6 +1186,12 @@
     "pacing": "{{days}} days left",
     "perDay": "day",
     "topSpending": "Top Spending",
+    "cardActions": "Actions",
+    "nudge": {
+      "overTapToAdjust": "Over by {{amount}} — tap to adjust",
+      "reduceToStaySafe": "Reduce by {{amount}} to stay safe",
+      "safeToSpend": "{{amount}}/day safe to spend"
+    },
     "status": {
       "onTrack": "On Track",
       "caution": "Caution",
