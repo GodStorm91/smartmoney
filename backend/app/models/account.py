@@ -61,7 +61,7 @@ class Account(Base):
         "Transaction", back_populates="account", lazy="select"
     )
     recurring_transactions: Mapped[list["RecurringTransaction"]] = relationship(
-        "RecurringTransaction", back_populates="account", lazy="select"
+        "RecurringTransaction", foreign_keys="[RecurringTransaction.account_id]", back_populates="account", lazy="select"
     )
 
     __table_args__ = (

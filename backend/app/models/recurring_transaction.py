@@ -32,6 +32,13 @@ class RecurringTransaction(Base):
     )
     is_income: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
+    # Transfer fields
+    is_transfer: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    to_account_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("accounts.id", ondelete="SET NULL"), nullable=True
+    )
+    transfer_fee_amount: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+
     # Currency and source (for templates)
     currency: Mapped[str] = mapped_column(String(3), nullable=False, default="JPY")
     source: Mapped[str] = mapped_column(String(100), nullable=False, default="Manual")
@@ -72,7 +79,10 @@ class RecurringTransaction(Base):
         "User", back_populates="recurring_transactions", lazy="select"
     )
     account: Mapped["Account | None"] = relationship(
-        "Account", back_populates="recurring_transactions", lazy="select"
+        "Account", foreign_keys=[account_id], back_populates="recurring_transactions", lazy="select"
+    )
+    to_account: Mapped["Account | None"] = relationship(
+        "Account", foreign_keys=[to_account_id], lazy="select"
     )
     linked_bill: Mapped["Bill | None"] = relationship(
         "Bill", back_populates="recurring_transaction", uselist=False

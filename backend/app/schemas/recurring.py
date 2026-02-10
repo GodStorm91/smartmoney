@@ -26,6 +26,11 @@ class RecurringTransactionBase(BaseModel):
     account_id: Optional[int] = None
     is_income: bool = False
 
+    # Transfer fields
+    is_transfer: bool = Field(default=False, description="Whether this is an account-to-account transfer")
+    to_account_id: Optional[int] = Field(None, description="Destination account ID for transfers")
+    transfer_fee_amount: Optional[int] = Field(None, ge=0, description="Transfer fee amount (positive)")
+
     # Currency and source
     currency: str = Field(default="JPY", max_length=3)
     source: str = Field(default="Manual", max_length=100)
@@ -68,6 +73,11 @@ class RecurringTransactionUpdate(BaseModel):
     category: Optional[str] = Field(None, max_length=100)
     account_id: Optional[int] = None
     is_income: Optional[bool] = None
+
+    # Transfer fields
+    is_transfer: Optional[bool] = None
+    to_account_id: Optional[int] = None
+    transfer_fee_amount: Optional[int] = Field(None, ge=0)
 
     # Currency and source
     currency: Optional[str] = Field(None, max_length=3)

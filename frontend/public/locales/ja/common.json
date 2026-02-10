@@ -515,6 +515,11 @@
     "createSuccess": "定期取引を作成しました",
     "deleteSuccess": "定期取引を削除しました",
     "updateSuccess": "定期取引を更新しました",
+    "transfer": "振替",
+    "fromAccount": "振替元",
+    "toAccount": "振替先",
+    "selectDestAccount": "振替先を選択",
+    "transferFee": "振替手数料（任意）",
     "days": {
       "monday": "月曜日",
       "tuesday": "火曜日",

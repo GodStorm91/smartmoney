@@ -12,6 +12,9 @@ export interface RecurringTransaction {
   category: string
   account_id: number | null
   is_income: boolean
+  is_transfer: boolean
+  to_account_id: number | null
+  transfer_fee_amount: number | null
   currency: string
   source: string
   frequency: FrequencyType
@@ -35,6 +38,9 @@ export interface RecurringTransactionCreate {
   category: string
   account_id?: number | null
   is_income: boolean
+  is_transfer?: boolean
+  to_account_id?: number | null
+  transfer_fee_amount?: number | null
   currency?: string
   source?: string
   frequency: FrequencyType
@@ -53,6 +59,9 @@ export interface RecurringTransactionUpdate {
   category?: string
   account_id?: number | null
   is_income?: boolean
+  is_transfer?: boolean
+  to_account_id?: number | null
+  transfer_fee_amount?: number | null
   currency?: string
   source?: string
   frequency?: FrequencyType

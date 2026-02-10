@@ -1,7 +1,9 @@
 """Service for recurring transaction operations."""
+import hashlib
 from calendar import monthrange
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
+from uuid import uuid4
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
@@ -266,37 +268,16 @@ class RecurringTransactionService:
 
         for recurring in due_recurring:
             try:
-                # Create the transaction
-                tx_hash = generate_tx_hash(
-                    str(recurring.next_run_date),
-                    recurring.amount if recurring.is_income else -recurring.amount,
-                    recurring.description,
-                    f"recurring_{recurring.id}",
-                    recurring.user_id,
-                )
-
-                # Get account name for source
-                source = "Recurring"
-                if recurring.account:
-                    source = recurring.account.name
-
-                transaction = Transaction(
-                    user_id=recurring.user_id,
-                    date=recurring.next_run_date,
-                    description=recurring.description,
-                    amount=recurring.amount if recurring.is_income else -recurring.amount,
-                    currency=recurring.account.currency if recurring.account else "JPY",
-                    category=recurring.category,
-                    source=source,
-                    is_income=recurring.is_income,
-                    is_transfer=False,
-                    is_adjustment=False,
-                    month_key=recurring.next_run_date.strftime("%Y-%m"),
-                    tx_hash=tx_hash,
-                    account_id=recurring.account_id,
-                )
-
-                db.add(transaction)
+                if recurring.is_transfer:
+                    count = RecurringTransactionService._create_transfer_transactions(
+                        db, recurring
+                    )
+                    created_count += count
+                else:
+                    RecurringTransactionService._create_single_transaction(
+                        db, recurring
+                    )
+                    created_count += 1
 
                 # Update recurring: set last_run_date and calculate next_run_date
                 recurring.last_run_date = recurring.next_run_date
@@ -308,8 +289,6 @@ class RecurringTransactionService:
                     day_of_month=recurring.day_of_month,
                 )
 
-                created_count += 1
-
             except Exception as e:
                 # Log error but continue processing other recurring transactions
                 print(f"Error processing recurring {recurring.id}: {e}")
@@ -317,3 +296,121 @@ class RecurringTransactionService:
 
         db.commit()
         return created_count
+
+    @staticmethod
+    def _create_single_transaction(db: Session, recurring: RecurringTransaction) -> None:
+        """Create a single (non-transfer) transaction from a recurring record."""
+        tx_hash = generate_tx_hash(
+            str(recurring.next_run_date),
+            recurring.amount if recurring.is_income else -recurring.amount,
+            recurring.description,
+            f"recurring_{recurring.id}",
+            recurring.user_id,
+        )
+
+        source = "Recurring"
+        if recurring.account:
+            source = recurring.account.name
+
+        transaction = Transaction(
+            user_id=recurring.user_id,
+            date=recurring.next_run_date,
+            description=recurring.description,
+            amount=recurring.amount if recurring.is_income else -recurring.amount,
+            currency=recurring.account.currency if recurring.account else "JPY",
+            category=recurring.category,
+            source=source,
+            is_income=recurring.is_income,
+            is_transfer=False,
+            is_adjustment=False,
+            month_key=recurring.next_run_date.strftime("%Y-%m"),
+            tx_hash=tx_hash,
+            account_id=recurring.account_id,
+        )
+        db.add(transaction)
+
+    @staticmethod
+    def _create_transfer_transactions(
+        db: Session, recurring: RecurringTransaction
+    ) -> int:
+        """Create paired transfer transactions (outgoing + incoming + optional fee)."""
+        transfer_id = str(uuid4())
+        month_key = recurring.next_run_date.strftime("%Y-%m")
+        timestamp = datetime.now().timestamp()
+
+        from_name = recurring.account.name if recurring.account else "Unknown"
+        to_name = recurring.to_account.name if recurring.to_account else "Unknown"
+        from_currency = recurring.account.currency if recurring.account else "JPY"
+        to_currency = recurring.to_account.currency if recurring.to_account else "JPY"
+
+        # Outgoing transaction (negative amount from source)
+        out_hash = hashlib.sha256(
+            f"{transfer_id}|out|{timestamp}".encode()
+        ).hexdigest()
+        out_tx = Transaction(
+            user_id=recurring.user_id,
+            account_id=recurring.account_id,
+            date=recurring.next_run_date,
+            description=recurring.description or f"Transfer to {to_name}",
+            amount=-recurring.amount,
+            currency=from_currency,
+            category="Transfer",
+            source=from_name,
+            is_income=False,
+            is_transfer=True,
+            transfer_id=transfer_id,
+            transfer_type="outgoing",
+            month_key=month_key,
+            tx_hash=out_hash,
+        )
+        db.add(out_tx)
+
+        # Incoming transaction (positive amount to destination)
+        in_hash = hashlib.sha256(
+            f"{transfer_id}|in|{timestamp}".encode()
+        ).hexdigest()
+        in_tx = Transaction(
+            user_id=recurring.user_id,
+            account_id=recurring.to_account_id,
+            date=recurring.next_run_date,
+            description=recurring.description or f"Transfer from {from_name}",
+            amount=recurring.amount,
+            currency=to_currency,
+            category="Transfer",
+            source=to_name,
+            is_income=True,
+            is_transfer=True,
+            transfer_id=transfer_id,
+            transfer_type="incoming",
+            month_key=month_key,
+            tx_hash=in_hash,
+        )
+        db.add(in_tx)
+
+        created = 2
+
+        # Optional fee transaction
+        if recurring.transfer_fee_amount and recurring.transfer_fee_amount > 0:
+            fee_hash = hashlib.sha256(
+                f"{transfer_id}|fee|{timestamp}".encode()
+            ).hexdigest()
+            fee_tx = Transaction(
+                user_id=recurring.user_id,
+                account_id=recurring.account_id,
+                date=recurring.next_run_date,
+                description="Transfer fee",
+                amount=-recurring.transfer_fee_amount,
+                currency=from_currency,
+                category="Bank Fees",
+                source=from_name,
+                is_income=False,
+                is_transfer=False,
+                transfer_id=transfer_id,
+                transfer_type="fee",
+                month_key=month_key,
+                tx_hash=fee_hash,
+            )
+            db.add(fee_tx)
+            created += 1
+
+        return created

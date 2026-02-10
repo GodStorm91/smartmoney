@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { X } from 'lucide-react'
+import { X, ArrowLeftRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -49,6 +49,9 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
   const [category, setCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [isIncome, setIsIncome] = useState(false)
+  const [isTransfer, setIsTransfer] = useState(false)
+  const [toAccountId, setToAccountId] = useState<number | null>(null)
+  const [transferFeeAmount, setTransferFeeAmount] = useState('')
   const [frequency, setFrequency] = useState<FrequencyType>('monthly')
   const [dayOfWeek, setDayOfWeek] = useState(0)
   const [dayOfMonth, setDayOfMonth] = useState(1)
@@ -63,30 +66,37 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
       setCategory(editItem.category)
       setAccountId(editItem.account_id)
       setIsIncome(editItem.is_income)
+      setIsTransfer(editItem.is_transfer)
+      setToAccountId(editItem.to_account_id)
+      setTransferFeeAmount(editItem.transfer_fee_amount?.toString() ?? '')
       setFrequency(editItem.frequency)
       setDayOfWeek(editItem.day_of_week ?? 0)
       setDayOfMonth(editItem.day_of_month ?? 1)
       setIntervalDays(editItem.interval_days ?? 7)
       setStartDate(editItem.next_run_date)
     } else if (isOpen && initialSuggestion) {
-      // Pre-fill from suggestion
       setDescription(initialSuggestion.description)
       setAmount(initialSuggestion.amount.toString())
       setCategory(initialSuggestion.category)
       setAccountId(null)
       setIsIncome(initialSuggestion.is_income)
+      setIsTransfer(false)
+      setToAccountId(null)
+      setTransferFeeAmount('')
       setFrequency(initialSuggestion.frequency as FrequencyType)
       setDayOfWeek(initialSuggestion.day_of_week ?? 0)
       setDayOfMonth(initialSuggestion.day_of_month ?? new Date().getDate())
       setIntervalDays(initialSuggestion.interval_days ?? 14)
       setStartDate(new Date().toISOString().split('T')[0])
     } else if (isOpen) {
-      // Reset to defaults
       setDescription('')
       setAmount('')
       setCategory('')
       setAccountId(null)
       setIsIncome(false)
+      setIsTransfer(false)
+      setToAccountId(null)
+      setTransferFeeAmount('')
       setFrequency('monthly')
       setDayOfWeek(0)
       setDayOfMonth(new Date().getDate())
@@ -118,9 +128,12 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
     const data: RecurringTransactionCreate = {
       description,
       amount: parseInt(amount, 10),
-      category,
+      category: isTransfer ? 'Transfer' : category,
       account_id: accountId,
-      is_income: isIncome,
+      is_income: isTransfer ? false : isIncome,
+      is_transfer: isTransfer,
+      to_account_id: isTransfer ? toAccountId : null,
+      transfer_fee_amount: isTransfer && transferFeeAmount ? parseInt(transferFeeAmount, 10) : null,
       frequency,
       day_of_week: frequency === 'weekly' ? dayOfWeek : null,
       day_of_month: frequency === 'monthly' ? dayOfMonth : null,
@@ -135,7 +148,7 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
     }
   }
 
-  const categories = isIncome ? incomeCategories : expenseCategories
+  const categories = isTransfer ? [] : isIncome ? incomeCategories : expenseCategories
   const isSubmitting = createMutation.isPending || updateMutation.isPending
 
   if (!isOpen) return null
@@ -173,10 +186,10 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
             <div className="flex gap-2">
               <button
                 type="button"
-                onClick={() => setIsIncome(false)}
+                onClick={() => { setIsIncome(false); setIsTransfer(false) }}
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
-                  !isIncome
+                  !isIncome && !isTransfer
                     ? 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
                     : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                 )}
@@ -185,15 +198,28 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
               </button>
               <button
                 type="button"
-                onClick={() => setIsIncome(true)}
+                onClick={() => { setIsIncome(true); setIsTransfer(false) }}
                 className={cn(
                   'flex-1 py-2 px-4 rounded-lg font-medium transition-colors',
-                  isIncome
+                  isIncome && !isTransfer
                     ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300'
                     : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                 )}
               >
                 {t('transaction.income')}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setIsTransfer(true); setIsIncome(false) }}
+                className={cn(
+                  'flex-1 py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-1',
+                  isTransfer
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                )}
+              >
+                <ArrowLeftRight className="w-4 h-4" />
+                {t('recurring.transfer', 'Transfer')}
               </button>
             </div>
           </div>
@@ -218,28 +244,55 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
             required
           />
 
-          {/* Category */}
-          <Select
-            label={t('transaction.category')}
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            options={[
-              { value: '', label: t('transaction.selectCategory') },
-              ...categories.map((cat) => ({ value: cat.name, label: cat.name })),
-            ]}
-            required
-          />
+          {/* Category (hidden for transfers — auto-set to "Transfer") */}
+          {!isTransfer && (
+            <Select
+              label={t('transaction.category')}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              options={[
+                { value: '', label: t('transaction.selectCategory') },
+                ...categories.map((cat) => ({ value: cat.name, label: cat.name })),
+              ]}
+              required
+            />
+          )}
 
-          {/* Account */}
+          {/* Account (Source for transfers) */}
           <Select
-            label={t('transaction.account')}
+            label={isTransfer ? t('recurring.fromAccount', 'From Account') : t('transaction.account')}
             value={accountId?.toString() ?? ''}
             onChange={(e) => setAccountId(e.target.value ? parseInt(e.target.value, 10) : null)}
             options={[
-              { value: '', label: t('transaction.selectAccount', 'Select account (optional)') },
-              ...(accounts?.map((acc) => ({ value: acc.id.toString(), label: acc.name })) ?? []),
+              { value: '', label: t('transaction.selectAccount', 'Select account') },
+              ...(accounts?.filter(a => a.id !== toAccountId).map((acc) => ({ value: acc.id.toString(), label: acc.name })) ?? []),
             ]}
+            required={isTransfer}
           />
+
+          {/* Transfer: Destination Account + Fee */}
+          {isTransfer && (
+            <>
+              <Select
+                label={t('recurring.toAccount', 'To Account')}
+                value={toAccountId?.toString() ?? ''}
+                onChange={(e) => setToAccountId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                options={[
+                  { value: '', label: t('recurring.selectDestAccount', 'Select destination') },
+                  ...(accounts?.filter(a => a.id !== accountId).map((acc) => ({ value: acc.id.toString(), label: acc.name })) ?? []),
+                ]}
+                required
+              />
+              <Input
+                label={t('recurring.transferFee', 'Transfer Fee (optional)')}
+                type="number"
+                value={transferFeeAmount}
+                onChange={(e) => setTransferFeeAmount(e.target.value)}
+                placeholder="0"
+                min="0"
+              />
+            </>
+          )}
 
           {/* Frequency Options */}
           <RecurringOptions

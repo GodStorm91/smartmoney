@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.account import Account
 from ..models.user import User
 from ..models.recurring_transaction import RecurringTransaction
 from ..schemas.recurring import (
@@ -30,6 +31,22 @@ async def create_recurring(
     current_user: User = Depends(get_current_user),
 ):
     """Create a new recurring transaction."""
+    # Validate transfer fields
+    if data.is_transfer:
+        if not data.account_id:
+            raise HTTPException(status_code=400, detail="Source account is required for transfers")
+        if not data.to_account_id:
+            raise HTTPException(status_code=400, detail="Destination account is required for transfers")
+        if data.account_id == data.to_account_id:
+            raise HTTPException(status_code=400, detail="Cannot transfer to the same account")
+        # Verify both accounts exist and belong to user
+        from_acc = db.query(Account).filter(Account.id == data.account_id, Account.user_id == current_user.id).first()
+        to_acc = db.query(Account).filter(Account.id == data.to_account_id, Account.user_id == current_user.id).first()
+        if not from_acc:
+            raise HTTPException(status_code=400, detail="Source account not found")
+        if not to_acc:
+            raise HTTPException(status_code=400, detail="Destination account not found")
+
     recurring = RecurringTransactionService.create_recurring(
         db=db,
         user_id=current_user.id,
@@ -243,6 +260,9 @@ def _to_response(recurring) -> dict:
         "category": recurring.category,
         "account_id": recurring.account_id,
         "is_income": recurring.is_income,
+        "is_transfer": recurring.is_transfer,
+        "to_account_id": recurring.to_account_id,
+        "transfer_fee_amount": recurring.transfer_fee_amount,
         "currency": recurring.currency,
         "source": recurring.source,
         "frequency": recurring.frequency,
