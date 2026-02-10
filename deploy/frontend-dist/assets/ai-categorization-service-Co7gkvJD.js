@@ -1,0 +1,1 @@
+import{F as s}from"./index-p_OOsc5s.js";async function i(a=50,t="ja"){return(await s.post("/api/ai/categorize/suggestions",{limit:a,language:t})).data}async function g(a,t=50,e="ja"){return(await s.post("/api/ai/categorize/budget-suggestions",{month:a,limit:t,language:e})).data}async function r(a){return(await s.post("/api/ai/categorize/apply",a)).data}export{r as a,i as b,g};

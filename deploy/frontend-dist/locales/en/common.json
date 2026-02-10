@@ -1211,10 +1211,33 @@
     "uncategorized": {
       "title": "Uncategorized spending detected",
       "description": "{{amount}} across {{count}} transactions not mapped to any budget category",
-      "reviewCta": "Review transactions"
+      "reviewCta": "Review transactions",
+      "aiCategorizeCta": "AI Categorize",
+      "aiProcessingBtn": "Analyzing...",
+      "aiProcessing": "Analyzing transactions...",
+      "aiSuccess": "Categories suggested!",
+      "aiSuccessDescription": "Review and apply the suggested categories below"
     },
     "coverage": {
       "label": "Budget coverage of total spending"
+    },
+    "aiCategorize": {
+      "title": "AI Auto-Categorize",
+      "description": "AI will suggest categories for uncategorized transactions",
+      "button": "AI Categorize",
+      "reviewing": "Review Suggestions",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "apply": "Apply {{count}} Changes",
+      "applying": "Applying...",
+      "success": "Successfully categorized {{count}} transactions",
+      "noSuggestions": "No suggestions found",
+      "error": "Failed to get suggestions. Please try again.",
+      "createRules": "Auto-create rules for future transactions",
+      "editCategory": "Change category",
+      "confidence": "confidence",
+      "processing": "Analyzing transactions...",
+      "newCategory": "New"
     }
   },
   "credits": {

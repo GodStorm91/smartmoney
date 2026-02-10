@@ -1139,10 +1139,33 @@
     "uncategorized": {
       "title": "未分類の支出があります",
       "description": "{{count}}件の取引（合計{{amount}}）が予算カテゴリに未割当",
-      "reviewCta": "取引を確認する"
+      "reviewCta": "取引を確認する",
+      "aiCategorizeCta": "AIで分類",
+      "aiProcessingBtn": "分析中...",
+      "aiProcessing": "取引を分析しています...",
+      "aiSuccess": "カテゴリを提案しました！",
+      "aiSuccessDescription": "提案されたカテゴリを確認して適用してください"
     },
     "coverage": {
       "label": "総支出に対する予算カバー率"
+    },
+    "aiCategorize": {
+      "title": "AI自動カテゴリ分類",
+      "description": "AIが未分類の取引にカテゴリを提案します",
+      "button": "AIで分類",
+      "reviewing": "提案を確認",
+      "selectAll": "すべて選択",
+      "deselectAll": "すべて解除",
+      "apply": "{{count}}件の変更を適用",
+      "applying": "適用中...",
+      "success": "{{count}}件の取引を分類しました",
+      "noSuggestions": "提案が見つかりませんでした",
+      "error": "提案の取得に失敗しました。もう一度お試しください。",
+      "createRules": "今後の取引に自動ルールを作成",
+      "editCategory": "カテゴリを変更",
+      "confidence": "信頼度",
+      "processing": "取引を分析中...",
+      "newCategory": "新規"
     }
   },
   "credits": {

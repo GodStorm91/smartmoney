@@ -1138,10 +1138,33 @@
     "uncategorized": {
       "title": "Phát hiện chi tiêu chưa phân loại",
       "description": "{{amount}} từ {{count}} giao dịch chưa được gán vào danh mục ngân sách",
-      "reviewCta": "Xem lại giao dịch"
+      "reviewCta": "Xem lại giao dịch",
+      "aiCategorizeCta": "AI Phân loại",
+      "aiProcessingBtn": "Đang phân tích...",
+      "aiProcessing": "Đang phân tích giao dịch...",
+      "aiSuccess": "Đã đề xuất danh mục!",
+      "aiSuccessDescription": "Xem xét và áp dụng các danh mục được đề xuất bên dưới"
     },
     "coverage": {
       "label": "Độ phủ ngân sách trên tổng chi tiêu"
+    },
+    "aiCategorize": {
+      "title": "Phân loại tự động bằng AI",
+      "description": "AI sẽ đề xuất danh mục cho các giao dịch chưa phân loại",
+      "button": "AI Phân loại",
+      "reviewing": "Xem xét đề xuất",
+      "selectAll": "Chọn tất cả",
+      "deselectAll": "Bỏ chọn tất cả",
+      "apply": "Áp dụng {{count}} thay đổi",
+      "applying": "Đang áp dụng...",
+      "success": "Đã phân loại thành công {{count}} giao dịch",
+      "noSuggestions": "Không tìm thấy đề xuất",
+      "error": "Không thể lấy đề xuất. Vui lòng thử lại.",
+      "createRules": "Tự động tạo quy tắc cho giao dịch sau",
+      "editCategory": "Đổi danh mục",
+      "confidence": "độ tin cậy",
+      "processing": "Đang phân tích giao dịch...",
+      "newCategory": "Mới"
     }
   },
   "credits": {
