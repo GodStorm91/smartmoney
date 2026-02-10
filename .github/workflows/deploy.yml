@@ -74,7 +74,63 @@ jobs:
           pull: true
 
   # ====================
-  # DEPLOY TO PRODUCTION
+  # AUTO-DEPLOY ON MAIN
+  # ====================
+  deploy-main:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            set -e
+            DEPLOY_DIR="/root/smartmoney/deploy"
+            REPO_DIR="/root/smartmoney"
+
+            echo "=== Auto-deploying main branch ==="
+
+            # Pull latest code (frontend-dist is inside deploy/)
+            cd $REPO_DIR
+            git fetch origin main
+            git reset --hard origin/main
+
+            cd $DEPLOY_DIR
+
+            # Pull latest backend image
+            echo "Pulling backend image: main"
+            docker pull ghcr.io/godstorm91/smartmoney-backend:main
+
+            # Ensure using main tag
+            sed -i "s/^BACKEND_IMAGE_TAG=.*/BACKEND_IMAGE_TAG=main/" .env || echo "BACKEND_IMAGE_TAG=main" >> .env
+
+            # Run migrations
+            echo "Running migrations..."
+            docker compose run --rm backend alembic upgrade head
+
+            # Restart backend
+            echo "Restarting backend..."
+            docker compose up -d --force-recreate backend
+
+            # Restart nginx to pick up new frontend files
+            echo "Restarting nginx..."
+            docker compose restart nginx
+
+            # Cleanup old images
+            docker image prune -af --filter "until=168h" || true
+
+            echo "=== Auto-deploy complete ==="
+            docker compose ps
+
+  # ====================
+  # DEPLOY TO PRODUCTION (versioned)
   # ====================
   deploy:
     needs: build-and-test
