@@ -11,8 +11,6 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi.exceptions import RequestValidationError
-import logging
-from fastapi.exceptions import RequestValidationError
 
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
@@ -97,19 +95,33 @@ async def handle_x_forwarded_proto(request: Request, call_next):
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
     """Handle database errors."""
+    logger.error(f"[DB Error] Path: {request.url.path}, Error: {str(exc)}")
+    content = {"detail": "DATABASE_ERROR"}
+    if app_settings.debug:
+        content["error"] = str(exc)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Database error occurred", "error": str(exc)},
+        content=content,
     )
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Handle validation errors with detailed output."""
+    """Handle validation errors with field-level detail for frontend form mapping."""
     logger.error(f"[Validation Error] Path: {request.url.path}, Errors: {exc.errors()}")
+    field_errors = []
+    for err in exc.errors():
+        loc = err.get("loc", ())
+        # Extract field name from location tuple (skip 'body', 'query', etc.)
+        field = str(loc[-1]) if loc else "unknown"
+        field_errors.append({
+            "field": field,
+            "message": err.get("msg", "Validation error"),
+            "type": err.get("type", "value_error"),
+        })
     return JSONResponse(
         status_code=422,
-        content={"detail": "Validation error", "errors": exc.errors()},
+        content={"detail": field_errors},
     )
 
 
@@ -117,9 +129,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions."""
     logger.error(f"[General Error] Path: {request.url.path}, Error: {str(exc)}")
+    content = {"detail": "INTERNAL_SERVER_ERROR"}
+    if app_settings.debug:
+        content["error"] = str(exc)
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error", "error": str(exc)},
+        content=content,
     )
 
 

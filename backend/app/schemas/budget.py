@@ -5,27 +5,27 @@ from pydantic import BaseModel, Field
 
 class BudgetAllocationSchema(BaseModel):
     """Budget allocation response."""
-    category: str
-    amount: int
-    reasoning: str | None = None
+    category: str = Field(..., description="Budget category name")
+    amount: int = Field(default=0, description="Allocated amount (JPY)")
+    reasoning: str | None = Field(None, description="AI reasoning for allocation")
 
 
 class BudgetGenerateRequest(BaseModel):
     """Request to generate budget."""
-    monthly_income: int = Field(..., gt=0)
-    feedback: str | None = None
-    language: str = Field(default="ja", pattern="^(ja|en|vi)$")
+    monthly_income: int = Field(..., gt=0, description="Monthly income (JPY)")
+    feedback: str | None = Field(None, description="User feedback for AI budget generation")
+    language: str = Field(default="ja", pattern="^(ja|en|vi)$", description="Language code: ja, en, or vi")
 
 
 class BudgetRegenerateRequest(BaseModel):
     """Request to regenerate budget with feedback."""
-    feedback: str = Field(..., min_length=1)
-    language: str = Field(default="ja", pattern="^(ja|en|vi)$")
+    feedback: str = Field(..., min_length=1, description="User feedback for regeneration")
+    language: str = Field(default="ja", pattern="^(ja|en|vi)$", description="Language code: ja, en, or vi")
 
 
 class AllocationUpdateRequest(BaseModel):
     """Request to update a single allocation amount."""
-    amount: int = Field(..., ge=0)
+    amount: int = Field(..., ge=0, description="New allocation amount (JPY)")
 
 
 class BudgetResponse(BaseModel):

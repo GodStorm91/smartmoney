@@ -75,7 +75,7 @@ class TransactionListResponse(BaseModel):
 class TransactionSummaryResponse(BaseModel):
     """Schema for transaction summary."""
 
-    income: int
-    expenses: int
-    net: int
-    count: int
+    income: int = Field(default=0, description="Total income (JPY)")
+    expenses: int = Field(default=0, description="Total expenses (JPY)")
+    net: int = Field(default=0, description="Net cashflow (income - expenses)")
+    count: int = Field(default=0, description="Total transaction count")
