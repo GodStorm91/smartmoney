@@ -346,13 +346,15 @@ def get_budget_by_month(
 @router.get("/tracking/current", response_model=BudgetTrackingResponse)
 def get_current_budget_tracking(
     db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)],
+    month: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}$", description="Month (YYYY-MM), defaults to current")
 ):
-    """Get current month's budget tracking with spending data.
+    """Get budget tracking with spending data for a given month.
 
     Args:
         db: Database session
         current_user: Authenticated user
+        month: Optional month string (YYYY-MM), defaults to current month
 
     Returns:
         Budget tracking with spending vs budget
@@ -360,12 +362,12 @@ def get_current_budget_tracking(
     Raises:
         HTTPException: If no budget exists
     """
-    tracking = BudgetTrackingService.get_budget_tracking(db, current_user.id)
+    tracking = BudgetTrackingService.get_budget_tracking(db, current_user.id, month=month)
 
     if not tracking:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="No budget found for current month"
+            detail=f"No budget found for month {month or 'current'}"
         )
 
     return tracking

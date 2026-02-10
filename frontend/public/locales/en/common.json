@@ -1180,6 +1180,12 @@
       "impact": "{{percent}}% of budget",
       "overBudget": "Over budget"
     },
+    "insight": {
+      "countsToward": "Counts toward {{category}} budget",
+      "left": "{{amount}} left",
+      "over": "{{amount}} over",
+      "willExceed": "This transaction will push over budget"
+    },
     "selectCategoryHint": "Select a category to view details",
     "noAllocations": "No budget allocations yet",
     "category": "Category",
@@ -1201,6 +1207,14 @@
       "onTrack": "On Track",
       "caution": "Caution",
       "overBudget": "Over Budget"
+    },
+    "uncategorized": {
+      "title": "Uncategorized spending detected",
+      "description": "{{amount}} across {{count}} transactions not mapped to any budget category",
+      "reviewCta": "Review transactions"
+    },
+    "coverage": {
+      "label": "Budget coverage of total spending"
     }
   },
   "credits": {

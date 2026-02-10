@@ -14,6 +14,7 @@ import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import { toStorageAmount } from '@/utils/formatCurrency'
 import { CURRENCY_SYMBOLS, formatWithCommas } from '@/utils/form-utils'
 import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
+import { BudgetInsightWidget } from './BudgetInsightWidget'
 import { DescriptionAutocomplete } from './DescriptionAutocomplete'
 import { RecurringOptions } from './RecurringOptions'
 import { ReceiptScannerModal } from '../receipts/ReceiptScannerModal'
@@ -41,6 +42,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   const [displayAmount, setDisplayAmount] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
+  const [parentCategory, setParentCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showScanner, setShowScanner] = useState(false)
@@ -81,6 +83,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
       setDisplayAmount('')
       setDescription('')
       setCategory('')
+      setParentCategory('')
       setAccountId(defaultAccountId ?? accounts?.[0]?.id ?? null)
       setErrors({})
       setReceiptFile(null)
@@ -98,6 +101,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   // Reset category when switching income/expense
   useEffect(() => {
     setCategory('')
+    setParentCategory('')
   }, [isIncome])
 
   // Offline-aware mutation
@@ -309,11 +313,21 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
             </label>
             <HierarchicalCategoryPicker
               selected={category}
-              onSelect={(childName) => setCategory(childName)}
+              onSelect={(childName, parentName) => {
+                setCategory(childName)
+                setParentCategory(parentName)
+              }}
               isIncome={isIncome}
             />
             {errors.category && (
               <p className="mt-1 text-sm text-red-500">{errors.category}</p>
+            )}
+            {category && !isAdjustment && (
+              <BudgetInsightWidget
+                parentCategory={parentCategory || category}
+                transactionAmount={parseInt(amount) || 0}
+                isExpense={!isIncome}
+              />
             )}
           </div>
 

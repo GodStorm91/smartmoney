@@ -1108,6 +1108,12 @@
       "impact": "予算の{{percent}}%",
       "overBudget": "予算超過"
     },
+    "insight": {
+      "countsToward": "{{category}}の予算に計上",
+      "left": "残り{{amount}}",
+      "over": "{{amount}}超過",
+      "willExceed": "この取引で予算を超過します"
+    },
     "selectCategoryHint": "詳細を表示するにはカテゴリを選択",
     "noAllocations": "予算配分がまだありません",
     "category": "カテゴリ",
@@ -1129,6 +1135,14 @@
       "onTrack": "順調",
       "caution": "注意",
       "overBudget": "予算超過"
+    },
+    "uncategorized": {
+      "title": "未分類の支出があります",
+      "description": "{{count}}件の取引（合計{{amount}}）が予算カテゴリに未割当",
+      "reviewCta": "取引を確認する"
+    },
+    "coverage": {
+      "label": "総支出に対する予算カバー率"
     }
   },
   "credits": {

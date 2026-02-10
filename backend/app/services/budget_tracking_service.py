@@ -57,6 +57,8 @@ class BudgetTrackingService:
     ) -> int:
         """Get total spending for a category including all its children.
 
+        Uses case-insensitive matching so "mortgage housing" matches "Mortgage".
+
         Args:
             category_spending: Dict of category name -> spending amount
             category_name: The budget allocation category name
@@ -68,11 +70,59 @@ class BudgetTrackingService:
         # Get all category names to sum (parent + children)
         categories_to_sum = hierarchy.get(category_name, [category_name])
 
+        # Build lowercase set for case-insensitive matching
+        lower_set = {name.lower() for name in categories_to_sum}
+
         total = 0
-        for cat_name in categories_to_sum:
-            total += category_spending.get(cat_name, 0)
+        for tx_cat, amount in category_spending.items():
+            # Check if any word in the transaction category matches a known category
+            tx_lower = tx_cat.lower() if tx_cat else ""
+            if tx_lower in lower_set:
+                total += amount
+            else:
+                # Check if any known category name appears as a word in the transaction category
+                # e.g. "mortgage housing" contains "mortgage" and "housing"
+                tx_words = tx_lower.split()
+                for word in tx_words:
+                    if word in lower_set:
+                        total += amount
+                        break
 
         return total
+
+    @staticmethod
+    def _get_spending_for_category_with_matched(
+        category_spending: dict[str, int],
+        category_name: str,
+        hierarchy: dict[str, list[str]]
+    ) -> tuple[int, set[str]]:
+        """Get total spending for a category, returning matched transaction category keys.
+
+        Same logic as _get_spending_for_category but also tracks which
+        transaction categories were consumed so we can detect uncategorized ones.
+
+        Returns:
+            Tuple of (total spending, set of matched transaction category keys)
+        """
+        categories_to_sum = hierarchy.get(category_name, [category_name])
+        lower_set = {name.lower() for name in categories_to_sum}
+
+        total = 0
+        matched: set[str] = set()
+        for tx_cat, amount in category_spending.items():
+            tx_lower = tx_cat.lower() if tx_cat else ""
+            if tx_lower in lower_set:
+                total += amount
+                matched.add(tx_cat)
+            else:
+                tx_words = tx_lower.split()
+                for word in tx_words:
+                    if word in lower_set:
+                        total += amount
+                        matched.add(tx_cat)
+                        break
+
+        return total, matched
 
     @staticmethod
     def get_budget_tracking(db: Session, user_id: int, month: str | None = None) -> dict | None:
@@ -139,12 +189,14 @@ class BudgetTrackingService:
         categories = []
         total_budgeted = 0
         total_spent = 0
+        matched_tx_categories: set[str] = set()
 
         for allocation in budget.allocations:
             # Sum spending from parent category + all child categories
-            spent = BudgetTrackingService._get_spending_for_category(
+            spent, matched = BudgetTrackingService._get_spending_for_category_with_matched(
                 category_spending, allocation.category, hierarchy
             )
+            matched_tx_categories.update(matched)
             remaining = allocation.amount - spent
             percentage = (spent / allocation.amount * 100) if allocation.amount > 0 else 0
 
@@ -170,6 +222,17 @@ class BudgetTrackingService:
             total_budgeted += allocation.amount
             total_spent += spent
 
+        # Compute uncategorized spending (transactions not matched to any budget allocation)
+        uncategorized_spending = 0
+        uncategorized_transactions = []
+        for tx_cat, amount in category_spending.items():
+            if tx_cat not in matched_tx_categories:
+                uncategorized_spending += amount
+                uncategorized_transactions.append({
+                    'category': tx_cat,
+                    'amount': amount
+                })
+
         # Calculate days remaining in month
         today = date.today()
         days_remaining = (month_end - today).days + 1
@@ -186,7 +249,9 @@ class BudgetTrackingService:
             'total_budgeted': total_budgeted,
             'total_spent': total_spent,
             'savings_target': budget.savings_target,
-            'categories': categories
+            'categories': categories,
+            'uncategorized_spending': uncategorized_spending,
+            'uncategorized_transactions': uncategorized_transactions
         }
 
     @staticmethod

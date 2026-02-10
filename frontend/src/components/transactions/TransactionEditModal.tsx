@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { HierarchicalCategoryPicker } from './HierarchicalCategoryPicker'
+import { BudgetInsightWidget } from './BudgetInsightWidget'
 import { ReceiptViewer } from '../receipts/ReceiptViewer'
 import type { Transaction } from '@/types'
 import { cn } from '@/utils/cn'
@@ -38,6 +39,7 @@ export function TransactionEditModal({
   const [category, setCategory] = useState('')
   const [accountId, setAccountId] = useState<number | null>(null)
   const [type, setType] = useState<'income' | 'expense'>('expense')
+  const [parentCategory, setParentCategory] = useState('')
   const [isAdjustment, setIsAdjustment] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
@@ -102,6 +104,7 @@ export function TransactionEditModal({
       setDisplayAmount(formatWithSeparators(absAmount))
       setCurrency(transaction.currency || 'JPY')
       setCategory(transaction.category)
+      setParentCategory('')
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
       setIsAdjustment(transaction.is_adjustment || false)
@@ -296,10 +299,22 @@ export function TransactionEditModal({
                 </label>
                 <HierarchicalCategoryPicker
                   selected={category}
-                  onSelect={(childName) => setCategory(childName)}
+                  onSelect={(childName, parentName) => {
+                    setCategory(childName)
+                    setParentCategory(parentName)
+                  }}
                   isIncome={type === 'income'}
                 />
               </div>
+
+              {/* Budget Insight */}
+              {category && !isAdjustment && (
+                <BudgetInsightWidget
+                  parentCategory={parentCategory || category}
+                  transactionAmount={parseInt(amount) || 0}
+                  isExpense={type === 'expense'}
+                />
+              )}
 
               <Select
                 label={t('account.account')}

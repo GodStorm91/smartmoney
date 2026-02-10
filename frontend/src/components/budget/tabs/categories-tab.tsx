@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CategoryListPanel } from '../category-list-panel'
 import { BudgetDetailPanel } from '../budget-detail-panel'
 import { BudgetAllocationList } from '../budget-allocation-list'
+import { UncategorizedSpendingAlert } from '../uncategorized-spending-alert'
 import type { Budget, BudgetTracking, BudgetAllocation } from '@/types'
 
 interface CategoriesTabProps {
@@ -33,6 +34,15 @@ export function CategoriesTab({
 
   return (
     <div className="space-y-4">
+      {/* Uncategorized Spending Warning */}
+      {tracking?.uncategorized_spending != null && tracking.uncategorized_spending > 0 && (
+        <UncategorizedSpendingAlert
+          amount={tracking.uncategorized_spending}
+          transactions={tracking.uncategorized_transactions}
+          month={selectedMonth}
+        />
+      )}
+
       {/* Desktop: Split View — compact list + detail panel */}
       <div className="hidden lg:grid lg:grid-cols-[280px_1fr] lg:gap-4 lg:min-h-[500px]">
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">

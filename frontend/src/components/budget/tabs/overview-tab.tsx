@@ -6,6 +6,8 @@ import { BudgetPulseHero } from '../budget-pulse-hero'
 import { BudgetMoneyFlow } from '../budget-money-flow'
 import { BudgetDonutChart } from '../budget-donut-chart'
 import { SpendingAlert } from '../spending-alert'
+import { UncategorizedSpendingAlert } from '../uncategorized-spending-alert'
+import { BudgetCoverageIndicator } from '../budget-coverage-indicator'
 import { calculateBudgetForecast } from '@/utils/spending-prediction'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -106,6 +108,18 @@ export function OverviewTab({
           </span>
         </button>
       )}
+
+      {/* 2b. Uncategorized Spending Warning */}
+      {tracking?.uncategorized_spending != null && tracking.uncategorized_spending > 0 && (
+        <UncategorizedSpendingAlert
+          amount={tracking.uncategorized_spending}
+          transactions={tracking.uncategorized_transactions}
+          month={selectedMonth}
+        />
+      )}
+
+      {/* 2c. Budget Coverage Indicator */}
+      {tracking && <BudgetCoverageIndicator tracking={tracking} />}
 
       {/* 3. Actionable Spending Alerts */}
       {tracking && tracking.categories && tracking.categories.length > 0 && (

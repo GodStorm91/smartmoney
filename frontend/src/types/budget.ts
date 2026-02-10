@@ -41,6 +41,11 @@ export interface BudgetTrackingItem {
   status: 'green' | 'yellow' | 'orange' | 'red'
 }
 
+export interface UncategorizedTransaction {
+  category: string
+  amount: number
+}
+
 export interface BudgetTracking {
   month: string
   monthly_income: number
@@ -52,6 +57,8 @@ export interface BudgetTracking {
   carry_over?: number
   effective_budget?: number
   categories: BudgetTrackingItem[]
+  uncategorized_spending?: number
+  uncategorized_transactions?: UncategorizedTransaction[]
 }
 
 export interface BudgetAllocationSuggestion {

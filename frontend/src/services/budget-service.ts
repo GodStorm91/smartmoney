@@ -57,10 +57,13 @@ export async function getBudgetByMonth(month: string): Promise<Budget> {
 }
 
 /**
- * Get current month's budget tracking with spending data
+ * Get budget tracking with spending data for a specific month.
+ * @param month Optional YYYY-MM string; defaults to current month on the server.
  */
-export async function getBudgetTracking(): Promise<BudgetTracking> {
-  const response = await apiClient.get<BudgetTracking>('/api/budgets/tracking/current')
+export async function getBudgetTracking(month?: string): Promise<BudgetTracking> {
+  const response = await apiClient.get<BudgetTracking>('/api/budgets/tracking/current', {
+    params: month ? { month } : undefined,
+  })
   return response.data
 }
 

@@ -92,6 +92,12 @@ class BudgetTrackingItem(BaseModel):
     status: str  # green, yellow, orange, red
 
 
+class UncategorizedTransactionItem(BaseModel):
+    """A transaction category that didn't match any budget allocation."""
+    category: str
+    amount: int
+
+
 class BudgetTrackingResponse(BaseModel):
     """Budget tracking response."""
     month: str
@@ -102,6 +108,8 @@ class BudgetTrackingResponse(BaseModel):
     total_spent: int
     savings_target: int | None = None
     categories: list[BudgetTrackingItem]
+    uncategorized_spending: int = 0
+    uncategorized_transactions: list[UncategorizedTransactionItem] = []
 
 
 # --- Historical Spending Schemas for Predictions ---

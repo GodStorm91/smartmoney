@@ -106,7 +106,7 @@ export function BudgetPage() {
   const { data: tracking } = useQuery({
     queryKey: ['budget', 'tracking', selectedMonth],
     queryFn: async () => {
-      try { return await getBudgetTracking() }
+      try { return await getBudgetTracking(selectedMonth) }
       catch (err: any) { if (err?.response?.status === 404) return null; throw err }
     },
     retry: false,
