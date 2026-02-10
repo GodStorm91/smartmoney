@@ -22,7 +22,10 @@
     "analytics": "Phân tích",
     "report": "Báo cáo",
     "proxy": "Mua hộ",
-    "more": "Thêm"
+    "more": "Thêm",
+    "explore": "Khám phá",
+    "collapse": "Thu gọn",
+    "expand": "Mở rộng"
   },
   "button": {
     "save": "Lưu",
@@ -519,6 +522,7 @@
     "deleteTransaction": "Xóa giao dịch này",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
     "saved": "Đã lưu giao dịch!",
+    "moreOptions": "Tùy chọn khác",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
       "descriptionRequired": "Mô tả là bắt buộc",
@@ -772,13 +776,29 @@
     "largeTransactionThresholdHint": "Đặt 0 để tắt. Chi phí lớn một lần (y tế, v.v.) có thể làm sai lệch trung bình tháng.",
     "saveFailed": "Không thể lưu cài đặt",
     "sections": {
+      "appearance": "Giao diện",
       "general": "Chung",
       "budget": "Ngân sách",
       "categories": "Danh mục",
       "sources": "Nguồn tiền",
       "recurring": "Định kỳ",
+      "notifications": "Thông báo",
       "crypto": "Tiền điện tử"
     }
+  },
+  "appearance": {
+    "title": "Giao diện",
+    "subtitle": "Chủ đề, màu sắc và tùy chọn hiển thị",
+    "themeMode": "Chế độ giao diện",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống",
+    "accentColor": "Màu chủ đạo",
+    "displayMode": "Chế độ hiển thị",
+    "pro": "Pro",
+    "proDesc": "Truy cập đầy đủ, hiển thị tất cả mục",
+    "lite": "Lite",
+    "liteDesc": "Giao diện đơn giản, ít mục hơn mỗi trang"
   },
   "crypto": {
     "wallets": "Ví Tiền Điện Tử",
@@ -1620,6 +1640,57 @@
       "avatarError": "Không thể chọn avatar",
       "nameSaved": "Đã cập nhật hồ sơ!",
       "saveError": "Không thể cập nhật hồ sơ"
+    }
+  },
+  "emptyState": {
+    "transactions": {
+      "title": "Chưa có giao dịch nào",
+      "description": "Tải lên CSV hoặc thêm giao dịch đầu tiên để bắt đầu theo dõi",
+      "cta": "Thêm giao dịch"
+    },
+    "goals": {
+      "title": "Đặt mục tiêu tiết kiệm đầu tiên",
+      "description": "Xác định mục tiêu 1, 3, 5 hoặc 10 năm và theo dõi tiến trình",
+      "cta": "Tạo mục tiêu"
+    },
+    "budget": {
+      "title": "Chưa có ngân sách cho tháng này",
+      "description": "Tạo ngân sách để theo dõi chi tiêu theo kế hoạch",
+      "cta": "Tạo ngân sách"
+    },
+    "accounts": {
+      "title": "Chưa có tài khoản nào",
+      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để theo dõi số dư",
+      "cta": "Thêm tài khoản"
+    },
+    "categories": {
+      "title": "Chưa có dữ liệu chi tiêu",
+      "description": "Thêm giao dịch để xem phân tích chi tiêu theo danh mục",
+      "cta": "Thêm giao dịch"
+    },
+    "analytics": {
+      "title": "Không đủ dữ liệu để phân tích",
+      "description": "Thêm ít nhất một tháng giao dịch để xem xu hướng",
+      "cta": "Tải lên CSV"
+    },
+    "bills": {
+      "title": "Chưa có hóa đơn nào",
+      "description": "Thêm hóa đơn định kỳ để nhận nhắc nhở trước hạn thanh toán",
+      "cta": "Thêm hóa đơn"
+    },
+    "recurring": {
+      "title": "Chưa có giao dịch định kỳ",
+      "description": "Thiết lập theo dõi tự động cho các chi phí thường xuyên",
+      "cta": "Thêm giao dịch định kỳ"
+    },
+    "dashboardRecent": {
+      "title": "Chưa có hoạt động gần đây",
+      "description": "Các giao dịch mới nhất sẽ hiển thị tại đây"
+    },
+    "welcome": {
+      "title": "Chào mừng đến SmartMoney",
+      "description": "Bắt đầu bằng cách thêm tài khoản và nhập giao dịch",
+      "cta": "Bắt đầu"
     }
   }
 }

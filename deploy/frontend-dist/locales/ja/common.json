@@ -22,7 +22,10 @@
     "analytics": "分析",
     "report": "レポート",
     "proxy": "代行",
-    "more": "その他"
+    "more": "その他",
+    "explore": "探索",
+    "collapse": "折りたたむ",
+    "expand": "展開"
   },
   "button": {
     "save": "保存",
@@ -251,6 +254,7 @@
     "deleteTransaction": "この取引を削除",
     "deleteConfirm": "この取引を削除してもよろしいですか？",
     "saved": "取引を保存しました！",
+    "moreOptions": "詳細オプション",
     "errors": {
       "amountRequired": "金額は必須です",
       "descriptionRequired": "説明は必須です",
@@ -773,13 +777,29 @@
     "largeTransactionThresholdHint": "0に設定すると無効。大きな一時的支出（医療費など）が月平均を歪める場合に有効。",
     "saveFailed": "設定の保存に失敗しました",
     "sections": {
+      "appearance": "外観",
       "general": "一般",
       "budget": "予算",
       "categories": "カテゴリ",
       "sources": "出金元",
       "recurring": "定期",
+      "notifications": "通知",
       "crypto": "暗号資産"
     }
+  },
+  "appearance": {
+    "title": "外観",
+    "subtitle": "テーマ、カラー、表示設定",
+    "themeMode": "テーマモード",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム",
+    "accentColor": "アクセントカラー",
+    "displayMode": "表示モード",
+    "pro": "プロ",
+    "proDesc": "すべての機能とアイテムにアクセス",
+    "lite": "ライト",
+    "liteDesc": "シンプルな表示、ページあたりのアイテム数を削減"
   },
   "crypto": {
     "wallets": "暗号資産ウォレット",
@@ -1733,6 +1753,57 @@
       "negotiate": "交渉提案",
       "switch_provider": "プロバイダー変更",
       "optimize_payment": "支払い最適化"
+    }
+  },
+  "emptyState": {
+    "transactions": {
+      "title": "取引がありません",
+      "description": "CSVをアップロードするか、最初の取引を追加して記録を開始しましょう",
+      "cta": "取引を追加"
+    },
+    "goals": {
+      "title": "最初の貯蓄目標を設定",
+      "description": "1年、3年、5年、10年の目標を設定して進捗を追跡しましょう",
+      "cta": "目標を作成"
+    },
+    "budget": {
+      "title": "今月の予算が未設定です",
+      "description": "予算を作成して支出を計画と比較しましょう",
+      "cta": "予算を作成"
+    },
+    "accounts": {
+      "title": "口座がまだありません",
+      "description": "銀行口座、クレジットカード、現金を追加して残高を管理しましょう",
+      "cta": "口座を追加"
+    },
+    "categories": {
+      "title": "支出データがありません",
+      "description": "取引を追加してカテゴリ別の支出内訳を確認しましょう",
+      "cta": "取引を追加"
+    },
+    "analytics": {
+      "title": "分析に十分なデータがありません",
+      "description": "1ヶ月以上の取引を追加してトレンドを確認しましょう",
+      "cta": "CSVをアップロード"
+    },
+    "bills": {
+      "title": "請求書がありません",
+      "description": "定期的な請求書を追加して支払期限前にリマインダーを受け取りましょう",
+      "cta": "請求書を追加"
+    },
+    "recurring": {
+      "title": "定期取引がありません",
+      "description": "定期的な支出の自動追跡を設定しましょう",
+      "cta": "定期取引を追加"
+    },
+    "dashboardRecent": {
+      "title": "最近の取引がありません",
+      "description": "最新の取引がここに表示されます"
+    },
+    "welcome": {
+      "title": "SmartMoneyへようこそ",
+      "description": "口座を追加し、取引をインポートして始めましょう",
+      "cta": "始める"
     }
   }
 }
