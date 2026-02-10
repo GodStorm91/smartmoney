@@ -26,7 +26,7 @@ export function ForecastTab({
   onViewCategory,
   onAdjustBudget
 }: ForecastTabProps) {
-  const { t, i18n } = useTranslation('common')
+  const { t } = useTranslation('common')
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
@@ -34,19 +34,11 @@ export function ForecastTab({
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
-  const formatMonth = (month: string) => {
-    const [year, monthNum] = month.split('-')
-    const date = new Date(parseInt(year), parseInt(monthNum) - 1)
-    return date.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })
-  }
-
-  // Generate predictions
   const predictions = useMemo(() => {
     if (!tracking) return []
     return generatePredictions(budget.allocations, tracking)
   }, [budget.allocations, tracking])
 
-  // Calculate overall forecast
   const forecast = useMemo(() => {
     if (!tracking) return null
     return calculateBudgetForecast(tracking)
@@ -64,16 +56,6 @@ export function ForecastTab({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {t('budget.forecast.title')} - {formatMonth(selectedMonth)}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {t('budget.forecast.subtitle')}
-        </p>
-      </div>
-
       {/* Overall Forecast Summary */}
       {forecast && (
         <Card className={cn(

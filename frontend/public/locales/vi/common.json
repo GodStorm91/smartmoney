@@ -961,6 +961,20 @@
     "cloneDescription": "Nhanh chóng tạo ngân sách tháng này dựa trên cài đặt trước đó",
     "orCreateNew": "Hoặc tạo mới",
     "previousIncome": "Tháng trước",
+    "createForMonth": "Tạo Ngân Sách cho {{month}}",
+    "copyFromPrevious": "Dựa trên ngân sách {{month}}",
+    "totalBudgeted": "Tổng Ngân Sách",
+    "totalSpent": "Tổng Chi Tiêu",
+    "categoriesOverBudget": "{{count}} danh mục vượt ngân sách",
+    "categoryPreview": "Xem Trước Danh Mục",
+    "moreCategories": "danh mục khác",
+    "copyAndEdit": "Sao Chép & Chỉnh Sửa",
+    "generateWithAI": "Tạo Bằng AI",
+    "startEmpty": "Bắt Đầu Trống",
+    "versionHistory": "Lịch Sử Phiên Bản",
+    "current": "Hiện tại",
+    "copied": "đã sao chép",
+    "restore": "Khôi phục",
     "languageMismatchNotice": "Lời khuyên này được tạo bằng ngôn ngữ khác. Nhấn 'Tạo Lại' để nhận lời khuyên bằng ngôn ngữ hiện tại.",
     "projection": {
       "title": "Tốc Độ Chi Tiêu",
@@ -982,6 +996,15 @@
       "overBy": "Bạn sẽ vượt ngân sách {{amount}}",
       "underBy": "Bạn sẽ tiết kiệm {{amount}} tháng này"
     },
+    "pulse": {
+      "perDay": "/ngày"
+    },
+    "flow": {
+      "income": "Thu nhập",
+      "allocated": "Đã phân bổ",
+      "saved": "Tiết kiệm",
+      "unallocated": "chưa phân bổ"
+    },
     "donutChart": {
       "title": "Cấu Trúc Ngân Sách",
       "remaining": "Còn lại",
@@ -990,7 +1013,9 @@
     "alerts": {
       "exceededBy": "{{category}} vượt {{amount}}",
       "approaching": "{{category}} gần hết — còn {{amount}} cho {{days}} ngày",
-      "allOnTrack": "{{count}} danh mục đang đúng tiến độ. Tiếp tục phát huy!"
+      "allOnTrack": "{{count}} danh mục đang đúng tiến độ. Tiếp tục phát huy!",
+      "cutToStay": "Giảm {{category}} {{amount}} để trở lại đúng hướng",
+      "reduceDaily": "Giữ {{category}} dưới {{amount}}/ngày để an toàn"
     },
     "addCategory": "Thêm Danh Mục",
     "selectCategory": "Chọn danh mục",
@@ -1020,6 +1045,17 @@
     },
     "undo": "Hoàn tác",
     "export": "Xuất",
+    "wizard": {
+      "title": "Tạo Ngân Sách cho {{month}}",
+      "subtitle": "Bạn muốn bắt đầu như thế nào?",
+      "copyTitle": "Sao Chép Tháng Trước",
+      "copyHint": "Sử dụng ngân sách {{month}} làm điểm bắt đầu",
+      "copyDescription": "Tất cả danh mục và số tiền sẽ được sao chép. Bạn có thể chỉnh sửa sau.",
+      "aiTitle": "AI Tạo Tự Động",
+      "aiHint": "Để AI tạo ngân sách cá nhân hóa từ mô hình chi tiêu của bạn",
+      "emptyTitle": "Bắt Đầu Từ Đầu",
+      "emptyHint": "Xây dựng ngân sách thủ công, từng danh mục một"
+    },
     "tabs": {
       "overview": "Tổng quan",
       "categories": "Danh mục",
@@ -1055,6 +1091,17 @@
         "low": "Thấp"
       }
     },
+    "forecastAlert": {
+      "exceedBy": "Với tốc độ này, bạn sẽ vượt ngân sách {{amount}}",
+      "onTrackSave": "Dự kiến tiết kiệm được {{amount}} tháng này",
+      "nearLimit": "Dự kiến sử dụng {{percent}}% ngân sách",
+      "seeDetails": "Xem dự báo chi tiết →"
+    },
+    "budgetContext": {
+      "progress": "{{spent}} / {{budgeted}}",
+      "impact": "{{percent}}% ngân sách",
+      "overBudget": "Vượt ngân sách"
+    },
     "selectCategoryHint": "Chọn danh mục để xem chi tiết",
     "noAllocations": "Chưa có phân bổ ngân sách",
     "category": "Danh mục",
@@ -1066,6 +1113,12 @@
     "pacing": "Còn {{days}} ngày",
     "perDay": "ngày",
     "topSpending": "Chi tiêu cao nhất",
+    "cardActions": "Thao tác",
+    "nudge": {
+      "overTapToAdjust": "Vượt {{amount}} — nhấn để điều chỉnh",
+      "reduceToStaySafe": "Giảm {{amount}} để an toàn",
+      "safeToSpend": "{{amount}}/ngày có thể chi tiêu"
+    },
     "status": {
       "onTrack": "Đúng tiến độ",
       "caution": "Cần chú ý",

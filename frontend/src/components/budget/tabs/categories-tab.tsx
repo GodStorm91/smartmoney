@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { CategoryListPanel } from '../category-list-panel'
 import { BudgetDetailPanel } from '../budget-detail-panel'
 import { BudgetAllocationList } from '../budget-allocation-list'
-import { cn } from '@/utils/cn'
 import type { Budget, BudgetTracking, BudgetAllocation } from '@/types'
 
 interface CategoriesTabProps {
@@ -24,9 +23,7 @@ export function CategoriesTab({
   onAllocationChange
 }: CategoriesTabProps) {
   const { t } = useTranslation('common')
-  // Don't pre-select any category on mobile to avoid showing detail panel overlay immediately
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
 
   const totalBudget = budget.monthly_income - (budget.savings_target || 0)
 
@@ -34,15 +31,10 @@ export function CategoriesTab({
     return tracking?.categories?.find(c => c.category === category)
   }, [tracking])
 
-  const handleToggleExpand = useCallback((category: string) => {
-    setExpandedCategory(prev => prev === category ? null : category)
-  }, [])
-
   return (
     <div className="space-y-4">
-      {/* Desktop: Split View */}
+      {/* Desktop: Split View — compact list + detail panel */}
       <div className="hidden lg:grid lg:grid-cols-[280px_1fr] lg:gap-4 lg:min-h-[500px]">
-        {/* Left Panel: Category List */}
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
           <CategoryListPanel
             allocations={budget.allocations}
@@ -53,8 +45,6 @@ export function CategoriesTab({
             onAddCategory={onAddCategory}
           />
         </div>
-
-        {/* Right Panel: Category Details */}
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
           {selectedCategory ? (
             <BudgetDetailPanel
@@ -73,7 +63,7 @@ export function CategoriesTab({
         </div>
       </div>
 
-      {/* Mobile: Editable Allocation List */}
+      {/* Mobile: Simplified allocation list (auto-sorted by urgency, no toolbar) */}
       <div className="lg:hidden">
         <BudgetAllocationList
           budgetId={budget.id}

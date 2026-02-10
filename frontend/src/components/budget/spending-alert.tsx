@@ -21,7 +21,7 @@ interface Alert {
   type: AlertType
   category?: string
   message: string
-  count?: number
+  action?: string
 }
 
 export function SpendingAlert({
@@ -39,30 +39,33 @@ export function SpendingAlert({
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
-  // Generate alerts based on category status
   const generateAlerts = (): Alert[] => {
     const alerts: Alert[] = []
-
-    // Count categories by status
     const exceeded = categories.filter(c => c.status === 'red')
     const warning = categories.filter(c => c.status === 'orange')
     const onTrack = categories.filter(c => c.status === 'green' || c.status === 'yellow')
 
-    // Exceeded alerts (max 2)
+    // Exceeded — actionable: "Cut X by Y to get back on track"
     exceeded.slice(0, 2).forEach(cat => {
+      const overAmount = Math.abs(cat.remaining)
       alerts.push({
         type: 'exceeded',
         category: cat.category,
         message: t('budget.alerts.exceededBy', {
           category: cat.category,
-          amount: formatCurrency(Math.abs(cat.remaining))
+          amount: formatCurrency(overAmount)
+        }),
+        action: t('budget.alerts.cutToStay', {
+          category: cat.category,
+          amount: formatCurrency(overAmount)
         })
       })
     })
 
-    // Warning alerts (max 1 if we have exceeded alerts, max 2 otherwise)
+    // Warning — actionable: "Reduce to X/day for remaining days"
     const maxWarnings = exceeded.length > 0 ? 1 : 2
     warning.slice(0, maxWarnings).forEach(cat => {
+      const safeDaily = daysRemaining > 0 ? cat.remaining / daysRemaining : 0
       alerts.push({
         type: 'warning',
         category: cat.category,
@@ -70,15 +73,19 @@ export function SpendingAlert({
           category: cat.category,
           amount: formatCurrency(cat.remaining),
           days: daysRemaining
-        })
+        }),
+        action: daysRemaining > 0
+          ? t('budget.alerts.reduceDaily', {
+              category: cat.category,
+              amount: formatCurrency(safeDaily)
+            })
+          : undefined
       })
     })
 
-    // If all on track and no warnings/exceeded, show positive alert
     if (exceeded.length === 0 && warning.length === 0 && onTrack.length > 0) {
       alerts.push({
         type: 'onTrack',
-        count: onTrack.length,
         message: t('budget.alerts.allOnTrack', { count: onTrack.length })
       })
     }
@@ -87,94 +94,58 @@ export function SpendingAlert({
   }
 
   const alerts = generateAlerts()
+  const visibleAlerts = alerts.filter(a => !dismissedAlerts.has(a.category || 'onTrack'))
 
-  // Filter out dismissed alerts
-  const visibleAlerts = alerts.filter(alert => {
-    const key = alert.category || 'onTrack'
-    return !dismissedAlerts.has(key)
-  })
+  if (visibleAlerts.length === 0) return null
 
-  const handleDismiss = (alert: Alert) => {
-    const key = alert.category || 'onTrack'
-    setDismissedAlerts(prev => new Set([...prev, key]))
-  }
-
-  if (visibleAlerts.length === 0) {
-    return null
-  }
-
-  const getAlertStyles = (type: AlertType) => {
+  const styles = (type: AlertType) => {
     switch (type) {
-      case 'exceeded':
-        return {
-          bg: 'bg-red-50 dark:bg-red-900/20',
-          border: 'border-red-200 dark:border-red-800',
-          text: 'text-red-700 dark:text-red-400',
-          icon: XCircle
-        }
-      case 'warning':
-        return {
-          bg: 'bg-amber-50 dark:bg-amber-900/20',
-          border: 'border-amber-200 dark:border-amber-800',
-          text: 'text-amber-700 dark:text-amber-400',
-          icon: AlertTriangle
-        }
-      case 'onTrack':
-        return {
-          bg: 'bg-green-50 dark:bg-green-900/20',
-          border: 'border-green-200 dark:border-green-800',
-          text: 'text-green-700 dark:text-green-400',
-          icon: CheckCircle
-        }
+      case 'exceeded': return {
+        bg: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800',
+        text: 'text-red-700 dark:text-red-400', icon: XCircle
+      }
+      case 'warning': return {
+        bg: 'bg-amber-50 dark:bg-amber-900/20', border: 'border-amber-200 dark:border-amber-800',
+        text: 'text-amber-700 dark:text-amber-400', icon: AlertTriangle
+      }
+      case 'onTrack': return {
+        bg: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-200 dark:border-green-800',
+        text: 'text-green-700 dark:text-green-400', icon: CheckCircle
+      }
     }
   }
 
   return (
     <div className={cn('space-y-2', className)}>
-      {visibleAlerts.slice(0, 2).map((alert, index) => {
-        const styles = getAlertStyles(alert.type)
-        const Icon = styles.icon
-
+      {visibleAlerts.slice(0, 2).map((alert, i) => {
+        const s = styles(alert.type)
+        const Icon = s.icon
         return (
-          <div
-            key={alert.category || `alert-${index}`}
-            className={cn(
-              'flex items-start gap-3 p-3 rounded-lg border',
-              styles.bg,
-              styles.border
-            )}
+          <div key={alert.category || `alert-${i}`}
+            className={cn('flex items-start gap-3 p-3 rounded-lg border', s.bg, s.border)}
             role="alert"
           >
-            <Icon className={cn('w-5 h-5 flex-shrink-0 mt-0.5', styles.text)} aria-hidden="true" />
-
+            <Icon className={cn('w-5 h-5 flex-shrink-0 mt-0.5', s.text)} aria-hidden="true" />
             <div className="flex-1 min-w-0">
-              <p className={cn('text-sm font-medium', styles.text)}>
-                {alert.message}
-              </p>
+              <p className={cn('text-sm font-medium', s.text)}>{alert.message}</p>
+              {alert.action && (
+                <p className={cn('text-xs mt-0.5 opacity-80', s.text)}>{alert.action}</p>
+              )}
             </div>
-
             <div className="flex items-center gap-1">
-              {/* View button for category alerts */}
               {alert.category && onViewCategory && (
-                <button
-                  onClick={() => onViewCategory(alert.category!)}
-                  className={cn(
-                    'p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors',
-                    styles.text
-                  )}
+                <button onClick={() => onViewCategory(alert.category!)}
+                  className={cn('p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5', s.text)}
                   aria-label={t('viewDetails')}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )}
-
-              {/* Dismiss button */}
-              <button
-                onClick={() => handleDismiss(alert)}
-                className={cn(
-                  'p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors',
-                  styles.text
-                )}
+              <button onClick={() => {
+                const key = alert.category || 'onTrack'
+                setDismissedAlerts(prev => new Set([...prev, key]))
+              }}
+                className={cn('p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5', s.text)}
                 aria-label={t('button.close')}
               >
                 <X className="w-4 h-4" />

@@ -1,9 +1,12 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { TrendingUp, AlertTriangle, Wallet, PiggyBank, Target } from 'lucide-react'
+import { TrendingUp, AlertTriangle, CheckCircle, ChevronRight } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { BudgetProjectionCard } from '../budget-projection-card'
+import { BudgetPulseHero } from '../budget-pulse-hero'
+import { BudgetMoneyFlow } from '../budget-money-flow'
 import { BudgetDonutChart } from '../budget-donut-chart'
 import { SpendingAlert } from '../spending-alert'
+import { calculateBudgetForecast } from '@/utils/spending-prediction'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
@@ -32,230 +35,108 @@ export function OverviewTab({
   const { data: exchangeRates } = useExchangeRates()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const totalAllocated = budget.allocations.reduce((sum, a) => sum + a.amount, 0)
   const totalBudget = budget.monthly_income - (budget.savings_target || 0)
-  const remainingBudget = totalBudget - totalAllocated
-
   const spentSoFar = tracking?.total_spent || 0
-  const spentPercent = totalAllocated > 0 ? (spentSoFar / totalAllocated) * 100 : 0
-  const availableToSpend = totalBudget - spentSoFar
-  const availablePercent = totalBudget > 0 ? Math.max(0, (availableToSpend / totalBudget) * 100) : 0
 
-  // Calculate health status
-  const getHealthStatus = () => {
-    if (spentSoFar > totalAllocated) {
-      return {
-        status: 'danger',
-        label: t('budget.health.overBudgetStatus'),
-        color: 'text-red-600 dark:text-red-400',
-        bg: 'bg-red-100 dark:bg-red-900/30'
-      }
-    }
-    if (spentPercent > 95) {
-      return {
-        status: 'warning',
-        label: t('budget.health.almostFull'),
-        color: 'text-amber-600 dark:text-amber-400',
-        bg: 'bg-amber-100 dark:bg-amber-900/30'
-      }
-    }
-    if (spentPercent > 85) {
-      return {
-        status: 'caution',
-        label: t('budget.health.warningNearLimit'),
-        color: 'text-yellow-600 dark:text-yellow-400',
-        bg: 'bg-yellow-100 dark:bg-yellow-900/30'
-      }
-    }
-    return {
-      status: 'good',
-      label: t('budget.health.onTrack'),
-      color: 'text-green-600 dark:text-green-400',
-      bg: 'bg-green-100 dark:bg-green-900/30'
-    }
+  const forecast = useMemo(() => {
+    if (!tracking) return null
+    return calculateBudgetForecast(tracking)
+  }, [tracking])
+
+  const navigateToForecast = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', 'forecast')
+    window.history.pushState({}, '', url.toString())
+    window.dispatchEvent(new PopStateEvent('popstate'))
   }
-
-  const health = getHealthStatus()
 
   return (
     <div className="space-y-4">
-      {/* Budget Health Status Banner - Shows Available to Spend prominently */}
-      <div className={cn('p-4 rounded-xl border', health.bg, health.color, 'border-current/20')}>
-        {/* Top row: Available to spend + Health status */}
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <p className="text-xs font-medium opacity-70 uppercase tracking-wider mb-1">
-              {t('budget.availableToSpend')}
-            </p>
-            <p className={cn(
-              'text-3xl font-bold',
-              availableToSpend < 0 ? 'text-red-600 dark:text-red-400' : ''
-            )}>
-              {availableToSpend < 0 && '-'}{formatCurrency(Math.abs(availableToSpend))}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className={cn(
-              'w-8 h-8 rounded-full flex items-center justify-center',
-              health.status === 'danger' ? 'bg-red-500' :
-              health.status === 'warning' ? 'bg-amber-500' :
-              health.status === 'caution' ? 'bg-yellow-500' : 'bg-green-500'
-            )}>
-              {health.status === 'danger' ? (
-                <AlertTriangle className="w-4 h-4 text-white" />
-              ) : (
-                <TrendingUp className="w-4 h-4 text-white" />
-              )}
-            </div>
-            <span className="text-sm font-medium">{health.label}</span>
-          </div>
-        </div>
-
-        {/* Progress bar showing remaining */}
-        <div className="h-2 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden mb-2">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-500',
-              availableToSpend < 0 ? 'bg-red-500' :
-              availablePercent < 20 ? 'bg-amber-500' :
-              availablePercent < 40 ? 'bg-yellow-500' : 'bg-green-500'
-            )}
-            style={{ width: `${Math.min(100, Math.max(0, availablePercent))}%` }}
-          />
-        </div>
-
-        {/* Bottom row: Spent / Total Budget */}
-        <div className="flex justify-between text-xs opacity-80">
-          <span>{formatCurrency(spentSoFar)} {t('budget.spent')}</span>
-          <span>{t('budget.ofTotalBudget', { total: formatCurrency(totalBudget) })}</span>
-        </div>
-      </div>
-
-      {/* Spending Forecast Card */}
-      <BudgetProjectionCard
+      {/* 1. Budget Pulse Hero */}
+      <BudgetPulseHero
         totalBudget={totalBudget}
         totalSpent={spentSoFar}
+        totalAllocated={totalAllocated}
         month={selectedMonth}
       />
 
-      {/* Budget Composition Donut Chart */}
-      {budget.allocations.length > 0 && (
-        <BudgetDonutChart
-          allocations={budget.allocations}
-          totalBudget={totalBudget}
-          totalAllocated={totalAllocated}
-        />
-      )}
-
-      {/* Quick Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
-        {/* Income Card */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <Wallet className="w-4 h-4 text-green-600 dark:text-green-400" />
-            </div>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {t('budget.monthlyIncome')}
-            </span>
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {formatCurrency(budget.monthly_income)}
-          </p>
-          {previousMonthData && (budget.monthly_income - previousMonthData.monthly_income) !== 0 && (
-            <p className={cn(
-              'text-xs mt-1',
-              budget.monthly_income > previousMonthData.monthly_income
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-            )}>
-              {budget.monthly_income > previousMonthData.monthly_income ? '+' : ''}
-              {formatCurrency(budget.monthly_income - previousMonthData.monthly_income)}
-            </p>
+      {/* 2. Forecast Alert — compact forward-looking insight */}
+      {forecast && (
+        <button
+          onClick={navigateToForecast}
+          className={cn(
+            'w-full flex items-center gap-3 p-3 rounded-xl border text-left transition-colors',
+            forecast.overallStatus === 'danger'
+              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30'
+              : forecast.overallStatus === 'warning'
+              ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30'
+              : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30'
           )}
-        </Card>
-
-        {/* Savings Target Card */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
-              <PiggyBank className="w-4 h-4 text-pink-600 dark:text-pink-400" />
-            </div>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {t('budget.savingsTarget')}
-            </span>
-          </div>
-          <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-            {formatCurrency(budget.savings_target || 0)}
-          </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {t('budget.percentOfIncome', {
-              percent: Math.round(((budget.savings_target || 0) / budget.monthly_income) * 100)
-            })}
-          </p>
-        </Card>
-
-        {/* Remaining Budget Card */}
-        <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <Target className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            </div>
-            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {t('budget.remainingBudget')}
-            </span>
-          </div>
+        >
+          {forecast.overallStatus === 'danger' ? (
+            <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+          ) : forecast.overallStatus === 'warning' ? (
+            <TrendingUp className="w-5 h-5 text-amber-500 flex-shrink-0" />
+          ) : (
+            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+          )}
           <p className={cn(
-            'text-xl font-bold',
-            remainingBudget >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'
+            'flex-1 text-sm font-medium',
+            forecast.overallStatus === 'danger' ? 'text-red-700 dark:text-red-300' :
+            forecast.overallStatus === 'warning' ? 'text-amber-700 dark:text-amber-300' :
+            'text-green-700 dark:text-green-300'
           )}>
-            {formatCurrency(Math.abs(remainingBudget))}
-            {remainingBudget < 0 && '!'}
+            {forecast.overallStatus === 'danger'
+              ? t('budget.forecastAlert.exceedBy', { amount: formatCurrency(forecast.totalPredicted - forecast.totalBudget) })
+              : forecast.overallStatus === 'warning'
+              ? t('budget.forecastAlert.nearLimit', { percent: Math.round(forecast.overallPercent) })
+              : t('budget.forecastAlert.onTrackSave', { amount: formatCurrency(forecast.totalBudget - forecast.totalPredicted) })}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-            {remainingBudget >= 0 ? t('budget.availableToSpend') : t('budget.overAllocated')}
-          </p>
-        </Card>
-      </div>
-
-      {/* Spending Progress */}
-      {tracking && (
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {t('budget.spendingProgress')}
-            </h3>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {formatCurrency(spentSoFar)} / {formatCurrency(totalAllocated)}
-            </span>
-          </div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
-            <div
-              className={cn(
-                'h-full rounded-full transition-all duration-500',
-                spentSoFar > totalAllocated ? 'bg-red-500' :
-                spentSoFar > totalAllocated * 0.9 ? 'bg-amber-500' :
-                spentSoFar > totalAllocated * 0.8 ? 'bg-yellow-500' : 'bg-green-500'
-              )}
-              style={{ width: `${Math.min(100, (spentSoFar / totalAllocated) * 100)}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-            <span>{Math.round((spentSoFar / totalAllocated) * 100)}%</span>
-            <span>{tracking.days_remaining} {t('budget.daysLeft')}</span>
-          </div>
-        </Card>
+          <span className={cn(
+            'text-xs font-medium flex items-center gap-0.5 flex-shrink-0',
+            forecast.overallStatus === 'danger' ? 'text-red-500 dark:text-red-400' :
+            forecast.overallStatus === 'warning' ? 'text-amber-500 dark:text-amber-400' :
+            'text-green-500 dark:text-green-400'
+          )}>
+            {t('budget.forecastAlert.seeDetails')}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </span>
+        </button>
       )}
 
-      {/* Smart Spending Alerts */}
+      {/* 3. Actionable Spending Alerts */}
       {tracking && tracking.categories && tracking.categories.length > 0 && (
         <SpendingAlert
           categories={tracking.categories}
           daysRemaining={tracking.days_remaining}
           onViewCategory={onViewCategory}
         />
+      )}
+
+      {/* 4. Money Flow: Income → Allocated → Savings */}
+      <BudgetMoneyFlow
+        income={budget.monthly_income}
+        allocated={totalAllocated}
+        savings={budget.savings_target || 0}
+        formatCurrency={formatCurrency}
+      />
+
+      {/* 5. Compact Donut Chart */}
+      {budget.allocations.length > 0 && (
+        <Card className="p-4">
+          <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+            {t('budget.donutChart.title')}
+          </h3>
+          <BudgetDonutChart
+            allocations={budget.allocations}
+            totalBudget={totalBudget}
+            totalAllocated={totalAllocated}
+            compact
+          />
+        </Card>
       )}
     </div>
   )

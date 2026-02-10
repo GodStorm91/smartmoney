@@ -997,6 +997,15 @@
       "overBy": "{{amount}}超過する見込み",
       "underBy": "今月{{amount}}節約できます"
     },
+    "pulse": {
+      "perDay": "/日"
+    },
+    "flow": {
+      "income": "収入",
+      "allocated": "配分済",
+      "saved": "貯蓄",
+      "unallocated": "未配分"
+    },
     "donutChart": {
       "title": "予算構成",
       "remaining": "残り",
@@ -1005,7 +1014,9 @@
     "alerts": {
       "exceededBy": "{{category}}が{{amount}}超過",
       "approaching": "{{category}}が上限に到達 — 残り{{days}}日で{{amount}}",
-      "allOnTrack": "{{count}}カテゴリが順調です。この調子で！"
+      "allOnTrack": "{{count}}カテゴリが順調です。この調子で！",
+      "cutToStay": "{{category}}を{{amount}}削減して軌道に戻しましょう",
+      "reduceDaily": "{{category}}を1日{{amount}}以内に抑えましょう"
     },
     "addCategory": "カテゴリを追加",
     "selectCategory": "カテゴリを選択",
@@ -1035,6 +1046,17 @@
     },
     "undo": "取り消し",
     "export": "エクスポート",
+    "wizard": {
+      "title": "{{month}}の予算を作成",
+      "subtitle": "どの方法で始めますか？",
+      "copyTitle": "先月をコピー",
+      "copyHint": "{{month}}の予算をベースに始める",
+      "copyDescription": "すべてのカテゴリと金額がコピーされます。後から編集できます。",
+      "aiTitle": "AIで生成",
+      "aiHint": "支出パターンからAIがパーソナライズされた予算を作成",
+      "emptyTitle": "ゼロから始める",
+      "emptyHint": "カテゴリを一つずつ追加して手動で作成"
+    },
     "tabs": {
       "overview": "概要",
       "categories": "カテゴリ",
@@ -1070,6 +1092,17 @@
         "low": "低"
       }
     },
+    "forecastAlert": {
+      "exceedBy": "このペースでは予算を{{amount}}超過する見込みです",
+      "onTrackSave": "今月{{amount}}節約できる見込みです",
+      "nearLimit": "予算の{{percent}}%を使用する見込みです",
+      "seeDetails": "詳細な予測を見る →"
+    },
+    "budgetContext": {
+      "progress": "{{spent}} / {{budgeted}}",
+      "impact": "予算の{{percent}}%",
+      "overBudget": "予算超過"
+    },
     "selectCategoryHint": "詳細を表示するにはカテゴリを選択",
     "noAllocations": "予算配分がまだありません",
     "category": "カテゴリ",
@@ -1081,6 +1114,12 @@
     "pacing": "残り{{days}}日",
     "perDay": "日",
     "topSpending": "上位支出",
+    "cardActions": "操作",
+    "nudge": {
+      "overTapToAdjust": "{{amount}}超過 — タップして調整",
+      "reduceToStaySafe": "{{amount}}削減で安全圏内",
+      "safeToSpend": "{{amount}}/日の支出が可能"
+    },
     "status": {
       "onTrack": "順調",
       "caution": "注意",

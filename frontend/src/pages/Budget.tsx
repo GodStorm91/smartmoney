@@ -1,16 +1,15 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, Download, Plus, Check } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download, Plus, Check, CalendarDays } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { BudgetGenerateForm } from '@/components/budget/budget-generate-form'
+import { BudgetCreationWizard } from '@/components/budget/budget-creation-wizard'
 import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { AddCategoryModal } from '@/components/budget/add-category-modal'
 import { BudgetConfirmDialog } from '@/components/budget/budget-confirm-dialog'
 import { BudgetTabsContainer } from '@/components/budget/budget-tabs-container'
-import { BudgetCopyPreview } from '@/components/budget/budget-copy-preview'
 import { BudgetVersionDropdown } from '@/components/budget/budget-version-dropdown'
 import { OverviewTab } from '@/components/budget/tabs/overview-tab'
 import { CategoriesTab } from '@/components/budget/tabs/categories-tab'
@@ -18,15 +17,8 @@ import { TransactionsTab } from '@/components/budget/tabs/transactions-tab'
 import { ForecastTab } from '@/components/budget/tabs/forecast-tab'
 import { TransactionEditModal } from '@/components/transactions/TransactionEditModal'
 import {
-  generateBudget,
-  regenerateBudget,
-  getBudgetByMonth,
-  getBudgetTracking,
-  getBudgetSuggestions,
-  previewBudgetCopy,
-  copyBudget,
-  getBudgetVersions,
-  restoreBudgetVersion
+  generateBudget, regenerateBudget, getBudgetByMonth, getBudgetTracking,
+  getBudgetSuggestions, previewBudgetCopy, copyBudget, getBudgetVersions, restoreBudgetVersion
 } from '@/services/budget-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -36,6 +28,19 @@ import { useXPGain } from '@/hooks/useXPGain'
 import { useBudgetTabState } from '@/hooks/useBudgetTabState'
 import { cn } from '@/utils/cn'
 import type { Budget, Transaction } from '@/types'
+import type { BudgetTab } from '@/hooks/useBudgetTabState'
+
+const getCurrentMonth = () => {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+
+const getPrevMonthStr = (month: string) => {
+  const [y, m] = month.split('-').map(Number)
+  const pm = m - 1 < 1 ? 12 : m - 1
+  const py = m - 1 < 1 ? y - 1 : y
+  return `${py}-${String(pm).padStart(2, '0')}`
+}
 
 export function BudgetPage() {
   const { t, i18n } = useTranslation('common')
@@ -46,22 +51,15 @@ export function BudgetPage() {
 
   const [showFeedbackForm, setShowFeedbackForm] = useState(false)
   const [draftBudget, setDraftBudget] = useState<Budget | null>(null)
-  const [selectedMonth, setSelectedMonth] = useState<string>(() => {
-    const now = new Date()
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
-  })
+  const [selectedMonth, setSelectedMonth] = useState<string>(getCurrentMonth)
   const [undoStack, setUndoStack] = useState<{ action: string; data: Budget }[]>([])
   const [showAddCategory, setShowAddCategory] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
-  // Tab state with persistence
   const { activeTab, setActiveTab } = useBudgetTabState('overview')
-
-  // XP Gain hook
   const { showBudgetCreatedXP } = useXPGain()
 
-  // Format currency helper
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
@@ -71,41 +69,26 @@ export function BudgetPage() {
     return date.toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' })
   }
 
+  const isCurrentMonth = selectedMonth === getCurrentMonth()
+
   const navigateMonth = useCallback((direction: 'prev' | 'next') => {
     setSelectedMonth(current => {
       const [year, month] = current.split('-').map(Number)
-      let newYear = year
-      let newMonth = month
-
-      if (direction === 'prev') {
-        newMonth -= 1
-        if (newMonth < 1) {
-          newMonth = 12
-          newYear -= 1
-        }
-      } else {
-        newMonth += 1
-        if (newMonth > 12) {
-          newMonth = 1
-          newYear += 1
-        }
-      }
-
-      return `${newYear}-${String(newMonth).padStart(2, '0')}`
+      let ny = year, nm = month
+      if (direction === 'prev') { nm -= 1; if (nm < 1) { nm = 12; ny -= 1 } }
+      else { nm += 1; if (nm > 12) { nm = 1; ny += 1 } }
+      return `${ny}-${String(nm).padStart(2, '0')}`
     })
   }, [])
 
+  const goToCurrentMonth = useCallback(() => setSelectedMonth(getCurrentMonth()), [])
+
+  // --- Queries ---
   const { data: savedBudget, isLoading, error } = useQuery({
     queryKey: ['budget', 'month', selectedMonth],
     queryFn: async () => {
-      try {
-        return await getBudgetByMonth(selectedMonth)
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
-          return null
-        }
-        throw err
-      }
+      try { return await getBudgetByMonth(selectedMonth) }
+      catch (err: any) { if (err?.response?.status === 404) return null; throw err }
     },
     retry: false,
   })
@@ -113,19 +96,8 @@ export function BudgetPage() {
   const { data: previousMonthData } = useQuery({
     queryKey: ['budget', 'previous-month', selectedMonth],
     queryFn: async () => {
-      const [year, month] = selectedMonth.split('-').map(Number)
-      let prevYear = year
-      let prevMonth = month - 1
-      if (prevMonth < 1) {
-        prevMonth = 12
-        prevYear -= 1
-      }
-      const prevMonthStr = `${prevYear}-${String(prevMonth).padStart(2, '0')}`
-      try {
-        return await getBudgetByMonth(prevMonthStr)
-      } catch {
-        return null
-      }
+      try { return await getBudgetByMonth(getPrevMonthStr(selectedMonth)) }
+      catch { return null }
     },
     enabled: !!savedBudget,
     staleTime: 5 * 60 * 1000,
@@ -134,14 +106,8 @@ export function BudgetPage() {
   const { data: tracking } = useQuery({
     queryKey: ['budget', 'tracking', selectedMonth],
     queryFn: async () => {
-      try {
-        return await getBudgetTracking()
-      } catch (err: any) {
-        if (err?.response?.status === 404) {
-          return null
-        }
-        throw err
-      }
+      try { return await getBudgetTracking() }
+      catch (err: any) { if (err?.response?.status === 404) return null; throw err }
     },
     retry: false,
     enabled: !!savedBudget,
@@ -153,19 +119,6 @@ export function BudgetPage() {
     enabled: !savedBudget && !isLoading,
   })
 
-  // Get previous month string for copy preview
-  const getPrevMonthStr = (month: string) => {
-    const [year, m] = month.split('-').map(Number)
-    let prevYear = year
-    let prevMonth = m - 1
-    if (prevMonth < 1) {
-      prevMonth = 12
-      prevYear -= 1
-    }
-    return `${prevYear}-${String(prevMonth).padStart(2, '0')}`
-  }
-
-  // Auto-fetch copy preview when no budget exists
   const { data: copyPreview, isLoading: isCopyPreviewLoading } = useQuery({
     queryKey: ['budget', 'copy-preview', selectedMonth],
     queryFn: () => previewBudgetCopy(getPrevMonthStr(selectedMonth), selectedMonth),
@@ -173,97 +126,64 @@ export function BudgetPage() {
     retry: false,
   })
 
-  // Fetch budget versions for current month
   const { data: versions } = useQuery({
     queryKey: ['budget', 'versions', selectedMonth],
     queryFn: () => getBudgetVersions(selectedMonth),
     enabled: !!savedBudget,
   })
 
+  // --- Mutations ---
   const generateMutation = useMutation({
-    mutationFn: (income: number) => generateBudget({
-      monthly_income: income,
-      language: i18n.language
-    }),
-    onSuccess: (data) => {
-      setDraftBudget(data)
-      pushUndo('generate', data)
-      showBudgetCreatedXP()
-    },
+    mutationFn: (income: number) => generateBudget({ monthly_income: income, language: i18n.language }),
+    onSuccess: (data) => { setDraftBudget(data); pushUndo('generate', data); showBudgetCreatedXP() },
   })
 
   const regenerateMutation = useMutation({
-    mutationFn: (feedback: string) =>
-      regenerateBudget((draftBudget || savedBudget)!.id, {
-        feedback,
-        language: i18n.language
-      }),
-    onSuccess: (data) => {
-      setDraftBudget(data)
-      setShowFeedbackForm(false)
-      pushUndo('regenerate', data)
-    },
+    mutationFn: (feedback: string) => regenerateBudget((draftBudget || savedBudget)!.id, { feedback, language: i18n.language }),
+    onSuccess: (data) => { setDraftBudget(data); setShowFeedbackForm(false); pushUndo('regenerate', data) },
   })
 
-  // Copy budget from previous month
   const copyMutation = useMutation({
-    mutationFn: () => copyBudget({
-      source_month: getPrevMonthStr(selectedMonth),
-      target_month: selectedMonth
-    }),
-    onSuccess: (data) => {
-      setDraftBudget(data)
-      queryClient.invalidateQueries({ queryKey: ['budget'] })
-    },
+    mutationFn: () => copyBudget({ source_month: getPrevMonthStr(selectedMonth), target_month: selectedMonth }),
+    onSuccess: (data) => { setDraftBudget(data); queryClient.invalidateQueries({ queryKey: ['budget'] }) },
   })
 
-  // Restore previous version
   const restoreMutation = useMutation({
     mutationFn: (budgetId: number) => restoreBudgetVersion(budgetId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budget'] })
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['budget'] }) },
   })
 
-  const [showGenerateForm, setShowGenerateForm] = useState(false)
-
+  // --- Helpers ---
   const pushUndo = useCallback((action: string, data: Budget) => {
     setUndoStack(prev => [...prev.slice(-9), { action, data }])
   }, [])
-
-  const handleUndo = useCallback(() => {
-    if (undoStack.length === 0) return
-    const lastAction = undoStack[undoStack.length - 1]
-    setDraftBudget(lastAction.data)
-    setUndoStack(prev => prev.slice(0, -1))
-  }, [undoStack])
-
-  const handleSaveClick = () => {
-    setShowConfirmDialog(true)
-  }
-
-  const handleConfirmSave = async () => {
-    await queryClient.refetchQueries({ queryKey: ['budget'] })
-    setDraftBudget(null)
-    setShowConfirmDialog(false)
-  }
 
   const displayBudget = draftBudget || savedBudget
   const isDraft = !!draftBudget
   const totalAllocated = displayBudget?.allocations.reduce((sum, a) => sum + a.amount, 0) || 0
 
+  // Compute budget health color
+  const healthColor = useMemo(() => {
+    if (!tracking) return null
+    const ratio = tracking.total_spent / (tracking.total_budgeted || 1)
+    if (ratio > 1) return 'bg-red-500'
+    if (ratio > 0.85) return 'bg-amber-500'
+    return 'bg-green-500'
+  }, [tracking])
+
+  // Compute alert tabs
+  const alertTabs = useMemo<BudgetTab[]>(() => {
+    if (!tracking) return []
+    const tabs: BudgetTab[] = []
+    if (tracking.categories.some(c => c.status === 'red')) tabs.push('categories')
+    const totalRatio = tracking.total_spent / (tracking.total_budgeted || 1)
+    if (totalRatio > 1) tabs.push('forecast')
+    return tabs
+  }, [tracking])
+
   const handleExportBudget = useCallback(() => {
     if (!displayBudget) return
-
-    const content = `${t('budget.title')} - ${displayBudget.month}
-${t('budget.monthlyIncome')}: ${formatCurrency(displayBudget.monthly_income)}
-${t('budget.savingsTarget')}: ${formatCurrency(displayBudget.savings_target || 0)}
-
-${t('budget.allocations')}:
-${displayBudget.allocations.map(a => `- ${a.category}: ${formatCurrency(a.amount)}`).join('\n')}
-
-${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
-`
+    const content = `${t('budget.title')} - ${displayBudget.month}\n${t('budget.monthlyIncome')}: ${formatCurrency(displayBudget.monthly_income)}\n${t('budget.savingsTarget')}: ${formatCurrency(displayBudget.savings_target || 0)}\n\n${t('budget.allocations')}:\n${displayBudget.allocations.map(a => `- ${a.category}: ${formatCurrency(a.amount)}`).join('\n')}\n\n${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}\n`
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -286,24 +206,40 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          {/* Date Navigation */}
+          {/* Month Navigation */}
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => navigateMonth('prev')}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {formatMonth(selectedMonth)}
-            </h1>
-            <button
-              onClick={() => navigateMonth('next')}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-              disabled={selectedMonth >= new Date().toISOString().slice(0, 7)}
-            >
-              <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {formatMonth(selectedMonth)}
+              </h1>
+              {healthColor && (
+                <span className={cn('w-2.5 h-2.5 rounded-full flex-shrink-0', healthColor)} title={t('budget.health.title')} />
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              {!isCurrentMonth && (
+                <button
+                  onClick={goToCurrentMonth}
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-green-600 dark:text-green-400"
+                  title={t('common.today')}
+                >
+                  <CalendarDays className="w-5 h-5" />
+                </button>
+              )}
+              <button
+                onClick={() => navigateMonth('next')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+                disabled={selectedMonth >= new Date().toISOString().slice(0, 7)}
+              >
+                <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </button>
+            </div>
           </div>
 
           {/* Title and Actions */}
@@ -317,7 +253,6 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {/* Version Dropdown */}
               {versions && versions.length > 1 && displayBudget && (
                 <BudgetVersionDropdown
                   versions={versions}
@@ -330,7 +265,7 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
               {displayBudget && (
                 <button
                   onClick={handleExportBudget}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
                   title={t('export')}
                 >
                   <Download className="w-5 h-5" />
@@ -343,93 +278,46 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
-        {/* Empty State - Copy Preview or Generate Form */}
+        {/* Empty State — Creation Wizard */}
         {!displayBudget && !error && (
-          <>
-            {/* Show copy preview when previous month budget exists */}
-            {copyPreview && !showGenerateForm && (
-              <BudgetCopyPreview
-                preview={copyPreview}
-                formatCurrency={formatCurrency}
-                formatMonth={formatMonth}
-                onCopy={() => copyMutation.mutate()}
-                onGenerateAI={() => setShowGenerateForm(true)}
-                onStartEmpty={() => {
-                  // Create empty draft with just income from previous
-                  setDraftBudget({
-                    id: 0,
-                    month: selectedMonth,
-                    monthly_income: copyPreview.source_budget.monthly_income,
-                    allocations: [],
-                    created_at: new Date().toISOString()
-                  })
-                }}
-                isLoading={copyMutation.isPending}
-              />
-            )}
-
-            {/* Show generate form when no previous budget or user wants AI */}
-            {(!copyPreview || showGenerateForm) && !isCopyPreviewLoading && (
-              <BudgetGenerateForm
-                onGenerate={(income) => generateMutation.mutate(income)}
-                isLoading={generateMutation.isPending}
-                error={generateMutation.isError}
-                suggestions={suggestions}
-              />
-            )}
-
-            {/* Loading state for copy preview */}
-            {isCopyPreviewLoading && (
-              <Card className="p-6 flex items-center justify-center">
-                <LoadingSpinner />
-              </Card>
-            )}
-          </>
+          <BudgetCreationWizard
+            copyPreview={copyPreview}
+            isCopyPreviewLoading={isCopyPreviewLoading}
+            suggestions={suggestions}
+            selectedMonth={selectedMonth}
+            formatCurrency={formatCurrency}
+            formatMonth={formatMonth}
+            onCopy={() => copyMutation.mutate()}
+            onGenerate={(income) => generateMutation.mutate(income)}
+            onStartEmpty={() => {
+              setDraftBudget({
+                id: 0,
+                month: selectedMonth,
+                monthly_income: copyPreview?.source_budget?.monthly_income || 0,
+                allocations: [],
+                created_at: new Date().toISOString()
+              })
+            }}
+            isCopyLoading={copyMutation.isPending}
+            isGenerateLoading={generateMutation.isPending}
+            generateError={generateMutation.isError}
+          />
         )}
 
-        {/* Budget exists - Tabbed Interface */}
+        {/* Budget exists — Tabbed Interface */}
         {displayBudget && (
-          <BudgetTabsContainer activeTab={activeTab} onTabChange={setActiveTab}>
+          <BudgetTabsContainer activeTab={activeTab} onTabChange={setActiveTab} alertTabs={alertTabs}>
             {activeTab === 'overview' && (
-              <OverviewTab
-                budget={displayBudget}
-                tracking={tracking || undefined}
-                previousMonthData={previousMonthData}
-                selectedMonth={selectedMonth}
-                onViewCategory={(cat) => { setActiveTab('categories') }}
-              />
+              <OverviewTab budget={displayBudget} tracking={tracking || undefined} previousMonthData={previousMonthData} selectedMonth={selectedMonth} onViewCategory={() => setActiveTab('categories')} />
             )}
             {activeTab === 'categories' && (
-              <CategoriesTab
-                budget={displayBudget}
-                tracking={tracking || undefined}
-                isDraft={isDraft}
-                selectedMonth={selectedMonth}
-                onAddCategory={() => setShowAddCategory(true)}
-                onAllocationChange={(allocations) => {
-                  if (isDraft) {
-                    setDraftBudget({
-                      ...displayBudget,
-                      allocations
-                    })
-                  }
-                }}
-              />
+              <CategoriesTab budget={displayBudget} tracking={tracking || undefined} isDraft={isDraft} selectedMonth={selectedMonth} onAddCategory={() => setShowAddCategory(true)} onAllocationChange={(allocs) => { if (isDraft) setDraftBudget({ ...displayBudget, allocations: allocs }) }} />
             )}
             {activeTab === 'transactions' && (
-              <TransactionsTab
-                allocations={displayBudget.allocations}
-                month={selectedMonth}
-                onEditTransaction={setEditingTransaction}
-              />
+              <TransactionsTab allocations={displayBudget.allocations} month={selectedMonth} onEditTransaction={setEditingTransaction} />
             )}
             {activeTab === 'forecast' && (
-              <ForecastTab
-                budget={displayBudget}
-                tracking={tracking || undefined}
-                selectedMonth={selectedMonth}
-                onViewCategory={(cat) => { setActiveTab('categories') }}
-              />
+              <ForecastTab budget={displayBudget} tracking={tracking || undefined} selectedMonth={selectedMonth} onViewCategory={() => setActiveTab('categories')} />
             )}
 
             {/* Draft Mode Actions */}
@@ -439,7 +327,7 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
                   <RefreshCcw className="w-4 h-4 mr-2" />
                   {t('budget.regenerate')}
                 </Button>
-                <Button onClick={handleSaveClick} className="flex-1">
+                <Button onClick={() => setShowConfirmDialog(true)} className="flex-1">
                   <Check className="w-4 h-4 mr-2" />
                   {t('budget.save')}
                 </Button>
@@ -471,14 +359,8 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
             budget={displayBudget}
             onClose={() => setShowAddCategory(false)}
             onAdd={(category, amount) => {
-              const newAllocations = [...displayBudget.allocations, { category, amount }]
-              const newTotalAllocated = newAllocations.reduce((sum, a) => sum + a.amount, 0)
-              const newSavingsTarget = Math.max(0, displayBudget.monthly_income - newTotalAllocated)
-              setDraftBudget({
-                ...displayBudget,
-                allocations: newAllocations,
-                savings_target: newSavingsTarget
-              })
+              const newAllocs = [...displayBudget.allocations, { category, amount }]
+              setDraftBudget({ ...displayBudget, allocations: newAllocs, savings_target: Math.max(0, displayBudget.monthly_income - newAllocs.reduce((s, a) => s + a.amount, 0)) })
               setShowAddCategory(false)
               pushUndo('add-category', displayBudget)
             }}
@@ -489,11 +371,7 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
       {/* FAB for quick add (mobile only) */}
       {displayBudget && isDraft && (
         <div className="fixed bottom-20 right-4 sm:hidden">
-          <Button
-            size="lg"
-            className="rounded-full shadow-lg"
-            onClick={() => setShowAddCategory(true)}
-          >
+          <Button size="lg" className="rounded-full shadow-lg" onClick={() => setShowAddCategory(true)}>
             <Plus className="w-6 h-6" />
           </Button>
         </div>
@@ -504,17 +382,14 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
         <TransactionEditModal
           transaction={editingTransaction}
           isOpen={!!editingTransaction}
-          onClose={() => {
-            setEditingTransaction(null)
-            queryClient.invalidateQueries({ queryKey: ['budget', 'tracking'] })
-          }}
+          onClose={() => { setEditingTransaction(null); queryClient.invalidateQueries({ queryKey: ['budget', 'tracking'] }) }}
         />
       )}
 
       {/* Save Confirmation Dialog */}
       <BudgetConfirmDialog
         isOpen={showConfirmDialog}
-        onConfirm={handleConfirmSave}
+        onConfirm={async () => { await queryClient.refetchQueries({ queryKey: ['budget'] }); setDraftBudget(null); setShowConfirmDialog(false) }}
         onCancel={() => setShowConfirmDialog(false)}
         monthlyIncome={displayBudget?.monthly_income || 0}
         totalAllocated={totalAllocated}
@@ -525,7 +400,6 @@ ${t('budget.aiAdvice')}: ${displayBudget.advice || '-'}
   )
 }
 
-// Refresh icon component
 function RefreshCcw({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">

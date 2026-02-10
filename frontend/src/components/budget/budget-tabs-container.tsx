@@ -1,5 +1,6 @@
+import { useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { LayoutGrid, List, Receipt, TrendingUp, ChevronDown } from 'lucide-react'
+import { LayoutGrid, List, Receipt, TrendingUp } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import type { BudgetTab } from '@/hooks/useBudgetTabState'
 
@@ -8,6 +9,7 @@ interface BudgetTabsContainerProps {
   onTabChange: (tab: BudgetTab) => void
   children: React.ReactNode
   className?: string
+  alertTabs?: BudgetTab[]
 }
 
 interface TabConfig {
@@ -27,13 +29,25 @@ export function BudgetTabsContainer({
   activeTab,
   onTabChange,
   children,
-  className
+  className,
+  alertTabs = [],
 }: BudgetTabsContainerProps) {
   const { t } = useTranslation('common')
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const activeRef = useRef<HTMLButtonElement>(null)
+
+  // Auto-scroll active pill into view on mobile
+  useEffect(() => {
+    if (activeRef.current && scrollRef.current) {
+      const container = scrollRef.current
+      const el = activeRef.current
+      const left = el.offsetLeft - container.offsetWidth / 2 + el.offsetWidth / 2
+      container.scrollTo({ left, behavior: 'smooth' })
+    }
+  }, [activeTab])
 
   const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
     let newIndex = currentIndex
-
     if (e.key === 'ArrowLeft') {
       e.preventDefault()
       newIndex = currentIndex > 0 ? currentIndex - 1 : TABS.length - 1
@@ -47,14 +61,8 @@ export function BudgetTabsContainer({
       e.preventDefault()
       newIndex = TABS.length - 1
     }
-
-    if (newIndex !== currentIndex) {
-      onTabChange(TABS[newIndex].id)
-    }
+    if (newIndex !== currentIndex) onTabChange(TABS[newIndex].id)
   }
-
-  const activeTabConfig = TABS.find(t => t.id === activeTab)
-  const ActiveIcon = activeTabConfig?.icon || LayoutGrid
 
   return (
     <div className={cn('flex flex-col', className)}>
@@ -67,7 +75,7 @@ export function BudgetTabsContainer({
         {TABS.map((tab, index) => {
           const Icon = tab.icon
           const isActive = activeTab === tab.id
-
+          const hasAlert = alertTabs.includes(tab.id)
           return (
             <button
               key={tab.id}
@@ -78,7 +86,7 @@ export function BudgetTabsContainer({
               onClick={() => onTabChange(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all',
+                'relative flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all',
                 'focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2',
                 isActive
                   ? 'bg-white dark:bg-gray-900 text-green-600 dark:text-green-400 shadow-sm'
@@ -87,35 +95,55 @@ export function BudgetTabsContainer({
             >
               <Icon className="w-4 h-4" />
               <span>{t(tab.labelKey)}</span>
+              {hasAlert && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+              )}
             </button>
           )
         })}
       </div>
 
-      {/* Mobile Dropdown */}
-      <div className="md:hidden mb-4">
-        <div className="relative">
-          <select
-            value={activeTab}
-            onChange={(e) => onTabChange(e.target.value as BudgetTab)}
-            className={cn(
-              'w-full appearance-none pl-10 pr-10 py-3 rounded-lg',
-              'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white',
-              'border border-gray-200 dark:border-gray-700',
-              'font-medium text-sm',
-              'focus:outline-none focus:ring-2 focus:ring-green-500'
-            )}
-            aria-label={t('budget.tabs.selectTab')}
-          >
-            {TABS.map((tab) => (
-              <option key={tab.id} value={tab.id}>
-                {t(tab.labelKey)}
-              </option>
-            ))}
-          </select>
-          <ActiveIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none" />
-        </div>
+      {/* Mobile Pill Tabs — horizontal scroll */}
+      <div
+        ref={scrollRef}
+        className="md:hidden flex gap-2 overflow-x-auto scrollbar-hide pb-1 mb-4 -mx-1 px-1"
+        role="tablist"
+        aria-label={t('budget.tabs.navigation')}
+      >
+        {TABS.map((tab, index) => {
+          const Icon = tab.icon
+          const isActive = activeTab === tab.id
+          const hasAlert = alertTabs.includes(tab.id)
+          return (
+            <button
+              key={tab.id}
+              ref={isActive ? activeRef : undefined}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => onTabChange(tab.id)}
+              onKeyDown={(e) => handleKeyDown(e, index)}
+              className={cn(
+                'relative flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500',
+                'min-h-[44px]',
+                isActive
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+              )}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{t(tab.labelKey)}</span>
+              {hasAlert && (
+                <span className={cn(
+                  'absolute top-1 right-1 w-2 h-2 rounded-full',
+                  isActive ? 'bg-white' : 'bg-red-500'
+                )} />
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* Tab Content */}
