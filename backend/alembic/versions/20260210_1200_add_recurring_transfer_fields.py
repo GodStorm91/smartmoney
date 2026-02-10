@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.add_column(
         "recurring_transactions",
-        sa.Column("is_transfer", sa.Boolean(), nullable=True, server_default="0"),
+        sa.Column("is_transfer", sa.Boolean(), nullable=True, server_default="false"),
     )
     op.add_column(
         "recurring_transactions",
@@ -32,7 +32,7 @@ def upgrade() -> None:
     )
 
     # Backfill is_transfer to False for existing rows, then make non-nullable
-    op.execute("UPDATE recurring_transactions SET is_transfer = 0 WHERE is_transfer IS NULL")
+    op.execute("UPDATE recurring_transactions SET is_transfer = false WHERE is_transfer IS NULL")
 
 
 def downgrade() -> None:
