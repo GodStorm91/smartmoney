@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { List, Grid, Filter, SortAsc, SortDesc } from 'lucide-react'
+import { List, Grid, Filter, SortAsc, SortDesc, CalendarClock } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { BillCard } from './BillCard'
 import { cn } from '@/utils/cn'
 import type { Bill } from '@/types'
@@ -204,19 +205,29 @@ export function BillList({
         view === 'list' ? 'space-y-3' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'
       )}>
         {filteredAndSortedBills.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-gray-500 dark:text-gray-400">
-            <p>{t('bills.no_bills_found')}</p>
+          <div className="col-span-full">
+            <EmptyState
+              compact
+              icon={<CalendarClock />}
+              title={t('emptyState.bills.title', 'No bills to track')}
+              description={t('emptyState.bills.description', 'Add recurring bills to get reminders before due dates')}
+            />
           </div>
         ) : (
-          filteredAndSortedBills.map(bill => (
-            <BillCard
+          filteredAndSortedBills.map((bill, idx) => (
+            <div
               key={bill.id}
-              bill={bill}
-              onClick={onBillClick}
-              onMarkPaid={handleMarkPaid}
-              onEdit={onBillEdit}
-              onDelete={handleDelete}
-            />
+              className="animate-stagger-in"
+              style={{ '--stagger-index': Math.min(idx, 9) } as React.CSSProperties}
+            >
+              <BillCard
+                bill={bill}
+                onClick={onBillClick}
+                onMarkPaid={handleMarkPaid}
+                onEdit={onBillEdit}
+                onDelete={handleDelete}
+              />
+            </div>
           ))
         )}
       </div>

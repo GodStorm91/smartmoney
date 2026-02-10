@@ -13,7 +13,7 @@ interface EmptyStateProps {
 export function EmptyState({ icon, title, description, action, className, compact = false }: EmptyStateProps) {
   return (
     <div className={cn(
-      'flex flex-col items-center justify-center px-4',
+      'flex flex-col items-center justify-center px-4 animate-fade-in',
       compact ? 'py-6' : 'py-12',
       className
     )}>

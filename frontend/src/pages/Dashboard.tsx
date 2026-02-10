@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Wallet, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Wallet,
   Target,
   Plus,
   Camera,
@@ -14,10 +14,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
-  Bell
+  Bell,
+  Receipt
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { CountUp } from '@/components/ui/CountUp'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { SpendingCalendar } from '@/components/dashboard/SpendingCalendar'
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
@@ -37,6 +40,7 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useAccounts } from '@/hooks/useAccounts'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
+import { useTierLimits } from '@/hooks/useTierLimits'
 import type { Transaction } from '@/types'
 
 export function Dashboard() {
@@ -44,6 +48,7 @@ export function Dashboard() {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
+  const limits = useTierLimits()
 
   // Navigation date state
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -84,7 +89,7 @@ export function Dashboard() {
     queryKey: ['recent-transactions'],
     queryFn: async () => {
       const transactions = await fetchTransactions()
-      return transactions.slice(0, 5)
+      return transactions.slice(0, limits.recentTransactions)
     },
   })
 
@@ -250,17 +255,19 @@ export function Dashboard() {
         {/* Quick Actions */}
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex gap-3 pb-2 min-w-max">
-            {quickActions.map((action, idx) => {
+            {quickActions.slice(0, limits.quickActions).map((action, idx) => {
               const Icon = action.icon
               return (
                 <Link
                   key={idx}
                   to={action.to}
-                  className="flex flex-col items-center gap-1.5 p-1"
+                  className="flex flex-col items-center gap-1.5 p-1 animate-stagger-in"
+                  style={{ '--stagger-index': idx } as React.CSSProperties}
                 >
                   <div className={cn(
                     'w-12 h-12 rounded-xl flex items-center justify-center',
-                    'transition-transform active:scale-95',
+                    'transition-all duration-150 ease-out hover:scale-[1.08] hover:shadow-lg active:scale-95 active:duration-[50ms]',
+                    'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                     action.color
                   )}>
                     <Icon className="w-5 h-5 text-white" />
@@ -279,20 +286,24 @@ export function Dashboard() {
 
         {/* Quick Stats Cards */}
         <div className="grid grid-cols-2 gap-3">
-          <QuickStatCard
-            label={t('dashboard.income', 'Income')}
-            value={currentMonth?.income || 0}
-            change={5.2}
-            isPositive
-            formatCurrency={formatCurrency}
-          />
-          <QuickStatCard
-            label={t('dashboard.expenses', 'Expenses')}
-            value={currentMonth?.expenses || 0}
-            change={-2.1}
-            isPositive={false}
-            formatCurrency={formatCurrency}
-          />
+          <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+            <QuickStatCard
+              label={t('dashboard.income', 'Income')}
+              value={currentMonth?.income || 0}
+              change={5.2}
+              isPositive
+              formatCurrency={formatCurrency}
+            />
+          </div>
+          <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
+            <QuickStatCard
+              label={t('dashboard.expenses', 'Expenses')}
+              value={currentMonth?.expenses || 0}
+              change={-2.1}
+              isPositive={false}
+              formatCurrency={formatCurrency}
+            />
+          </div>
         </div>
 
         {/* Savings Rate */}
@@ -313,12 +324,16 @@ export function Dashboard() {
           </div>
           {recentTransactions && recentTransactions.length > 0 ? (
             <div className="space-y-2">
-              {recentTransactions.slice(0, 4).map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+              {recentTransactions.slice(0, limits.recentTransactions).map((tx, idx) => (
+                <div
+                  key={tx.id}
+                  className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
+                  style={{ '--stagger-index': idx } as React.CSSProperties}
+                >
                   <div className="flex items-center gap-3">
                     <div className={cn(
                       'w-8 h-8 rounded-full flex items-center justify-center text-sm',
-                      tx.type === 'income' 
+                      tx.type === 'income'
                         ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
                     )}>
@@ -335,8 +350,8 @@ export function Dashboard() {
                   </div>
                   <span className={cn(
                     'text-sm font-semibold font-numbers',
-                    tx.type === 'income' 
-                      ? 'text-green-600 dark:text-green-400' 
+                    tx.type === 'income'
+                      ? 'text-green-600 dark:text-green-400'
                       : 'text-gray-900 dark:text-gray-100'
                   )}>
                     {tx.type === 'income' ? '+' : '-'}{formatTransactionCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}
@@ -345,9 +360,17 @@ export function Dashboard() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-              {t('dashboard.noTransactions', 'No transactions yet')}
-            </p>
+            <EmptyState
+              compact
+              icon={<Receipt />}
+              title={t('emptyState.dashboardRecent.title', 'No recent activity')}
+              description={t('emptyState.dashboardRecent.description', 'Your latest transactions will appear here')}
+              action={
+                <Link to="/transactions" className="text-sm font-medium text-primary-600 dark:text-primary-400">
+                  {t('emptyState.transactions.cta', 'Add Transaction')}
+                </Link>
+              }
+            />
           )}
         </Card>
 
@@ -361,10 +384,11 @@ export function Dashboard() {
               {t('dashboard.spendingByCategory', 'Spending')}
             </h3>
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-1 px-1">
-              {categories.slice(0, 8).map((cat, idx) => (
+              {categories.slice(0, limits.categoryChips).map((cat, idx) => (
                 <span
                   key={idx}
-                  className="flex-shrink-0 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300"
+                  className="flex-shrink-0 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-full text-xs font-medium text-gray-700 dark:text-gray-300 animate-stagger-in"
+                  style={{ '--stagger-index': idx } as React.CSSProperties}
                 >
                   {cat.category} · {formatCurrency(cat.amount)}
                 </span>
@@ -388,14 +412,19 @@ export function Dashboard() {
               </Link>
             </div>
             <div className="space-y-3">
-              {goalsProgress.slice(0, 2).map((progress) => (
+              {goalsProgress.slice(0, limits.dashboardGoals).map((progress, idx) => (
                 progress.achievability && (
-                  <MiniGoalCard
+                  <div
                     key={progress.goal_id}
-                    years={progress.years}
-                    progress={progress}
-                    formatCurrency={formatTransactionCurrency}
-                  />
+                    className="animate-stagger-in"
+                    style={{ '--stagger-index': idx } as React.CSSProperties}
+                  >
+                    <MiniGoalCard
+                      years={progress.years}
+                      progress={progress}
+                      formatCurrency={formatTransactionCurrency}
+                    />
+                  </div>
                 )
               ))}
             </div>
@@ -426,17 +455,17 @@ export function Dashboard() {
 
       {/* Insight Card List */}
       <div className="max-w-2xl mx-auto px-4 pb-4">
-        <InsightCardList limit={5} showHeader={true} />
+        <InsightCardList limit={limits.insightCards} showHeader={true} />
       </div>
 
       {/* Savings Recommendations */}
       <div className="max-w-2xl mx-auto px-4 pb-4">
-        <SavingsRecommendations limit={5} showHeader={true} />
+        <SavingsRecommendations limit={limits.savingsRecs} showHeader={true} />
       </div>
 
       {/* Anomaly Alert List */}
       <div className="max-w-2xl mx-auto px-4 pb-4">
-        <AnomalyAlertList limit={3} showHeader={true} />
+        <AnomalyAlertList limit={limits.anomalyAlerts} showHeader={true} />
       </div>
 
       {/* Day Detail Modal */}
@@ -592,9 +621,9 @@ function SavingsRateCard({ rate }: { rate: number }) {
       </div>
       {/* Progress bar */}
       <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-3 overflow-hidden">
-        <div 
+        <div
           className={cn(
-            'h-full rounded-full transition-all',
+            'h-full rounded-full animate-progress-fill',
             rate >= 20 ? 'bg-green-500' : rate >= 10 ? 'bg-amber-500' : 'bg-red-500'
           )}
           style={{ width: `${Math.min(100, rate)}%` }}
@@ -637,9 +666,9 @@ function MiniGoalCard({
           {t('goals.yearGoal', { years })} · {formatCurrency(progress.total_saved)}
         </p>
         <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-600 rounded-full mt-1 overflow-hidden">
-          <div 
+          <div
             className={cn(
-              'h-full rounded-full',
+              'h-full rounded-full animate-progress-fill',
               isOnTrack ? 'bg-green-500' : 'bg-amber-500'
             )}
             style={{ width: `${progressPct}%` }}
@@ -654,33 +683,37 @@ function MiniGoalCard({
 // KPI Row Component
 function KpiRow({ summary, formatCurrency, accounts }: { summary: any; formatCurrency: (amount: number) => string; accounts: any[] }) {
   const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
-  
+
   const assets = accounts?.filter(a => ASSET_TYPES.includes(a.type))
     .reduce((sum, a) => sum + a.current_balance, 0) || 0
-  
+
   const liabilities = accounts?.filter(a => !ASSET_TYPES.includes(a.type))
     .reduce((sum, a) => sum + Math.abs(a.current_balance), 0) || 0
 
+  const kpis = [
+    { label: 'Assets', value: assets, color: 'text-green-600 dark:text-green-400' },
+    { label: 'Liabilities', value: liabilities, color: 'text-red-600 dark:text-red-400' },
+    { label: 'Transactions', value: summary?.transaction_count || 0, color: 'text-gray-900 dark:text-gray-100', isCount: true },
+  ]
+
   return (
     <div className="grid grid-cols-3 gap-3">
-      <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Assets</p>
-        <p className="text-sm font-semibold font-numbers text-green-600 dark:text-green-400">
-          {formatCurrency(assets)}
-        </p>
-      </div>
-      <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Liabilities</p>
-        <p className="text-sm font-semibold font-numbers text-red-600 dark:text-red-400">
-          {formatCurrency(liabilities)}
-        </p>
-      </div>
-      <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Transactions</p>
-        <p className="text-sm font-semibold font-numbers text-gray-900 dark:text-gray-100">
-          {summary?.transaction_count || 0}
-        </p>
-      </div>
+      {kpis.map((kpi, idx) => (
+        <div
+          key={kpi.label}
+          className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg animate-stagger-in"
+          style={{ '--stagger-index': idx } as React.CSSProperties}
+        >
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</p>
+          <p className={cn('text-sm font-semibold font-numbers', kpi.color)}>
+            {kpi.isCount ? (
+              <CountUp end={kpi.value} duration={800} />
+            ) : (
+              <CountUp end={kpi.value} duration={800} formatter={formatCurrency} />
+            )}
+          </p>
+        </div>
+      ))}
     </div>
   )
 }

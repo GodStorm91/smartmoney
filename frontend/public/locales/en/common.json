@@ -1846,5 +1846,56 @@
       "description": "Mute non-critical notifications during set hours",
       "configure": "Configure"
     }
+  },
+  "emptyState": {
+    "transactions": {
+      "title": "No transactions yet",
+      "description": "Upload a CSV or add your first transaction to start tracking",
+      "cta": "Add Transaction"
+    },
+    "goals": {
+      "title": "Set your first savings goal",
+      "description": "Define targets for 1, 3, 5, or 10 years and track your progress",
+      "cta": "Create Goal"
+    },
+    "budget": {
+      "title": "No budget set for this month",
+      "description": "Create a budget to track spending against your plan",
+      "cta": "Create Budget"
+    },
+    "accounts": {
+      "title": "No accounts added yet",
+      "description": "Add your bank accounts, credit cards, or cash to track balances",
+      "cta": "Add Account"
+    },
+    "categories": {
+      "title": "No spending data yet",
+      "description": "Add transactions to see your spending breakdown by category",
+      "cta": "Add Transaction"
+    },
+    "analytics": {
+      "title": "Not enough data for analytics",
+      "description": "Add at least one month of transactions to see trends and insights",
+      "cta": "Upload CSV"
+    },
+    "bills": {
+      "title": "No bills to track",
+      "description": "Add recurring bills to get reminders before due dates",
+      "cta": "Add Bill"
+    },
+    "recurring": {
+      "title": "No recurring transactions",
+      "description": "Set up automated tracking for regular expenses",
+      "cta": "Add Recurring"
+    },
+    "dashboardRecent": {
+      "title": "No recent activity",
+      "description": "Your latest transactions will appear here"
+    },
+    "welcome": {
+      "title": "Welcome to SmartMoney",
+      "description": "Start by adding an account and importing your transactions",
+      "cta": "Get Started"
+    }
   }
 }

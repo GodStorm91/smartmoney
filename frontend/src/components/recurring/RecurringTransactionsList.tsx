@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { RefreshCw, Trash2, Play, Pause, Calendar } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Card } from '@/components/ui/Card'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import {
   fetchRecurringTransactions,
@@ -194,13 +195,12 @@ export function RecurringTransactionsList() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-8">
-          <RefreshCw className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-          <p className="text-gray-500 dark:text-gray-400">{t('recurring.noRecurring')}</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
-            {t('recurring.addFirst')}
-          </p>
-        </div>
+        <EmptyState
+          compact
+          icon={<RefreshCw />}
+          title={t('emptyState.recurring.title', 'No recurring transactions')}
+          description={t('emptyState.recurring.description', 'Set up automated tracking for regular expenses')}
+        />
       )}
     </Card>
   )

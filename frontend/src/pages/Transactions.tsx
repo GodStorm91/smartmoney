@@ -643,38 +643,44 @@ export function Transactions() {
       {/* When filtering by account: amounts are in account's native currency */}
       {/* When viewing all: amounts are aggregated in JPY (base currency) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card
-          onClick={() => handleTypeFilter('income')}
-          className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
-            typeParam === 'income'
-              ? 'ring-2 ring-green-500 dark:ring-green-400 bg-green-50/50 dark:bg-green-900/20'
-              : ''
-          }`}
-        >
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
-          <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
-            {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
-          </p>
-        </Card>
-        <Card
-          onClick={() => handleTypeFilter('expense')}
-          className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
-            typeParam === 'expense'
-              ? 'ring-2 ring-red-500 dark:ring-red-400 bg-red-50/50 dark:bg-red-900/20'
-              : ''
-          }`}
-        >
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
-          <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
-            {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
-          <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
-            {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
-          </p>
-        </Card>
+        <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+          <Card
+            onClick={() => handleTypeFilter('income')}
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+              typeParam === 'income'
+                ? 'ring-2 ring-green-500 dark:ring-green-400 bg-green-50/50 dark:bg-green-900/20'
+                : ''
+            }`}
+          >
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
+            <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
+              {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
+            </p>
+          </Card>
+        </div>
+        <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
+          <Card
+            onClick={() => handleTypeFilter('expense')}
+            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+              typeParam === 'expense'
+                ? 'ring-2 ring-red-500 dark:ring-red-400 bg-red-50/50 dark:bg-red-900/20'
+                : ''
+            }`}
+          >
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
+            <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
+              {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
+            </p>
+          </Card>
+        </div>
+        <div className="animate-stagger-in" style={{ '--stagger-index': 2 } as React.CSSProperties}>
+          <Card>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
+            <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
+              {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
+            </p>
+          </Card>
+        </div>
       </div>
 
       {/* Show Count & Sort Controls */}

@@ -13,7 +13,7 @@ export const Progress: React.FC<ProgressProps> = ({ value, max = 100, className 
   return (
     <div className={clsx('h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700', className)}>
       <div
-        className="h-full transition-all duration-300 ease-in-out bg-blue-600"
+        className="h-full bg-blue-600 animate-progress-fill"
         style={{ width: `${percentage}%` }}
       />
     </div>

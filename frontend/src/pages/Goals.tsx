@@ -194,19 +194,24 @@ export function Goals() {
           </div>
         ) : goalsProgress && goalsProgress.length > 0 ? (
           <div className="space-y-4">
-            {goalsProgress.map((progress) => (
+            {goalsProgress.map((progress, idx) => (
               progress.achievability && (
-                <GoalAchievabilityCard
+                <div
                   key={progress.goal_id}
-                  goalId={progress.goal_id}
-                  goalName={t('goals.yearGoal', { years: progress.years })}
-                  achievability={progress.achievability}
-                  targetAmount={progress.target_amount}
-                  currentAmount={progress.total_saved}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  topExpenseCategory={topExpenseCategory}
-                />
+                  className="animate-stagger-in"
+                  style={{ '--stagger-index': idx } as React.CSSProperties}
+                >
+                  <GoalAchievabilityCard
+                    goalId={progress.goal_id}
+                    goalName={t('goals.yearGoal', { years: progress.years })}
+                    achievability={progress.achievability}
+                    targetAmount={progress.target_amount}
+                    currentAmount={progress.total_saved}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    topExpenseCategory={topExpenseCategory}
+                  />
+                </div>
               )
             ))}
 

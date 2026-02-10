@@ -12,6 +12,7 @@ import {
   Check,
   AlertTriangle,
   Bell,
+  Palette,
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
@@ -25,11 +26,13 @@ import { CategoryManagementSection } from '@/components/settings/CategoryManagem
 import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings'
 import { AnomalyConfigPanel } from '@/components/anomalies/AnomalyConfigPanel'
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences'
+import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 import { cn } from '@/utils/cn'
 
 // Settings sections for navigation
 const SECTIONS = [
+  { id: 'appearance', labelKey: 'settings.sections.appearance', icon: Palette },
   { id: 'general', labelKey: 'settings.sections.general', icon: SettingsIcon },
   { id: 'budget', labelKey: 'settings.sections.budget', icon: Wallet },
   { id: 'categories', labelKey: 'settings.sections.categories', icon: Tag },
@@ -43,7 +46,7 @@ const SECTIONS = [
 export function Settings() {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
-  const [activeSection, setActiveSection] = useState<string>('general')
+  const [activeSection, setActiveSection] = useState<string>('appearance')
   const [hasChanges, setHasChanges] = useState(false)
   
   const { data: settings, isLoading } = useQuery({
@@ -165,6 +168,13 @@ export function Settings() {
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+        {/* Appearance */}
+        <div className={cn('space-y-4', activeSection !== 'appearance' && 'hidden')}>
+          <SectionCard icon={Palette} title={t('appearance.title', 'Appearance')} description={t('appearance.subtitle', 'Theme, colors, and display preferences')}>
+            <AppearanceSettings />
+          </SectionCard>
+        </div>
+
         {/* General Settings */}
         <div className={cn('space-y-4', activeSection !== 'general' && 'hidden')}>
           <SectionCard icon={SettingsIcon} title={t('settings.general')} description="Currency and basic preferences">
