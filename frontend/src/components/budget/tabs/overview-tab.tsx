@@ -1,5 +1,6 @@
-import { useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { TrendingUp, AlertTriangle, CheckCircle, ChevronRight } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { BudgetPulseHero } from '../budget-pulse-hero'
@@ -7,6 +8,8 @@ import { BudgetMoneyFlow } from '../budget-money-flow'
 import { BudgetDonutChart } from '../budget-donut-chart'
 import { SpendingAlert } from '../spending-alert'
 import { UncategorizedSpendingAlert } from '../uncategorized-spending-alert'
+import type { AiCategorizationState } from '../uncategorized-spending-alert'
+import { AiCategorizeReviewModal } from '../ai-categorize-review-modal'
 import { BudgetCoverageIndicator } from '../budget-coverage-indicator'
 import { calculateBudgetForecast } from '@/utils/spending-prediction'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
@@ -32,6 +35,7 @@ export function OverviewTab({
   onViewCategory
 }: OverviewTabProps) {
   const { t } = useTranslation('common')
+  const queryClient = useQueryClient()
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
@@ -42,6 +46,25 @@ export function OverviewTab({
   const totalAllocated = budget.allocations.reduce((sum, a) => sum + a.amount, 0)
   const totalBudget = budget.monthly_income - (budget.savings_target || 0)
   const spentSoFar = tracking?.total_spent || 0
+
+  // AI categorization state
+  const [aiState, setAiState] = useState<AiCategorizationState>('idle')
+  const [showReviewModal, setShowReviewModal] = useState(false)
+
+  const budgetCategoryNames = useMemo(
+    () => budget.allocations.map((a) => a.category),
+    [budget.allocations]
+  )
+
+  const handleAiCategorize = useCallback(() => {
+    setShowReviewModal(true)
+  }, [])
+
+  const handleCategorizationSuccess = useCallback(() => {
+    setAiState('success')
+    queryClient.invalidateQueries({ queryKey: ['budget', 'tracking'] })
+    queryClient.invalidateQueries({ queryKey: ['budget', 'month'] })
+  }, [queryClient])
 
   const forecast = useMemo(() => {
     if (!tracking) return null
@@ -115,8 +138,19 @@ export function OverviewTab({
           amount={tracking.uncategorized_spending}
           transactions={tracking.uncategorized_transactions}
           month={selectedMonth}
+          aiState={aiState}
+          onAiCategorize={handleAiCategorize}
         />
       )}
+
+      {/* AI Categorize Review Modal */}
+      <AiCategorizeReviewModal
+        open={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        month={selectedMonth}
+        budgetCategories={budgetCategoryNames}
+        onSuccess={handleCategorizationSuccess}
+      />
 
       {/* 2c. Budget Coverage Indicator */}
       {tracking && <BudgetCoverageIndicator tracking={tracking} />}

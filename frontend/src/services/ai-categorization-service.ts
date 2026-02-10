@@ -44,6 +44,21 @@ export async function getCategorizationSuggestions(
 }
 
 /**
+ * Get AI-powered categorization suggestions for budget-scoped uncategorized transactions
+ */
+export async function getBudgetCategorizationSuggestions(
+  month: string,
+  limit: number = 50,
+  language: string = 'ja'
+): Promise<CategorizeSuggestionsResponse> {
+  const response = await apiClient.post<CategorizeSuggestionsResponse>(
+    '/api/ai/categorize/budget-suggestions',
+    { month, limit, language }
+  )
+  return response.data
+}
+
+/**
  * Apply approved categorization suggestions
  */
 export async function applyCategorizationSuggestions(

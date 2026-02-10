@@ -168,6 +168,85 @@ class ClaudeAIService:
 
         return budget_data, usage
 
+    def categorize_transactions(
+        self,
+        transactions: list[dict],
+        available_categories: dict[str, list[str]],
+        language: str = "ja"
+    ) -> tuple[list[dict], dict[str, int]]:
+        """Categorize transactions using Claude AI.
+
+        Args:
+            transactions: List of {id, description, amount} dicts
+            available_categories: Dict of parent_category -> [child_categories]
+            language: Language code for response
+
+        Returns:
+            Tuple of (list of categorization results, usage dict)
+        """
+        language_map = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}
+        language_name = language_map.get(language, "Japanese")
+
+        # Format categories for prompt
+        cat_str = "\n".join([
+            f"  {parent}: {', '.join(children)}"
+            for parent, children in available_categories.items()
+        ])
+
+        # Format transactions for prompt
+        tx_str = "\n".join([
+            f"  - ID: {tx['id']}, Description: {tx['description']}, Amount: ¥{abs(tx['amount']):,}"
+            for tx in transactions
+        ])
+
+        prompt = f"""IMPORTANT: You MUST respond entirely in {language_name} language for the "reason" field.
+
+You are a financial transaction categorizer. Categorize the following transactions into the most appropriate category.
+
+AVAILABLE CATEGORIES:
+{cat_str}
+
+TRANSACTIONS TO CATEGORIZE:
+{tx_str}
+
+REQUIRED OUTPUT FORMAT (JSON array):
+[
+  {{"id": 123, "category": "Food", "confidence": 0.9, "reason": "Description suggests food purchase"}},
+  ...
+]
+
+RULES:
+- Use ONLY categories from the available list above
+- If a transaction clearly doesn't fit any existing category, prefix with "NEW:" (e.g. "NEW:Pet Care")
+- Confidence should be between 0.0 and 1.0
+- Provide a brief reason for each categorization in {language_name}
+- Return a JSON array only, no other text
+
+Categorize now:"""
+
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=4096,
+            temperature=0.3,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens
+        }
+
+        # Parse JSON response
+        response_text = response.content[0].text
+        start_idx = response_text.find("[")
+        end_idx = response_text.rfind("]") + 1
+
+        if start_idx == -1 or end_idx == 0:
+            raise ValueError("No valid JSON array found in Claude response")
+
+        results = json.loads(response_text[start_idx:end_idx])
+        return results, usage
+
     def _build_budget_prompt(
         self,
         monthly_income: int,
