@@ -11,7 +11,8 @@ interface AiCategorizeReviewRowProps {
   suggestion: CategorySuggestion
   isSelected: boolean
   editedCategory: string
-  categories: Array<{ value: string; label: string }>
+  categories: Array<{ value: string; label: string; matchesBudget?: boolean }>
+  categoryMatchesBudget?: boolean
   onToggle: (id: number) => void
   onCategoryChange: (id: number, category: string) => void
 }
@@ -32,6 +33,7 @@ export function AiCategorizeReviewRow({
   isSelected,
   editedCategory,
   categories,
+  categoryMatchesBudget: matchesBudget,
   onToggle,
   onCategoryChange,
 }: AiCategorizeReviewRowProps) {
@@ -101,22 +103,30 @@ export function AiCategorizeReviewRow({
               onClick={(e) => e.stopPropagation()}
               className={cn(
                 'w-full text-xs py-1 pl-2 pr-7 rounded-lg border appearance-none',
-                'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
-                'border-gray-200 dark:border-gray-600',
-                'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent',
-                'transition-colors duration-150'
+                'focus:outline-none focus:ring-2 focus:border-transparent transition-colors duration-150',
+                matchesBudget
+                  ? 'bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200 border-green-300 dark:border-green-700 focus:ring-green-500'
+                  : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-600 focus:ring-primary-500'
               )}
               aria-label={t('budget.aiCategorize.selectCategory')}
             >
               {categories.map((cat) => (
                 <option key={cat.value} value={cat.value}>
-                  {cat.label}
+                  {cat.matchesBudget ? `${cat.label}` : cat.label}
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+            <ChevronDown className={cn(
+              'absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none',
+              matchesBudget ? 'text-green-500' : 'text-gray-400'
+            )} />
           </div>
-          {suggestion.is_new_category && (
+          {matchesBudget && (
+            <Badge variant="success" className="text-[10px] px-1.5 py-0.5">
+              {t('budget.aiCategorize.budgetMatch', 'Budget')}
+            </Badge>
+          )}
+          {suggestion.is_new_category && !matchesBudget && (
             <Badge variant="info" className="text-[10px] px-1.5 py-0.5">
               {t('ai.newCategory')}
             </Badge>

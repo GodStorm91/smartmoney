@@ -5,9 +5,63 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models.budget import Budget, BudgetAllocation, BudgetFeedback
 
+# Mapping of common AI-generated category names to real parent categories.
+# Used both at budget creation time and in the data migration.
+CATEGORY_NAME_MAPPING: dict[str, str] = {
+    "Food & Dining": "Food",
+    "Housing & Utilities": "Housing",
+    "Insurance & Medical": "Health",
+    "Personal & Entertainment": "Entertainment",
+    "Gifts & Transfers": "Other",
+    "Personal Expenses": "Shopping",
+    "Personal & Discretionary": "Shopping",
+    "Utilities": "Housing",
+}
+
+
+def normalize_allocation_category(name: str) -> str:
+    """Normalize a budget allocation category name to a real parent category.
+
+    Checks the static mapping first, returns original name if no match.
+    """
+    return CATEGORY_NAME_MAPPING.get(name, name)
+
 
 class BudgetService:
     """Service for budget operations."""
+
+    @staticmethod
+    def _normalize_allocations(allocations: list[dict]) -> list[dict]:
+        """Normalize and merge allocation category names.
+
+        Applies CATEGORY_NAME_MAPPING to each allocation's category.
+        If two allocations end up with the same category, their amounts
+        are summed and reasonings are concatenated.
+
+        Args:
+            allocations: Raw allocation dicts with category, amount, reasoning
+
+        Returns:
+            Deduplicated list of allocation dicts
+        """
+        merged: dict[str, dict] = {}
+        for alloc in allocations:
+            category = normalize_allocation_category(alloc["category"])
+            if category in merged:
+                merged[category]["amount"] += alloc["amount"]
+                existing_reason = merged[category].get("reasoning") or ""
+                new_reason = alloc.get("reasoning") or ""
+                if new_reason and existing_reason:
+                    merged[category]["reasoning"] = f"{existing_reason}; {new_reason}"
+                elif new_reason:
+                    merged[category]["reasoning"] = new_reason
+            else:
+                merged[category] = {
+                    "category": category,
+                    "amount": alloc["amount"],
+                    "reasoning": alloc.get("reasoning"),
+                }
+        return list(merged.values())
 
     @staticmethod
     def create_budget(
@@ -35,6 +89,9 @@ class BudgetService:
         Returns:
             Created budget
         """
+        # Normalize category names and merge duplicates
+        allocations = BudgetService._normalize_allocations(allocations)
+
         # Get current max version for this month
         max_version = db.query(func.max(Budget.version)).filter(
             Budget.user_id == user_id,

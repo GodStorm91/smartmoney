@@ -50,6 +50,71 @@ class BudgetTrackingService:
         return hierarchy
 
     @staticmethod
+    def _resolve_allocation_to_hierarchy(
+        allocation_name: str,
+        hierarchy: dict[str, list[str]]
+    ) -> str:
+        """Resolve a budget allocation name to the best matching hierarchy key.
+
+        Handles cases like "Food & Dining" matching the "Food" parent category.
+
+        Args:
+            allocation_name: The budget allocation category name
+            hierarchy: Parent -> children mapping from _build_category_hierarchy
+
+        Returns:
+            The matched hierarchy key, or the original allocation_name if no match found
+        """
+        # 1. Exact match
+        if allocation_name in hierarchy:
+            return allocation_name
+
+        # Build lowercase lookup: lowercase key -> original key
+        lower_to_key = {k.lower(): k for k in hierarchy}
+
+        alloc_lower = allocation_name.lower()
+
+        # 2. Case-insensitive exact match
+        if alloc_lower in lower_to_key:
+            return lower_to_key[alloc_lower]
+
+        # 3. Split by " & " or " and " and check if any part matches a hierarchy key
+        for separator in [" & ", " and "]:
+            if separator in alloc_lower:
+                parts = [p.strip() for p in alloc_lower.split(separator)]
+                for part in parts:
+                    if part in lower_to_key:
+                        return lower_to_key[part]
+
+        # 4. Check if any single word in the allocation name matches a hierarchy key
+        words = alloc_lower.split()
+        for word in words:
+            if word in lower_to_key:
+                return lower_to_key[word]
+
+        # 5. Check if the allocation name (or its parts) is a known child category,
+        #    and map to its parent
+        child_to_parent = {}
+        for parent_key, children in hierarchy.items():
+            for child in children:
+                child_to_parent[child.lower()] = parent_key
+
+        # Check full allocation name as child
+        if alloc_lower in child_to_parent:
+            return child_to_parent[alloc_lower]
+
+        # Check split parts as children
+        for separator in [" & ", " and "]:
+            if separator in alloc_lower:
+                parts = [p.strip() for p in alloc_lower.split(separator)]
+                for part in parts:
+                    if part in child_to_parent:
+                        return child_to_parent[part]
+
+        # No match found, return original
+        return allocation_name
+
+    @staticmethod
     def _get_spending_for_category(
         category_spending: dict[str, int],
         category_name: str,
@@ -67,8 +132,12 @@ class BudgetTrackingService:
         Returns:
             Total spending amount for category and all children
         """
+        # Resolve allocation name to best matching hierarchy key
+        resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
+            category_name, hierarchy
+        )
         # Get all category names to sum (parent + children)
-        categories_to_sum = hierarchy.get(category_name, [category_name])
+        categories_to_sum = hierarchy.get(resolved_key, [category_name])
 
         # Build lowercase set for case-insensitive matching
         lower_set = {name.lower() for name in categories_to_sum}
@@ -104,7 +173,11 @@ class BudgetTrackingService:
         Returns:
             Tuple of (total spending, set of matched transaction category keys)
         """
-        categories_to_sum = hierarchy.get(category_name, [category_name])
+        # Resolve allocation name to best matching hierarchy key
+        resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
+            category_name, hierarchy
+        )
+        categories_to_sum = hierarchy.get(resolved_key, [category_name])
         lower_set = {name.lower() for name in categories_to_sum}
 
         total = 0
@@ -338,7 +411,10 @@ class BudgetTrackingService:
 
         # Build category hierarchy to include children
         hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)
-        categories_to_query = hierarchy.get(category, [category])
+        resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
+            category, hierarchy
+        )
+        categories_to_query = hierarchy.get(resolved_key, [category])
 
         # Get exchange rates for currency conversion
         rates = ExchangeRateService.get_cached_rates(db)
