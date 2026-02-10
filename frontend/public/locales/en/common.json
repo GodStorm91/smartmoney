@@ -25,7 +25,10 @@
     "gamification": "Achievements",
     "proxy": "Proxy",
     "report": "Report",
-    "more": "More"
+    "more": "More",
+    "explore": "Explore",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "button": {
     "save": "Save",
@@ -590,6 +593,7 @@
     "deleteTransaction": "Delete this transaction",
     "deleteConfirm": "Are you sure you want to delete this transaction?",
     "saved": "Transaction saved!",
+    "moreOptions": "More Options",
     "errors": {
       "amountRequired": "Amount is required",
       "descriptionRequired": "Description is required",

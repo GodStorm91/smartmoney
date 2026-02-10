@@ -22,7 +22,10 @@
     "analytics": "分析",
     "report": "レポート",
     "proxy": "代行",
-    "more": "その他"
+    "more": "その他",
+    "explore": "探索",
+    "collapse": "折りたたむ",
+    "expand": "展開"
   },
   "button": {
     "save": "保存",
@@ -251,6 +254,7 @@
     "deleteTransaction": "この取引を削除",
     "deleteConfirm": "この取引を削除してもよろしいですか？",
     "saved": "取引を保存しました！",
+    "moreOptions": "詳細オプション",
     "errors": {
       "amountRequired": "金額は必須です",
       "descriptionRequired": "説明は必須です",

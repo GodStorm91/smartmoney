@@ -5,24 +5,9 @@ import { useCreateAccount, useUpdateAccount, useAccount } from '@/hooks/useAccou
 import type { AccountType, AccountCreate, AccountUpdate, AccountWithBalance } from '@/types'
 import { cn } from '@/utils/cn'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { formatWithCommas, parseFormattedNumber } from '@/utils/form-utils'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { usePrivacy } from '@/contexts/PrivacyContext'
-
-// Helper to format number with thousand separators (supports negative)
-const formatWithCommas = (value: string): string => {
-  const isNegative = value.startsWith('-')
-  const num = value.replace(/[^\d.]/g, '')
-  const parts = num.split('.')
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return (isNegative ? '-' : '') + parts.join('.')
-}
-
-// Helper to parse formatted number back to raw value (preserves negative)
-const parseFormattedNumber = (value: string): string => {
-  const isNegative = value.startsWith('-')
-  const num = value.replace(/[^\d.]/g, '')
-  return (isNegative ? '-' : '') + num
-}
 
 // Get currency multiplier (JPY/VND = 1, USD = 100)
 const getCurrencyMultiplier = (curr: string): number => {

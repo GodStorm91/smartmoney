@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { BottomNavigation } from './BottomNavigation'
+import { Sidebar } from './Sidebar'
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { CommandPalette } from '@/components/ui/CommandPalette'
@@ -117,8 +118,9 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <Sidebar />
       <Header />
-      <main className="flex-1 pb-24 md:pb-0">
+      <main className="flex-1 pb-24 md:pb-0 md:ml-16">
         <PageTransition>{children}</PageTransition>
       </main>
       <Footer />

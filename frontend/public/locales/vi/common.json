@@ -22,7 +22,10 @@
     "analytics": "Phân tích",
     "report": "Báo cáo",
     "proxy": "Mua hộ",
-    "more": "Thêm"
+    "more": "Thêm",
+    "explore": "Khám phá",
+    "collapse": "Thu gọn",
+    "expand": "Mở rộng"
   },
   "button": {
     "save": "Lưu",
@@ -519,6 +522,7 @@
     "deleteTransaction": "Xóa giao dịch này",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
     "saved": "Đã lưu giao dịch!",
+    "moreOptions": "Tùy chọn khác",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
       "descriptionRequired": "Mô tả là bắt buộc",
