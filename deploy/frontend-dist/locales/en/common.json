@@ -559,6 +559,11 @@
     "createSuccess": "Recurring transaction created",
     "deleteSuccess": "Recurring transaction deleted",
     "updateSuccess": "Recurring transaction updated",
+    "transfer": "Transfer",
+    "fromAccount": "From Account",
+    "toAccount": "To Account",
+    "selectDestAccount": "Select destination",
+    "transferFee": "Transfer Fee (optional)",
     "days": {
       "monday": "Monday",
       "tuesday": "Tuesday",

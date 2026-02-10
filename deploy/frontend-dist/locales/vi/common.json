@@ -488,6 +488,11 @@
     "createSuccess": "Đã tạo giao dịch định kỳ",
     "deleteSuccess": "Đã xóa giao dịch định kỳ",
     "updateSuccess": "Đã cập nhật giao dịch định kỳ",
+    "transfer": "Chuyển khoản",
+    "fromAccount": "Từ tài khoản",
+    "toAccount": "Đến tài khoản",
+    "selectDestAccount": "Chọn tài khoản đích",
+    "transferFee": "Phí chuyển khoản (tùy chọn)",
     "days": {
       "monday": "Thứ Hai",
       "tuesday": "Thứ Ba",
