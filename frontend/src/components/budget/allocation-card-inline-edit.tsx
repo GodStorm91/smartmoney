@@ -50,10 +50,10 @@ export function AllocationInlineEdit({ currentAmount, onSave, onCancel }: Alloca
       />
       <button
         onClick={handleSave}
-        className="p-1.5 bg-green-100 dark:bg-green-900/40 hover:bg-green-200 dark:hover:bg-green-900/60 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+        className="p-1.5 bg-primary-100 dark:bg-primary-900/40 hover:bg-primary-200 dark:hover:bg-primary-900/60 rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label={t('save')}
       >
-        <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+        <Check className="w-4 h-4 text-primary-600 dark:text-primary-400" />
       </button>
       <button
         onClick={onCancel}

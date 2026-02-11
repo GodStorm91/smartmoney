@@ -87,9 +87,9 @@ export function BudgetTabsContainer({
               onKeyDown={(e) => handleKeyDown(e, index)}
               className={cn(
                 'relative flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                 isActive
-                  ? 'bg-white dark:bg-gray-900 text-green-600 dark:text-green-400 shadow-sm'
+                  ? 'bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
               )}
             >
