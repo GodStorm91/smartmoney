@@ -10,6 +10,8 @@ from ..models.budget import Budget, BudgetAllocation
 from ..models.transaction import Transaction
 from ..models.budget_alert import BudgetAlert
 from ..schemas.budget_alert import BudgetAlertCreate
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 
 class BudgetAlertService:
@@ -35,11 +37,13 @@ class BudgetAlertService:
         else:
             month_end = datetime(year, month_num + 1, 1)
 
-        # Build query for expenses
+        # Build query for expenses with currency for conversion
+        rates = ExchangeRateService.get_cached_rates(db)
         query = db.query(
             Transaction.category,
             Transaction.subcategory,
-            func.sum(Transaction.amount).label("total"),
+            Transaction.amount,
+            Transaction.currency,
         ).filter(
             Transaction.user_id == user_id,
             Transaction.is_income == False,
@@ -52,13 +56,14 @@ class BudgetAlertService:
         if category:
             query = query.filter(Transaction.category == category)
 
-        results = query.group_by(Transaction.category, Transaction.subcategory).all()
+        rows = query.all()
 
-        # Combine category totals (including subcategories)
+        # Combine category totals with currency conversion to JPY
         category_totals = {}
-        for cat, subcat, total in results:
+        for cat, subcat, amount, currency in rows:
             cat_key = cat or "Uncategorized"
-            category_totals[cat_key] = category_totals.get(cat_key, 0) + (total or 0)
+            amount_jpy = convert_to_jpy(abs(amount or 0), currency, rates)
+            category_totals[cat_key] = category_totals.get(cat_key, 0) + amount_jpy
 
         return category_totals
 
@@ -232,8 +237,10 @@ class BudgetAlertService:
         else:
             month_end = datetime(year, month_num + 1, 1)
 
-        total_spent = (
-            db.query(func.coalesce(func.sum(Transaction.amount), 0))
+        # Fetch individual rows and convert to JPY before summing
+        rates = ExchangeRateService.get_cached_rates(db)
+        expense_rows = (
+            db.query(Transaction.amount, Transaction.currency)
             .filter(
                 Transaction.user_id == user_id,
                 Transaction.is_income == False,
@@ -242,8 +249,11 @@ class BudgetAlertService:
                 Transaction.date >= month_start.date(),
                 Transaction.date < month_end.date(),
             )
-            .scalar()
-            or 0
+            .all()
+        )
+        total_spent = sum(
+            convert_to_jpy(abs(row.amount), row.currency, rates)
+            for row in expense_rows
         )
 
         total_budget = sum(a.amount for a in budget.allocations)

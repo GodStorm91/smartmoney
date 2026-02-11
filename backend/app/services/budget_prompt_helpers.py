@@ -9,6 +9,8 @@ from sqlalchemy import func
 
 from ..models.category import Category
 from ..models.transaction import Transaction
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 logger = logging.getLogger(__name__)
 
@@ -29,11 +31,12 @@ _CATEGORY_ALIASES: dict[str, str] = {
 def fetch_category_spending(db: Session, user_id: int) -> dict[str, dict]:
     """Fetch average monthly spending per category for last 3 months."""
     three_months_ago = date.today() - timedelta(days=90)
-    spending_data = (
+    rates = ExchangeRateService.get_cached_rates(db)
+    rows = (
         db.query(
             Transaction.category,
-            func.sum(Transaction.amount).label("total"),
-            func.count(Transaction.id).label("count")
+            Transaction.amount,
+            Transaction.currency,
         )
         .filter(
             Transaction.user_id == user_id,
@@ -42,16 +45,24 @@ def fetch_category_spending(db: Session, user_id: int) -> dict[str, dict]:
             Transaction.is_adjustment == False,
             Transaction.date >= three_months_ago
         )
-        .group_by(Transaction.category)
         .all()
     )
 
+    # Aggregate per category with currency conversion to JPY
+    category_totals: dict[str, dict] = {}
+    for row in rows:
+        cat = row.category
+        if cat not in category_totals:
+            category_totals[cat] = {"total": 0, "count": 0}
+        category_totals[cat]["total"] += convert_to_jpy(abs(row.amount), row.currency, rates)
+        category_totals[cat]["count"] += 1
+
     category_spending = {}
-    for row in spending_data:
-        avg_monthly = abs(row.total) / 3
-        category_spending[row.category] = {
+    for cat, data in category_totals.items():
+        avg_monthly = data["total"] / 3
+        category_spending[cat] = {
             "average_monthly": int(avg_monthly),
-            "transaction_count": row.count
+            "transaction_count": data["count"]
         }
     return category_spending
 

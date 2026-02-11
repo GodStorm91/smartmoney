@@ -216,7 +216,7 @@ export function Dashboard() {
         </div>
 
         {/* 6. Monthly Summary (KPI + Income/Expense + Savings Rate) */}
-        <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} />
+        <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} exchangeRates={exchangeRates?.rates || {}} />
 
         <div className="grid grid-cols-2 gap-3">
           <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>

@@ -13,6 +13,8 @@ from ..schemas.report import MonthlyUsageReportData
 from ..services.monthly_report_service import MonthlyReportService
 from ..services.monthly_report_pdf_service import get_monthly_report_pdf_service
 from ..services.report_service import get_pdf_service
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 router = APIRouter(prefix="/api/reports", tags=["reports"])
 
@@ -78,26 +80,34 @@ async def generate_yearly_report(
         .all()
     )
 
-    # Calculate totals
-    total_income = sum(tx.amount for tx in transactions if tx.is_income)
-    total_expense = sum(abs(tx.amount) for tx in transactions if not tx.is_income)
+    # Convert amounts to JPY before aggregating
+    rates = ExchangeRateService.get_cached_rates(db)
+
+    total_income = sum(
+        convert_to_jpy(tx.amount, tx.currency, rates)
+        for tx in transactions if tx.is_income
+    )
+    total_expense = sum(
+        convert_to_jpy(abs(tx.amount), tx.currency, rates)
+        for tx in transactions if not tx.is_income
+    )
     net = total_income - total_expense
 
-    # Category breakdown
+    # Category breakdown with currency conversion
     categories = {}
     for tx in transactions:
         if not tx.is_income:
             cat = tx.category
-            categories[cat] = categories.get(cat, 0) + abs(tx.amount)
+            categories[cat] = categories.get(cat, 0) + convert_to_jpy(abs(tx.amount), tx.currency, rates)
 
     categories_sorted = sorted(categories.items(), key=lambda x: x[1], reverse=True)
 
-    # Convert to dict format for PDF service
+    # Convert to dict format for PDF service (amounts pre-converted to JPY)
     tx_dicts = [
         {
             'date': tx.date.isoformat(),
             'description': tx.description,
-            'amount': tx.amount,
+            'amount': convert_to_jpy(tx.amount, tx.currency, rates),
             'is_income': tx.is_income,
             'category': tx.category,
         }
@@ -154,26 +164,34 @@ async def generate_monthly_report(
         .all()
     )
 
-    # Calculate totals
-    total_income = sum(tx.amount for tx in transactions if tx.is_income)
-    total_expense = sum(abs(tx.amount) for tx in transactions if not tx.is_income)
+    # Convert amounts to JPY before aggregating
+    rates = ExchangeRateService.get_cached_rates(db)
+
+    total_income = sum(
+        convert_to_jpy(tx.amount, tx.currency, rates)
+        for tx in transactions if tx.is_income
+    )
+    total_expense = sum(
+        convert_to_jpy(abs(tx.amount), tx.currency, rates)
+        for tx in transactions if not tx.is_income
+    )
     net = total_income - total_expense
 
-    # Category breakdown
+    # Category breakdown with currency conversion
     categories = {}
     for tx in transactions:
         if not tx.is_income:
             cat = tx.category
-            categories[cat] = categories.get(cat, 0) + abs(tx.amount)
+            categories[cat] = categories.get(cat, 0) + convert_to_jpy(abs(tx.amount), tx.currency, rates)
 
     categories_sorted = sorted(categories.items(), key=lambda x: x[1], reverse=True)
 
-    # Convert to dict format
+    # Convert to dict format (amounts pre-converted to JPY)
     tx_dicts = [
         {
             'date': tx.date.isoformat(),
             'description': tx.description,
-            'amount': tx.amount,
+            'amount': convert_to_jpy(tx.amount, tx.currency, rates),
             'is_income': tx.is_income,
             'category': tx.category,
         }
@@ -243,12 +261,15 @@ async def generate_deductible_report(
 
     transactions = query.order_by(Transaction.date.desc()).all()
 
-    # Filter deductible categories (contains keyword)
+    # Convert amounts to JPY for deductible report
+    rates = ExchangeRateService.get_cached_rates(db)
+
+    # Filter deductible categories (contains keyword), amounts pre-converted to JPY
     deductible = [
         {
             'date': tx.date.isoformat(),
             'description': tx.description,
-            'amount': tx.amount,
+            'amount': convert_to_jpy(tx.amount, tx.currency, rates),
             'category': tx.category,
         }
         for tx in transactions

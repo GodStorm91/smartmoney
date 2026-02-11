@@ -5,16 +5,25 @@ interface KpiRowProps {
   summary: any
   formatCurrency: (amount: number) => string
   accounts: any[]
+  exchangeRates?: Record<string, number>
 }
 
 const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
 
-export function KpiRow({ summary, formatCurrency, accounts }: KpiRowProps) {
+function convertToJpy(amount: number, currency: string, rates: Record<string, number>): number {
+  if (currency === 'JPY' || !rates[currency]) return amount
+  const rate = rates[currency]
+  if (rate === 0) return amount
+  const actual = currency === 'USD' ? amount / 100 : amount
+  return Math.round(actual / rate)
+}
+
+export function KpiRow({ summary, formatCurrency, accounts, exchangeRates = {} }: KpiRowProps) {
   const assets = accounts?.filter(a => ASSET_TYPES.includes(a.type))
-    .reduce((sum, a) => sum + a.current_balance, 0) || 0
+    .reduce((sum, a) => sum + convertToJpy(a.current_balance, a.currency || 'JPY', exchangeRates), 0) || 0
 
   const liabilities = accounts?.filter(a => !ASSET_TYPES.includes(a.type))
-    .reduce((sum, a) => sum + Math.abs(a.current_balance), 0) || 0
+    .reduce((sum, a) => sum + Math.abs(convertToJpy(a.current_balance, a.currency || 'JPY', exchangeRates)), 0) || 0
 
   const kpis = [
     { label: 'Assets', value: assets, color: 'text-green-600 dark:text-green-400' },

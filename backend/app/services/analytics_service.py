@@ -229,15 +229,13 @@ class AnalyticsService:
         query = (
             db.query(
                 Transaction.source,
-                func.sum(Transaction.amount).label("total"),
-                func.count(Transaction.id).label("count"),
+                Transaction.amount,
+                Transaction.currency,
             )
             .filter(
                 Transaction.user_id == user_id,
                 ~Transaction.is_transfer
             )
-            .group_by(Transaction.source)
-            .order_by(func.count(Transaction.id).desc())
         )
 
         if start_date:
@@ -245,17 +243,23 @@ class AnalyticsService:
         if end_date:
             query = query.filter(Transaction.date <= end_date)
 
-        results = query.all()
+        rows = query.all()
 
-        sources = []
-        for row in results:
-            sources.append(
-                {
-                    "source": row.source,
-                    "total": row.total,
-                    "count": row.count,
-                }
-            )
+        # Aggregate per source with currency conversion
+        rates = ExchangeRateService.get_cached_rates(db)
+        source_totals: dict[str, dict] = {}
+        for row in rows:
+            key = row.source
+            if key not in source_totals:
+                source_totals[key] = {"total": 0, "count": 0}
+            source_totals[key]["total"] += convert_to_jpy(row.amount, row.currency, rates)
+            source_totals[key]["count"] += 1
+
+        sources = sorted(
+            [{"source": k, "total": v["total"], "count": v["count"]} for k, v in source_totals.items()],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
 
         return sources
 

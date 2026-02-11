@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..models.transaction import Transaction
+from ..services.exchange_rate_service import ExchangeRateService
+from ..utils.currency_utils import convert_to_jpy
 
 
 class TransactionService:
@@ -273,8 +275,16 @@ class TransactionService:
 
         transactions = query.all()
 
-        income = sum(tx.amount for tx in transactions if tx.is_income)
-        expenses = abs(sum(tx.amount for tx in transactions if not tx.is_income))
+        # Convert each transaction to JPY before summing
+        rates = ExchangeRateService.get_cached_rates(db)
+        income = sum(
+            convert_to_jpy(tx.amount, tx.currency, rates)
+            for tx in transactions if tx.is_income
+        )
+        expenses = abs(sum(
+            convert_to_jpy(tx.amount, tx.currency, rates)
+            for tx in transactions if not tx.is_income
+        ))
 
         return {
             "income": income,
