@@ -17,7 +17,7 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@money.khanh.page << 'D
 set -e
 
 DEPLOY_DIR="/var/www/smartmoney"
-NGINX_DIR="/root/smartmoney/deploy/frontend-dist"
+NGINX_DIR="/var/www/smartmoney/deploy/frontend-dist"
 
 echo "🔨 Building frontend..."
 cd "$DEPLOY_DIR/frontend"

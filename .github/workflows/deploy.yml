@@ -102,6 +102,12 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
+            # Sync frontend-dist to nginx volume mount directory
+            NGINX_VOLUME_DIR="/var/www/smartmoney/deploy/frontend-dist"
+            echo "Syncing frontend files to nginx volume..."
+            rm -rf "$NGINX_VOLUME_DIR/assets" "$NGINX_VOLUME_DIR/locales" "$NGINX_VOLUME_DIR/icons"
+            cp -r $DEPLOY_DIR/frontend-dist/* "$NGINX_VOLUME_DIR/"
+
             cd $DEPLOY_DIR
 
             # Pull latest backend image
@@ -121,7 +127,7 @@ jobs:
 
             # Restart nginx to pick up new frontend files
             echo "Restarting nginx..."
-            docker compose restart nginx
+            docker compose down nginx && docker compose up -d nginx
 
             # Cleanup old images
             docker image prune -af --filter "until=168h" || true
@@ -182,10 +188,16 @@ jobs:
             npm ci
             npm run build
 
-            # Copy frontend to deploy dir
+            # Copy frontend to deploy dir and nginx volume
             echo "Copying frontend files..."
             rm -rf $DEPLOY_DIR/frontend-dist/*
             cp -r dist/* $DEPLOY_DIR/frontend-dist/
+
+            # Sync to nginx volume mount directory
+            NGINX_VOLUME_DIR="/var/www/smartmoney/deploy/frontend-dist"
+            echo "Syncing frontend files to nginx volume..."
+            rm -rf "$NGINX_VOLUME_DIR/assets" "$NGINX_VOLUME_DIR/locales" "$NGINX_VOLUME_DIR/icons"
+            cp -r dist/* "$NGINX_VOLUME_DIR/"
 
             cd $DEPLOY_DIR
 
@@ -206,7 +218,7 @@ jobs:
 
             # Restart nginx to pick up new frontend files
             echo "Restarting nginx..."
-            docker compose restart nginx
+            docker compose down nginx && docker compose up -d nginx
 
             # Cleanup old images (older than 7 days)
             echo "Cleaning up old images..."
