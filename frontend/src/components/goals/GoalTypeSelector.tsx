@@ -53,7 +53,7 @@ export function GoalTypeSelector({ selectedType, onSelect, hasEmergencyFund }: G
               disabled={isDisabled}
               className={`
                 p-4 rounded-lg border-2 text-center transition-all
-                ${isSelected ? 'ring-2 ring-blue-500 border-blue-500' : config.color}
+                ${isSelected ? 'ring-2 ring-primary-500 border-primary-500' : config.color}
                 ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
             >

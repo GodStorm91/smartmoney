@@ -45,7 +45,7 @@ export function AllocationInlineEdit({ currentAmount, onSave, onCancel }: Alloca
           if (e.key === 'Enter') handleSave()
           else if (e.key === 'Escape') onCancel()
         }}
-        className="w-28 text-right text-lg font-bold border-2 border-blue-400 rounded px-2 py-1 dark:bg-gray-700 dark:border-blue-500 dark:text-gray-100 focus:outline-none focus:border-blue-500"
+        className="w-28 text-right text-lg font-bold border-2 border-primary-400 rounded px-2 py-1 dark:bg-gray-700 dark:border-primary-500 dark:text-gray-100 focus:outline-none focus:border-primary-500"
         aria-label={t('budget.editAmount')}
       />
       <button

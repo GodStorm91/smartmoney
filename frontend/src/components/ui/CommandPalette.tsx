@@ -170,7 +170,7 @@ export function CommandPalette({
                     key={tx.id}
                     value={`transaction-${tx.id}`}
                     onSelect={() => handleSelect('transaction')}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[selected=true]:bg-blue-50 dark:data-[selected=true]:bg-blue-900/30"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[selected=true]:bg-primary-50 dark:data-[selected=true]:bg-primary-900/30"
                   >
                     <Receipt className="w-4 h-4 text-gray-400" />
                     <div className="flex-1 min-w-0">
@@ -337,7 +337,7 @@ function CommandItem({ icon, label, shortcut, value, onSelect }: CommandItemProp
     <Command.Item
       value={value}
       onSelect={onSelect}
-      className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[selected=true]:bg-blue-50 dark:data-[selected=true]:bg-blue-900/30"
+      className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 data-[selected=true]:bg-primary-50 dark:data-[selected=true]:bg-primary-900/30"
     >
       <span className="text-gray-400 dark:text-gray-500">{icon}</span>
       <span className="flex-1">{label}</span>

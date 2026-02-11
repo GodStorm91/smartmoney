@@ -113,7 +113,7 @@ export function ReceiptThumbnail({ receiptUrl, onClick, size = 'md' }: ReceiptTh
   return (
     <button
       onClick={onClick}
-      className={`${sizeClasses[size]} rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 transition-colors`}
+      className={`${sizeClasses[size]} rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-400 transition-colors`}
       aria-label={t('receipt.viewReceipt', 'View Receipt')}
     >
       <img

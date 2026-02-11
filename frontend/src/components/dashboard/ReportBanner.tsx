@@ -54,7 +54,7 @@ export function ReportBanner({ className }: ReportBannerProps) {
   return (
     <div
       className={cn(
-        'relative rounded-xl p-4 bg-gradient-to-r from-primary-500/10 to-blue-500/10',
+        'relative rounded-xl p-4 bg-gradient-to-r from-primary-500/10 to-primary-500/5',
         'border border-primary-200 dark:border-primary-800',
         'animate-slide-in-top',
         className,

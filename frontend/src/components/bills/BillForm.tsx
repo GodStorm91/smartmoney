@@ -266,7 +266,7 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
                 type="checkbox"
                 checked={formData.is_paid}
                 onChange={(e) => setFormData(prev => ({ ...prev, is_paid: e.target.checked }))}
-                className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('bills.field.already_paid')}

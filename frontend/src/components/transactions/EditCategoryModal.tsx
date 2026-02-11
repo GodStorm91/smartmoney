@@ -182,7 +182,7 @@ export function EditCategoryModal({
                   className={cn(
                     'w-8 h-8 text-lg rounded flex items-center justify-center',
                     icon === emoji
-                      ? 'bg-blue-100 dark:bg-blue-900 border-2 border-blue-500'
+                      ? 'bg-primary-100 dark:bg-primary-900 border-2 border-primary-500'
                       : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
                   )}
                 >

@@ -72,7 +72,7 @@ export function ImageDropZone({ onImageSelect, className }: ImageDropZoneProps) 
       className={cn(
         'border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer',
         isDragging
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
           : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500',
         isProcessing && 'opacity-50 pointer-events-none',
         className
@@ -89,7 +89,7 @@ export function ImageDropZone({ onImageSelect, className }: ImageDropZoneProps) 
         <div className="flex flex-col items-center gap-3">
           {isProcessing ? (
             <>
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500" />
               <p className="text-gray-600 dark:text-gray-400">
                 {t('receipt.processing', 'Processing...')}
               </p>

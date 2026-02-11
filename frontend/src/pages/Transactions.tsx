@@ -785,7 +785,7 @@ export function Transactions() {
                       type="checkbox"
                       checked={allSelected}
                       onChange={toggleSelectAll}
-                      className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                     />
                   </th>
                   <th
@@ -854,7 +854,7 @@ export function Transactions() {
                         type="checkbox"
                         checked={selectedIds.has(tx.id)}
                         onChange={() => toggleSelect(tx.id)}
-                        className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                       />
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{formatDate(tx.date)}</td>

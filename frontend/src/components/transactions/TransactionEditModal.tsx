@@ -336,7 +336,7 @@ export function TransactionEditModal({
                   type="checkbox"
                   checked={isAdjustment}
                   onChange={(e) => setIsAdjustment(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                 />
                 <div>
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -382,7 +382,7 @@ export function TransactionEditModal({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-10 flex items-center justify-center gap-2 border border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 text-gray-500 dark:text-gray-400 rounded-lg text-sm"
+                    className="w-full h-10 flex items-center justify-center gap-2 border border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 text-gray-500 dark:text-gray-400 rounded-lg text-sm"
                   >
                     <Camera size={16} />
                     {t('receipt.attachReceipt', 'Attach Receipt')}

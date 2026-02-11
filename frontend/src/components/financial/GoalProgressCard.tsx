@@ -70,7 +70,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
         </div>
         <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-blue-500 transition-all duration-500"
+            className="h-full bg-primary-500 transition-all duration-500"
             style={{ width: `${Math.min(progress, 100)}%` }}
             role="progressbar"
             aria-valuenow={progress}
@@ -97,7 +97,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
             {goal.start_date} → {goal.target_date}
           </p>
           {goal.account_name && (
-            <p className="text-sm text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+            <p className="text-sm text-primary-600 dark:text-primary-400 mt-1 flex items-center gap-1">
               <span>🐷</span> {goal.account_name}
             </p>
           )}
@@ -116,24 +116,24 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
         </div>
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('goals.currentSavings')}</p>
-          <p className="text-3xl font-bold font-numbers text-blue-600 dark:text-blue-400">
+          <p className="text-3xl font-bold font-numbers text-primary-600 dark:text-primary-400">
             {formatCurrency(goal.total_saved, currency, exchangeRates?.rates || {}, true)}
           </p>
         </div>
         <div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('goals.achievementRate')}</p>
-          <p className="text-3xl font-bold font-numbers text-blue-600 dark:text-blue-400">{Math.min(progress, 100).toFixed(1)}%</p>
+          <p className="text-3xl font-bold font-numbers text-primary-600 dark:text-primary-400">{Math.min(progress, 100).toFixed(1)}%</p>
         </div>
       </div>
 
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('goals.progress')}</span>
-          <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">{Math.min(progress, 100).toFixed(1)}%</span>
+          <span className="text-sm font-semibold text-primary-600 dark:text-primary-400">{Math.min(progress, 100).toFixed(1)}%</span>
         </div>
         <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${progress >= 100 ? 'bg-green-500' : 'bg-blue-500'}`}
+            className={`h-full rounded-full transition-all duration-500 ${progress >= 100 ? 'bg-green-500' : 'bg-primary-500'}`}
             style={{ width: `${Math.min(progress, 100)}%` }}
             role="progressbar"
             aria-valuenow={Math.min(progress, 100)}
@@ -150,12 +150,12 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
           </p>
         </div>
       ) : (
-        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+        <div className="bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 rounded-lg p-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+            <p className="text-sm font-medium text-primary-900 dark:text-primary-100">
               {t('goals.remaining')}: {formatCurrency(goal.needed_remaining, currency, exchangeRates?.rates || {}, true)}
             </p>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
+            <p className="text-sm text-primary-700 dark:text-primary-300">
               ~{formatCurrency(goal.needed_per_month, currency, exchangeRates?.rates || {}, true)}/{t('goals.month')}
             </p>
           </div>

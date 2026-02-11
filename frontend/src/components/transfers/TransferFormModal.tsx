@@ -246,7 +246,7 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
                 type="checkbox"
                 checked={isExchangeMode}
                 onChange={e => setIsExchangeMode(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <RefreshCw className="w-4 h-4" />
               {t('transfer.exchangeMode', 'Currency Exchange')}

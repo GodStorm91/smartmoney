@@ -50,7 +50,7 @@ export function MultiSelect({ label, options, selected, onChange, placeholder }:
           'w-full px-4 py-2 border rounded-lg text-left flex justify-between items-center',
           'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100',
           'border-gray-300 dark:border-gray-600',
-          'transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500'
+          'transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500'
         )}
       >
         <span className={selected.length === 0 ? 'text-gray-500' : ''}>
@@ -77,7 +77,7 @@ export function MultiSelect({ label, options, selected, onChange, placeholder }:
                 type="checkbox"
                 checked={selected.includes(opt.value)}
                 onChange={() => toggleOption(opt.value)}
-                className="mr-3 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                className="mr-3 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
               />
               <span className="text-gray-900 dark:text-gray-100">{opt.label}</span>
             </label>

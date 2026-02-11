@@ -52,7 +52,7 @@ export function AllocationCard({
     <Card
       className={cn(
         'overflow-hidden',
-        isExpanded && 'border-blue-300 dark:border-blue-700',
+        isExpanded && 'border-primary-300 dark:border-primary-700',
         className
       )}
       role="article"

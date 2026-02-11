@@ -37,8 +37,8 @@ export const Switch: React.FC<SwitchProps> = ({
       disabled={disabled}
       onClick={handleChange}
       className={clsx(
-        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-        checked ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700',
+        'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+        checked ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700',
         disabled && 'opacity-50 cursor-not-allowed',
         className
       )}

@@ -59,7 +59,7 @@ export function TransactionReceiptSection({
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-12 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 text-gray-500 dark:text-gray-400 rounded-lg font-medium transition-colors"
+          className="w-full h-12 flex items-center justify-center gap-2 border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-primary-400 dark:hover:border-primary-500 text-gray-500 dark:text-gray-400 rounded-lg font-medium transition-colors"
         >
           <Camera size={20} />
           {t('receipt.attachReceipt', 'Attach Receipt Photo')}

@@ -221,7 +221,7 @@ export function AccountFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={cn(
-                'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
                 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
                 errors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
               )}
@@ -239,7 +239,7 @@ export function AccountFormModal({
               id="type"
               value={type}
               onChange={(e) => setType(e.target.value as AccountType)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             >
               {accountTypes.map((accountType) => (
                 <option key={accountType} value={accountType}>
@@ -264,7 +264,7 @@ export function AccountFormModal({
                   id="initialBalance"
                   value={formatWithCommas(initialBalance)}
                   onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="0"
                 />
               </div>
@@ -279,7 +279,7 @@ export function AccountFormModal({
                   value={initialBalanceDate}
                   onChange={(e) => setInitialBalanceDate(e.target.value)}
                   className={cn(
-                    'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                    'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
                     'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
                     errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   )}
@@ -297,7 +297,7 @@ export function AccountFormModal({
                   id="currency"
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 >
                   <option value="JPY">JPY (¥)</option>
                   <option value="USD">USD ($)</option>
@@ -320,7 +320,7 @@ export function AccountFormModal({
                   id="initialBalance"
                   value={formatWithCommas(initialBalance)}
                   onChange={(e) => setInitialBalance(parseFormattedNumber(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="0"
                 />
               </div>
@@ -335,7 +335,7 @@ export function AccountFormModal({
                   value={initialBalanceDate}
                   onChange={(e) => setInitialBalanceDate(e.target.value)}
                   className={cn(
-                    'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
+                    'w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500',
                     'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
                     errors.initialBalanceDate ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                   )}
@@ -383,7 +383,7 @@ export function AccountFormModal({
                     setDesiredCurrentBalance(parseFormattedNumber(e.target.value))
                     setShowConfirmation(false) // Reset confirmation when value changes
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
                   placeholder="Enter the actual balance"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -474,7 +474,7 @@ export function AccountFormModal({
               id="notes"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               rows={3}
               placeholder={t('account.notesPlaceholder')}
             />

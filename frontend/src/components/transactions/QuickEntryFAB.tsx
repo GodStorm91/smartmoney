@@ -594,7 +594,7 @@ export function QuickEntryFAB() {
                   'bg-gray-100 dark:bg-gray-700 border-0',
                   'text-gray-900 dark:text-gray-100',
                   'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-                  'focus:outline-none focus:ring-2 focus:ring-blue-500'
+                  'focus:outline-none focus:ring-2 focus:ring-primary-500'
                 )}
                 autoFocus
               />
@@ -630,7 +630,7 @@ export function QuickEntryFAB() {
             {/* Saving indicator */}
             {createMutation.isPending && (
               <div className="flex items-center justify-center gap-2 mt-4 text-gray-500">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500" />
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-500" />
                 <span>{t('saving', 'Saving...')}</span>
               </div>
             )}

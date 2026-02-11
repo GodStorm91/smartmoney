@@ -405,7 +405,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                     type="checkbox"
                     checked={isAdjustment}
                     onChange={(e) => setIsAdjustment(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
                   <div>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -424,7 +424,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                       type="checkbox"
                       checked={isRecurring}
                       onChange={(e) => setIsRecurring(e.target.checked)}
-                      className="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                      className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                     />
                     <RefreshCw className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">

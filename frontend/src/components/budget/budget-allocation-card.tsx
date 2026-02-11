@@ -113,8 +113,8 @@ export function AllocationCard({
       className={cn(
         'p-3 sm:p-4 transition-all',
         isDraft
-          ? 'border-dashed border-blue-300 dark:border-blue-700'
-          : 'cursor-pointer hover:shadow-md hover:border-blue-300 dark:hover:border-blue-600',
+          ? 'border-dashed border-primary-300 dark:border-primary-700'
+          : 'cursor-pointer hover:shadow-md hover:border-primary-300 dark:hover:border-primary-600',
         (isUpdating || isDeleting) && 'opacity-50 pointer-events-none'
       )}
       onClick={handleCardClick}

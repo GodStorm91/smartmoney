@@ -99,7 +99,7 @@ export function HierarchicalCategoryPicker({
                 'flex flex-col items-center justify-center p-3 rounded-lg',
                 'min-h-[64px] transition-colors',
                 selected === child.name
-                  ? 'bg-blue-100 border-2 border-blue-500 dark:bg-blue-900'
+                  ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600'
               )}
             >
@@ -175,7 +175,7 @@ export function HierarchicalCategoryPicker({
             'flex flex-col items-center justify-center p-3 rounded-lg',
             'min-h-[64px] transition-colors',
             findParentForChild(selected)?.id === parent.id
-              ? 'bg-blue-100 border-2 border-blue-500 dark:bg-blue-900'
+              ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'
               : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600'
           )}
         >

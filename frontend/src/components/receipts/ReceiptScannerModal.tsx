@@ -136,7 +136,7 @@ export function ReceiptScannerModal({
               {/* Scanning status */}
               {scanMutation.isPending && (
                 <div className="flex items-center justify-center gap-3 py-4">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500" />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500" />
                   <span className="text-gray-600 dark:text-gray-400">
                     {t('receipt.analyzing', 'Analyzing receipt with AI...')}
                   </span>
