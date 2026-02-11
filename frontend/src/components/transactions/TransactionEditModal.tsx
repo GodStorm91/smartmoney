@@ -313,6 +313,7 @@ export function TransactionEditModal({
                   parentCategory={parentCategory || category}
                   transactionAmount={parseInt(amount) || 0}
                   isExpense={type === 'expense'}
+                  transactionCurrency={currency}
                 />
               )}
 

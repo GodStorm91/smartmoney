@@ -327,6 +327,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                 parentCategory={parentCategory || category}
                 transactionAmount={parseInt(amount) || 0}
                 isExpense={!isIncome}
+                transactionCurrency={selectedAccount?.currency || 'JPY'}
               />
             )}
           </div>

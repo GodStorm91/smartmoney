@@ -11,16 +11,27 @@ import { cn } from '@/utils/cn'
 interface BudgetInsightWidgetProps {
   /** Parent category name that maps to budget allocation */
   parentCategory: string
-  /** Current transaction amount (positive integer) */
+  /** Current transaction amount (positive integer, in display currency units) */
   transactionAmount: number
   /** Whether this is an expense transaction */
   isExpense: boolean
+  /** Currency of the transaction amount (defaults to JPY) */
+  transactionCurrency?: string
+}
+
+function convertToJpy(amount: number, currency: string, rates: Record<string, number>): number {
+  if (currency === 'JPY' || !rates[currency]) return amount
+  const rate = rates[currency]
+  if (rate === 0) return amount
+  const actual = currency === 'USD' ? amount / 100 : amount
+  return Math.round(actual / rate)
 }
 
 export function BudgetInsightWidget({
   parentCategory,
   transactionAmount,
   isExpense,
+  transactionCurrency = 'JPY',
 }: BudgetInsightWidgetProps) {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
@@ -56,8 +67,11 @@ export function BudgetInsightWidget({
   const { spent, budgeted } = trackingItem
   const spentPercent = budgeted > 0 ? (spent / budgeted) * 100 : 0
 
+  // Convert transaction amount to JPY (budget tracking data is already in JPY)
+  const amountJpy = convertToJpy(transactionAmount, transactionCurrency, exchangeRates?.rates || {})
+
   // Calculate what happens if this transaction is added
-  const afterSpent = spent + transactionAmount
+  const afterSpent = spent + amountJpy
   const afterPercent = budgeted > 0 ? (afterSpent / budgeted) * 100 : 0
   const willExceed = afterSpent > budgeted
 

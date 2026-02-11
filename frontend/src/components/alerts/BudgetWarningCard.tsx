@@ -3,6 +3,7 @@ import { TrendingUp, AlertTriangle } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Progress } from '@/components/ui/Progress'
 import { useThresholdStatus } from '@/hooks/useBudgetAlerts'
+import { formatCurrency } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 
 interface BudgetWarningCardProps {
@@ -76,8 +77,8 @@ export function BudgetWarningCard({
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
             {t('alerts.budget_progress.message', {
               budget: budgetName,
-              spent: `$${spent.toFixed(2)}`,
-              limit: `$${limit.toFixed(2)}`
+              spent: formatCurrency(spent),
+              limit: formatCurrency(limit)
             })}
           </p>
 
@@ -89,7 +90,7 @@ export function BudgetWarningCard({
 
           <div className="flex justify-between mt-2 text-sm">
             <span className="text-gray-500 dark:text-gray-400">
-              {t('alerts.remaining')}: ${remaining.toFixed(2)}
+              {t('alerts.remaining')}: {formatCurrency(remaining)}
             </span>
             <span className={cn(
               'font-medium',
@@ -98,7 +99,7 @@ export function BudgetWarningCard({
                 : 'text-gray-700 dark:text-gray-300'
             )}>
               {isOverBudget
-                ? t('alerts.over_by', { amount: `$${Math.abs(remaining).toFixed(2)}` })
+                ? t('alerts.over_by', { amount: formatCurrency(Math.abs(remaining)) })
                 : t('alerts.left')}
             </span>
           </div>

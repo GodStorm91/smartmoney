@@ -130,9 +130,9 @@ def _build_prompt(report: MonthlyUsageReportData, language: str) -> str:
     return (
         f"You are a financial advisor summarizing a monthly report.\n"
         f"Respond in {lang_name}. Return ONLY a JSON object.\n\n"
-        f"DATA:\n"
-        f"- Income: {s.total_income:,} ({s.income_change:+.1f}%)\n"
-        f"- Expenses: {s.total_expense:,} ({s.expense_change:+.1f}%)\n"
+        f"DATA (all amounts in JPY):\n"
+        f"- Income: ¥{s.total_income:,} ({s.income_change:+.1f}%)\n"
+        f"- Expenses: ¥{s.total_expense:,} ({s.expense_change:+.1f}%)\n"
         f"- Savings rate: {s.savings_rate}%\n"
         f"- Focus areas:\n{focus_lines}\n"
         f'Return JSON: {{"win":"one positive insight",'
