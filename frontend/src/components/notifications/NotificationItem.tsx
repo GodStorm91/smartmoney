@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button'
 import { cn } from '@/utils/cn'
 import type { InAppNotification } from '@/types/notification'
 import { notificationService } from '@/services/notification-service'
+import { getLocaleTag } from '@/utils/formatDate'
 
 interface NotificationItemProps {
   notification: InAppNotification
@@ -104,7 +105,7 @@ export function NotificationItem({ notification, onDismiss, onAction }: Notifica
     if (diffMins < 60) return t('notifications.minutesAgo', { count: diffMins })
     if (diffHours < 24) return t('notifications.hoursAgo', { count: diffHours })
     if (diffDays < 7) return t('notifications.daysAgo', { count: diffDays })
-    return date.toLocaleDateString()
+    return date.toLocaleDateString(getLocaleTag())
   }
 
   return (

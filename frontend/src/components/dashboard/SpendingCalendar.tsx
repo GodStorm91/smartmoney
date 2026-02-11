@@ -3,20 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, TrendingDown, DollarSign } from 'lucide-react'
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, isToday, addMonths, subMonths, getDate } from 'date-fns'
-import { ja, vi, enUS, type Locale } from 'date-fns/locale'
 import { Card } from '@/components/ui/Card'
 import { fetchTransactions } from '@/services/transaction-service'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { formatMonth as formatMonthLabel, getDateLocale } from '@/utils/formatDate'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
-
-const localeMap: Record<string, Locale> = {
-  ja: ja,
-  vi: vi,
-  en: enUS,
-}
 
 const weekDaysShort = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -59,7 +53,7 @@ export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProp
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [hoveredDay, setHoveredDay] = useState<Date | null>(null)
 
-  const locale = localeMap[i18n.language] || enUS
+  const locale = getDateLocale()
   const weekDays = weekDaysShort.map(day => {
     const date = new Date()
     date.setDate(weekDaysShort.indexOf(day) + 1)
@@ -177,7 +171,7 @@ export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProp
             <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 min-w-[100px] text-center">
-            {format(currentMonth, 'yyyy年M月', { locale })}
+            {formatMonthLabel(currentMonth)}
           </span>
           <button
             onClick={handleNextMonth}

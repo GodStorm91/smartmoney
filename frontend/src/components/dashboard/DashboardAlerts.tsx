@@ -55,7 +55,7 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount }: DashboardAlertsP
                 {t('anomaly.title')}
               </p>
               <p className="text-xs text-red-500 dark:text-red-400">
-                {unreadAnomalyCount} {unreadAnomalyCount === 1 ? 'alert' : 'alerts'} detected
+                {t('anomaly.alertsDetected', '{{count}} alerts detected', { count: unreadAnomalyCount })}
               </p>
             </div>
             <Badge variant="error">{unreadAnomalyCount}</Badge>

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Gift, TrendingUp, Calendar, RefreshCw, Check, Receipt, ExternalLink, Loader2, X, ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import { fetchPositionROI, scanRewards, fetchPositionRewardsList, createTransactionFromReward, batchCreateTransactions } from '@/services/crypto-service'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { PositionReward } from '@/types'
 
 interface PositionRewardsTabProps {
@@ -129,7 +130,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
   const formatMonth = (monthStr: string) => {
     const [year, month] = monthStr.split('-')
     const date = new Date(Number(year), Number(month) - 1)
-    return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    return date.toLocaleDateString(getLocaleTag(), { month: 'short', year: 'numeric' })
   }
 
   const formatAmount = (amount: number) => {
@@ -348,7 +349,7 @@ export function PositionRewardsTab({ positionId }: PositionRewardsTabProps) {
                         {Number(reward.reward_amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} {reward.reward_token_symbol || 'tokens'}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {new Date(reward.claimed_at).toLocaleDateString()} via {reward.source}
+                        {new Date(reward.claimed_at).toLocaleDateString(getLocaleTag())} via {reward.source}
                         {reward.reward_usd && (
                           <span className="ml-2 text-green-600 dark:text-green-400">
                             ≈ ${Number(reward.reward_usd).toFixed(2)}

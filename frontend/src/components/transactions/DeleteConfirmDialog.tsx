@@ -41,7 +41,7 @@ export function DeleteConfirmDialog({
       {/* Dialog */}
       <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-md p-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          {t('transaction.deleteConfirm', '取引を削除しますか？')}
+          {t('transaction.deleteConfirm', 'Delete this transaction?')}
         </h2>
 
         {/* Transaction Details */}
@@ -72,7 +72,7 @@ export function DeleteConfirmDialog({
         </div>
 
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          {t('transaction.deleteWarning', 'この操作は取り消せません。本当に削除しますか？')}
+          {t('transaction.deleteWarning', 'This action cannot be undone. Are you sure?')}
         </p>
 
         {/* Actions */}
@@ -83,14 +83,14 @@ export function DeleteConfirmDialog({
             disabled={isDeleting}
             className="flex-1"
           >
-            {t('button.cancel', 'キャンセル')}
+            {t('button.cancel', 'Cancel')}
           </Button>
           <Button
             onClick={onConfirm}
             disabled={isDeleting}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white"
           >
-            {isDeleting ? '削除中...' : t('button.delete', '削除')}
+            {isDeleting ? t('button.deleting', 'Deleting...') : t('button.delete', 'Delete')}
           </Button>
         </div>
       </div>

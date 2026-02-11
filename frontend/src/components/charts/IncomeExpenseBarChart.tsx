@@ -22,8 +22,8 @@ interface IncomeExpenseBarChartProps {
   data: MonthlyData[]
 }
 
-// Format large numbers compactly for bar labels
-function formatCompact(value: number, currency: string): string {
+// Format large numbers compactly for bar labels (locale-aware)
+function formatCompact(value: number, currency: string, lang: string): string {
   if (value === 0) return ''
   const absValue = Math.abs(value)
 
@@ -34,9 +34,12 @@ function formatCompact(value: number, currency: string): string {
     return value.toString()
   }
 
-  // For JPY, use 万 (10K) or K
+  // For JPY, use 万 (10K) for ja, W for others
   if (currency === 'JPY') {
-    if (absValue >= 10000) return `${(value / 10000).toFixed(1)}万`
+    if (absValue >= 10000) {
+      const unit = lang === 'ja' ? '万' : 'W'
+      return `${(value / 10000).toFixed(1)}${unit}`
+    }
     if (absValue >= 1000) return `${(value / 1000).toFixed(0)}K`
     return value.toString()
   }
@@ -50,8 +53,9 @@ function formatCompact(value: number, currency: string): string {
 export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const { resolvedTheme } = useTheme()
+  const lang = i18n.language
   const isDark = resolvedTheme === 'dark'
 
   // Dark mode colors (Catppuccin Mocha inspired)
@@ -114,7 +118,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
           <LabelList
             dataKey="income"
             position="top"
-            formatter={(value: number) => formatCompact(value, currency)}
+            formatter={(value: number) => formatCompact(value, currency, lang)}
             style={{ fontSize: '10px', fill: '#4CAF50', fontWeight: 500 }}
           />
         </Bar>
@@ -141,7 +145,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
           <LabelList
             dataKey="expenses"
             position="top"
-            formatter={(value: number) => formatCompact(value, currency)}
+            formatter={(value: number) => formatCompact(value, currency, lang)}
             style={{ fontSize: '10px', fill: '#F44336', fontWeight: 500 }}
           />
         </Bar>

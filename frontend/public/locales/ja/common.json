@@ -41,13 +41,23 @@
     "selectFile": "ファイルを選択",
     "addMore": "追加",
     "showDetails": "詳細を表示",
-    "hideDetails": "詳細を非表示"
+    "hideDetails": "詳細を非表示",
+    "copy": "コピー",
+    "deleting": "削除中...",
+    "saving": "保存中..."
   },
   "filter": {
     "category": "カテゴリー",
     "source": "支払元",
     "min": "最小",
     "max": "最大"
+  },
+  "date": {
+    "today": "今日",
+    "thisWeek": "今週",
+    "thisMonth": "今月",
+    "lastMonth": "先月",
+    "last3Months": "3ヶ月"
   },
   "language": {
     "selectLanguage": "言語を選択",
@@ -234,7 +244,14 @@
     "recategorize": "カテゴリー変更",
     "deleteSelected": "削除",
     "selectedCount": "{{count}}件選択中",
-    "clearSelection": "選択解除"
+    "clearSelection": "選択解除",
+    "searchPlaceholder": "取引を検索...",
+    "selectCategory": "カテゴリを選択...",
+    "recategorizeTitle": "カテゴリーの変更",
+    "recategorizeDescription": "{{count}}件の取引のカテゴリーを変更",
+    "newCategory": "新しいカテゴリー",
+    "bulkDeleteTitle": "取引の削除",
+    "bulkDeleteConfirm": "{{count}}件の取引を削除しますか？この操作は取り消せません。"
   },
   "transaction": {
     "addTransaction": "取引を追加",
@@ -253,8 +270,15 @@
     "selectAccount": "口座を選択",
     "deleteTransaction": "この取引を削除",
     "deleteConfirm": "この取引を削除してもよろしいですか？",
+    "deleteWarning": "この操作は取り消せません。本当に削除しますか？",
     "saved": "取引を保存しました！",
     "moreOptions": "詳細オプション",
+    "balanceAdjustment": "残高調整",
+    "balanceAdjustmentHint": "予算に含めません",
+    "currency": "通貨",
+    "today": "今日",
+    "cancel": "キャンセル",
+    "save": "保存",
     "errors": {
       "amountRequired": "金額は必須です",
       "descriptionRequired": "説明は必須です",
@@ -506,6 +530,7 @@
     "everyNDays": "{{n}}日ごと",
     "dayOfWeek": "曜日",
     "dayOfMonth": "日付",
+    "dayOfMonthValue": "{{day}}日",
     "nextRun": "次回実行",
     "lastRun": "前回実行",
     "active": "有効",
@@ -1623,17 +1648,6 @@
     "decreasePercent": "先月比{{percent}}減",
     "increasePercent": "先月比{{percent}}増"
   },
-  "transactions": {
-    "today": "今日",
-    "thisWeek": "今週",
-    "thisMonth": "今月",
-    "searchPlaceholder": "取引を検索..."
-  },
-  "transaction": {
-    "today": "今日",
-    "cancel": "キャンセル",
-    "save": "保存"
-  },
   "bills": {
     "pageTitle": "請求・医療費",
     "pageSubtitle": "定期的な請求とリマインダーを追跡・管理",
@@ -1793,6 +1807,7 @@
   "anomaly": {
     "title": "異常検知",
     "noAlerts": "異常は検出されませんでした",
+    "alertsDetected": "{{count}}件のアラートを検出",
     "severity": {
       "critical": "重大",
       "high": "高",

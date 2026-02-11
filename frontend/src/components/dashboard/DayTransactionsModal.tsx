@@ -1,10 +1,9 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { X, Calendar, TrendingDown } from 'lucide-react'
-import { format } from 'date-fns'
-import { ja } from 'date-fns/locale'
 import { Button } from '@/components/ui/Button'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { formatFullDate } from '@/utils/formatDate'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
@@ -58,7 +57,7 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
               <Calendar className="w-5 h-5 text-primary-500" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                  {format(date, 'yyyy年M月d日', { locale: ja })}
+                  {formatFullDate(date)}
                 </h3>
                 <p className="text-xs text-gray-500">
                   {transactions.length} {t('transactions.count', 'transactions')}

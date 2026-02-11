@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { AlertTriangle, CheckSquare, Square, CheckCircle2, Receipt, ExternalLink, Loader2, Check, X } from 'lucide-react'
+import { getLocaleTag } from '@/utils/formatDate'
 import { fetchUnattributedRewards, batchAttributeRewards, fetchDefiPositions, createTransactionFromReward } from '@/services/crypto-service'
 import type { PositionReward, DefiPosition } from '@/types'
 
@@ -79,7 +80,7 @@ export function UnattributedRewardsCard({ walletId }: UnattributedRewardsCardPro
   }
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getLocaleTag(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

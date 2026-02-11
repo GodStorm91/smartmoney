@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Medal, Trophy, Star, Crown, Target, TrendingUp, DollarSign, Building, Folder, Award } from 'lucide-react';
+import { getLocaleTag } from '@/utils/formatDate';
 
 interface Badge {
   id: number;
@@ -261,7 +262,7 @@ export function BadgeCard({ badge, showDetails = true }: BadgeCardProps) {
 
               {badge.unlocked && badge.unlocked_at && (
                 <p className="text-xs text-gray-500 mt-2">
-                  {t('gamification.badge.unlockedOn', { date: new Date(badge.unlocked_at).toLocaleDateString() })}
+                  {t('gamification.badge.unlockedOn', { date: new Date(badge.unlocked_at).toLocaleDateString(getLocaleTag()) })}
                 </p>
               )}
             </>

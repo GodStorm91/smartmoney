@@ -12,6 +12,7 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { useTheme } from '@/contexts/ThemeContext'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { DefiPositionSnapshot } from '@/types'
 
 interface PositionPerformanceChartProps {
@@ -36,7 +37,7 @@ export function PositionPerformanceChart({ snapshots }: PositionPerformanceChart
       .map((snap) => ({
         date: snap.snapshot_date,
         value: Number(snap.balance_usd),
-        formattedDate: new Date(snap.snapshot_date).toLocaleDateString('en-US', {
+        formattedDate: new Date(snap.snapshot_date).toLocaleDateString(getLocaleTag(), {
           month: 'short',
           day: 'numeric',
         }),

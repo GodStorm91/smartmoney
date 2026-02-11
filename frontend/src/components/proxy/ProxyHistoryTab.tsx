@@ -161,7 +161,7 @@ export function ProxyHistoryTab() {
                     </span>
                   </div>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                    {formatDate(tx.date, 'MMM dd, yyyy')}
+                    {formatDate(tx.date, 'PP')}
                     {chargeInfo?.client_name && (
                       <span className="ml-2">• {chargeInfo.client_name}</span>
                     )}

@@ -13,6 +13,7 @@ import {
 } from 'recharts'
 import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { getLocaleTag } from '@/utils/formatDate'
 import { useSettings } from '@/contexts/SettingsContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -22,15 +23,16 @@ interface ForecastChartProps {
   data: ForecastMonth[]
 }
 
-// Format month key (YYYY-MM) to short display (Jan, Feb, etc.)
+// Format month key (YYYY-MM) to short display using locale
 function formatMonthLabel(monthKey: string): string {
   const [year, month] = monthKey.split('-')
   const date = new Date(parseInt(year), parseInt(month) - 1)
-  return date.toLocaleDateString('en-US', { month: 'short' })
+  const tag = getLocaleTag()
+  return date.toLocaleDateString(tag, { month: 'short' })
 }
 
-// Format large numbers compactly
-function formatCompact(value: number, currency: string): string {
+// Format large numbers compactly (locale-aware)
+function formatCompact(value: number, currency: string, lang: string): string {
   if (value === 0) return ''
   const absValue = Math.abs(value)
 
@@ -41,7 +43,10 @@ function formatCompact(value: number, currency: string): string {
   }
 
   if (currency === 'JPY') {
-    if (absValue >= 10000) return `${(value / 10000).toFixed(1)}万`
+    if (absValue >= 10000) {
+      const unit = lang === 'ja' ? '万' : 'W'
+      return `${(value / 10000).toFixed(1)}${unit}`
+    }
     if (absValue >= 1000) return `${(value / 1000).toFixed(0)}K`
     return value.toString()
   }
@@ -54,8 +59,9 @@ function formatCompact(value: number, currency: string): string {
 export function ForecastChart({ data }: ForecastChartProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const { resolvedTheme } = useTheme()
+  const lang = i18n.language
   const isDark = resolvedTheme === 'dark'
 
   // Theme colors
@@ -94,14 +100,14 @@ export function ForecastChart({ data }: ForecastChartProps) {
           yAxisId="left"
           stroke={axisColor}
           style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
-          tickFormatter={(value) => formatCompact(value, currency)}
+          tickFormatter={(value) => formatCompact(value, currency, lang)}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
           stroke={balanceColor}
           style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
-          tickFormatter={(value) => formatCompact(value, currency)}
+          tickFormatter={(value) => formatCompact(value, currency, lang)}
         />
         <Tooltip
           contentStyle={{

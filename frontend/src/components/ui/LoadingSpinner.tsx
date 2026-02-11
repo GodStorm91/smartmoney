@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
 
 interface LoadingSpinnerProps {
@@ -6,6 +7,8 @@ interface LoadingSpinnerProps {
 }
 
 export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) {
+  const { t } = useTranslation('common')
+
   return (
     <div
       className={cn(
@@ -18,7 +21,7 @@ export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) 
         className
       )}
       role="status"
-      aria-label="読み込み中"
+      aria-label={t('common.loading', 'Loading...')}
     >
       <svg
         className="animate-spin text-primary-500"
@@ -42,7 +45,7 @@ export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) 
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         />
       </svg>
-      <span className="sr-only">読み込み中...</span>
+      <span className="sr-only">{t('common.loading', 'Loading...')}</span>
     </div>
   )
 }

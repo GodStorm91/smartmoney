@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Star, Calendar, Lock } from 'lucide-react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { cn } from '@/utils/cn'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { Achievement } from '@/services/gamification-service'
 
 interface BadgeDetailSheetProps {
@@ -124,7 +125,7 @@ export function BadgeDetailSheet({ badge, onClose }: BadgeDetailSheetProps) {
             <span className="text-sm">
               {t('gamification.badge.unlockedOn', {
                 date: badge.unlocked_at
-                  ? new Date(badge.unlocked_at).toLocaleDateString()
+                  ? new Date(badge.unlocked_at).toLocaleDateString(getLocaleTag())
                   : 'Unknown'
               })}
             </span>

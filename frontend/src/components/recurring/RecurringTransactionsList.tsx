@@ -9,6 +9,7 @@ import { cn } from '@/utils/cn'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { getLocaleTag } from '@/utils/formatDate'
 import {
   fetchRecurringTransactions,
   deleteRecurringTransaction,
@@ -75,7 +76,7 @@ export function RecurringTransactionsList() {
         const dayKey = DAY_KEYS[item.day_of_week ?? 0]
         return `${t('recurring.weekly')} - ${t(dayKey)}`
       case 'monthly':
-        return `${t('recurring.monthly')} - ${item.day_of_month ?? 1}日`
+        return `${t('recurring.monthly')} - ${t('recurring.dayOfMonthValue', { day: item.day_of_month ?? 1 })}`
       case 'yearly':
         return t('recurring.yearly')
       case 'custom':
@@ -87,7 +88,7 @@ export function RecurringTransactionsList() {
 
   const formatDate = (dateStr: string | null): string => {
     if (!dateStr) return '-'
-    return new Date(dateStr).toLocaleDateString()
+    return new Date(dateStr).toLocaleDateString(getLocaleTag())
   }
 
   if (isLoading) {

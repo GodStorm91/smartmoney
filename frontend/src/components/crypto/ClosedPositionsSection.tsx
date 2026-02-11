@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronDown, ChevronUp, Archive, TrendingUp, TrendingDown } from 'lucide-react'
 import { getClosedPositions } from '@/services/position-closure-service'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { getLocaleTag } from '@/utils/formatDate'
 import { CHAIN_INFO, ChainId } from '@/types/crypto'
 
 export function ClosedPositionsSection() {
@@ -77,7 +78,7 @@ export function ClosedPositionsSection() {
                   </p>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     {chainInfo && <span>{chainInfo.icon}</span>}
-                    <span>{new Date(closure.exit_date).toLocaleDateString()}</span>
+                    <span>{new Date(closure.exit_date).toLocaleDateString(getLocaleTag())}</span>
                   </div>
                 </div>
                 <div className="text-right">

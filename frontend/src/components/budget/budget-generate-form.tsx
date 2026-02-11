@@ -11,6 +11,7 @@ import {
   getCurrencyPosition,
   getCurrencyDecimals,
 } from '@/utils/formatNumber'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { BudgetSuggestions } from '@/types'
 
 interface BudgetGenerateFormProps {
@@ -82,7 +83,7 @@ export function BudgetGenerateForm({ onGenerate, isLoading, error, suggestions }
   const formatMonth = (monthStr: string) => {
     const [year, month] = monthStr.split('-')
     const date = new Date(parseInt(year), parseInt(month) - 1)
-    return date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    return date.toLocaleDateString(getLocaleTag(), { month: 'long', year: 'numeric' })
   }
 
   return (

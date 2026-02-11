@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { useCreditTransactions, useCreditBalance } from '@/hooks/useCredits'
 import { ArrowLeft, TrendingUp, TrendingDown, RefreshCw, DollarSign } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { TransactionType } from '@/types/credit'
 
 const TRANSACTION_ICONS: Record<TransactionType, typeof TrendingUp> = {
@@ -39,7 +40,7 @@ export function CreditTransactions() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(getLocaleTag(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

@@ -1,5 +1,5 @@
-import { useTranslation } from 'react-i18next'
-import { format, subMonths, addMonths } from 'date-fns'
+import { subMonths, addMonths } from 'date-fns'
+import { formatMonth } from '@/utils/formatDate'
 import { cn } from '@/utils/cn'
 
 interface MonthPickerProps {
@@ -9,19 +9,6 @@ interface MonthPickerProps {
 }
 
 export function MonthPicker({ selectedMonth, onChange, className }: MonthPickerProps) {
-  const { i18n } = useTranslation()
-
-  // Format month based on locale
-  const formatMonth = (date: Date) => {
-    const locale = i18n.language
-    if (locale === 'ja') {
-      return format(date, 'yyyy年M月')
-    }
-    if (locale === 'vi') {
-      return `Tháng ${format(date, 'M/yyyy')}`
-    }
-    return format(date, 'MMMM yyyy')
-  }
 
   const handlePrev = () => {
     onChange(subMonths(selectedMonth, 1))

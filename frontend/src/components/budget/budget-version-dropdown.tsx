@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { History, Check, RotateCcw, ChevronDown } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { BudgetVersion } from '@/types'
 
 interface BudgetVersionDropdownProps {
@@ -28,7 +29,7 @@ export function BudgetVersionDropdown({
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(getLocaleTag(), {
       month: 'short',
       day: 'numeric',
       hour: '2-digit',

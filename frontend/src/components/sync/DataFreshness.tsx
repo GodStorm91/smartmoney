@@ -4,14 +4,8 @@
 import { useSyncStatus } from '../../contexts/SyncContext'
 import { useTranslation } from 'react-i18next'
 import { formatDistanceToNow } from 'date-fns'
-import { ja, vi, enUS, type Locale } from 'date-fns/locale'
+import { getDateLocale } from '@/utils/formatDate'
 import { Clock } from 'lucide-react'
-
-const localeMap: Record<string, Locale> = {
-  ja,
-  vi,
-  en: enUS,
-}
 
 interface DataFreshnessProps {
   className?: string
@@ -19,12 +13,11 @@ interface DataFreshnessProps {
 
 export function DataFreshness({ className = '' }: DataFreshnessProps) {
   const { lastSyncAt, isOnline } = useSyncStatus()
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   if (!lastSyncAt) return null
 
-  const locale = localeMap[i18n.language] || enUS
-  const timeAgo = formatDistanceToNow(lastSyncAt, { addSuffix: true, locale })
+  const timeAgo = formatDistanceToNow(lastSyncAt, { addSuffix: true, locale: getDateLocale() })
 
   // Data older than 24 hours is considered stale
   const isStale = Date.now() - lastSyncAt.getTime() > 24 * 60 * 60 * 1000

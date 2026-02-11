@@ -5,6 +5,7 @@ import { CheckCircle, Bell, Edit2, Trash2, RotateCcw } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import type { ReminderSchedule } from '@/types'
 import { format } from 'date-fns'
+import { getDateLocale } from '@/utils/formatDate'
 
 interface ReminderScheduleItemProps {
   schedule: ReminderSchedule
@@ -28,7 +29,7 @@ export function ReminderScheduleItem({
   const formatReminderTime = (timeStr: string) => {
     try {
       const date = new Date(timeStr)
-      return format(date, 'MMM d, yyyy HH:mm')
+      return format(date, 'PPp', { locale: getDateLocale() })
     } catch {
       return timeStr
     }

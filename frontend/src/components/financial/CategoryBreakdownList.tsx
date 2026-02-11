@@ -10,6 +10,7 @@ interface CategoryBreakdownListProps {
 }
 
 const categoryEmojis: Record<string, string> = {
+  // Japanese category names (backend data)
   '食費': '🍜',
   '住宅': '🏠',
   'こども・教育': '👶',
@@ -18,6 +19,18 @@ const categoryEmojis: Record<string, string> = {
   '娯楽': '🎮',
   '衣服': '👔',
   'その他': '📦',
+  // English category names
+  'Food': '🍜',
+  'Housing': '🏠',
+  'Education': '👶',
+  'Transport': '🚗',
+  'Medical': '🏥',
+  'Health': '🏥',
+  'Entertainment': '🎮',
+  'Shopping': '👔',
+  'Other': '📦',
+  'Utilities': '💡',
+  'Communication': '📱',
 }
 
 export function CategoryBreakdownList({ categories, maxItems }: CategoryBreakdownListProps) {

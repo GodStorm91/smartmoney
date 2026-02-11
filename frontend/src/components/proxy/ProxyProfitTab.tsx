@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { TrendingUp, TrendingDown, Calendar } from 'lucide-react'
 import { fetchTransactions } from '@/services/transaction-service'
+import { getLocaleTag } from '@/utils/formatDate'
 import { cn } from '@/utils/cn'
 
 interface MonthlyProfit {
@@ -72,7 +73,7 @@ export function ProxyProfitTab() {
       .map(([month, data]) => {
         const [year, m] = month.split('-')
         const date = new Date(parseInt(year), parseInt(m) - 1)
-        const monthLabel = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+        const monthLabel = date.toLocaleDateString(getLocaleTag(), { month: 'short', year: 'numeric' })
 
         return {
           month,

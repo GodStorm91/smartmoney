@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { Calendar, Repeat, Bell, Edit, Trash2, CheckCircle, Clock, Settings2, ChevronDown, ChevronUp } from 'lucide-react'
 import { format, differenceInDays, isPast, isToday } from 'date-fns'
+import { getDateLocale } from '@/utils/formatDate'
 import type { Bill } from '@/types'
 import { cn } from '@/utils/cn'
 import { BillReminderSettings } from './BillReminderSettings'
@@ -125,7 +126,7 @@ export function BillDetailModal({
           <div className="flex items-center gap-3 text-sm">
             <Calendar className="w-5 h-5 text-gray-400" />
             <span className="text-gray-600 dark:text-gray-300">
-              {format(dueDate, 'EEEE, MMMM d, yyyy')}
+              {format(dueDate, 'PPPP', { locale: getDateLocale() })}
             </span>
           </div>
 

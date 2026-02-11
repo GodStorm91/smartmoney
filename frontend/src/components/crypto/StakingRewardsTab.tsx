@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Gift, TrendingUp, Calendar, RefreshCw, Check, Plus, Loader2, X } from 'lucide-react'
+import { getLocaleTag } from '@/utils/formatDate'
 import { fetchStakingRewards, scanRewards, fetchPositionRewards, batchCreateTransactions } from '@/services/crypto-service'
 
 interface StakingRewardsTabProps {
@@ -80,7 +81,7 @@ export function StakingRewardsTab({ source = 'symbiotic' }: StakingRewardsTabPro
   const formatMonth = (monthStr: string) => {
     const [year, month] = monthStr.split('-')
     const date = new Date(Number(year), Number(month) - 1)
-    return date.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    return date.toLocaleDateString(getLocaleTag(), { month: 'short', year: 'numeric' })
   }
 
   const formatAmount = (amount: number) => {

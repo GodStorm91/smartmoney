@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/ui/Input'
+import { getLocaleTag } from '@/utils/formatDate'
 import type { StartDateOption } from './goal-form-helpers'
 
 interface StartDateSelectorProps {
@@ -17,7 +18,7 @@ export function StartDateSelector({
   onOptionChange,
   onCustomDateChange,
 }: StartDateSelectorProps) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   const nextMonthDate = new Date(
     new Date().getFullYear(),
@@ -25,8 +26,7 @@ export function StartDateSelector({
     1
   )
 
-  // Get locale for date formatting
-  const dateLocale = i18n.language === 'ja' ? 'ja-JP' : i18n.language === 'vi' ? 'vi-VN' : 'en-US'
+  const dateLocale = getLocaleTag()
 
   return (
     <div>

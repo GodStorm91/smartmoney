@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/utils/cn'
 import type { Bill } from '@/types'
 import { format, differenceInDays, isPast, isToday } from 'date-fns'
+import { getDateLocale } from '@/utils/formatDate'
 
 interface BillCardProps {
   bill: Bill
@@ -78,7 +79,7 @@ export function BillCard({
           <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
-              <span>{format(new Date(bill.next_due_date), 'MMM d, yyyy')}</span>
+              <span>{format(new Date(bill.next_due_date), 'PPP', { locale: getDateLocale() })}</span>
             </div>
             {bill.reminder_days_before > 0 && (
               <div className="flex items-center gap-1">

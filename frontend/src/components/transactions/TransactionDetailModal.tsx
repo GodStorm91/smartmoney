@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { formatCurrencyWithJPY } from '@/utils/formatCurrency'
-import { formatDate } from '@/utils/formatDate'
+import { formatDate, formatFullDate } from '@/utils/formatDate'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
@@ -156,7 +156,7 @@ export function TransactionDetailModal({
                     {t('transactions.date')}
                   </p>
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {formatDate(transaction.date, 'MMMM d, yyyy')}
+                    {formatFullDate(transaction.date)}
                   </p>
                 </div>
               </div>

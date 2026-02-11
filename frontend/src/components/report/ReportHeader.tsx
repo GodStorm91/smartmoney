@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Download, Mail, Loader2 } from 'lucide-react'
-import { format } from 'date-fns'
+import { formatMonth } from '@/utils/formatDate'
 
 interface ReportHeaderProps {
   year: number
@@ -11,7 +11,7 @@ interface ReportHeaderProps {
 
 export function ReportHeader({ year, month, onDownloadPDF, isDownloading }: ReportHeaderProps) {
   const { t } = useTranslation('common')
-  const monthName = format(new Date(year, month - 1), 'MMMM yyyy')
+  const monthName = formatMonth(new Date(year, month - 1))
 
   return (
     <div className="flex items-center justify-between mb-6">
