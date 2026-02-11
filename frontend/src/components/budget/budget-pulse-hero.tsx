@@ -92,7 +92,7 @@ export function BudgetPulseHero({
             health.status === 'danger' ? 'bg-red-500 text-white' :
             health.status === 'warning' ? 'bg-amber-500 text-white' :
             health.status === 'caution' ? 'bg-yellow-500 text-gray-900' :
-            'bg-green-500 text-white'
+            'bg-primary-500 text-white'
           )}>
             {health.status === 'danger' ? (
               <AlertTriangle className="w-3.5 h-3.5" />

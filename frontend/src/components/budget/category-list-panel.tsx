@@ -142,8 +142,8 @@ export function CategoryListPanel({
                 'w-full flex items-center justify-between px-4 py-3',
                 'text-left transition-all',
                 'hover:bg-gray-50 dark:hover:bg-gray-800',
-                isFocused && 'ring-2 ring-inset ring-green-500',
-                isSelected && 'bg-green-50 dark:bg-green-900/20 border-l-3 border-green-500'
+                isFocused && 'ring-2 ring-inset ring-primary-500',
+                isSelected && 'bg-primary-50 dark:bg-primary-900/20 border-l-3 border-primary-500'
               )}
             >
               <div className="flex-1 min-w-0">

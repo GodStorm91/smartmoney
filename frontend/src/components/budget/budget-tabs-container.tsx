@@ -126,10 +126,10 @@ export function BudgetTabsContainer({
               onKeyDown={(e) => handleKeyDown(e, index)}
               className={cn(
                 'relative flex items-center gap-1.5 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
                 'min-h-[44px]',
                 isActive
-                  ? 'bg-green-600 text-white shadow-sm'
+                  ? 'bg-primary-600 text-white shadow-sm'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
               )}
             >
