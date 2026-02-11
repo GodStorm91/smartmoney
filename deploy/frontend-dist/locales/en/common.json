@@ -44,13 +44,23 @@
     "selectFile": "Select File",
     "addMore": "Add More",
     "showDetails": "Show Details",
-    "hideDetails": "Hide Details"
+    "hideDetails": "Hide Details",
+    "copy": "Copy",
+    "deleting": "Deleting...",
+    "saving": "Saving..."
   },
   "filter": {
     "category": "Category",
     "source": "Source",
     "min": "Min",
     "max": "Max"
+  },
+  "date": {
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "last3Months": "3 Months"
   },
   "language": {
     "selectLanguage": "Select Language",
@@ -237,7 +247,14 @@
     "recategorize": "Recategorize",
     "deleteSelected": "Delete",
     "selectedCount": "{{count}} selected",
-    "clearSelection": "Clear"
+    "clearSelection": "Clear",
+    "searchPlaceholder": "Search transactions...",
+    "selectCategory": "Select category...",
+    "recategorizeTitle": "Change Category",
+    "recategorizeDescription": "Update category for {{count}} transactions",
+    "newCategory": "New Category",
+    "bulkDeleteTitle": "Delete Transactions",
+    "bulkDeleteConfirm": "Are you sure you want to delete {{count}} transactions? This cannot be undone."
   },
   "export": {
     "title": "Export Reports",
@@ -565,6 +582,7 @@
     "everyNDays": "Every {{n}} days",
     "dayOfWeek": "Day of week",
     "dayOfMonth": "Day of month",
+    "dayOfMonthValue": "Day {{day}}",
     "monthOfYear": "Month",
     "nextRun": "Next run",
     "lastRun": "Last run",
@@ -615,8 +633,12 @@
     "selectAccount": "Select account",
     "deleteTransaction": "Delete this transaction",
     "deleteConfirm": "Are you sure you want to delete this transaction?",
+    "deleteWarning": "This action cannot be undone. Are you sure?",
     "saved": "Transaction saved!",
     "moreOptions": "More Options",
+    "balanceAdjustment": "Balance adjustment",
+    "balanceAdjustmentHint": "Won't count toward budget",
+    "currency": "Currency",
     "errors": {
       "amountRequired": "Amount is required",
       "descriptionRequired": "Description is required",
@@ -1850,6 +1872,7 @@
   "anomaly": {
     "title": "Anomaly Alerts",
     "noAlerts": "No anomalies detected",
+    "alertsDetected": "{{count}} alerts detected",
     "severity": {
       "critical": "Critical",
       "high": "High",
@@ -2000,5 +2023,12 @@
       "description": "Start by adding an account and importing your transactions",
       "cta": "Get Started"
     }
+  },
+  "dateFormat": {
+    "monthYear": "{{month}} {{year}}",
+    "shortDate": "{{month}}/{{day}}",
+    "shortDateWithWeekday": "{{weekday}}, {{month}}/{{day}}",
+    "fullDate": "{{month}} {{day}}, {{year}}",
+    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   }
 }

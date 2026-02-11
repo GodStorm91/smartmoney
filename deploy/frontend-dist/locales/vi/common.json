@@ -41,13 +41,23 @@
     "selectFile": "Chọn tệp",
     "addMore": "Thêm",
     "showDetails": "Hiện chi tiết",
-    "hideDetails": "Ẩn chi tiết"
+    "hideDetails": "Ẩn chi tiết",
+    "copy": "Sao chép",
+    "deleting": "Đang xóa...",
+    "saving": "Đang lưu..."
   },
   "filter": {
     "category": "Danh mục",
     "source": "Nguồn",
     "min": "Tối thiểu",
     "max": "Tối đa"
+  },
+  "date": {
+    "today": "Hôm nay",
+    "thisWeek": "Tuần này",
+    "thisMonth": "Tháng này",
+    "lastMonth": "Tháng trước",
+    "last3Months": "3 tháng"
   },
   "language": {
     "selectLanguage": "Chọn ngôn ngữ",
@@ -234,7 +244,14 @@
     "recategorize": "Phân loại lại",
     "deleteSelected": "Xóa",
     "selectedCount": "{{count}} đã chọn",
-    "clearSelection": "Bỏ chọn"
+    "clearSelection": "Bỏ chọn",
+    "searchPlaceholder": "Tìm kiếm giao dịch...",
+    "selectCategory": "Chọn danh mục...",
+    "recategorizeTitle": "Đổi danh mục",
+    "recategorizeDescription": "Cập nhật danh mục cho {{count}} giao dịch",
+    "newCategory": "Danh mục mới",
+    "bulkDeleteTitle": "Xóa giao dịch",
+    "bulkDeleteConfirm": "Bạn có chắc muốn xóa {{count}} giao dịch? Hành động này không thể hoàn tác."
   },
   "upload": {
     "title": "Tải lên CSV",
@@ -479,6 +496,7 @@
     "everyNDays": "Mỗi {{n}} ngày",
     "dayOfWeek": "Ngày trong tuần",
     "dayOfMonth": "Ngày trong tháng",
+    "dayOfMonthValue": "Ngày {{day}}",
     "nextRun": "Lần tiếp theo",
     "lastRun": "Lần trước",
     "active": "Hoạt động",
@@ -526,8 +544,12 @@
     "selectAccount": "Chọn tài khoản",
     "deleteTransaction": "Xóa giao dịch này",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này?",
+    "deleteWarning": "Hành động này không thể hoàn tác. Bạn có chắc không?",
     "saved": "Đã lưu giao dịch!",
     "moreOptions": "Tùy chọn khác",
+    "balanceAdjustment": "Điều chỉnh số dư",
+    "balanceAdjustmentHint": "Không tính vào ngân sách",
+    "currency": "Tiền tệ",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
       "descriptionRequired": "Mô tả là bắt buộc",
@@ -1805,5 +1827,17 @@
       "description": "Bắt đầu bằng cách thêm tài khoản và nhập giao dịch",
       "cta": "Bắt đầu"
     }
+  },
+  "anomaly": {
+    "title": "Cảnh báo bất thường",
+    "noAlerts": "Không phát hiện bất thường",
+    "alertsDetected": "Phát hiện {{count}} cảnh báo"
+  },
+  "dateFormat": {
+    "monthYear": "Tháng {{month}}, {{year}}",
+    "shortDate": "{{day}}/{{month}}",
+    "shortDateWithWeekday": "{{weekday}}, {{day}}/{{month}}",
+    "fullDate": "Ngày {{day}} tháng {{month}}, {{year}}",
+    "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
   }
 }
