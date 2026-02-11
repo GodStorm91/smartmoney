@@ -25,6 +25,22 @@ class BudgetCategoryStatus(BaseModel):
     spent: int
     percentage: float = Field(description="% of budget used")
     status: str  # normal, threshold_50, threshold_80, over_budget
+    spending_change: Optional[float] = None
+    prev_month_spent: Optional[int] = None
+
+
+class FocusAreaItem(BaseModel):
+    """Top spending concern for the report focus areas section."""
+
+    category: str
+    status: str
+    budget_amount: int
+    spent: int
+    amount_over_under: int
+    percentage: float
+    spending_change: Optional[float] = None
+    suggestion_key: str
+    suggestion_params: dict
 
 
 class BudgetAdherence(BaseModel):
@@ -35,6 +51,7 @@ class BudgetAdherence(BaseModel):
     percentage_used: float
     is_over_budget: bool
     category_status: list[BudgetCategoryStatus]
+    focus_areas: list[FocusAreaItem] = Field(default_factory=list)
 
 
 class GoalProgressItem(BaseModel):
@@ -86,3 +103,16 @@ class MonthlyUsageReportData(BaseModel):
     account_summary: list[AccountSummaryItem]
     insights: list[ReportInsight]
     total_net_worth: int = Field(description="Sum of all account balances in JPY")
+
+
+class AIReportSummary(BaseModel):
+    """AI-generated 3-bullet summary for a monthly report."""
+
+    year: int
+    month: int
+    win: str
+    warning: str
+    trend: str
+    generated_at: datetime
+    is_cached: bool
+    credits_used: float

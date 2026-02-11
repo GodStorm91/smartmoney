@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { MonthlyUsageReportData } from '@/types'
+import type { MonthlyUsageReportData, AIReportSummary } from '@/types'
 
 /**
  * Fetch monthly usage report data
@@ -26,4 +26,38 @@ export async function downloadMonthlyReportPDF(
     { responseType: 'blob' }
   )
   return response.data
+}
+
+/**
+ * Generate AI summary for a monthly report (POST — costs credits)
+ */
+export async function generateAISummary(
+  year: number,
+  month: number,
+  language?: string,
+  forceRegenerate?: boolean
+): Promise<AIReportSummary> {
+  const response = await apiClient.post<AIReportSummary>(
+    `/api/reports/monthly/${year}/${month}/ai-summary`,
+    null,
+    { params: { language, force_regenerate: forceRegenerate } }
+  )
+  return response.data
+}
+
+/**
+ * Fetch cached AI summary (GET — no credit cost, returns null if not cached)
+ */
+export async function fetchAISummary(
+  year: number,
+  month: number
+): Promise<AIReportSummary | null> {
+  try {
+    const response = await apiClient.get<AIReportSummary>(
+      `/api/reports/monthly/${year}/${month}/ai-summary`
+    )
+    return response.data
+  } catch {
+    return null
+  }
 }

@@ -10,9 +10,11 @@ import { MonthPicker } from '@/components/analytics/MonthPicker'
 import { CategoryBarChart } from '@/components/charts/CategoryBarChart'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
 import { ReportHeader } from '@/components/report/ReportHeader'
-import { BudgetAdherenceTable } from '@/components/report/BudgetAdherenceTable'
+import { FocusAreas } from '@/components/report/FocusAreas'
+import { SmartSummaryCard } from '@/components/report/SmartSummaryCard'
 import { GoalProgressCard } from '@/components/report/GoalProgressCard'
 import { AccountSummaryCard } from '@/components/report/AccountSummaryCard'
+import { ReportInsights } from '@/components/report/ReportInsights'
 import { formatCurrency } from '@/utils/formatCurrency'
 
 export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
@@ -54,9 +56,7 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
       <MonthPicker selectedMonth={selectedMonth} onChange={setSelectedMonth} className="mb-6" />
 
       {isLoading && (
-        <div className="flex justify-center py-20">
-          <LoadingSpinner size="lg" />
-        </div>
+        <div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>
       )}
 
       {error && (
@@ -67,6 +67,9 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
 
       {report && (
         <div className="space-y-6">
+          {/* AI Smart Summary */}
+          <SmartSummaryCard year={year} month={month} reportData={report} />
+
           {/* Summary metrics */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <MetricCard
@@ -94,13 +97,16 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
             />
           </div>
 
-          {/* Budget adherence */}
+          {/* Budget adherence — focus areas + expandable full table */}
           {report.budget_adherence && (
             <Card>
               <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                 {t('report.budgetAdherence')}
               </h2>
-              <BudgetAdherenceTable data={report.budget_adherence} />
+              <FocusAreas
+                focusAreas={report.budget_adherence.focus_areas ?? []}
+                budgetAdherence={report.budget_adherence}
+              />
             </Card>
           )}
 
@@ -144,38 +150,11 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
               <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                 {t('report.accountSummary')}
               </h2>
-              <AccountSummaryCard
-                accounts={report.account_summary}
-                totalNetWorth={report.total_net_worth}
-              />
+              <AccountSummaryCard accounts={report.account_summary} totalNetWorth={report.total_net_worth} />
             </Card>
           )}
 
-          {/* Insights */}
-          {report.insights.length > 0 && (
-            <Card>
-              <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                {t('report.insights')}
-              </h2>
-              <div className="space-y-3">
-                {report.insights.map((insight, i) => (
-                  <div
-                    key={i}
-                    className="p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600"
-                  >
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {insight.title}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {insight.message}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )}
+          <ReportInsights insights={report.insights} />
 
           {/* Empty state */}
           {report.summary.total_income === 0 && report.summary.total_expense === 0 && (

@@ -16,6 +16,20 @@ export interface BudgetCategoryStatus {
   spent: number
   percentage: number
   status: string // normal, threshold_50, threshold_80, over_budget
+  spending_change: number | null
+  prev_month_spent: number | null
+}
+
+export interface FocusAreaItem {
+  category: string
+  status: string
+  budget_amount: number
+  spent: number
+  amount_over_under: number
+  percentage: number
+  spending_change: number | null
+  suggestion_key: string
+  suggestion_params: Record<string, string | number>
 }
 
 export interface BudgetAdherence {
@@ -24,6 +38,18 @@ export interface BudgetAdherence {
   percentage_used: number
   is_over_budget: boolean
   category_status: BudgetCategoryStatus[]
+  focus_areas: FocusAreaItem[]
+}
+
+export interface AIReportSummary {
+  year: number
+  month: number
+  win: string
+  warning: string
+  trend: string
+  generated_at: string
+  is_cached: boolean
+  credits_used: number
 }
 
 export interface GoalProgressItem {

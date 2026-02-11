@@ -26,6 +26,7 @@ import { KpiRow } from '@/components/dashboard/KpiRow'
 import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
+import { ReportBanner } from '@/components/dashboard/ReportBanner'
 import { formatMonth, formatDate } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
@@ -181,6 +182,9 @@ export function Dashboard() {
 
         {/* 4. Alerts (merged smart + anomaly) */}
         <DashboardAlerts alerts={alerts} unreadAnomalyCount={unreadAnomalies?.count} />
+
+        {/* 4.5 Report Banner (first 7 days of month) */}
+        <ReportBanner />
 
         {/* 5. Quick Actions */}
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">

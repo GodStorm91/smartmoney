@@ -5,18 +5,17 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-from ..models.account import Account
 from ..schemas.report import (
-    AccountSummaryItem, BudgetAdherence, BudgetCategoryStatus,
-    GoalProgressItem, MonthlyUsageReportData, ReportInsight, ReportSummary,
+    BudgetAdherence, BudgetCategoryStatus,
+    GoalProgressItem, MonthlyUsageReportData,
+    ReportInsight, ReportSummary,
 )
-from ..services.account_service import AccountService
 from ..services.analytics_service import AnalyticsService
 from ..services.budget_alert_service import BudgetAlertService
 from ..services.dashboard_service import DashboardService
-from ..services.exchange_rate_service import ExchangeRateService
 from ..services.goal_service import GoalService
-from ..utils.currency_utils import convert_to_jpy
+from ..services.report_account_helpers import get_account_summary
+from ..services.report_focus_helpers import build_focus_areas, prev_month_key
 
 
 class MonthlyReportService:
@@ -80,9 +79,7 @@ class MonthlyReportService:
         ]
 
         # 6. Account summary + net worth
-        account_summary, total_net_worth = MonthlyReportService._get_account_summary(
-            db, user_id
-        )
+        account_summary, total_net_worth = get_account_summary(db, user_id)
 
         # 7. Insights (spending insights for the month)
         raw_insights = AnalyticsService.generate_spending_insights(db, user_id)
@@ -129,7 +126,7 @@ class MonthlyReportService:
     def _get_budget_adherence(
         db: Session, user_id: int, month_key: str
     ) -> Optional[BudgetAdherence]:
-        """Get budget adherence data if budget exists for the month."""
+        """Get budget adherence data with per-category deltas and focus areas."""
         budget = BudgetAlertService.get_budget_with_allocations(
             db, user_id, month_key
         )
@@ -140,16 +137,30 @@ class MonthlyReportService:
         if not status:
             return None
 
-        category_items = [
-            BudgetCategoryStatus(
+        # Fetch previous month spending for delta calculation
+        prev_key = prev_month_key(month_key)
+        prev_spending = BudgetAlertService.calculate_category_spending(
+            db, user_id, prev_key
+        )
+
+        category_items = []
+        for cs in status.get("category_status", []):
+            prev_spent = prev_spending.get(cs["category"])
+            change = (
+                DashboardService._calculate_change(prev_spent, cs["spent"])
+                if prev_spent is not None else None
+            )
+            category_items.append(BudgetCategoryStatus(
                 category=cs["category"],
                 budget_amount=cs["budget_amount"],
                 spent=cs["spent"],
                 percentage=cs["percentage"],
                 status=cs["status"],
-            )
-            for cs in status.get("category_status", [])
-        ]
+                spending_change=change,
+                prev_month_spent=prev_spent,
+            ))
+
+        focus_areas = build_focus_areas(category_items)
 
         return BudgetAdherence(
             total_budget=status["total_budget"],
@@ -157,6 +168,7 @@ class MonthlyReportService:
             percentage_used=status["percentage_used"],
             is_over_budget=status["is_over_budget"],
             category_status=category_items,
+            focus_areas=focus_areas,
         )
 
     @staticmethod
@@ -172,26 +184,3 @@ class MonthlyReportService:
             status=progress["status"],
         )
 
-    @staticmethod
-    def _get_account_summary(
-        db: Session, user_id: int
-    ) -> tuple[list[AccountSummaryItem], int]:
-        """Get active accounts with balances and total net worth in JPY."""
-        rates = ExchangeRateService.get_cached_rates(db)
-        accounts = (
-            db.query(Account)
-            .filter(Account.user_id == user_id, Account.is_active == True)
-            .order_by(Account.type, Account.name)
-            .all()
-        )
-        items = []
-        total_net_worth = 0
-        for acct in accounts:
-            balance = AccountService.calculate_balance(db, user_id, acct.id)
-            items.append(AccountSummaryItem(
-                account_id=acct.id, account_name=acct.name,
-                account_type=acct.type, balance=balance, currency=acct.currency,
-            ))
-            # Convert balance to JPY for net worth (negative = liability)
-            total_net_worth += convert_to_jpy(balance, acct.currency, rates)
-        return items, total_net_worth

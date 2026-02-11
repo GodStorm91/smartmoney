@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import type { BudgetAdherence } from '@/types'
 import { Progress } from '@/components/ui/Progress'
 import { Badge } from '@/components/ui/Badge'
+import { DeltaBadge } from './DeltaBadge'
 import { formatCurrency } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 
@@ -57,7 +58,8 @@ export function BudgetAdherenceTable({ data }: BudgetAdherenceTableProps) {
                 <span className="text-sm font-medium truncate text-gray-900 dark:text-gray-100">
                   {cat.category}
                 </span>
-                <Badge variant={statusToBadgeVariant(cat.status)} className="ml-2 text-[10px]">
+                <DeltaBadge value={cat.spending_change} invertColor className="ml-1" />
+                <Badge variant={statusToBadgeVariant(cat.status)} className="ml-1 text-[10px]">
                   {statusLabel(cat.status, t)}
                 </Badge>
               </div>

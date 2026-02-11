@@ -36,6 +36,7 @@ from .notification import (
 )
 from .position_closure import PositionClosure
 from .receipt import Receipt
+from .report_ai_summary import ReportAISummary
 from .recurring_transaction import RecurringTransaction
 from .rewards import (
     Theme,
@@ -123,6 +124,7 @@ __all__ = [
     "GoalType",
     "PositionClosure",
     "Receipt",
+    "ReportAISummary",
     "RecurringTransaction",
     "Quiz",
     "QuizQuestion",
