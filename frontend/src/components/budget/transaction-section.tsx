@@ -46,6 +46,9 @@ export function TransactionSection({
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
+  const formatTxCurrency = (amount: number, txCurrency: string) =>
+    formatCurrencyPrivacy(amount, txCurrency || currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+
   // Build parent to children category map
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -197,7 +200,7 @@ export function TransactionSection({
             </span>
           </div>
           <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4 flex-shrink-0">
-            {formatCurrency(transaction.amount)}
+            {formatTxCurrency(transaction.amount, transaction.currency)}
           </span>
         </div>
       ))}

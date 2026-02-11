@@ -38,6 +38,8 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
   const fmtShort = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+  const formatTxCurrency = (amount: number, txCurrency: string) =>
+    formatCurrencyPrivacy(amount, txCurrency || currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
   const categories = useMemo(() => ['all', ...allocations.map(a => a.category)], [allocations])
 
@@ -162,7 +164,7 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
                 <p className="text-sm text-gray-500">{formatDate(tx.date, 'MMM d')} • {tx.category || t('category.other')}</p>
               </div>
               <div className="text-right ml-4 flex-shrink-0">
-                <span className="font-semibold text-gray-900 dark:text-white">{formatCurrency(tx.amount)}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">{formatTxCurrency(tx.amount, tx.currency)}</span>
                 {impactPercent > 10 && (
                   <p className={cn(
                     'text-[10px] font-medium mt-0.5',

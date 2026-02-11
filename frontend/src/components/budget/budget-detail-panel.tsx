@@ -66,6 +66,9 @@ export function BudgetDetailPanel({
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
 
+  const formatTxCurrency = (amount: number, txCurrency: string) =>
+    formatCurrencyPrivacy(amount, txCurrency || currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+
   // Build parent to children category map
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()
@@ -296,7 +299,7 @@ export function BudgetDetailPanel({
            : <div className="space-y-3">{transactions.map(tx => (
                <div key={tx.id} className="flex items-center justify-between py-2">
                  <div className="flex-1 min-w-0"><p className="text-sm text-gray-900 dark:text-gray-100 truncate">{tx.description}</p><p className="text-xs text-gray-500 dark:text-gray-400">{formatTxDate(tx.date)}</p></div>
-                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">{formatCurrency(tx.amount)}</span>
+                 <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">{formatTxCurrency(tx.amount, tx.currency)}</span>
                </div>
              ))}{transactions.length >= 10 && <Button variant="ghost" size="sm" onClick={handleViewAll} className="w-full flex items-center justify-center gap-1 mt-2"><span>{t('dashboard.viewAllCategories')}</span><ExternalLink className="w-3 h-3" /></Button>}</div>}
         </div>
@@ -447,7 +450,7 @@ export function BudgetDetailPanel({
                       </p>
                     </div>
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100 ml-4">
-                      {formatCurrency(transaction.amount)}
+                      {formatTxCurrency(transaction.amount, transaction.currency)}
                     </span>
                   </div>
                 ))}
