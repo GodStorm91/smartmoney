@@ -36,6 +36,7 @@ from .routes.notifications import router as notifications_router
 from .routes.proxy import router as proxy_router
 from .routes.receipts import router as receipts_router
 from .routes.recurring import router as recurring_router
+from .routes.relocation import router as relocation_router
 from .routes.report_ai_summary import router as report_ai_router
 from .routes.reports import router as reports_router
 from .routes.savings import router as savings_router
@@ -423,6 +424,7 @@ app.include_router(rewards_router)
 app.include_router(insights_router)
 app.include_router(savings_router)
 app.include_router(notifications_router)
+app.include_router(relocation_router)
 
 
 # Root endpoints

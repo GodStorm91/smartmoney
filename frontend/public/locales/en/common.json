@@ -28,7 +28,8 @@
     "more": "More",
     "explore": "Explore",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "relocation": "Relocation"
   },
   "button": {
     "save": "Save",
@@ -2041,5 +2042,49 @@
     "shortDateWithWeekday": "{{weekday}}, {{month}}/{{day}}",
     "fullDate": "{{month}} {{day}}, {{year}}",
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+  },
+  "relocation": {
+    "title": "Relocation Planner",
+    "subtitle": "Compare living costs between Japanese cities",
+    "nenshu": "Annual Income (Yen)",
+    "nenshuPlaceholder": "e.g. 5000000",
+    "familySizeLabel": "Family Size",
+    "familySize": {
+      "single": "Single",
+      "couple": "Couple",
+      "couple_1": "Couple + 1 child",
+      "couple_2": "Couple + 2 children",
+      "couple_3": "Couple + 3 children"
+    },
+    "roomTypeLabel": "Room Type",
+    "citySelection": "City Selection",
+    "currentCity": "Current City",
+    "targetCity": "Target City",
+    "selectCity": "Select a city",
+    "compare": "Compare Costs",
+    "monthlyDiff": "Monthly Difference",
+    "annualDiff": "Annual Difference",
+    "totalMonthly": "Total Monthly",
+    "saving": "Saving",
+    "moreExpensive": "More Expensive",
+    "same": "No Change",
+    "breakdown": "Cost Breakdown",
+    "cost": {
+      "rent": "Rent",
+      "estimated_food": "Food",
+      "estimated_utilities": "Utilities",
+      "estimated_transport": "Transport",
+      "social_insurance": "Social Insurance",
+      "resident_tax": "Resident Tax",
+      "income_tax": "Income Tax"
+    },
+    "goalImpact": "Goal Impact",
+    "goalFaster": "{{months}} months faster",
+    "goalSlower": "{{months}} months slower",
+    "goalNoChange": "No change",
+    "monthsRemaining": "{{months}}mo left",
+    "errorTitle": "Comparison Failed",
+    "errorDescription": "Could not compare these cities. Please try again.",
+    "compareError": "Failed to compare cities. Please try again."
   }
 }

@@ -25,7 +25,8 @@
     "more": "Thêm",
     "explore": "Khám phá",
     "collapse": "Thu gọn",
-    "expand": "Mở rộng"
+    "expand": "Mở rộng",
+    "relocation": "Chuyển chỗ ở"
   },
   "button": {
     "save": "Lưu",
@@ -1850,5 +1851,49 @@
     "shortDateWithWeekday": "{{weekday}}, {{day}}/{{month}}",
     "fullDate": "Ngày {{day}} tháng {{month}}, {{year}}",
     "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+  },
+  "relocation": {
+    "title": "Kế hoạch chuyển nhà",
+    "subtitle": "So sánh chi phí sinh hoạt giữa các thành phố Nhật Bản",
+    "nenshu": "Thu nhập hàng năm (Yên)",
+    "nenshuPlaceholder": "VD: 5000000",
+    "familySizeLabel": "Quy mô gia đình",
+    "familySize": {
+      "single": "Độc thân",
+      "couple": "Vợ chồng",
+      "couple_1": "Vợ chồng + 1 con",
+      "couple_2": "Vợ chồng + 2 con",
+      "couple_3": "Vợ chồng + 3 con"
+    },
+    "roomTypeLabel": "Loại phòng",
+    "citySelection": "Chọn thành phố",
+    "currentCity": "Thành phố hiện tại",
+    "targetCity": "Thành phố đích",
+    "selectCity": "Chọn thành phố",
+    "compare": "So sánh chi phí",
+    "monthlyDiff": "Chênh lệch hàng tháng",
+    "annualDiff": "Chênh lệch hàng năm",
+    "totalMonthly": "Tổng hàng tháng",
+    "saving": "Tiết kiệm",
+    "moreExpensive": "Đắt hơn",
+    "same": "Không thay đổi",
+    "breakdown": "Chi tiết chi phí",
+    "cost": {
+      "rent": "Tiền thuê nhà",
+      "estimated_food": "Thực phẩm",
+      "estimated_utilities": "Tiện ích",
+      "estimated_transport": "Giao thông",
+      "social_insurance": "Bảo hiểm xã hội",
+      "resident_tax": "Thuế cư trú",
+      "income_tax": "Thuế thu nhập"
+    },
+    "goalImpact": "Tác động đến mục tiêu",
+    "goalFaster": "Nhanh hơn {{months}} tháng",
+    "goalSlower": "Chậm hơn {{months}} tháng",
+    "goalNoChange": "Không thay đổi",
+    "monthsRemaining": "Còn {{months}} tháng",
+    "errorTitle": "So sánh thất bại",
+    "errorDescription": "Không thể so sánh các thành phố này. Vui lòng thử lại.",
+    "compareError": "So sánh thành phố thất bại. Vui lòng thử lại."
   }
 }

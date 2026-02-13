@@ -15,6 +15,7 @@ import { Route as UploadRouteImport } from './routes/upload'
 import { Route as TransactionsRouteImport } from './routes/transactions'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ReportRouteImport } from './routes/report'
+import { Route as RelocationRouteImport } from './routes/relocation'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as RecurringRouteImport } from './routes/recurring'
 import { Route as ProxyRouteImport } from './routes/proxy'
@@ -59,6 +60,11 @@ const ReportRoute = ReportRouteImport.update({
   path: '/report',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/report.lazy').then((d) => d.Route))
+const RelocationRoute = RelocationRouteImport.update({
+  id: '/relocation',
+  path: '/relocation',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/relocation.lazy').then((d) => d.Route))
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/proxy': typeof ProxyRoute
   '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
+  '/relocation': typeof RelocationRoute
   '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/proxy': typeof ProxyRoute
   '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
+  '/relocation': typeof RelocationRoute
   '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/proxy': typeof ProxyRoute
   '/recurring': typeof RecurringRoute
   '/register': typeof RegisterRoute
+  '/relocation': typeof RelocationRoute
   '/report': typeof ReportRoute
   '/settings': typeof SettingsRoute
   '/transactions': typeof TransactionsRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/proxy'
     | '/recurring'
     | '/register'
+    | '/relocation'
     | '/report'
     | '/settings'
     | '/transactions'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/proxy'
     | '/recurring'
     | '/register'
+    | '/relocation'
     | '/report'
     | '/settings'
     | '/transactions'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/proxy'
     | '/recurring'
     | '/register'
+    | '/relocation'
     | '/report'
     | '/settings'
     | '/transactions'
@@ -233,6 +245,7 @@ export interface RootRouteChildren {
   ProxyRoute: typeof ProxyRoute
   RecurringRoute: typeof RecurringRoute
   RegisterRoute: typeof RegisterRoute
+  RelocationRoute: typeof RelocationRoute
   ReportRoute: typeof ReportRoute
   SettingsRoute: typeof SettingsRoute
   TransactionsRoute: typeof TransactionsRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       path: '/report'
       fullPath: '/report'
       preLoaderRoute: typeof ReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/relocation': {
+      id: '/relocation'
+      path: '/relocation'
+      fullPath: '/relocation'
+      preLoaderRoute: typeof RelocationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -369,6 +389,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProxyRoute: ProxyRoute,
   RecurringRoute: RecurringRoute,
   RegisterRoute: RegisterRoute,
+  RelocationRoute: RelocationRoute,
   ReportRoute: ReportRoute,
   SettingsRoute: SettingsRoute,
   TransactionsRoute: TransactionsRoute,

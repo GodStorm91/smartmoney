@@ -38,6 +38,12 @@ from .position_closure import PositionClosure
 from .receipt import Receipt
 from .report_ai_summary import ReportAISummary
 from .recurring_transaction import RecurringTransaction
+from .regional_data import (
+    PrefectureInsuranceRate,
+    RegionalCity,
+    RegionalCostIndex,
+    RegionalRent,
+)
 from .rewards import (
     Theme,
     UserTheme,
@@ -145,4 +151,8 @@ __all__ = [
     "BillReminderSchedule",
     "BurnRateAlert",
     "QueuedNotification",
+    "RegionalCity",
+    "RegionalRent",
+    "RegionalCostIndex",
+    "PrefectureInsuranceRate",
 ]
