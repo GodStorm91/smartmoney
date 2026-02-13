@@ -25,7 +25,8 @@
     "more": "その他",
     "explore": "探索",
     "collapse": "折りたたむ",
-    "expand": "展開"
+    "expand": "展開",
+    "relocation": "引越し"
   },
   "button": {
     "save": "保存",
@@ -1930,5 +1931,49 @@
       "description": "口座を追加し、取引をインポートして始めましょう",
       "cta": "始める"
     }
+  },
+  "relocation": {
+    "title": "引越しプランナー",
+    "subtitle": "日本の都市間の生活費を比較",
+    "nenshu": "年収（円）",
+    "nenshuPlaceholder": "例: 5000000",
+    "familySizeLabel": "家族構成",
+    "familySize": {
+      "single": "単身",
+      "couple": "夫婦",
+      "couple_1": "夫婦+子1人",
+      "couple_2": "夫婦+子2人",
+      "couple_3": "夫婦+子3人"
+    },
+    "roomTypeLabel": "間取り",
+    "citySelection": "都市選択",
+    "currentCity": "現在の都市",
+    "targetCity": "引越し先",
+    "selectCity": "都市を選択",
+    "compare": "比較する",
+    "monthlyDiff": "月額差額",
+    "annualDiff": "年間差額",
+    "totalMonthly": "月額合計",
+    "saving": "節約",
+    "moreExpensive": "割高",
+    "same": "変化なし",
+    "breakdown": "費用内訳",
+    "cost": {
+      "rent": "家賃",
+      "estimated_food": "食費",
+      "estimated_utilities": "光熱費",
+      "estimated_transport": "交通費",
+      "social_insurance": "社会保険",
+      "resident_tax": "住民税",
+      "income_tax": "所得税"
+    },
+    "goalImpact": "目標への影響",
+    "goalFaster": "{{months}}ヶ月早く達成",
+    "goalSlower": "{{months}}ヶ月遅く達成",
+    "goalNoChange": "変化なし",
+    "monthsRemaining": "残り{{months}}ヶ月",
+    "errorTitle": "比較に失敗しました",
+    "errorDescription": "都市の比較ができませんでした。もう一度お試しください。",
+    "compareError": "都市の比較に失敗しました。もう一度お試しください。"
   }
 }
