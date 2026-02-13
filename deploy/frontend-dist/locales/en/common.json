@@ -1445,7 +1445,18 @@
     "skip": "Skip",
     "action": {
       "create_goal": "Create Goal",
-      "create_budget": "Create Budget"
+      "create_budget": "Create Budget",
+      "parameters": "Parameters",
+      "monthly_income": "Monthly Income",
+      "monthlyIncome": "Monthly Income",
+      "target_amount": "Target Amount",
+      "targetAmount": "Target Amount",
+      "years": "Years",
+      "goal_type": "Goal Type",
+      "goalType": "Goal Type",
+      "name": "Name",
+      "feedback": "Feedback",
+      "language": "Language"
     },
     "goalCreated": "Goal created successfully!",
     "budgetCreated": "Budget created successfully!",
@@ -1454,7 +1465,9 @@
     "credits": "{{count}} credits",
     "noCredits": "No credits remaining. Please purchase more credits.",
     "welcomeMessage": "Hi! I'm your financial assistant. Ask me anything about your spending, savings goals, or budget.",
-    "error": "Failed to get response. Please try again."
+    "error": "Failed to get response. Please try again.",
+    "clearHistory": "Clear history",
+    "clearHistoryConfirm": "Clear all chat history? This cannot be undone."
   },
   "transfer": {
     "title": "Transfer Between Accounts",

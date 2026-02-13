@@ -1399,7 +1399,18 @@
     "skip": "Bỏ qua",
     "action": {
       "create_goal": "Tạo mục tiêu",
-      "create_budget": "Tạo ngân sách"
+      "create_budget": "Tạo ngân sách",
+      "parameters": "Tham số",
+      "monthly_income": "Thu nhập hàng tháng",
+      "monthlyIncome": "Thu nhập hàng tháng",
+      "target_amount": "Số tiền mục tiêu",
+      "targetAmount": "Số tiền mục tiêu",
+      "years": "Số năm",
+      "goal_type": "Loại mục tiêu",
+      "goalType": "Loại mục tiêu",
+      "name": "Tên",
+      "feedback": "Phản hồi",
+      "language": "Ngôn ngữ"
     },
     "goalCreated": "Đã tạo mục tiêu thành công!",
     "budgetCreated": "Đã tạo ngân sách thành công!",
@@ -1408,7 +1419,9 @@
     "credits": "{{count}} credit",
     "noCredits": "Hết credit. Vui lòng mua thêm.",
     "welcomeMessage": "Xin chào! Tôi là trợ lý tài chính của bạn. Hãy hỏi tôi bất cứ điều gì về chi tiêu, mục tiêu tiết kiệm, hoặc ngân sách.",
-    "error": "Không thể nhận phản hồi. Vui lòng thử lại."
+    "error": "Không thể nhận phản hồi. Vui lòng thử lại.",
+    "clearHistory": "Xóa lịch sử",
+    "clearHistoryConfirm": "Xóa toàn bộ lịch sử trò chuyện? Hành động này không thể hoàn tác."
   },
   "transfer": {
     "title": "Chuyển tiền giữa tài khoản",

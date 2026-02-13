@@ -1403,7 +1403,18 @@
     "skip": "スキップ",
     "action": {
       "create_goal": "目標を作成",
-      "create_budget": "予算を作成"
+      "create_budget": "予算を作成",
+      "parameters": "パラメータ",
+      "monthly_income": "月収",
+      "monthlyIncome": "月収",
+      "target_amount": "目標金額",
+      "targetAmount": "目標金額",
+      "years": "年数",
+      "goal_type": "目標タイプ",
+      "goalType": "目標タイプ",
+      "name": "名前",
+      "feedback": "フィードバック",
+      "language": "言語"
     },
     "goalCreated": "目標を作成しました！",
     "budgetCreated": "予算を作成しました！",
@@ -1412,7 +1423,9 @@
     "credits": "{{count}}クレジット",
     "noCredits": "クレジットが不足しています。追加購入してください。",
     "welcomeMessage": "こんにちは！私はあなたの家計アシスタントです。支出、貯蓄目標、予算について何でもお聞きください。",
-    "error": "応答の取得に失敗しました。もう一度お試しください。"
+    "error": "応答の取得に失敗しました。もう一度お試しください。",
+    "clearHistory": "履歴をクリア",
+    "clearHistoryConfirm": "すべてのチャット履歴を削除しますか？この操作は元に戻せません。"
   },
   "transfer": {
     "title": "口座間振替",
