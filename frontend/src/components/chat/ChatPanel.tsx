@@ -14,13 +14,39 @@ interface ChatPanelProps {
   onClose: () => void
 }
 
+const STORAGE_KEY = 'smartmoney_chat_history'
+const MAX_STORED_MESSAGES = 20
+
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+
+  // Load messages from localStorage on mount
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (stored) {
+        return JSON.parse(stored)
+      }
+    } catch (e) {
+      console.error('Failed to load chat history:', e)
+    }
+    return []
+  })
+
   const [isLoading, setIsLoading] = useState(false)
   const [credits, setCredits] = useState<number | null>(null)
   const [applyingAction, setApplyingAction] = useState<number | null>(null)
+
+  // Persist messages to localStorage whenever they change
+  useEffect(() => {
+    try {
+      const toStore = messages.slice(-MAX_STORED_MESSAGES)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore))
+    } catch (e) {
+      console.error('Failed to save chat history:', e)
+    }
+  }, [messages])
 
   // Handle escape key to close
   useEffect(() => {
@@ -148,6 +174,11 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     })
   }, [])
 
+  const handleClearHistory = useCallback(() => {
+    setMessages([])
+    localStorage.removeItem(STORAGE_KEY)
+  }, [])
+
   return (
     <>
       {/* Backdrop */}
@@ -162,15 +193,19 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       <div
         className={cn(
           'fixed right-0 top-0 h-full z-[100]',
-          'w-full sm:w-96',
+          'w-full sm:w-[448px] lg:w-96',
           'bg-white dark:bg-gray-800',
           'shadow-2xl',
           'flex flex-col',
           'transform transition-transform duration-300 ease-out',
-          isOpen ? 'translate-x-0' : '-translate-x-full pointer-events-none'
+          isOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         )}
       >
-        <ChatHeader onClose={onClose} credits={credits} />
+        <ChatHeader
+          onClose={onClose}
+          credits={credits}
+          onClearHistory={handleClearHistory}
+        />
         <ChatMessages
           messages={messages}
           isLoading={isLoading}

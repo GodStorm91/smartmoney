@@ -70,10 +70,11 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           className={cn(
             'p-2 rounded-full',
             'bg-primary-500 text-white',
-            'hover:bg-primary-600',
+            'hover:bg-primary-600 active:bg-primary-700',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            'transition-colors',
-            'flex-shrink-0'
+            'transition-all duration-200',
+            'flex-shrink-0',
+            !disabled && value.trim() && 'hover:scale-105 active:scale-95 hover:shadow-lg'
           )}
           aria-label={t('chat.send')}
         >

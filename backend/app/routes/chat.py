@@ -3,6 +3,7 @@ from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
@@ -11,11 +12,19 @@ from ..models.user import User
 from ..schemas.chat import ChatRequest, ChatResponse
 from ..services.claude_ai_service import ClaudeAIService
 from ..services.credit_service import CreditService, InsufficientCreditsError
+from ..services.tool_executor import ToolExecutor
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
 # Cost per chat message in credits
 CHAT_CREDIT_COST = Decimal("1.0000")
+
+
+class ExecuteActionRequest(BaseModel):
+    """Request to execute a confirmed action."""
+
+    action_type: str
+    payload: dict
 
 
 @router.post("", response_model=ChatResponse)
@@ -93,3 +102,55 @@ async def chat(
         suggested_action=response_data.get("action"),
         credits_remaining=float(new_balance)
     )
+
+
+@router.post("/execute-action")
+async def execute_action(
+    request: ExecuteActionRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Execute a confirmed action from the chat assistant.
+
+    This endpoint is called when the user confirms an action suggested by the AI.
+    No additional credits are charged for executing confirmed actions.
+
+    Args:
+        request: Action execution request
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        Execution result
+
+    Raises:
+        HTTPException: If execution fails
+    """
+    executor = ToolExecutor(db, current_user.id)
+
+    try:
+        result = executor.execute_confirmed_action(
+            action_type=request.action_type,
+            payload=request.payload
+        )
+
+        if not result.get("success"):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=result.get("message", "Action execution failed")
+            )
+
+        db.commit()
+        return result
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to execute action: {str(e)}"
+        )

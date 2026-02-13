@@ -48,7 +48,11 @@ export function ChatMessages({
       )}
 
       {messages.map((message, index) => (
-        <div key={index}>
+        <div
+          key={index}
+          className="animate-[slideUp_200ms_ease-out]"
+          style={{ animationDelay: `${Math.min(index * 20, 100)}ms` }}
+        >
           <ChatMessage role={message.role} content={message.content} />
           {message.action && (
             <div className="ml-11">

@@ -21,7 +21,7 @@ class ChatRequest(BaseModel):
 class SuggestedAction(BaseModel):
     """Suggested action from AI response."""
 
-    type: Literal["create_goal", "create_budget"]
+    type: Literal["create_goal", "create_budget", "create_transaction"]
     payload: dict
     description: str
 
