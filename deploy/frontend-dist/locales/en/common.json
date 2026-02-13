@@ -910,6 +910,17 @@
     "light": "Light",
     "dark": "Dark",
     "system": "System",
+    "colorTheme": "Color Theme",
+    "themes": {
+      "default": "Default",
+      "catppuccinLatte": "Catppuccin Latte",
+      "catppuccinFrappe": "Catppuccin Frappe",
+      "catppuccinMacchiato": "Catppuccin Macchiato",
+      "catppuccinMocha": "Catppuccin Mocha",
+      "dracula": "Dracula",
+      "draculaLight": "Dracula Light"
+    },
+    "themeControlled": "Controlled by theme",
     "accentColor": "Accent Color",
     "displayMode": "Display Mode",
     "pro": "Pro",

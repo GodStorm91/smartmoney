@@ -820,6 +820,17 @@
     "light": "Sáng",
     "dark": "Tối",
     "system": "Hệ thống",
+    "colorTheme": "Chủ đề màu",
+    "themes": {
+      "default": "Mặc định",
+      "catppuccinLatte": "Catppuccin Latte",
+      "catppuccinFrappe": "Catppuccin Frappe",
+      "catppuccinMacchiato": "Catppuccin Macchiato",
+      "catppuccinMocha": "Catppuccin Mocha",
+      "dracula": "Dracula",
+      "draculaLight": "Dracula Light"
+    },
+    "themeControlled": "Được điều khiển bởi chủ đề",
     "accentColor": "Màu chủ đạo",
     "displayMode": "Chế độ hiển thị",
     "pro": "Pro",

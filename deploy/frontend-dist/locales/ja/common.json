@@ -824,6 +824,17 @@
     "light": "ライト",
     "dark": "ダーク",
     "system": "システム",
+    "colorTheme": "カラーテーマ",
+    "themes": {
+      "default": "デフォルト",
+      "catppuccinLatte": "Catppuccin Latte",
+      "catppuccinFrappe": "Catppuccin Frappe",
+      "catppuccinMacchiato": "Catppuccin Macchiato",
+      "catppuccinMocha": "Catppuccin Mocha",
+      "dracula": "Dracula",
+      "draculaLight": "Dracula Light"
+    },
+    "themeControlled": "テーマにより制御",
     "accentColor": "アクセントカラー",
     "displayMode": "表示モード",
     "pro": "プロ",
