@@ -1965,8 +1965,11 @@
       "estimated_transport": "交通費",
       "social_insurance": "社会保険",
       "resident_tax": "住民税",
-      "income_tax": "所得税"
+      "income_tax": "所得税",
+      "estimated_childcare": "保育園料 (0〜2歳)"
     },
+    "hasYoungChildren": "0〜2歳のお子様がいますか？",
+    "childcareFree": "無料",
     "goalImpact": "目標への影響",
     "goalFaster": "{{months}}ヶ月早く達成",
     "goalSlower": "{{months}}ヶ月遅く達成",
@@ -1974,6 +1977,11 @@
     "monthsRemaining": "残り{{months}}ヶ月",
     "errorTitle": "比較に失敗しました",
     "errorDescription": "都市の比較ができませんでした。もう一度お試しください。",
-    "compareError": "都市の比較に失敗しました。もう一度お試しください。"
+    "compareError": "都市の比較に失敗しました。もう一度お試しください。",
+    "postalCodeLabel": "郵便番号",
+    "postalCodePlaceholder": "例: 100-0001",
+    "postalCodeNotFound": "この郵便番号に該当する都市が見つかりません",
+    "chooseManually": "手動で選択",
+    "adviceTitle": "財務アドバイス"
   }
 }

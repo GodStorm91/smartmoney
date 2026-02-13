@@ -12,14 +12,22 @@ from ..models.regional_data import (
 from ..schemas.relocation import (
     CityBreakdown,
     CityListItem,
+    PostalCodeResponse,
     RelocationCompareRequest,
     RelocationCompareResponse,
 )
+from ..utils.constants import (
+    CHILDCARE_MONTHLY_AVG,
+    OSAKA_PREFECTURE_CODE,
+    TOKYO_PREFECTURE_CODE,
+)
+from ..utils.relocation_advice import generate_advice
 from ..utils.tax_calculator import (
     calculate_income_tax,
     calculate_resident_tax,
     calculate_social_insurance,
 )
+from .postal_code_service import resolve_postal_code as _resolve_postal_code
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +55,15 @@ _DEPENDENTS = {
 }
 
 
+def _calc_childcare(prefecture_code: int, has_young_children: bool) -> int:
+    """Calculate monthly childcare cost for children aged 0-2."""
+    if not has_young_children:
+        return 0
+    if prefecture_code in (TOKYO_PREFECTURE_CODE, OSAKA_PREFECTURE_CODE):
+        return 0
+    return CHILDCARE_MONTHLY_AVG
+
+
 def _build_breakdown(
     city: RegionalCity,
     rent: int,
@@ -54,6 +71,7 @@ def _build_breakdown(
     family_size: str,
     nenshu: int,
     insurance_rate: float,
+    has_young_children: bool = False,
 ) -> CityBreakdown:
     """Build a monthly cost breakdown for one city."""
     multiplier = _FAMILY_MULTIPLIER.get(family_size, 1.0)
@@ -71,7 +89,9 @@ def _build_breakdown(
     monthly_rt = annual_rt // 12
     monthly_it = annual_it // 12
 
-    total = rent + food + utilities + transport + monthly_si + monthly_rt + monthly_it
+    childcare = _calc_childcare(city.prefecture_code, has_young_children)
+
+    total = rent + food + utilities + transport + monthly_si + monthly_rt + monthly_it + childcare
 
     return CityBreakdown(
         city_name=city.city_name,
@@ -83,6 +103,7 @@ def _build_breakdown(
         social_insurance=monthly_si,
         resident_tax=monthly_rt,
         income_tax=monthly_it,
+        estimated_childcare=childcare,
         total_monthly=total,
     )
 
@@ -166,6 +187,7 @@ class RelocationService:
             req.family_size.value,
             req.nenshu,
             _insurance(current_city),
+            req.has_young_children,
         )
         tgt = _build_breakdown(
             target_city,
@@ -174,16 +196,34 @@ class RelocationService:
             req.family_size.value,
             req.nenshu,
             _insurance(target_city),
+            req.has_young_children,
         )
 
         diff = tgt.total_monthly - cur.total_monthly
+        annual = diff * 12
+
+        advice = generate_advice(
+            current=cur,
+            target=tgt,
+            nenshu=req.nenshu,
+            has_young_children=req.has_young_children,
+            monthly_diff=diff,
+            annual_diff=annual,
+        )
 
         return RelocationCompareResponse(
             current=cur,
             target=tgt,
             monthly_difference=diff,
-            annual_difference=diff * 12,
+            annual_difference=annual,
+            advice=advice,
         )
+
+
+    @staticmethod
+    def resolve_postal_code(db: Session, postal_code: str) -> PostalCodeResponse:
+        """Resolve a 7-digit Japanese postal code to a RegionalCity."""
+        return _resolve_postal_code(db, postal_code)
 
 
 _service: RelocationService | None = None

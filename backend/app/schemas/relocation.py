@@ -31,6 +31,7 @@ class RelocationCompareRequest(BaseModel):
     room_type: RoomType
     current_city_id: int = Field(..., gt=0)
     target_city_id: int = Field(..., gt=0)
+    has_young_children: bool = False
 
 
 class CityBreakdown(BaseModel):
@@ -45,6 +46,7 @@ class CityBreakdown(BaseModel):
     social_insurance: int
     resident_tax: int
     income_tax: int
+    estimated_childcare: int
     total_monthly: int
 
 
@@ -55,6 +57,7 @@ class RelocationCompareResponse(BaseModel):
     target: CityBreakdown
     monthly_difference: int
     annual_difference: int
+    advice: list[str] = []
 
 
 class CityListItem(BaseModel):
@@ -68,3 +71,13 @@ class CityListItem(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class PostalCodeResponse(BaseModel):
+    """Response for postal code resolution."""
+
+    city_id: int | None = None
+    prefecture_name: str | None = None
+    city_name: str | None = None
+    matched: bool = False
+    error: str | None = None

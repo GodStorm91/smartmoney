@@ -11,7 +11,7 @@ interface ComparisonReportProps {
 
 const COST_KEYS: (keyof Pick<
   CityBreakdown,
-  'rent' | 'estimated_food' | 'estimated_utilities' | 'estimated_transport' | 'social_insurance' | 'resident_tax' | 'income_tax'
+  'rent' | 'estimated_food' | 'estimated_utilities' | 'estimated_transport' | 'social_insurance' | 'resident_tax' | 'income_tax' | 'estimated_childcare'
 >)[] = [
   'rent',
   'estimated_food',
@@ -20,6 +20,7 @@ const COST_KEYS: (keyof Pick<
   'social_insurance',
   'resident_tax',
   'income_tax',
+  'estimated_childcare',
 ]
 
 function formatYen(amount: number): string {
@@ -43,7 +44,9 @@ function CityColumn({ breakdown, label }: { breakdown: CityBreakdown; label: str
               {t(`relocation.cost.${key}`)}
             </span>
             <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
-              {formatYen(breakdown[key])}
+              {key === 'estimated_childcare' && breakdown[key] === 0
+                ? t('relocation.childcareFree')
+                : formatYen(breakdown[key])}
             </span>
           </div>
         ))}

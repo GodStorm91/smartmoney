@@ -10,6 +10,7 @@ export interface RelocationCompareRequest {
   room_type: RoomType
   current_city_id: number
   target_city_id: number
+  has_young_children: boolean
 }
 
 export interface CityBreakdown {
@@ -22,6 +23,7 @@ export interface CityBreakdown {
   social_insurance: number
   resident_tax: number
   income_tax: number
+  estimated_childcare: number
   total_monthly: number
 }
 
@@ -30,6 +32,7 @@ export interface RelocationCompareResponse {
   target: CityBreakdown
   monthly_difference: number
   annual_difference: number
+  advice: string[]
 }
 
 export interface CityListItem {
@@ -38,4 +41,12 @@ export interface CityListItem {
   city_name_en: string
   prefecture_name: string
   prefecture_name_en: string
+}
+
+export interface PostalCodeResponse {
+  city_id: number | null
+  prefecture_name: string | null
+  city_name: string | null
+  matched: boolean
+  error: string | null
 }

@@ -1,10 +1,13 @@
 """Relocation financial comparison API routes."""
-from fastapi import APIRouter, Depends, HTTPException
+import re
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..schemas.relocation import (
     CityListItem,
+    PostalCodeResponse,
     RelocationCompareRequest,
     RelocationCompareResponse,
 )
@@ -35,3 +38,18 @@ async def compare_cities(
         return service.compare_cities(db, req)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("/resolve-postal", response_model=PostalCodeResponse)
+async def resolve_postal(
+    code: str = Query(..., description="7-digit Japanese postal code"),
+    db: Session = Depends(get_db),
+):
+    """Resolve a Japanese postal code to a city in our database."""
+    if not re.fullmatch(r"\d{7}", code):
+        raise HTTPException(
+            status_code=400,
+            detail="Postal code must be exactly 7 digits",
+        )
+    service = get_relocation_service()
+    return service.resolve_postal_code(db, code)

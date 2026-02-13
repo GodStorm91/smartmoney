@@ -2076,8 +2076,11 @@
       "estimated_transport": "Transport",
       "social_insurance": "Social Insurance",
       "resident_tax": "Resident Tax",
-      "income_tax": "Income Tax"
+      "income_tax": "Income Tax",
+      "estimated_childcare": "Childcare (0-2 yrs)"
     },
+    "hasYoungChildren": "Children aged 0-2?",
+    "childcareFree": "Free",
     "goalImpact": "Goal Impact",
     "goalFaster": "{{months}} months faster",
     "goalSlower": "{{months}} months slower",
@@ -2085,6 +2088,11 @@
     "monthsRemaining": "{{months}}mo left",
     "errorTitle": "Comparison Failed",
     "errorDescription": "Could not compare these cities. Please try again.",
-    "compareError": "Failed to compare cities. Please try again."
+    "compareError": "Failed to compare cities. Please try again.",
+    "postalCodeLabel": "Postal Code",
+    "postalCodePlaceholder": "e.g. 100-0001",
+    "postalCodeNotFound": "No matching city found for this postal code",
+    "chooseManually": "Choose manually",
+    "adviceTitle": "Financial Insights"
   }
 }

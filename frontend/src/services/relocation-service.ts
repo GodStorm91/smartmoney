@@ -1,5 +1,5 @@
 import { apiClient } from './api-client'
-import type { CityListItem, RelocationCompareRequest, RelocationCompareResponse } from '@/types/relocation'
+import type { CityListItem, PostalCodeResponse, RelocationCompareRequest, RelocationCompareResponse } from '@/types/relocation'
 
 /**
  * Fetch available cities for relocation comparison
@@ -18,6 +18,16 @@ export async function compareLocations(
   const response = await apiClient.post<RelocationCompareResponse>(
     '/api/relocation/compare',
     request
+  )
+  return response.data
+}
+
+/**
+ * Resolve a 7-digit Japanese postal code to a city
+ */
+export async function resolvePostalCode(code: string): Promise<PostalCodeResponse> {
+  const response = await apiClient.get<PostalCodeResponse>(
+    `/api/relocation/resolve-postal?code=${code}`
   )
   return response.data
 }

@@ -6,6 +6,7 @@ import { MapPinned } from 'lucide-react'
 import { RelocationForm } from '@/components/relocation/RelocationForm'
 import { ComparisonReport } from '@/components/relocation/ComparisonReport'
 import { GoalImpactCard } from '@/components/relocation/GoalImpactCard'
+import { AdviceCard } from '@/components/relocation/AdviceCard'
 import { compareLocations } from '@/services/relocation-service'
 import type { RelocationCompareRequest, RelocationCompareResponse } from '@/types/relocation'
 
@@ -46,6 +47,7 @@ export function RelocationPage() {
         {result && (
           <>
             <ComparisonReport data={result} />
+            {result.advice?.length > 0 && <AdviceCard advice={result.advice} />}
             <GoalImpactCard monthlyDifference={result.monthly_difference} />
           </>
         )}

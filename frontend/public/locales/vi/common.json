@@ -1885,8 +1885,11 @@
       "estimated_transport": "Giao thông",
       "social_insurance": "Bảo hiểm xã hội",
       "resident_tax": "Thuế cư trú",
-      "income_tax": "Thuế thu nhập"
+      "income_tax": "Thuế thu nhập",
+      "estimated_childcare": "Nhà trẻ (0-2 tuổi)"
     },
+    "hasYoungChildren": "Có con từ 0-2 tuổi?",
+    "childcareFree": "Miễn phí",
     "goalImpact": "Tác động đến mục tiêu",
     "goalFaster": "Nhanh hơn {{months}} tháng",
     "goalSlower": "Chậm hơn {{months}} tháng",
@@ -1894,6 +1897,11 @@
     "monthsRemaining": "Còn {{months}} tháng",
     "errorTitle": "So sánh thất bại",
     "errorDescription": "Không thể so sánh các thành phố này. Vui lòng thử lại.",
-    "compareError": "So sánh thành phố thất bại. Vui lòng thử lại."
+    "compareError": "So sánh thành phố thất bại. Vui lòng thử lại.",
+    "postalCodeLabel": "Mã bưu điện",
+    "postalCodePlaceholder": "VD: 100-0001",
+    "postalCodeNotFound": "Không tìm thấy thành phố phù hợp với mã bưu điện này",
+    "chooseManually": "Chọn thủ công",
+    "adviceTitle": "Phân tích tài chính"
   }
 }
