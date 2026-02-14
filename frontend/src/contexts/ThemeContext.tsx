@@ -1,31 +1,27 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { apiClient } from '@/services/api-client'
+import {
+  ACCENT_COLORS,
+  COLOR_THEMES,
+  THEME_STORAGE_KEY,
+  ACCENT_STORAGE_KEY,
+  COLOR_THEME_STORAGE_KEY,
+  TIER_STORAGE_KEY,
+  getSystemTheme,
+  getStoredTheme,
+  getStoredAccent,
+  getStoredColorTheme,
+  getStoredTier,
+  type Theme,
+  type AccentColor,
+  type AppTier,
+  type ColorTheme,
+} from '@/lib/theme-storage'
+import { toBackendFormat, fromBackendFormat, type BackendThemeSettings } from '@/lib/theme-api-mapper'
 
-type Theme = 'light' | 'dark' | 'system'
-export type AccentColor = 'green' | 'blue' | 'purple' | 'orange' | 'rose' | 'teal'
-export type AppTier = 'pro' | 'lite'
-export type ColorTheme = 'default' | 'catppuccin-latte' | 'catppuccin-frappe' | 'catppuccin-macchiato' | 'catppuccin-mocha' | 'dracula' | 'dracula-light'
-
-export const ACCENT_COLORS: { id: AccentColor; label: string; preview: string }[] = [
-  { id: 'green', label: 'Emerald', preview: '#4CAF50' },
-  { id: 'blue', label: 'Ocean', preview: '#3B82F6' },
-  { id: 'purple', label: 'Royal', preview: '#8B5CF6' },
-  { id: 'orange', label: 'Sunset', preview: '#F97316' },
-  { id: 'rose', label: 'Rose', preview: '#F43F5E' },
-  { id: 'teal', label: 'Teal', preview: '#14B8A6' },
-]
-
-/** Theme metadata for the theme selector UI */
-export const COLOR_THEMES: { id: ColorTheme; mode: 'light' | 'dark'; preview: { base: string; surface: string; text: string; primary: string } }[] = [
-  { id: 'default', mode: 'light', preview: { base: '#f9fafb', surface: '#ffffff', text: '#111827', primary: '#4CAF50' } },
-  { id: 'catppuccin-latte', mode: 'light', preview: { base: '#eff1f5', surface: '#ccd0da', text: '#4c4f69', primary: '#7c3aed' } },
-  { id: 'catppuccin-frappe', mode: 'dark', preview: { base: '#303446', surface: '#414559', text: '#c6d0f5', primary: '#babbf1' } },
-  { id: 'catppuccin-macchiato', mode: 'dark', preview: { base: '#24273a', surface: '#363a4f', text: '#cad3f5', primary: '#91d7e3' } },
-  { id: 'catppuccin-mocha', mode: 'dark', preview: { base: '#1e1e2e', surface: '#313244', text: '#cdd6f4', primary: '#cba6f7' } },
-  { id: 'dracula', mode: 'dark', preview: { base: '#282a36', surface: '#44475a', text: '#f8f8f2', primary: '#bd93f9' } },
-  { id: 'dracula-light', mode: 'light', preview: { base: '#fffbeb', surface: '#dedccf', text: '#1f1f1f', primary: '#644ac9' } },
-]
-
-const VALID_COLOR_THEMES: ColorTheme[] = COLOR_THEMES.map(t => t.id)
+// Re-export types and constants for backward compatibility
+export type { Theme, AccentColor, AppTier, ColorTheme }
+export { ACCENT_COLORS, COLOR_THEMES }
 
 interface ThemeContextType {
   theme: Theme
@@ -42,52 +38,6 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-const THEME_STORAGE_KEY = 'smartmoney-theme'
-const ACCENT_STORAGE_KEY = 'smartmoney-accent'
-const COLOR_THEME_STORAGE_KEY = 'smartmoney-color-theme'
-const TIER_STORAGE_KEY = 'smartmoney-tier'
-
-function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window !== 'undefined' && window.matchMedia) {
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  }
-  return 'light'
-}
-
-function getStoredTheme(): Theme {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY)
-    if (stored === 'light' || stored === 'dark' || stored === 'system') {
-      return stored
-    }
-  }
-  return 'system'
-}
-
-function getStoredAccent(): AccentColor {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(ACCENT_STORAGE_KEY)
-    if (ACCENT_COLORS.some(c => c.id === stored)) return stored as AccentColor
-  }
-  return 'green'
-}
-
-function getStoredColorTheme(): ColorTheme {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(COLOR_THEME_STORAGE_KEY)
-    if (stored && VALID_COLOR_THEMES.includes(stored as ColorTheme)) return stored as ColorTheme
-  }
-  return 'default'
-}
-
-function getStoredTier(): AppTier {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(TIER_STORAGE_KEY)
-    if (stored === 'pro' || stored === 'lite') return stored
-  }
-  return 'pro'
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => getStoredTheme())
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
@@ -97,6 +47,61 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [accentColor, setAccentColorState] = useState<AccentColor>(() => getStoredAccent())
   const [colorTheme, setColorThemeState] = useState<ColorTheme>(() => getStoredColorTheme())
   const [tier, setTierState] = useState<AppTier>(() => getStoredTier())
+  const [isLoadingFromAPI, setIsLoadingFromAPI] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  // Check if user is authenticated by looking for access token
+  useEffect(() => {
+    const token = localStorage.getItem('smartmoney_access_token')
+    setIsAuthenticated(!!token)
+  }, [])
+
+  // Fetch theme settings from backend on mount (authenticated users only)
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const fetchThemeSettings = async () => {
+      setIsLoadingFromAPI(true)
+      try {
+        const response = await apiClient.get<BackendThemeSettings>('/api/user/theme-settings')
+        const { colorTheme: ct, accentColor: ac, tier: t } = fromBackendFormat(response.data)
+
+        setColorThemeState(ct)
+        setAccentColorState(ac)
+        setTierState(t)
+
+        // Update localStorage to keep in sync
+        localStorage.setItem(COLOR_THEME_STORAGE_KEY, ct)
+        localStorage.setItem(ACCENT_STORAGE_KEY, ac)
+        localStorage.setItem(TIER_STORAGE_KEY, t)
+      } catch (error) {
+        console.error('Failed to fetch theme settings from backend:', error)
+        // Keep using localStorage values on error
+      } finally {
+        setIsLoadingFromAPI(false)
+      }
+    }
+
+    fetchThemeSettings()
+  }, [isAuthenticated])
+
+  // Sync theme changes to backend (debounced)
+  useEffect(() => {
+    if (!isAuthenticated || isLoadingFromAPI) return
+
+    const syncToBackend = async () => {
+      try {
+        const backendSettings = toBackendFormat(colorTheme, accentColor, tier)
+        await apiClient.put('/api/user/theme-settings', backendSettings)
+      } catch (error) {
+        console.error('Failed to sync theme settings to backend:', error)
+      }
+    }
+
+    // Debounce API calls to avoid excessive requests
+    const timeoutId = setTimeout(syncToBackend, 500)
+    return () => clearTimeout(timeoutId)
+  }, [colorTheme, accentColor, tier, isAuthenticated, isLoadingFromAPI])
 
   // Update resolved theme when theme, color theme, or system preference changes
   useEffect(() => {
