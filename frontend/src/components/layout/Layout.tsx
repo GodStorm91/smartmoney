@@ -144,7 +144,7 @@ export function Layout({ children }: LayoutProps) {
       {/* AI Chat Button */}
       <button
         onClick={() => setIsChatPanelOpen(true)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 p-4 bg-accent-600 hover:bg-accent-700 text-white rounded-full shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 p-4 bg-primary-600 hover:bg-primary-700 text-white rounded-full shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         title="AI Chat Assistant (Ctrl+Alt+C)"
       >
         <MessageCircle className="w-6 h-6" />
