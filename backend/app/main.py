@@ -44,6 +44,7 @@ from .routes.settings import router as settings_router
 from .routes.social_learning import router as social_learning_router
 from .routes.rewards import router as rewards_router
 from .routes.tags import router as tags_router
+from .routes.theme import router as theme_router
 from .routes.transactions import router as transactions_router
 from .routes.transfers import router as transfers_router
 from .routes.upload import router as upload_router
@@ -425,6 +426,7 @@ app.include_router(insights_router)
 app.include_router(savings_router)
 app.include_router(notifications_router)
 app.include_router(relocation_router)
+app.include_router(theme_router)
 
 
 # Root endpoints
