@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { MessageCircle } from 'lucide-react'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { BottomNavigation } from './BottomNavigation'
@@ -8,6 +9,7 @@ import { FloatingActionButton } from '@/components/ui/FloatingActionButton'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { ShortcutsHelpModal } from '@/components/ui/ShortcutsHelpModal'
+import { ChatPanel } from '@/components/chat/ChatPanel'
 import { useKeyboardShortcuts, SHORTCUT_KEYS } from '@/hooks/useKeyboardShortcuts'
 
 interface LayoutProps {
@@ -18,6 +20,7 @@ export function Layout({ children }: LayoutProps) {
   const navigate = useNavigate()
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false)
   const [isShortcutsModalOpen, setIsShortcutsModalOpen] = useState(false)
+  const [isChatPanelOpen, setIsChatPanelOpen] = useState(false)
 
   // Navigation shortcut state (for "G then X" shortcuts)
   const [pendingNavKey, setPendingNavKey] = useState<string | null>(null)
@@ -52,11 +55,20 @@ export function Layout({ children }: LayoutProps) {
       callback: () => setIsCommandPaletteOpen(true),
       description: 'Open command palette',
     },
+    // Chat panel
+    {
+      key: 'c',
+      ctrlKey: true,
+      altKey: true,
+      callback: () => setIsChatPanelOpen(true),
+      description: 'Open AI chat',
+    },
     // Escape - close modals
     {
       key: SHORTCUT_KEYS.ESCAPE,
       callback: () => {
-        if (isCommandPaletteOpen) setIsCommandPaletteOpen(false)
+        if (isChatPanelOpen) setIsChatPanelOpen(false)
+        else if (isCommandPaletteOpen) setIsCommandPaletteOpen(false)
         else if (isShortcutsModalOpen) setIsShortcutsModalOpen(false)
         setPendingNavKey(null)
       },
@@ -129,6 +141,15 @@ export function Layout({ children }: LayoutProps) {
       {/* Quick Actions FAB (mobile only) */}
       <FloatingActionButton />
 
+      {/* AI Chat Button */}
+      <button
+        onClick={() => setIsChatPanelOpen(true)}
+        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 p-4 bg-accent-600 hover:bg-accent-700 text-white rounded-full shadow-lg transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent-500 focus:ring-offset-2"
+        title="AI Chat Assistant (Ctrl+Alt+C)"
+      >
+        <MessageCircle className="w-6 h-6" />
+      </button>
+
       {/* Command Palette */}
       <CommandPalette
         open={isCommandPaletteOpen}
@@ -140,6 +161,12 @@ export function Layout({ children }: LayoutProps) {
       <ShortcutsHelpModal
         open={isShortcutsModalOpen}
         onClose={() => setIsShortcutsModalOpen(false)}
+      />
+
+      {/* AI Chat Panel */}
+      <ChatPanel
+        isOpen={isChatPanelOpen}
+        onClose={() => setIsChatPanelOpen(false)}
       />
     </div>
   )
