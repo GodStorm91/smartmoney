@@ -1469,6 +1469,12 @@
     "clearHistory": "Clear history",
     "clearHistoryConfirm": "Clear all chat history? This cannot be undone."
   },
+  "quickActions": {
+    "viewBudget": "View Budget",
+    "viewTransactions": "View Transactions",
+    "viewAnalytics": "View Analytics",
+    "viewGoals": "View Goals"
+  },
   "transfer": {
     "title": "Transfer Between Accounts",
     "exchangeTitle": "Currency Exchange",

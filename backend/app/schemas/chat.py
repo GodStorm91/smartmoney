@@ -16,6 +16,7 @@ class ChatRequest(BaseModel):
 
     messages: list[ChatMessage] = Field(..., min_length=1, max_length=20)
     language: str = Field(default="ja", pattern="^(ja|en|vi)$")
+    current_page: Optional[str] = Field(default=None, description="Current page/route user is viewing")
 
 
 class SuggestedAction(BaseModel):
@@ -26,9 +27,18 @@ class SuggestedAction(BaseModel):
     description: str
 
 
+class QuickAction(BaseModel):
+    """Quick action navigation button."""
+
+    label: str
+    route: str
+    icon: Optional[str] = None
+
+
 class ChatResponse(BaseModel):
     """Response from chat endpoint."""
 
     message: str
     suggested_action: Optional[SuggestedAction] = None
+    quick_actions: list[QuickAction] = Field(default_factory=list)
     credits_remaining: float

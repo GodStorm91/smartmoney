@@ -66,7 +66,8 @@ async def chat(
             db=db,
             user_id=current_user.id,
             messages=[{"role": m.role, "content": m.content} for m in request.messages],
-            language=request.language
+            language=request.language,
+            current_page=request.current_page
         )
     except Exception as e:
         raise HTTPException(
@@ -100,6 +101,7 @@ async def chat(
     return ChatResponse(
         message=response_data["message"],
         suggested_action=response_data.get("action"),
+        quick_actions=response_data.get("quick_actions", []),
         credits_remaining=float(new_balance)
     )
 

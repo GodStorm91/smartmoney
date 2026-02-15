@@ -1427,6 +1427,12 @@
     "clearHistory": "履歴をクリア",
     "clearHistoryConfirm": "すべてのチャット履歴を削除しますか？この操作は元に戻せません。"
   },
+  "quickActions": {
+    "viewBudget": "予算を見る",
+    "viewTransactions": "取引を見る",
+    "viewAnalytics": "分析を見る",
+    "viewGoals": "目標を見る"
+  },
   "transfer": {
     "title": "口座間振替",
     "exchangeTitle": "通貨両替",

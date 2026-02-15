@@ -204,7 +204,8 @@ Categorize now:"""
         db: Session,
         user_id: int,
         messages: list[dict[str, str]],
-        language: str = "ja"
+        language: str = "ja",
+        current_page: str | None = None
     ) -> tuple[dict[str, Any], dict[str, int]]:
         """Chat with Claude AI about financial data with tool calling support.
 
@@ -213,6 +214,7 @@ Categorize now:"""
             user_id: User ID
             messages: List of message dicts with role and content
             language: Language code for response (ja, en, vi)
+            current_page: Current page/route user is viewing
 
         Returns:
             Tuple of (response_data dict, usage dict with token counts)
@@ -226,10 +228,14 @@ Categorize now:"""
         language_map = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}
         language_name = language_map.get(language, "Japanese")
 
+        page_context = ""
+        if current_page:
+            page_context = f"\nCURRENT PAGE: User is currently viewing the '{current_page}' page. Provide context-aware responses related to this page when relevant.\n"
+
         system_message = f"""You are a helpful financial assistant for SmartMoney app. You help users manage their finances by answering questions and performing actions.
 
 IMPORTANT: Respond entirely in {language_name}.
-
+{page_context}
 AVAILABLE CATEGORIES:
 {', '.join(categories)}
 
@@ -356,8 +362,68 @@ INSTRUCTIONS:
             if suggested_action:
                 response_data["action"] = suggested_action
 
+            # Generate quick actions based on current page and context
+            quick_actions = self._generate_quick_actions(current_page, language)
+            if quick_actions:
+                response_data["quick_actions"] = quick_actions
+
             return response_data, usage
 
         except Exception as e:
             logger.error(f"Chat API error: {e}", exc_info=True)
             raise
+
+    def _generate_quick_actions(
+        self,
+        current_page: str | None,
+        language: str
+    ) -> list[dict[str, str]]:
+        """Generate contextual quick action buttons based on current page.
+
+        Args:
+            current_page: Current page/route user is viewing
+            language: Language code for labels
+
+        Returns:
+            List of quick action dicts with label, route, and optional icon
+        """
+        if not current_page:
+            return []
+
+        # Define quick actions per page
+        page_actions = {
+            "budget": [
+                {"label_key": "quickActions.viewAnalytics", "route": "/analytics", "icon": "BarChart3"},
+                {"label_key": "quickActions.viewTransactions", "route": "/transactions", "icon": "Receipt"}
+            ],
+            "transactions": [
+                {"label_key": "quickActions.viewBudget", "route": "/budget", "icon": "TrendingUp"},
+                {"label_key": "quickActions.viewAnalytics", "route": "/analytics", "icon": "BarChart3"}
+            ],
+            "analytics": [
+                {"label_key": "quickActions.viewBudget", "route": "/budget", "icon": "TrendingUp"},
+                {"label_key": "quickActions.viewGoals", "route": "/goals", "icon": "Target"}
+            ],
+            "goals": [
+                {"label_key": "quickActions.viewBudget", "route": "/budget", "icon": "TrendingUp"},
+                {"label_key": "quickActions.viewAnalytics", "route": "/analytics", "icon": "BarChart3"}
+            ],
+            "/": [
+                {"label_key": "quickActions.viewBudget", "route": "/budget", "icon": "TrendingUp"},
+                {"label_key": "quickActions.viewTransactions", "route": "/transactions", "icon": "Receipt"}
+            ]
+        }
+
+        # Get actions for current page, strip leading slash for comparison
+        page_key = current_page.lstrip("/") if current_page else "/"
+        actions = page_actions.get(page_key, [])
+
+        # Return actions with label_key (frontend will handle i18n)
+        return [
+            {
+                "label": action["label_key"],
+                "route": action["route"],
+                "icon": action.get("icon")
+            }
+            for action in actions
+        ]

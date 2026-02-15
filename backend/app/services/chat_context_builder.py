@@ -8,6 +8,9 @@ from sqlalchemy.orm import Session
 from ..models.budget import Budget
 from ..models.goal import Goal
 from ..models.transaction import Transaction
+from ..models.account import Account
+from ..services.goal_service import GoalService
+from ..services.account_service import AccountService
 
 
 def build_financial_context(db: Session, user_id: int, days: int = 30) -> str:
@@ -62,10 +65,33 @@ def build_financial_context(db: Session, user_id: int, days: int = 30) -> str:
         Budget.is_active == True
     ).first()
 
-    # Get goals
+    # Get goals with progress
     goals = db.query(Goal).filter(
         Goal.user_id == user_id
     ).order_by(Goal.years).all()
+
+    goal_service = GoalService()
+    goals_progress = []
+    for goal in goals:
+        progress = goal_service.calculate_goal_progress(db, user_id, goal)
+        goals_progress.append(progress)
+
+    # Get accounts with balances
+    account_service = AccountService()
+    accounts = account_service.get_all_accounts(db, user_id, include_inactive=False)
+    accounts_data = []
+    net_worth = 0
+    for account in accounts:
+        try:
+            balance = account_service.calculate_balance(db, user_id, account.id)
+            accounts_data.append({
+                "name": account.name,
+                "type": account.type,
+                "balance": balance
+            })
+            net_worth += balance
+        except ValueError:
+            pass
 
     # Build context string
     context_parts = [
@@ -110,12 +136,24 @@ def build_financial_context(db: Session, user_id: int, days: int = 30) -> str:
             )
         context_parts.append("")
 
-    # Add goals
-    if goals:
-        context_parts.append("FINANCIAL GOALS:")
-        for goal in goals:
+    # Add accounts and net worth
+    if accounts_data:
+        context_parts.append("ACCOUNTS & NET WORTH:")
+        context_parts.append(f"- Net Worth: ¥{net_worth:,}")
+        for acc in accounts_data:
             context_parts.append(
-                f"- {goal.years}-Year Goal: Target ¥{goal.target_amount:,}"
+                f"  - {acc['name']} ({acc['type']}): ¥{acc['balance']:,}"
+            )
+        context_parts.append("")
+
+    # Add goals with progress
+    if goals_progress:
+        context_parts.append("FINANCIAL GOALS:")
+        for g in goals_progress:
+            status_emoji = "✓" if g["status"] == "on_track" else "⚠️" if g["status"] == "ahead" else "❌"
+            context_parts.append(
+                f"{status_emoji} {g['years']}-Year Goal: ¥{g['total_saved']:,} / ¥{g['target_amount']:,} "
+                f"({g['progress_percentage']:.1f}%) - {g['status'].replace('_', ' ').title()}"
             )
         context_parts.append("")
 

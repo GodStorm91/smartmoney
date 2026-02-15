@@ -3,13 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/utils/cn'
 import { ChatMessage } from './ChatMessage'
 import { ActionCard } from './ActionCard'
+import { QuickActionButton } from './QuickActionButton'
 import { Loader2 } from 'lucide-react'
-import type { SuggestedAction } from '@/services/chat-service'
+import type { SuggestedAction, QuickAction } from '@/services/chat-service'
 
 interface Message {
   role: 'user' | 'assistant'
   content: string
   action?: SuggestedAction | null
+  quickActions?: QuickAction[]
 }
 
 interface ChatMessagesProps {
@@ -62,6 +64,18 @@ export function ChatMessages({
                 onSkip={() => onSkipAction(index)}
                 isApplying={applyingAction === index}
               />
+            </div>
+          )}
+          {message.quickActions && message.quickActions.length > 0 && (
+            <div className="ml-11 mt-2 flex flex-wrap gap-2">
+              {message.quickActions.map((quickAction, qaIndex) => (
+                <QuickActionButton
+                  key={qaIndex}
+                  label={quickAction.label}
+                  route={quickAction.route}
+                  icon={quickAction.icon}
+                />
+              ))}
             </div>
           )}
         </div>

@@ -1423,6 +1423,12 @@
     "clearHistory": "Xóa lịch sử",
     "clearHistoryConfirm": "Xóa toàn bộ lịch sử trò chuyện? Hành động này không thể hoàn tác."
   },
+  "quickActions": {
+    "viewBudget": "Xem ngân sách",
+    "viewTransactions": "Xem giao dịch",
+    "viewAnalytics": "Xem phân tích",
+    "viewGoals": "Xem mục tiêu"
+  },
   "transfer": {
     "title": "Chuyển tiền giữa tài khoản",
     "exchangeTitle": "Đổi ngoại tệ",

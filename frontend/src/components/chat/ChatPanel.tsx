@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
+import { useLocation } from '@tanstack/react-router'
 import { cn } from '@/utils/cn'
 import { ChatHeader } from './ChatHeader'
 import { ChatMessages } from './ChatMessages'
@@ -20,6 +21,7 @@ const MAX_STORED_MESSAGES = 20
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const { t, i18n } = useTranslation()
   const queryClient = useQueryClient()
+  const location = useLocation()
 
   // Load messages from localStorage on mount
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
@@ -66,12 +68,13 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     setIsLoading(true)
 
     try {
-      const response = await sendChatMessage(newMessages, i18n.language)
+      const response = await sendChatMessage(newMessages, i18n.language, location.pathname)
 
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: response.message,
-        action: response.suggested_action
+        action: response.suggested_action,
+        quickActions: response.quick_actions
       }])
 
       setCredits(response.credits_remaining)
@@ -93,7 +96,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     } finally {
       setIsLoading(false)
     }
-  }, [messages, i18n.language, t])
+  }, [messages, i18n.language, location.pathname, t])
 
   const handleApplyAction = useCallback(async (messageIndex: number) => {
     const message = messages[messageIndex]
