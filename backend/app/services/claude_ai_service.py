@@ -26,8 +26,8 @@ class ClaudeAIService:
     def __init__(self):
         """Initialize Claude AI client."""
         self.client = Anthropic(api_key=settings.anthropic_api_key)
-        self.model = "claude-3-5-haiku-20241022"
-        self.chat_model = "claude-3-5-sonnet-20241022"  # Sonnet for chat with tool calling
+        self.model = "claude-haiku-4-5-20251001"
+        self.chat_model = "claude-sonnet-4-5-20250929"  # Sonnet for chat with tool calling
 
     def generate_budget(
         self,
