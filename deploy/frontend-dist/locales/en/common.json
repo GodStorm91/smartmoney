@@ -29,8 +29,8 @@
     "explore": "Explore",
     "collapse": "Collapse",
     "expand": "Expand",
-    "relocation": "Relocation"
-    "benchmark": "Benchmark",
+    "relocation": "Relocation",
+    "benchmark": "Benchmark"
   },
   "button": {
     "save": "Save",
@@ -903,8 +903,13 @@
       "sources": "Sources",
       "recurring": "Recurring",
       "notifications": "Notifications",
-      "crypto": "Crypto"
-    }
+      "crypto": "Crypto",
+      "household": "Household"
+    },
+    "householdProfile": "Household Profile",
+    "householdProfileDescription": "Family size, prefecture, and income bracket for spending benchmarks",
+    "profileSaved": "Household profile saved successfully",
+    "profileSaveError": "Failed to save household profile"
   },
   "appearance": {
     "title": "Appearance",
@@ -2141,14 +2146,5 @@
     "setupHint": "Go to Settings to configure your family size, prefecture, and income bracket.",
     "errorTitle": "Failed to load comparison data",
     "errorMessage": "Please ensure you have transactions recorded and try again."
-  },
-  "settings": {
-    "sections": {
-      "household": "Household"
-    },
-    "householdProfile": "Household Profile",
-    "householdProfileDescription": "Family size, prefecture, and income bracket for spending benchmarks",
-    "profileSaved": "Household profile saved successfully",
-    "profileSaveError": "Failed to save household profile"
   }
 }
