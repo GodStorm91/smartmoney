@@ -30,6 +30,7 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "relocation": "Relocation"
+    "benchmark": "Benchmark",
   },
   "button": {
     "save": "Save",
@@ -657,6 +658,7 @@
     "entertainment": "Entertainment",
     "shopping": "Shopping",
     "health": "Health",
+    "education": "Education",
     "other": "Other",
     "salary": "Salary",
     "bonus": "Bonus",
@@ -2063,6 +2065,7 @@
     "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
   },
   "relocation": {
+    "benchmark": "Benchmark",
     "title": "Relocation Planner",
     "subtitle": "Compare living costs between Japanese cities",
     "nenshu": "Annual Income (Yen)",
@@ -2113,5 +2116,39 @@
     "postalCodeNotFound": "No matching city found for this postal code",
     "chooseManually": "Choose manually",
     "adviceTitle": "Financial Insights"
+  },
+  "benchmark": {
+    "title": "Spending Benchmark",
+    "subtitle": "Compare your spending against national averages",
+    "noProfile": "Set up your household profile to see comparisons",
+    "setupProfile": "Set up profile",
+    "yourProfile": "Your Household Profile",
+    "familySize": "Family size",
+    "people": "people",
+    "prefecture": "Prefecture",
+    "annualIncome": "Annual income",
+    "yourSpending": "Your spending",
+    "avgSpending": "Average",
+    "difference": "Difference",
+    "yourTotal": "Your Total (3mo avg)",
+    "avgTotal": "National Average",
+    "categoryComparison": "Category Comparison",
+    "insights": "Insights",
+    "spendingMore": "Spending more than average",
+    "spendingLess": "Spending less than average",
+    "noInsights": "No insights available yet. Add more transactions to generate insights.",
+    "setupRequired": "Set up your household profile",
+    "setupHint": "Go to Settings to configure your family size, prefecture, and income bracket.",
+    "errorTitle": "Failed to load comparison data",
+    "errorMessage": "Please ensure you have transactions recorded and try again."
+  },
+  "settings": {
+    "sections": {
+      "household": "Household"
+    },
+    "householdProfile": "Household Profile",
+    "householdProfileDescription": "Family size, prefecture, and income bracket for spending benchmarks",
+    "profileSaved": "Household profile saved successfully",
+    "profileSaveError": "Failed to save household profile"
   }
 }

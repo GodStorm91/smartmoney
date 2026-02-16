@@ -27,6 +27,7 @@
     "collapse": "折りたたむ",
     "expand": "展開",
     "relocation": "引越し"
+    "benchmark": "ベンチマーク",
   },
   "button": {
     "save": "保存",
@@ -571,6 +572,7 @@
     "entertainment": "娯楽",
     "shopping": "買い物",
     "health": "医療",
+    "education": "教育",
     "other": "その他",
     "salary": "給与",
     "bonus": "ボーナス",
@@ -1952,6 +1954,7 @@
     }
   },
   "relocation": {
+    "benchmark": "ベンチマーク",
     "title": "引越しプランナー",
     "subtitle": "日本の都市間の生活費を比較",
     "nenshu": "年収（円）",
@@ -2002,5 +2005,40 @@
     "postalCodeNotFound": "この郵便番号に該当する都市が見つかりません",
     "chooseManually": "手動で選択",
     "adviceTitle": "財務アドバイス"
+  }
+},
+  "benchmark": {
+    "title": "支出ベンチマーク",
+    "subtitle": "全国平均と比較して支出を確認",
+    "noProfile": "比較を表示するには世帯プロフィールを設定してください",
+    "setupProfile": "プロフィール設定",
+    "yourProfile": "あなたの世帯プロフィール",
+    "familySize": "世帯人数",
+    "people": "人",
+    "prefecture": "都道府県",
+    "annualIncome": "年収",
+    "yourSpending": "あなたの支出",
+    "avgSpending": "平均",
+    "difference": "差額",
+    "yourTotal": "あなたの合計（3ヶ月平均）",
+    "avgTotal": "全国平均",
+    "categoryComparison": "カテゴリー別比較",
+    "insights": "インサイト",
+    "spendingMore": "平均より多く支出",
+    "spendingLess": "平均より少なく支出",
+    "noInsights": "インサイトはまだありません。取引を追加してインサイトを生成してください。",
+    "setupRequired": "世帯プロフィールを設定してください",
+    "setupHint": "設定画面で世帯人数、都道府県、年収を設定してください。",
+    "errorTitle": "比較データの読み込みに失敗しました",
+    "errorMessage": "取引が記録されていることを確認してから、もう一度お試しください。"
+  },
+  "settings": {
+    "sections": {
+      "household": "世帯情報"
+    },
+    "householdProfile": "世帯プロフィール",
+    "householdProfileDescription": "支出ベンチマーク用の世帯人数、都道府県、年収",
+    "profileSaved": "世帯プロフィールを保存しました",
+    "profileSaveError": "世帯プロフィールの保存に失敗しました"
   }
 }
