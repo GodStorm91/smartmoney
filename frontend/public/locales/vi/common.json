@@ -26,8 +26,8 @@
     "explore": "Khám phá",
     "collapse": "Thu gọn",
     "expand": "Mở rộng",
-    "relocation": "Chuyển chỗ ở"
-    "benchmark": "Chuẩn",
+    "relocation": "Chuyển chỗ ở",
+    "benchmark": "Chuẩn"
   },
   "button": {
     "save": "Lưu",
@@ -812,8 +812,13 @@
       "sources": "Nguồn tiền",
       "recurring": "Định kỳ",
       "notifications": "Thông báo",
-      "crypto": "Tiền điện tử"
-    }
+      "crypto": "Tiền điện tử",
+      "household": "Hộ gia đình"
+    },
+    "householdProfile": "Hồ sơ gia đình",
+    "householdProfileDescription": "Quy mô gia đình, tỉnh/thành và thu nhập cho chuẩn chi tiêu",
+    "profileSaved": "Đã lưu hồ sơ gia đình",
+    "profileSaveError": "Lưu hồ sơ gia đình thất bại"
   },
   "appearance": {
     "title": "Giao diện",
@@ -1924,8 +1929,7 @@
     "postalCodeNotFound": "Không tìm thấy thành phố phù hợp với mã bưu điện này",
     "chooseManually": "Chọn thủ công",
     "adviceTitle": "Phân tích tài chính"
-  }
-},
+  },
   "benchmark": {
     "title": "Chuẩn chi tiêu",
     "subtitle": "So sánh chi tiêu của bạn với mức trung bình quốc gia",
@@ -1950,14 +1954,5 @@
     "setupHint": "Vào Cài đặt để cấu hình quy mô gia đình, tỉnh/thành và mức thu nhập.",
     "errorTitle": "Không thể tải dữ liệu so sánh",
     "errorMessage": "Vui lòng đảm bảo bạn đã ghi lại các giao dịch và thử lại."
-  },
-  "settings": {
-    "sections": {
-      "household": "Hộ gia đình"
-    },
-    "householdProfile": "Hồ sơ gia đình",
-    "householdProfileDescription": "Quy mô gia đình, tỉnh/thành và thu nhập cho chuẩn chi tiêu",
-    "profileSaved": "Đã lưu hồ sơ gia đình",
-    "profileSaveError": "Lưu hồ sơ gia đình thất bại"
   }
 }
