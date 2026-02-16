@@ -169,5 +169,14 @@ def get_tool_definitions() -> list[dict[str, Any]]:
                 },
                 "required": ["category", "amount"]
             }
+        },
+        {
+            "name": "get_spending_benchmark",
+            "description": "Compare user's spending against Japanese national household averages. Use this when the user asks how their spending compares to others, national averages, or typical households.",
+            "input_schema": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
         }
     ]

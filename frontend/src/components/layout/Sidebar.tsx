@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   Home, Receipt, Wallet, Settings, TrendingUp, Target, Upload,
   Trophy, BarChart3, ShoppingCart, MapPinned, LogOut, ChevronsLeft, ChevronsRight,
+  Scale,
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
@@ -20,6 +21,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { path: '/accounts', icon: Wallet, labelKey: 'nav.accounts' },
   { path: '/budget', icon: TrendingUp, labelKey: 'nav.budget' },
   { path: '/analytics', icon: BarChart3, labelKey: 'nav.analytics' },
+  { path: '/benchmark', icon: Scale, labelKey: 'nav.benchmark' },
   { path: '/goals', icon: Target, labelKey: 'nav.goals' },
   { path: '/proxy', icon: ShoppingCart, labelKey: 'nav.proxy' },
   { path: '/relocation', icon: MapPinned, labelKey: 'nav.relocation' },

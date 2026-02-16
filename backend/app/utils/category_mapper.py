@@ -14,6 +14,18 @@ CATEGORY_MAPPING = {
     "医療・保険": "Healthcare",
     "収入": "Income",
     "その他": "Other",
+    # Benchmark 家計調査 mappings
+    "食料": "Food",
+    "住居": "Housing",
+    "光熱・水道": "Utilities",
+    "通信": "Communication",
+    "交通・通信": "Transportation",
+    "教養娯楽": "Entertainment",
+    "保健医療": "Health",
+    "被服": "Shopping",
+    "家具・家事用品": "Shopping",
+    "教育": "Education",
+    "その他の消費支出": "Other",
 }
 
 

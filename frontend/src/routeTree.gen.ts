@@ -23,6 +23,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as BudgetRouteImport } from './routes/budget'
+import { Route as BenchmarkRouteImport } from './routes/benchmark'
 import { Route as AnalyticsRouteImport } from './routes/analytics'
 import { Route as AccountsRouteImport } from './routes/accounts'
 import { Route as IndexRouteImport } from './routes/index'
@@ -100,6 +101,11 @@ const BudgetRoute = BudgetRouteImport.update({
   path: '/budget',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/budget.lazy').then((d) => d.Route))
+const BenchmarkRoute = BenchmarkRouteImport.update({
+  id: '/benchmark',
+  path: '/benchmark',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/benchmark.lazy').then((d) => d.Route))
 const AnalyticsRoute = AnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
+  '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
+  '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/accounts': typeof AccountsRoute
   '/analytics': typeof AnalyticsRoute
+  '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
   '/landing': typeof LandingRoute
@@ -180,6 +189,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
+    | '/benchmark'
     | '/budget'
     | '/goals'
     | '/landing'
@@ -199,6 +209,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
+    | '/benchmark'
     | '/budget'
     | '/goals'
     | '/landing'
@@ -218,6 +229,7 @@ export interface FileRouteTypes {
     | '/'
     | '/accounts'
     | '/analytics'
+    | '/benchmark'
     | '/budget'
     | '/goals'
     | '/landing'
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountsRoute: typeof AccountsRoute
   AnalyticsRoute: typeof AnalyticsRoute
+  BenchmarkRoute: typeof BenchmarkRoute
   BudgetRoute: typeof BudgetRoute
   GoalsRoute: typeof GoalsRoute
   LandingRoute: typeof LandingRoute
@@ -354,6 +367,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BudgetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/benchmark': {
+      id: '/benchmark'
+      path: '/benchmark'
+      fullPath: '/benchmark'
+      preLoaderRoute: typeof BenchmarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/analytics': {
       id: '/analytics'
       path: '/analytics'
@@ -382,6 +402,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountsRoute: AccountsRoute,
   AnalyticsRoute: AnalyticsRoute,
+  BenchmarkRoute: BenchmarkRoute,
   BudgetRoute: BudgetRoute,
   GoalsRoute: GoalsRoute,
   LandingRoute: LandingRoute,

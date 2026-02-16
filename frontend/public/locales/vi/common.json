@@ -27,6 +27,7 @@
     "collapse": "Thu gọn",
     "expand": "Mở rộng",
     "relocation": "Chuyển chỗ ở"
+    "benchmark": "Chuẩn",
   },
   "button": {
     "save": "Lưu",
@@ -1872,6 +1873,7 @@
     "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
   },
   "relocation": {
+    "benchmark": "Chuẩn",
     "title": "Kế hoạch chuyển nhà",
     "subtitle": "So sánh chi phí sinh hoạt giữa các thành phố Nhật Bản",
     "nenshu": "Thu nhập hàng năm (Yên)",
@@ -1922,5 +1924,40 @@
     "postalCodeNotFound": "Không tìm thấy thành phố phù hợp với mã bưu điện này",
     "chooseManually": "Chọn thủ công",
     "adviceTitle": "Phân tích tài chính"
+  }
+},
+  "benchmark": {
+    "title": "Chuẩn chi tiêu",
+    "subtitle": "So sánh chi tiêu của bạn với mức trung bình quốc gia",
+    "noProfile": "Thiết lập hồ sơ gia đình để xem so sánh",
+    "setupProfile": "Thiết lập hồ sơ",
+    "yourProfile": "Hồ sơ gia đình của bạn",
+    "familySize": "Quy mô gia đình",
+    "people": "người",
+    "prefecture": "Tỉnh/thành",
+    "annualIncome": "Thu nhập hàng năm",
+    "yourSpending": "Chi tiêu của bạn",
+    "avgSpending": "Trung bình",
+    "difference": "Chênh lệch",
+    "yourTotal": "Tổng của bạn (TB 3 tháng)",
+    "avgTotal": "Trung bình quốc gia",
+    "categoryComparison": "So sánh theo danh mục",
+    "insights": "Phân tích",
+    "spendingMore": "Chi tiêu nhiều hơn trung bình",
+    "spendingLess": "Chi tiêu ít hơn trung bình",
+    "noInsights": "Chưa có phân tích. Thêm giao dịch để tạo phân tích.",
+    "setupRequired": "Thiết lập hồ sơ gia đình",
+    "setupHint": "Vào Cài đặt để cấu hình quy mô gia đình, tỉnh/thành và mức thu nhập.",
+    "errorTitle": "Không thể tải dữ liệu so sánh",
+    "errorMessage": "Vui lòng đảm bảo bạn đã ghi lại các giao dịch và thử lại."
+  },
+  "settings": {
+    "sections": {
+      "household": "Hộ gia đình"
+    },
+    "householdProfile": "Hồ sơ gia đình",
+    "householdProfileDescription": "Quy mô gia đình, tỉnh/thành và thu nhập cho chuẩn chi tiêu",
+    "profileSaved": "Đã lưu hồ sơ gia đình",
+    "profileSaveError": "Lưu hồ sơ gia đình thất bại"
   }
 }

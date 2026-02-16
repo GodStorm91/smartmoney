@@ -19,6 +19,7 @@ from .routes.ai_categorization import router as ai_categorization_router
 from .routes.analytics import router as analytics_router
 from .routes.anomalies import router as anomalies_router
 from .routes.auth import router as auth_router
+from .routes.benchmarks import router as benchmarks_router
 from .routes.budgets import router as budgets_router
 from .routes.budget_alerts import router as budget_alerts_router
 from .routes.bills import router as bills_router
@@ -392,6 +393,7 @@ async def shutdown_event():
 
 # Include routers
 app.include_router(auth_router)
+app.include_router(benchmarks_router)
 app.include_router(accounts_router)
 app.include_router(anomalies_router)
 app.include_router(tags_router)

@@ -14,6 +14,7 @@ export const EXPENSE_CATEGORIES: CategoryOption[] = [
   { id: 'entertainment', labelKey: 'category.entertainment', icon: '🎬', value: 'Entertainment' },
   { id: 'shopping', labelKey: 'category.shopping', icon: '🛍️', value: 'Shopping' },
   { id: 'health', labelKey: 'category.health', icon: '🏥', value: 'Health' },
+  { id: 'education', labelKey: 'category.education', icon: '📚', value: 'Education' },
   { id: 'proxy_purchase', labelKey: 'category.proxy_purchase', icon: '🛒', value: 'Proxy Purchase' },
   { id: 'other', labelKey: 'category.other', icon: '📦', value: 'Other' },
 ]

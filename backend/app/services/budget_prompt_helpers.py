@@ -25,6 +25,7 @@ _CATEGORY_ALIASES: dict[str, str] = {
     "gifts & transfers": "Other", "miscellaneous": "Other",
     "telecom": "Communication", "phone": "Communication", "internet": "Communication",
     "transit": "Transportation", "transport": "Transportation", "commute": "Transportation",
+    "education": "Education", "tuition": "Education", "school": "Education",
 }
 
 

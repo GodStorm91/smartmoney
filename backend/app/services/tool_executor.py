@@ -13,6 +13,7 @@ from ..services.goal_service import GoalService
 from ..services.account_service import AccountService
 from ..services.insight_generator_service import InsightGeneratorService
 from ..services.budget_service import BudgetService
+from ..services.benchmark_service import BenchmarkService
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,8 @@ class ToolExecutor:
             return self._create_goal(params)
         elif tool_name == "update_budget":
             return self._update_budget(params)
+        elif tool_name == "get_spending_benchmark":
+            return self._get_spending_benchmark(params)
         else:
             raise ValueError(f"Unknown tool: {tool_name}")
 
@@ -669,4 +672,52 @@ class ToolExecutor:
                 "success": False,
                 "error": "execution",
                 "message": f"Failed to update budget: {str(e)}"
+            }
+
+    def _get_spending_benchmark(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Get spending benchmark comparison.
+
+        Args:
+            params: Tool parameters (none required)
+
+        Returns:
+            Benchmark comparison data
+        """
+        try:
+            comparison = BenchmarkService.get_comparison(self.db, self.user_id)
+
+            # Format response for chat
+            return {
+                "success": True,
+                "profile": {
+                    "household_size": comparison.user_profile.household_size,
+                    "prefecture_code": comparison.user_profile.prefecture_code,
+                    "income_quintile": comparison.user_profile.income_quintile,
+                },
+                "total_user_spending": comparison.total_user_spending,
+                "total_benchmark_spending": comparison.total_benchmark_spending,
+                "overall_difference_pct": comparison.overall_difference_pct,
+                "categories": [
+                    {
+                        "category": c.category,
+                        "user_amount": c.user_amount,
+                        "benchmark_amount": c.benchmark_amount,
+                        "difference_pct": c.difference_pct,
+                        "status": c.status,
+                    }
+                    for c in comparison.comparisons
+                ],
+            }
+        except ValueError as e:
+            return {
+                "success": False,
+                "error": "profile_not_set",
+                "message": str(e),
+            }
+        except Exception as e:
+            logger.error(f"Failed to get spending benchmark: {e}", exc_info=True)
+            return {
+                "success": False,
+                "error": "execution",
+                "message": f"Failed to get spending benchmark: {str(e)}",
             }

@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   Bell,
   Palette,
+  Users,
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
@@ -27,13 +28,17 @@ import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings
 import { AnomalyConfigPanel } from '@/components/anomalies/AnomalyConfigPanel'
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences'
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
+import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileForm'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
+import { getHouseholdProfile, updateHouseholdProfile } from '@/services/benchmark-service'
+import { toast } from 'sonner'
 import { cn } from '@/utils/cn'
 
 // Settings sections for navigation
 const SECTIONS = [
   { id: 'appearance', labelKey: 'settings.sections.appearance', icon: Palette },
   { id: 'general', labelKey: 'settings.sections.general', icon: SettingsIcon },
+  { id: 'household', labelKey: 'settings.sections.household', icon: Users },
   { id: 'budget', labelKey: 'settings.sections.budget', icon: Wallet },
   { id: 'categories', labelKey: 'settings.sections.categories', icon: Tag },
   { id: 'sources', labelKey: 'settings.sections.sources', icon: CreditCard },
@@ -52,6 +57,25 @@ export function Settings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: fetchSettings,
+  })
+
+  // Household profile
+  const { data: householdProfile } = useQuery({
+    queryKey: ['household-profile'],
+    queryFn: getHouseholdProfile,
+  })
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateHouseholdProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['household-profile'] })
+      queryClient.invalidateQueries({ queryKey: ['benchmark-comparison'] })
+      toast.success(t('settings.profileSaved', 'Household profile saved successfully'))
+    },
+    onError: (error) => {
+      console.error('Failed to save household profile:', error)
+      toast.error(t('settings.profileSaveError', 'Failed to save household profile'))
+    },
   })
 
   // Local state for form inputs
@@ -201,6 +225,17 @@ export function Settings() {
                 {t('settings.paydayDescription')}
               </p>
             </div>
+          </SectionCard>
+        </div>
+
+        {/* Household Profile */}
+        <div className={cn('space-y-4', activeSection !== 'household' && 'hidden')}>
+          <SectionCard icon={Users} title={t('settings.householdProfile', 'Household Profile')} description={t('settings.householdProfileDescription', 'Family size, prefecture, and income bracket for spending benchmarks')}>
+            <HouseholdProfileForm
+              profile={householdProfile || null}
+              onSave={(profile) => updateProfileMutation.mutate(profile)}
+              isLoading={updateProfileMutation.isPending}
+            />
           </SectionCard>
         </div>
 
