@@ -68,6 +68,8 @@ export function Settings() {
   const [isGeneratingLink, setIsGeneratingLink] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const [linkCountdown, setLinkCountdown] = useState<string>('')
+  const [linkExpired, setLinkExpired] = useState(false)
+  const [linkExpired, setLinkExpired] = useState(false)
   
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
@@ -158,7 +160,7 @@ export function Settings() {
       setExportSuccess(true)
       setTimeout(() => setExportSuccess(false), 3000)
     } catch (error) {
-      console.error('Export failed:', error)
+      toast.error(t('settings.export.error'))
     } finally {
       setIsExporting(false)
     }
@@ -168,12 +170,13 @@ export function Settings() {
     setIsGeneratingLink(true)
     setGeneratedLink(null)
     setLinkCopied(false)
+    setLinkExpired(false)
     try {
       const result = await generateExportLink()
       setGeneratedLink(result.url)
       setLinkExpiresAt(new Date(result.expiresAt))
-    } catch (error) {
-      console.error('Generate link failed:', error)
+    } catch {
+      toast.error(t('settings.export.generateFailed', 'Failed to generate link'))
     } finally {
       setIsGeneratingLink(false)
     }
@@ -186,7 +189,7 @@ export function Settings() {
       setLinkCopied(true)
       setTimeout(() => setLinkCopied(false), 2000)
     } catch {
-      console.error('Failed to copy link')
+      toast.error(t('settings.export.copyFailed', 'Failed to copy link'))
     }
   }
 
@@ -198,8 +201,9 @@ export function Settings() {
       const diff = linkExpiresAt.getTime() - now.getTime()
       if (diff <= 0) {
         setLinkCountdown('')
-        setGeneratedLink(null)
+        setLinkExpired(true)
         setLinkExpiresAt(null)
+        toast.info(t('settings.export.linkExpired'))
         clearInterval(timer)
         return
       }
@@ -453,7 +457,7 @@ export function Settings() {
               )}
 
               {/* Generated Link Section */}
-              {generatedLink && (
+              {generatedLink && !linkExpired && (
                 <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
@@ -504,11 +508,13 @@ export function Settings() {
                       {linkCountdown}
                     </p>
                   )}
-                  {!linkExpiresAt && !linkCountdown && (
-                    <p className="text-xs text-center text-red-600 dark:text-red-400">
-                      {t('settings.export.linkExpired')}
-                    </p>
-                  )}
+                </div>
+              )}
+              {linkExpired && (
+                <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <p className="text-sm text-center text-red-600 dark:text-red-400">
+                    {t('settings.export.linkExpired')}
+                  </p>
                 </div>
               )}
             </div>

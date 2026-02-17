@@ -265,12 +265,18 @@ async def download_export(token: str):
 
     file_age = time.time() - os.path.getmtime(file_path)
     if file_age > LINK_EXPIRY_SECONDS:
-        os.remove(file_path)
+        try:
+            os.remove(file_path)
+        except FileNotFoundError:
+            pass
         raise HTTPException(status_code=404, detail="Link expired")
 
     today = datetime.utcnow().strftime("%Y-%m-%d")
-    return FileResponse(
-        file_path,
-        media_type="application/json",
-        filename=f"smartmoney-export-{today}.json",
-    )
+    try:
+        return FileResponse(
+            file_path,
+            media_type="application/json",
+            filename=f"smartmoney-export-{today}.json",
+        )
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Not found")

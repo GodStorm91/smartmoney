@@ -487,6 +487,17 @@ async def health_check():
 
 
 # Mount uploads directory - accessible via /api/uploads due to nginx proxy
+# Note: exports/ subdirectory is excluded - served via /api/export/download/{token} with auth
 uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
 if os.path.exists(uploads_dir):
-    app.mount("/api/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+    from starlette.routing import Mount
+    from starlette.middleware import Middleware
+
+    class ExcludeExportsStaticFiles(StaticFiles):
+        async def get_response(self, path, scope):
+            if path.startswith("exports/") or path.startswith("exports\\"):
+                from starlette.responses import Response
+                return Response(status_code=404)
+            return await super().get_response(path, scope)
+
+    app.mount("/api/uploads", ExcludeExportsStaticFiles(directory=uploads_dir), name="uploads")
