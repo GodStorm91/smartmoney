@@ -29,7 +29,7 @@ cp -r frontend/public/locales deploy/frontend-dist/
 # Fix permissions
 echo -e "${GREEN}Fixing permissions...${NC}"
 chmod -R 755 deploy/frontend-dist/
-chmod -R 644 deploy/frontend-dist/locales/
+find deploy/frontend-dist/locales -type f -exec chmod 644 {} \;
 
 # Deploy to server
 echo -e "${GREEN}Deploying to server...${NC}"
@@ -41,7 +41,7 @@ ssh root@$SERVER "
   rm -rf /root/smartmoney/deploy/frontend-dist/*
   tar -xzf /tmp/frontend-deploy.tar.gz -C /root/smartmoney/deploy/frontend-dist/
   chmod -R 755 /root/smartmoney/deploy/frontend-dist/
-  chmod -R 644 /root/smartmoney/deploy/frontend-dist/locales/
+  find /root/smartmoney/deploy/frontend-dist/locales -type f -exec chmod 644 {} \;
   docker restart smartmoney-nginx
 "
 
