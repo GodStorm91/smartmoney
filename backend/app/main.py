@@ -50,6 +50,7 @@ from .routes.transactions import router as transactions_router
 from .routes.transfers import router as transfers_router
 from .routes.upload import router as upload_router
 from .routes.exchange_rates import router as exchange_rates_router
+from .routes.export import router as export_router
 from .routes.user_categories import router as user_categories_router
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
@@ -289,6 +290,28 @@ def scheduled_bill_reminders():
         db.close()
 
 
+def scheduled_export_cleanup():
+    """Clean up expired export files (older than 10 minutes)."""
+    import time
+
+    exports_dir = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "uploads", "exports"
+    )
+    if not os.path.isdir(exports_dir):
+        return
+    now = time.time()
+    deleted = 0
+    for filename in os.listdir(exports_dir):
+        if not filename.endswith(".json"):
+            continue
+        filepath = os.path.join(exports_dir, filename)
+        if now - os.path.getmtime(filepath) > 600:
+            os.remove(filepath)
+            deleted += 1
+    if deleted:
+        logger.info(f"Export cleanup: deleted {deleted} expired files")
+
+
 # Startup event
 @app.on_event("startup")
 async def startup_event():
@@ -378,6 +401,20 @@ async def startup_event():
     )
     logger.info("Bill reminder processing scheduled (hourly)")
 
+    # Schedule export link cleanup every 5 minutes
+    scheduler.add_job(
+        scheduled_export_cleanup,
+        trigger="cron",
+        minute="*/5",
+        id="export_cleanup",
+        replace_existing=True,
+    )
+    logger.info("Export cleanup scheduled (every 5 minutes)")
+
+    # Ensure exports directory exists
+    exports_dir = os.path.join(uploads_dir, "exports")
+    os.makedirs(exports_dir, exist_ok=True)
+
     scheduler.start()
     logger.info(
         "Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)"
@@ -429,6 +466,7 @@ app.include_router(savings_router)
 app.include_router(notifications_router)
 app.include_router(relocation_router)
 app.include_router(theme_router)
+app.include_router(export_router)
 
 
 # Root endpoints

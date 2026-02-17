@@ -904,12 +904,29 @@
       "recurring": "Recurring",
       "notifications": "Notifications",
       "crypto": "Crypto",
-      "household": "Household"
+      "household": "Household",
+      "export": "Export"
     },
     "householdProfile": "Household Profile",
     "householdProfileDescription": "Family size, prefecture, and income bracket for spending benchmarks",
     "profileSaved": "Household profile saved successfully",
-    "profileSaveError": "Failed to save household profile"
+    "profileSaveError": "Failed to save household profile",
+    "export": {
+      "title": "Export to iOS",
+      "description": "Transfer your data to the SmartMoney iOS app",
+      "instructions": "Download your data as a JSON file to import into the SmartMoney iOS app. This includes all your transactions, accounts, budgets, goals, bills, categories, and settings.",
+      "button": "Export Data for iOS App",
+      "exporting": "Exporting...",
+      "success": "Export downloaded successfully!",
+      "generateLink": "Generate Link for iOS",
+      "generatingLink": "Generating...",
+      "linkGenerated": "Link Generated",
+      "copyLink": "Copy Link",
+      "linkCopied": "Copied!",
+      "linkExpires": "Expires in {{minutes}}m {{seconds}}s",
+      "linkExpired": "Link expired",
+      "scanQR": "Scan with your iPhone"
+    }
   },
   "appearance": {
     "title": "Appearance",

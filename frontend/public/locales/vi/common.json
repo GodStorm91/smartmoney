@@ -813,12 +813,29 @@
       "recurring": "Định kỳ",
       "notifications": "Thông báo",
       "crypto": "Tiền điện tử",
-      "household": "Hộ gia đình"
+      "household": "Hộ gia đình",
+      "export": "Xuất dữ liệu"
     },
     "householdProfile": "Hồ sơ gia đình",
     "householdProfileDescription": "Quy mô gia đình, tỉnh/thành và thu nhập cho chuẩn chi tiêu",
     "profileSaved": "Đã lưu hồ sơ gia đình",
-    "profileSaveError": "Lưu hồ sơ gia đình thất bại"
+    "profileSaveError": "Lưu hồ sơ gia đình thất bại",
+    "export": {
+      "title": "Xuất sang iOS",
+      "description": "Chuyển dữ liệu sang ứng dụng SmartMoney iOS",
+      "instructions": "Tải xuống dữ liệu dưới dạng file JSON để nhập vào ứng dụng SmartMoney iOS. Bao gồm tất cả giao dịch, tài khoản, ngân sách, mục tiêu, hóa đơn, danh mục và cài đặt.",
+      "button": "Xuất dữ liệu cho ứng dụng iOS",
+      "exporting": "Đang xuất...",
+      "success": "Xuất dữ liệu thành công!",
+      "generateLink": "Tạo liên kết cho iOS",
+      "generatingLink": "Đang tạo...",
+      "linkGenerated": "Đã tạo liên kết",
+      "copyLink": "Sao chép liên kết",
+      "linkCopied": "Đã sao chép!",
+      "linkExpires": "Hết hạn sau {{minutes}}p {{seconds}}s",
+      "linkExpired": "Liên kết đã hết hạn",
+      "scanQR": "Quét bằng iPhone"
+    }
   },
   "appearance": {
     "title": "Giao diện",

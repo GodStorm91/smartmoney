@@ -818,12 +818,29 @@
       "recurring": "定期",
       "notifications": "通知",
       "crypto": "暗号資産",
-      "household": "世帯情報"
+      "household": "世帯情報",
+      "export": "エクスポート"
     },
     "householdProfile": "世帯プロフィール",
     "householdProfileDescription": "支出ベンチマーク用の世帯人数、都道府県、年収",
     "profileSaved": "世帯プロフィールを保存しました",
-    "profileSaveError": "世帯プロフィールの保存に失敗しました"
+    "profileSaveError": "世帯プロフィールの保存に失敗しました",
+    "export": {
+      "title": "iOSへエクスポート",
+      "description": "SmartMoney iOSアプリにデータを転送",
+      "instructions": "SmartMoney iOSアプリにインポートするためのJSONファイルをダウンロードします。取引、口座、予算、目標、請求書、カテゴリ、設定がすべて含まれます。",
+      "button": "iOSアプリ用データをエクスポート",
+      "exporting": "エクスポート中...",
+      "success": "エクスポートが正常にダウンロードされました！",
+      "generateLink": "iOS用リンクを生成",
+      "generatingLink": "生成中...",
+      "linkGenerated": "リンク生成完了",
+      "copyLink": "リンクをコピー",
+      "linkCopied": "コピーしました！",
+      "linkExpires": "有効期限: {{minutes}}分{{seconds}}秒",
+      "linkExpired": "リンクの有効期限切れ",
+      "scanQR": "iPhoneでスキャン"
+    }
   },
   "appearance": {
     "title": "外観",

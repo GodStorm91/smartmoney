@@ -14,6 +14,11 @@ import {
   Bell,
   Palette,
   Users,
+  Smartphone,
+  Download,
+  Link2,
+  Copy,
+  CheckCircle,
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
@@ -32,6 +37,8 @@ import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileFor
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 import { getHouseholdProfile, updateHouseholdProfile } from '@/services/benchmark-service'
 import { toast } from 'sonner'
+import { exportForIOS, generateExportLink } from '@/services/export-service'
+import { QRCodeSVG } from 'qrcode.react'
 import { cn } from '@/utils/cn'
 
 // Settings sections for navigation
@@ -46,6 +53,7 @@ const SECTIONS = [
   { id: 'notifications', labelKey: 'settings.sections.notifications', icon: Bell },
   { id: 'crypto', labelKey: 'settings.sections.crypto', icon: Globe },
   { id: 'anomaly', labelKey: 'anomaly.title', icon: AlertTriangle },
+  { id: 'export', labelKey: 'settings.sections.export', icon: Smartphone },
 ] as const
 
 export function Settings() {
@@ -53,6 +61,13 @@ export function Settings() {
   const queryClient = useQueryClient()
   const [activeSection, setActiveSection] = useState<string>('appearance')
   const [hasChanges, setHasChanges] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
+  const [exportSuccess, setExportSuccess] = useState(false)
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null)
+  const [linkExpiresAt, setLinkExpiresAt] = useState<Date | null>(null)
+  const [isGeneratingLink, setIsGeneratingLink] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
+  const [linkCountdown, setLinkCountdown] = useState<string>('')
   
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
@@ -134,6 +149,66 @@ export function Settings() {
       large_transaction_threshold: largeTransactionThreshold,
     })
   }
+
+  const handleExportIOS = async () => {
+    setIsExporting(true)
+    setExportSuccess(false)
+    try {
+      await exportForIOS()
+      setExportSuccess(true)
+      setTimeout(() => setExportSuccess(false), 3000)
+    } catch (error) {
+      console.error('Export failed:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  const handleGenerateLink = async () => {
+    setIsGeneratingLink(true)
+    setGeneratedLink(null)
+    setLinkCopied(false)
+    try {
+      const result = await generateExportLink()
+      setGeneratedLink(result.url)
+      setLinkExpiresAt(new Date(result.expiresAt))
+    } catch (error) {
+      console.error('Generate link failed:', error)
+    } finally {
+      setIsGeneratingLink(false)
+    }
+  }
+
+  const handleCopyLink = async () => {
+    if (!generatedLink) return
+    try {
+      await navigator.clipboard.writeText(generatedLink)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 2000)
+    } catch {
+      console.error('Failed to copy link')
+    }
+  }
+
+  // Countdown timer for generated link
+  useEffect(() => {
+    if (!linkExpiresAt) return
+    const timer = setInterval(() => {
+      const now = new Date()
+      const diff = linkExpiresAt.getTime() - now.getTime()
+      if (diff <= 0) {
+        setLinkCountdown('')
+        setGeneratedLink(null)
+        setLinkExpiresAt(null)
+        clearInterval(timer)
+        return
+      }
+      const minutes = Math.floor(diff / 60000)
+      const seconds = Math.floor((diff % 60000) / 1000)
+      setLinkCountdown(t('settings.export.linkExpires', { minutes, seconds }))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [linkExpiresAt, t])
 
   if (isLoading) {
     return (
@@ -322,6 +397,122 @@ export function Settings() {
         {/* Anomaly Detection */}
         <div className={cn('space-y-4', activeSection !== 'anomaly' && 'hidden')}>
           <AnomalyConfigPanel />
+        </div>
+
+        {/* Export to iOS */}
+        <div className={cn('space-y-4', activeSection !== 'export' && 'hidden')}>
+          <SectionCard icon={Smartphone} title={t('settings.export.title')} description={t('settings.export.description')}>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {t('settings.export.instructions')}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleExportIOS}
+                  disabled={isExporting}
+                  className="flex-1"
+                  size="lg"
+                >
+                  {isExporting ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      {t('settings.export.exporting')}
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      {t('settings.export.button')}
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={handleGenerateLink}
+                  disabled={isGeneratingLink}
+                  variant="outline"
+                  className="flex-1"
+                  size="lg"
+                >
+                  {isGeneratingLink ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      {t('settings.export.generatingLink')}
+                    </>
+                  ) : (
+                    <>
+                      <Link2 className="w-4 h-4 mr-2" />
+                      {t('settings.export.generateLink')}
+                    </>
+                  )}
+                </Button>
+              </div>
+              {exportSuccess && (
+                <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <Check className="w-4 h-4" />
+                  {t('settings.export.success')}
+                </div>
+              )}
+
+              {/* Generated Link Section */}
+              {generatedLink && (
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    {t('settings.export.linkGenerated')}
+                  </div>
+
+                  {/* URL + Copy */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={generatedLink}
+                      className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 select-all"
+                      onClick={(e) => (e.target as HTMLInputElement).select()}
+                    />
+                    <Button
+                      onClick={handleCopyLink}
+                      variant="outline"
+                      size="sm"
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="w-4 h-4 mr-1" />
+                          {t('settings.export.linkCopied')}
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4 mr-1" />
+                          {t('settings.export.copyLink')}
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* QR Code */}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="p-3 bg-white rounded-lg">
+                      <QRCodeSVG value={generatedLink} size={180} />
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('settings.export.scanQR')}
+                    </p>
+                  </div>
+
+                  {/* Countdown */}
+                  {linkCountdown && (
+                    <p className="text-xs text-center text-amber-600 dark:text-amber-400">
+                      {linkCountdown}
+                    </p>
+                  )}
+                  {!linkExpiresAt && !linkCountdown && (
+                    <p className="text-xs text-center text-red-600 dark:text-red-400">
+                      {t('settings.export.linkExpired')}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </SectionCard>
         </div>
 
         {/* Category Rules - Always visible but can be hidden on mobile */}

@@ -30,6 +30,7 @@
     "i18next-browser-languagedetector": "^7.2.2",
     "i18next-http-backend": "^2.7.3",
     "lucide-react": "^0.554.0",
+    "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-easy-crop": "^5.5.6",
