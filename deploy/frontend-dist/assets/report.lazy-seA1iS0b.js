@@ -1,0 +1,1 @@
+import{j as t}from"./vendor-react-CezGY3Eh.js";import{h as o,N as e}from"./vendor-router-CjTheb1B.js";const s=o("/report")({component:()=>t.jsx(e,{to:"/analytics",search:{tab:"report"}})});export{s as Route};
