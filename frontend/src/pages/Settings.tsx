@@ -279,7 +279,7 @@ export function Settings() {
 
         {/* General Settings */}
         <div className={cn('space-y-4', activeSection !== 'general' && 'hidden')}>
-          <SectionCard icon={SettingsIcon} title={t('settings.general')} description="Currency and basic preferences">
+          <SectionCard icon={SettingsIcon} title={t('settings.general')} description={t('settings.generalDescription', 'Currency and basic preferences')}>
             <div className="space-y-4">
               <Select
                 label={t('settings.currency')}
@@ -319,7 +319,7 @@ export function Settings() {
 
         {/* Budget Settings */}
         <div className={cn('space-y-4', activeSection !== 'budget' && 'hidden')}>
-          <SectionCard icon={Wallet} title={t('settings.budgetSettings')} description="Budget behavior and alerts">
+          <SectionCard icon={Wallet} title={t('settings.budgetSettings')} description={t('settings.budgetDescription', 'Budget behavior and alerts')}>
             <div className="space-y-4">
               <ToggleSetting
                 label={t('settings.budgetCarryOver')}

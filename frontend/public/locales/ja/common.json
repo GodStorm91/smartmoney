@@ -724,24 +724,26 @@
     "account": "口座",
     "accounts": "口座",
     "selectAccount": "口座を選択",
-    "manageYourAccounts": "口座を管理",
-    "createAccount": "口座を作成",
+    "subtitle": "すべての口座の残高を管理",
+    "manageYourAccounts": "すべての口座の残高を管理",
+    "createAccount": "口座を追加",
     "editAccount": "口座を編集",
-    "showInactive": "無効な口座を表示",
+    "showInactive": "解約済み口座を表示",
     "noAccounts": "口座がありません",
     "createFirstAccount": "最初の口座を作成しましょう",
     "name": "口座名",
-    "namePlaceholder": "例: メインバンク口座",
+    "namePlaceholder": "例: みずほ銀行 普通預金",
     "accountType": "口座タイプ",
-    "initialBalance": "初期残高",
-    "initialBalanceDate": "初期残高日",
+    "initialBalance": "開始残高",
+    "initialBalanceDate": "基準日",
+    "initialBalanceDateHint": "この残高はいつ時点のものですか？",
     "currency": "通貨",
     "notes": "メモ",
-    "notesPlaceholder": "この口座に関するメモ...",
+    "notesPlaceholder": "例: 共同口座、緊急資金...",
     "currentBalance": "現在の残高",
     "transactions": "取引",
     "edit": "編集",
-    "inactive": "無効",
+    "inactive": "解約済み",
     "type": {
       "bank": "銀行口座",
       "cash": "現金",
@@ -752,23 +754,25 @@
       "crypto": "暗号資産",
       "other": "その他"
     },
-    "desiredCurrentBalance": "希望する現在残高",
-    "desiredBalancePlaceholder": "調整後の残高を入力",
+    "desiredCurrentBalance": "実際の残高",
+    "desiredBalancePlaceholder": "現在の正しい残高は？",
+    "reconcileHint": "銀行やウォレットを確認して、実際の残高を入力してください",
     "balanceAdjustment": "残高調整",
-    "adjustmentAmount": "調整額",
-    "confirmAdjustment": "残高調整を確認",
-    "cancelAdjustment": "調整をキャンセル",
+    "adjustmentAmount": "差額",
+    "confirmAdjustment": "調整を適用",
+    "cancelAdjustment": "キャンセル",
     "adjustmentWarning": "これにより残高調整取引が作成されます",
-    "adjustmentConfirmTitle": "⚠️ 残高調整を確認",
+    "adjustmentConfirmTitle": "残高調整の確認",
+    "adjustmentConfirmMessage": "実際の残高に合わせるため、{{amount}}の調整取引を作成します。",
     "adjustmentDetails": "調整の詳細:",
     "adjustmentCurrent": "現在の残高:",
     "adjustmentNew": "新しい残高:",
-    "hasTransactionsInfo": "この口座には {{count}} 件の取引があります。残高を調整するには、希望する金額を以下に入力してください。",
+    "hasTransactionsInfo": "この口座には{{count}}件の取引があります。実際の残高を入力して照合してください。",
     "errors": {
-      "loadFailed": "口座の読み込みに失敗しました",
-      "nameRequired": "口座名は必須です",
-      "dateRequired": "初期残高日は必須です",
-      "submitFailed": "口座の保存に失敗しました"
+      "loadFailed": "口座を読み込めませんでした。接続を確認してもう一度お試しください。",
+      "nameRequired": "口座名を入力してください",
+      "dateRequired": "この残高の基準日を選択してください",
+      "submitFailed": "口座を保存できませんでした。もう一度お試しください。"
     }
   },
   "auth": {
@@ -816,6 +820,8 @@
     "largeTransactionThreshold": "大型取引の除外しきい値",
     "largeTransactionThresholdDescription": "目標達成計算から除外する取引の金額しきい値",
     "largeTransactionThresholdHint": "0に設定すると無効。大きな一時的支出（医療費など）が月平均を歪める場合に有効。",
+    "generalDescription": "通貨と基本設定",
+    "budgetDescription": "予算の動作とアラート",
     "saveFailed": "設定の保存に失敗しました",
     "sections": {
       "appearance": "外観",
@@ -847,7 +853,9 @@
       "linkCopied": "コピーしました！",
       "linkExpires": "有効期限: {{minutes}}分{{seconds}}秒",
       "linkExpired": "リンクの有効期限切れ",
-      "scanQR": "iPhoneでスキャン"
+      "scanQR": "iPhoneでスキャン",
+      "generateFailed": "リンクの生成に失敗しました",
+      "copyFailed": "リンクのコピーに失敗しました"
     }
   },
   "appearance": {
@@ -868,7 +876,16 @@
       "draculaLight": "Dracula Light"
     },
     "themeControlled": "テーマにより制御",
+    "language": "言語",
     "accentColor": "アクセントカラー",
+    "colors": {
+      "emerald": "エメラルド",
+      "ocean": "オーシャン",
+      "royal": "ロイヤル",
+      "sunset": "サンセット",
+      "rose": "ローズ",
+      "teal": "ティール"
+    },
     "displayMode": "表示モード",
     "pro": "プロ",
     "proDesc": "すべての機能とアイテムにアクセス",
@@ -1950,8 +1967,8 @@
     },
     "accounts": {
       "title": "口座がまだありません",
-      "description": "銀行口座、クレジットカード、現金を追加して残高を管理しましょう",
-      "cta": "口座を追加"
+      "description": "銀行、クレジットカード、現金の口座を追加して残高管理を始めましょう",
+      "cta": "最初の口座を追加"
     },
     "categories": {
       "title": "支出データがありません",

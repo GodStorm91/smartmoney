@@ -113,19 +113,19 @@ export default function Accounts() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('account.accounts')}</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('account.manageYourAccounts')}</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-1">{t('account.subtitle')}</p>
           </div>
           <div className="flex gap-3">
             <button
               onClick={() => setIsTransferModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
             >
               <ArrowRightLeft className="w-5 h-5" />
               {t('transfer.title')}
             </button>
             <button
               onClick={handleCreateAccount}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -167,7 +167,7 @@ export default function Accounts() {
       {error && (
         <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
           <p className="text-red-700 dark:text-red-400">
-            {t('account.errors.loadFailed')}: {(error as Error).message}
+            {t('account.errors.loadFailed')}
           </p>
         </div>
       )}

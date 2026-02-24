@@ -353,7 +353,7 @@ export function AccountFormModal({
               {/* Current Balance Display */}
               <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-blue-900 dark:text-blue-200">Current Balance</span>
+                  <span className="text-sm font-medium text-blue-900 dark:text-blue-200">{t('account.currentBalance')}</span>
                   <span className="text-lg font-bold text-blue-900 dark:text-blue-200">
                     {formatCurrencyPrivacy(
                       (existingAccount as AccountWithBalance).current_balance,
@@ -365,14 +365,14 @@ export function AccountFormModal({
                   </span>
                 </div>
                 <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                  {(existingAccount as AccountWithBalance).transaction_count} transactions
+                  {t('account.hasTransactionsInfo', { count: (existingAccount as AccountWithBalance).transaction_count })}
                 </p>
               </div>
 
               {/* Desired Balance Input */}
               <div>
                 <label htmlFor="desiredBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Desired Current Balance
+                  {t('account.desiredCurrentBalance')}
                 </label>
                 <input
                   type="text"
@@ -381,13 +381,13 @@ export function AccountFormModal({
                   value={formatWithCommas(desiredCurrentBalance)}
                   onChange={(e) => {
                     setDesiredCurrentBalance(parseFormattedNumber(e.target.value))
-                    setShowConfirmation(false) // Reset confirmation when value changes
+                    setShowConfirmation(false)
                   }}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 font-numbers"
-                  placeholder="Enter the actual balance"
+                  placeholder={t('account.desiredBalancePlaceholder')}
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Enter the actual balance from your bank/wallet to reconcile
+                  {t('account.reconcileHint')}
                 </p>
               </div>
 
@@ -395,25 +395,25 @@ export function AccountFormModal({
               {adjustmentAmount !== null && adjustmentAmount !== 0 && (
                 <div className={cn(
                   'border rounded-lg p-4',
-                  adjustmentAmount > 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                  adjustmentAmount > 0 ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                 )}>
                   <div className="flex items-center justify-between">
                     <span className={cn(
                       'text-sm font-medium',
-                      adjustmentAmount > 0 ? 'text-green-900' : 'text-red-900'
+                      adjustmentAmount > 0 ? 'text-green-900 dark:text-green-200' : 'text-red-900 dark:text-red-200'
                     )}>
-                      Adjustment Amount
+                      {t('account.adjustmentAmount')}
                     </span>
                     <div className="flex items-center gap-2">
                       <span className={cn(
                         'text-lg font-bold',
-                        adjustmentAmount > 0 ? 'text-green-900' : 'text-red-900'
+                        adjustmentAmount > 0 ? 'text-green-900 dark:text-green-200' : 'text-red-900 dark:text-red-200'
                       )}>
                         {adjustmentAmount > 0 ? '↑' : '↓'}
                       </span>
                       <span className={cn(
                         'text-lg font-bold',
-                        adjustmentAmount > 0 ? 'text-green-900' : 'text-red-900'
+                        adjustmentAmount > 0 ? 'text-green-900 dark:text-green-200' : 'text-red-900 dark:text-red-200'
                       )}>
                         {formatCurrencyPrivacy(
                           Math.abs(adjustmentAmount),
@@ -430,10 +430,10 @@ export function AccountFormModal({
 
               {/* Confirmation Warning */}
               {showConfirmation && adjustmentAmount !== null && adjustmentAmount !== 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <svg
-                      className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -444,19 +444,17 @@ export function AccountFormModal({
                       />
                     </svg>
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-yellow-900">Confirm Balance Adjustment</h4>
-                      <p className="text-sm text-yellow-700 mt-1">
-                        This will create a balance adjustment transaction of{' '}
-                        <span className="font-semibold">
-                          {formatCurrencyPrivacy(
+                      <h4 className="text-sm font-medium text-yellow-900 dark:text-yellow-200">{t('account.adjustmentConfirmTitle')}</h4>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                        {t('account.adjustmentConfirmMessage', {
+                          amount: formatCurrencyPrivacy(
                             Math.abs(adjustmentAmount),
                             existingAccount.currency,
                             rates,
                             true,
                             isPrivacyMode
-                          )}
-                        </span>
-                        {' '}to reconcile your account balance.
+                          )
+                        })}
                       </p>
                     </div>
                   </div>
@@ -498,7 +496,7 @@ export function AccountFormModal({
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
               >
-                Cancel Adjustment
+                {t('account.cancelAdjustment')}
               </button>
             )}
             {!showConfirmation && (
@@ -521,7 +519,7 @@ export function AccountFormModal({
               {createMutation.isPending || updateMutation.isPending
                 ? t('saving')
                 : showConfirmation
-                ? 'Confirm Adjustment'
+                ? t('account.confirmAdjustment')
                 : editingAccountId
                 ? t('update')
                 : t('create')}

@@ -719,24 +719,26 @@
   "account": {
     "account": "Tài khoản",
     "accounts": "Tài khoản",
-    "manageYourAccounts": "Quản lý tài khoản của bạn",
-    "createAccount": "Tạo tài khoản",
+    "subtitle": "Theo dõi số dư tất cả tài khoản",
+    "manageYourAccounts": "Theo dõi số dư tất cả tài khoản",
+    "createAccount": "Thêm tài khoản",
     "editAccount": "Chỉnh sửa tài khoản",
-    "showInactive": "Hiển thị tài khoản không hoạt động",
+    "showInactive": "Hiện tài khoản đã đóng",
     "noAccounts": "Không có tài khoản",
-    "createFirstAccount": "Tạo tài khoản đầu tiên của bạn",
+    "createFirstAccount": "Tạo tài khoản đầu tiên",
     "name": "Tên tài khoản",
-    "namePlaceholder": "ví dụ: Tài khoản ngân hàng chính",
+    "namePlaceholder": "ví dụ: Tiết kiệm Vietcombank",
     "accountType": "Loại tài khoản",
     "initialBalance": "Số dư ban đầu",
-    "initialBalanceDate": "Ngày số dư ban đầu",
+    "initialBalanceDate": "Tính đến ngày",
+    "initialBalanceDateHint": "Số dư này chính xác vào ngày nào?",
     "currency": "Tiền tệ",
     "notes": "Ghi chú",
-    "notesPlaceholder": "Ghi chú về tài khoản này...",
+    "notesPlaceholder": "ví dụ: tài khoản chung, quỹ dự phòng...",
     "currentBalance": "Số dư hiện tại",
     "transactions": "Giao dịch",
     "edit": "Chỉnh sửa",
-    "inactive": "Không hoạt động",
+    "inactive": "Đã đóng",
     "type": {
       "bank": "Tài khoản ngân hàng",
       "cash": "Tiền mặt",
@@ -747,23 +749,25 @@
       "crypto": "Tiền điện tử",
       "other": "Khác"
     },
-    "desiredCurrentBalance": "Số dư hiện tại mong muốn",
-    "desiredBalancePlaceholder": "Nhập số dư mong muốn",
+    "desiredCurrentBalance": "Số dư thực tế",
+    "desiredBalancePlaceholder": "Số dư thực sự hiện tại là bao nhiêu?",
+    "reconcileHint": "Kiểm tra ngân hàng hoặc ví và nhập số dư thực tế để đối chiếu",
     "balanceAdjustment": "Điều chỉnh số dư",
-    "adjustmentAmount": "Số tiền điều chỉnh",
-    "confirmAdjustment": "Xác nhận điều chỉnh",
-    "cancelAdjustment": "Hủy điều chỉnh",
+    "adjustmentAmount": "Chênh lệch",
+    "confirmAdjustment": "Áp dụng điều chỉnh",
+    "cancelAdjustment": "Hủy",
     "adjustmentWarning": "Điều này sẽ tạo giao dịch điều chỉnh số dư",
-    "adjustmentConfirmTitle": "⚠️ Xác nhận điều chỉnh số dư",
+    "adjustmentConfirmTitle": "Xác nhận điều chỉnh số dư",
+    "adjustmentConfirmMessage": "Sẽ tạo điều chỉnh {{amount}} để khớp với số dư thực tế.",
     "adjustmentDetails": "Chi tiết điều chỉnh:",
     "adjustmentCurrent": "Số dư hiện tại:",
     "adjustmentNew": "Số dư mới:",
-    "hasTransactionsInfo": "Tài khoản này có {{count}} giao dịch. Để điều chỉnh số dư, nhập số tiền mong muốn bên dưới.",
+    "hasTransactionsInfo": "Tài khoản này có {{count}} giao dịch. Nhập số dư thực tế để đối chiếu.",
     "errors": {
-      "loadFailed": "Không thể tải tài khoản",
-      "nameRequired": "Tên tài khoản là bắt buộc",
-      "dateRequired": "Ngày số dư ban đầu là bắt buộc",
-      "submitFailed": "Không thể lưu tài khoản"
+      "loadFailed": "Không thể tải tài khoản. Kiểm tra kết nối và thử lại.",
+      "nameRequired": "Đặt tên cho tài khoản này",
+      "dateRequired": "Chọn ngày số dư này chính xác",
+      "submitFailed": "Không thể lưu tài khoản. Vui lòng thử lại."
     }
   },
   "auth": {
@@ -811,6 +815,8 @@
     "largeTransactionThreshold": "Ngưỡng Giao Dịch Lớn",
     "largeTransactionThresholdDescription": "Loại trừ giao dịch vượt số tiền này khỏi tính toán khả năng đạt mục tiêu",
     "largeTransactionThresholdHint": "Đặt 0 để tắt. Chi phí lớn một lần (y tế, v.v.) có thể làm sai lệch trung bình tháng.",
+    "generalDescription": "Tiền tệ và tùy chọn cơ bản",
+    "budgetDescription": "Hành vi ngân sách và cảnh báo",
     "saveFailed": "Không thể lưu cài đặt",
     "sections": {
       "appearance": "Giao diện",
@@ -842,7 +848,9 @@
       "linkCopied": "Đã sao chép!",
       "linkExpires": "Hết hạn sau {{minutes}}p {{seconds}}s",
       "linkExpired": "Liên kết đã hết hạn",
-      "scanQR": "Quét bằng iPhone"
+      "scanQR": "Quét bằng iPhone",
+      "generateFailed": "Không thể tạo liên kết",
+      "copyFailed": "Không thể sao chép liên kết"
     }
   },
   "appearance": {
@@ -863,7 +871,16 @@
       "draculaLight": "Dracula Light"
     },
     "themeControlled": "Được điều khiển bởi chủ đề",
+    "language": "Ngôn ngữ",
     "accentColor": "Màu chủ đạo",
+    "colors": {
+      "emerald": "Ngọc lục",
+      "ocean": "Đại dương",
+      "royal": "Hoàng gia",
+      "sunset": "Hoàng hôn",
+      "rose": "Hồng",
+      "teal": "Xanh ngọc"
+    },
     "displayMode": "Chế độ hiển thị",
     "pro": "Pro",
     "proDesc": "Truy cập đầy đủ, hiển thị tất cả mục",
@@ -1857,8 +1874,8 @@
     },
     "accounts": {
       "title": "Chưa có tài khoản nào",
-      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để theo dõi số dư",
-      "cta": "Thêm tài khoản"
+      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để bắt đầu theo dõi số dư",
+      "cta": "Thêm tài khoản đầu tiên"
     },
     "categories": {
       "title": "Chưa có dữ liệu chi tiêu",
