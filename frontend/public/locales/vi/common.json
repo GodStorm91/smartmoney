@@ -136,7 +136,15 @@
     "goals": "Mục tiêu",
     "createFirstGoal": "Tạo mục tiêu đầu tiên",
     "goalMotivation": "Theo dõi tiến độ tiết kiệm",
-    "noTransactions": "Chưa có giao dịch"
+    "noTransactions": "Chưa có giao dịch",
+    "greetingMorning": "Chào buổi sáng",
+    "greetingAfternoon": "Chào buổi chiều",
+    "greetingEvening": "Chào buổi tối",
+    "greetingNight": "Chúc ngủ ngon",
+    "subtitleMorning": "Bắt đầu ngày mới với tổng quan tài chính",
+    "subtitleAfternoon": "Xem tình hình tài chính hôm nay",
+    "subtitleEvening": "Cùng xem lại hoạt động hôm nay",
+    "subtitleNight": "Tổng kết tài chính hôm nay"
   },
   "spendingCalendar": {
     "title": "Lịch chi tiêu",

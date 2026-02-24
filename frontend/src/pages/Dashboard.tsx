@@ -16,6 +16,8 @@ import {
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
+import { useGreeting } from '@/hooks/useGreeting'
+import { useProfile } from '@/services/rewards-service'
 import { SpendingCalendar } from '@/components/dashboard/SpendingCalendar'
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
@@ -47,6 +49,8 @@ export function Dashboard() {
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
   const limits = useTierLimits()
+  const { data: profile } = useProfile()
+  const { greeting, subtitle: greetingSubtitle, emoji } = useGreeting(profile?.display_name)
 
   const [currentDate, setCurrentDate] = useState(new Date())
 
@@ -138,13 +142,17 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-2xl mx-auto px-4 py-4">
+      {/* Sticky Header with personalized greeting */}
+      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 overflow-hidden">
+        {/* Pastel decorative orbs */}
+        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-primary-200/30 dark:bg-primary-800/20 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-net-100/40 dark:bg-net-900/20 blur-2xl pointer-events-none" />
+
+        <div className="relative max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() - 1); setCurrentDate(d) }}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
@@ -153,17 +161,17 @@ export function Dashboard() {
             </h1>
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() + 1); setCurrentDate(d) }}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-              {t('dashboard.title')}
+              {emoji} {greeting}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {t('dashboard.subtitle', { month: formatMonth(new Date()) })}
+              {greetingSubtitle}
             </p>
           </div>
         </div>
