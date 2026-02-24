@@ -1,0 +1,1 @@
+import{e as t,j as e,N as o}from"./vendor-router-DONIM_LE.js";import"./vendor-react-Cwh1aMWO.js";const s=t("/report")({component:()=>e.jsx(o,{to:"/analytics",search:{tab:"report"}})});export{s as Route};
