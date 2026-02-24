@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense, useMemo, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
@@ -18,7 +18,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { useGreeting } from '@/hooks/useGreeting'
 import { useProfile } from '@/services/rewards-service'
-import { SpendingCalendar } from '@/components/dashboard/SpendingCalendar'
+const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalendar').then(m => ({ default: m.SpendingCalendar })))
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
@@ -134,11 +134,13 @@ export function Dashboard() {
 
   if (isLoading) return <DashboardSkeleton />
 
-  const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+  const formatCurrency = useCallback((amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode),
+    [currency, exchangeRates?.rates, isPrivacyMode])
 
-  const formatTransactionCurrency = (amount: number, txCurrency: string = 'JPY') =>
-    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode)
+  const formatTransactionCurrency = useCallback((amount: number, txCurrency: string = 'JPY') =>
+    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode),
+    [exchangeRates?.rates, isPrivacyMode])
 
   return (
     <div className="min-h-screen pb-32">
@@ -314,8 +316,10 @@ export function Dashboard() {
           )}
         </Card>
 
-        {/* 8. Spending Calendar */}
-        <SpendingCalendar onDayClick={handleDayClick} />
+        {/* 8. Spending Calendar (lazy-loaded — pulls date-fns) */}
+        <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
+          <SpendingCalendar onDayClick={handleDayClick} />
+        </Suspense>
 
         {/* 9. Goals Progress (limit 2) */}
         {goalsProgress && goalsProgress.length > 0 && (

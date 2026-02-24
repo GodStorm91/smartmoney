@@ -81,7 +81,7 @@ export function HeroProgressCard({
           <div className="h-3 bg-white/20 rounded-full overflow-hidden">
             <div
               className={cn(
-                'h-full bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full transition-all duration-500',
+                'h-full bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full transition-[width] duration-500',
                 progressPercent >= 90 && 'animate-pulse'
               )}
               style={{ width: `${Math.min(100, progressPercent)}%` }}

@@ -114,7 +114,7 @@ export function BudgetPulseHero({
         <div className="mt-3 h-2.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
           <div
             className={cn(
-              'h-full rounded-full transition-all duration-700 ease-out',
+              'h-full rounded-full transition-[width] duration-700 ease-out',
               availableToSpend < 0 ? 'bg-expense-600' :
               availablePercent < 20 ? 'bg-amber-500' :
               availablePercent < 40 ? 'bg-yellow-500' : 'bg-income-600'

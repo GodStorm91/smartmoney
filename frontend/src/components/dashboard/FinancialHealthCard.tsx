@@ -122,7 +122,7 @@ export function FinancialHealthCard({
               </div>
               <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-blue-500 rounded-full transition-all duration-500"
+                  className="h-full bg-blue-500 rounded-full transition-[width] duration-500"
                   style={{ width: `${(health.breakdown.savingsRate.score / health.breakdown.savingsRate.max) * 100}%` }}
                 />
               </div>
@@ -140,7 +140,7 @@ export function FinancialHealthCard({
               </div>
               <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-purple-500 rounded-full transition-all duration-500"
+                  className="h-full bg-purple-500 rounded-full transition-[width] duration-500"
                   style={{ width: `${(health.breakdown.budgetAdherence.score / health.breakdown.budgetAdherence.max) * 100}%` }}
                 />
               </div>
@@ -158,7 +158,7 @@ export function FinancialHealthCard({
               </div>
               <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-green-500 rounded-full transition-all duration-500"
+                  className="h-full bg-green-500 rounded-full transition-[width] duration-500"
                   style={{ width: `${(health.breakdown.goalProgress.score / health.breakdown.goalProgress.max) * 100}%` }}
                 />
               </div>

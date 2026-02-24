@@ -89,7 +89,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
             <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={cn(
-                  'h-full rounded-full transition-all duration-700 ease-out',
+                  'h-full rounded-full transition-[width] duration-700 ease-out',
                   goalProgress && goalProgress >= 100
                     ? 'bg-green-500'
                     : 'bg-primary-500'
@@ -194,7 +194,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
           <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               className={cn(
-                'h-full rounded-full transition-all duration-700 ease-out',
+                'h-full rounded-full transition-[width] duration-700 ease-out',
                 goalProgress && goalProgress >= 100
                   ? 'bg-green-500'
                   : 'bg-primary-500'

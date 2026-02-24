@@ -136,7 +136,7 @@ export function GoalAchievabilityCard({
           </div>
           <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
-              className={cn('h-full rounded-full transition-all duration-500', progressColor)}
+              className={cn('h-full rounded-full transition-[width] duration-500', progressColor)}
               style={{ width: `${Math.min(100, progressPercentage)}%` }}
             />
           </div>

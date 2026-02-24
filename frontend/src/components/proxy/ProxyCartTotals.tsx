@@ -67,7 +67,7 @@ export function ProxyCartTotals({ items, exchangeRate }: ProxyCartTotalsProps) {
         <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
             className={cn(
-              'h-full rounded-full transition-all',
+              'h-full rounded-full transition-[width]',
               totals.marginPct >= 20 ? 'bg-green-500' : totals.marginPct >= 10 ? 'bg-yellow-500' : 'bg-red-500'
             )}
             style={{ width: `${Math.min(100, Math.max(0, totals.marginPct))}%` }}

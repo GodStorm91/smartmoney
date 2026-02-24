@@ -76,7 +76,7 @@ export function FileUploadItem({ item, onRemove }: FileUploadItemProps) {
               <div className="mt-2">
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
                   <div
-                    className="bg-blue-600 h-1.5 rounded-full transition-all duration-300"
+                    className="bg-blue-600 h-1.5 rounded-full transition-[width] duration-300"
                     style={{ width: `${item.progress}%` }}
                   />
                 </div>

@@ -133,7 +133,7 @@ export function GoalProgressCard({ goal, compact = false }: GoalProgressCardProp
         </div>
         <div className="h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${progress >= 100 ? 'bg-green-500' : 'bg-primary-500'}`}
+            className={`h-full rounded-full transition-[width] duration-500 ${progress >= 100 ? 'bg-green-500' : 'bg-primary-500'}`}
             style={{ width: `${Math.min(progress, 100)}%` }}
             role="progressbar"
             aria-valuenow={Math.min(progress, 100)}

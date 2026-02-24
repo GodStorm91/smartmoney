@@ -99,7 +99,7 @@ export function AllocationCard({
           >
             <div
               className={cn(
-                'h-full rounded-full transition-all duration-500',
+                'h-full rounded-full transition-[width] duration-500',
                 percentOfTotal > 100 ? 'bg-red-500' :
                 percentOfTotal > 90 ? 'bg-amber-500' : 'bg-blue-500'
               )}
@@ -140,7 +140,7 @@ export function AllocationCard({
           >
             <div
               className={cn(
-                'h-full rounded-full transition-all duration-500',
+                'h-full rounded-full transition-[width] duration-500',
                 trackingItem.status === 'red' ? 'bg-red-500' :
                 trackingItem.status === 'orange' ? 'bg-orange-500' :
                 trackingItem.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'

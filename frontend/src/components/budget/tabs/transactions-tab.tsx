@@ -141,7 +141,7 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
           </div>
           <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div className={cn(
-              'h-full rounded-full transition-all',
+              'h-full rounded-full transition-[width]',
               activePercent! > 100 ? 'bg-red-500' : activePercent! > 85 ? 'bg-amber-500' : 'bg-green-500'
             )} style={{ width: `${Math.min(100, activePercent!)}%` }} />
           </div>

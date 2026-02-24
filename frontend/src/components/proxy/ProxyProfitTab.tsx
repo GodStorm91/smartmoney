@@ -222,7 +222,7 @@ export function ProxyProfitTab() {
               <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2">
                 <div
                   className={cn(
-                    'h-full rounded-full transition-all',
+                    'h-full rounded-full transition-[width]',
                     month.profit >= 0 ? 'bg-green-500' : 'bg-red-500'
                   )}
                   style={{ width: `${barWidth}%` }}

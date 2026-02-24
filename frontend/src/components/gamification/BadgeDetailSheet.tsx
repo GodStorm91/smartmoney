@@ -143,7 +143,7 @@ export function BadgeDetailSheet({ badge, onClose }: BadgeDetailSheetProps) {
             <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className={cn(
-                  'h-full rounded-full transition-all duration-500',
+                  'h-full rounded-full transition-[width] duration-500',
                   badge.progress >= 75 ? 'bg-green-500 animate-pulse' : 'bg-blue-500'
                 )}
                 style={{ width: `${badge.progress}%` }}

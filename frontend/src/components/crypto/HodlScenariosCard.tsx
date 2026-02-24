@@ -216,7 +216,7 @@ function ScenarioBar({
       {/* Bar */}
       <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-300 ${getBarColor()}`}
+          className={`h-full rounded-full transition-[width] duration-300 ${getBarColor()}`}
           style={{ width: `${barWidth}%` }}
         />
       </div>

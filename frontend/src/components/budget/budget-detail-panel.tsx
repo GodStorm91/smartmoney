@@ -281,7 +281,7 @@ export function BudgetDetailPanel({
             </div>
           </div>
           <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
-            <div className={cn('h-full rounded-full transition-all duration-500', trackingItem?.status === 'red' ? 'bg-red-500' : trackingItem?.status === 'orange' ? 'bg-orange-500' : trackingItem?.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500')} style={{ width: `${Math.min(100, trackingItem?.percentage || 0)}%` }} />
+            <div className={cn('h-full rounded-full transition-[width] duration-500', trackingItem?.status === 'red' ? 'bg-red-500' : trackingItem?.status === 'orange' ? 'bg-orange-500' : trackingItem?.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500')} style={{ width: `${Math.min(100, trackingItem?.percentage || 0)}%` }} />
           </div>
           {changePercent !== null && (
             <div className={cn('flex items-center gap-2 text-sm', changePercent > 0 ? 'text-red-600 dark:text-red-400' : changePercent < 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500')}>
@@ -384,7 +384,7 @@ export function BudgetDetailPanel({
           <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-3">
             <div
               className={cn(
-                'h-full rounded-full transition-all duration-500',
+                'h-full rounded-full transition-[width] duration-500',
                 trackingItem?.status === 'red' ? 'bg-red-500' :
                 trackingItem?.status === 'orange' ? 'bg-orange-500' :
                 trackingItem?.status === 'yellow' ? 'bg-yellow-500' : 'bg-green-500'

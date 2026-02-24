@@ -69,7 +69,7 @@ export function NextToUnlock({ badges, onAddTransaction, onBadgeClick }: NextToU
                     <div className="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
                         className={cn(
-                          'h-full rounded-full transition-all duration-500',
+                          'h-full rounded-full transition-[width] duration-500',
                           progressBarColors[rarity],
                           isClose && 'animate-pulse'
                         )}

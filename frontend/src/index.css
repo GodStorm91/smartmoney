@@ -439,6 +439,7 @@
   /* Sparkle animation for AI button — idles most of the time, subtle periodic wiggle */
   .animate-sparkle {
     animation: sparkleRotate 4s ease-in-out infinite;
+    will-change: transform;
   }
 
   @keyframes sparkleRotate {
@@ -527,6 +528,7 @@
   .animate-confetti-spin {
     animation: confettiSpin linear infinite;
     animation-duration: inherit;
+    will-change: transform;
   }
 
   @keyframes confettiSpin {

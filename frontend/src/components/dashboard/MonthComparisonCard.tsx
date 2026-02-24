@@ -124,7 +124,7 @@ export function MonthComparisonCard({ currentMonth, previousMonth }: MonthCompar
               <div className="flex items-center gap-2 h-2">
                 <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gray-300 dark:bg-gray-600 rounded-full transition-all duration-500"
+                    className="h-full bg-gray-300 dark:bg-gray-600 rounded-full transition-[width] duration-500"
                     style={{
                       width: `${Math.min(100, Math.max(0, (metric.previous / Math.max(metric.current, metric.previous)) * 100))}%`,
                     }}
@@ -133,7 +133,7 @@ export function MonthComparisonCard({ currentMonth, previousMonth }: MonthCompar
                 <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
                   <div
                     className={cn(
-                      'h-full rounded-full transition-all duration-500',
+                      'h-full rounded-full transition-[width] duration-500',
                       metric.isPositive ? 'bg-income-600' : metric.isNeutral ? 'bg-gray-400' : 'bg-expense-600'
                     )}
                     style={{

@@ -161,7 +161,7 @@ export function AllocationCard({
       <div className="mt-2">
         <div className="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className={cn('h-full rounded-full transition-all duration-500 ease-out', getBarColor())}
+            className={cn('h-full rounded-full transition-[width] duration-500 ease-out', getBarColor())}
             style={{ width: `${Math.min(spentPercent, 100)}%` }}
           />
         </div>

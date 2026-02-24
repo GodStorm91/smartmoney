@@ -120,7 +120,7 @@ export function OnboardingChecklist() {
       <div className="mb-4">
         <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary-500 transition-all duration-500"
+            className="h-full bg-primary-500 transition-[width] duration-500"
             style={{ width: `${progress}%` }}
           />
         </div>

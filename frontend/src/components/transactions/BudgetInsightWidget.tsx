@@ -107,7 +107,7 @@ export function BudgetInsightWidget({
           {/* Current spent (solid) */}
           <div className="h-full rounded-full relative overflow-hidden">
             <div
-              className={cn('h-full rounded-full transition-all duration-300', getBarColor())}
+              className={cn('h-full rounded-full transition-[width] duration-300', getBarColor())}
               style={{ width: `${Math.min(afterPercent, 100)}%` }}
             />
             {/* Show the "new" portion as a striped overlay */}
