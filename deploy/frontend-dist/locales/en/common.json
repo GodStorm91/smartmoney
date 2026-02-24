@@ -253,6 +253,8 @@
     "deleteConfirm": "Are you sure you want to delete this transaction?",
     "minAmount": "Min",
     "maxAmount": "Max",
+    "amountRange": "Amount Range",
+    "account": "Account",
     "allCategories": "All",
     "recategorize": "Recategorize",
     "deleteSelected": "Delete",

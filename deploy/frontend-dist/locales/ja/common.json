@@ -250,6 +250,8 @@
     "deleteConfirm": "この取引を削除してもよろしいですか？",
     "minAmount": "最小",
     "maxAmount": "最大",
+    "amountRange": "金額の範囲",
+    "account": "口座",
     "allCategories": "すべて",
     "recategorize": "カテゴリー変更",
     "deleteSelected": "削除",

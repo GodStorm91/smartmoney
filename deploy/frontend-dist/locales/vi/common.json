@@ -250,6 +250,8 @@
     "deleteConfirm": "Bạn có chắc chắn muốn xóa giao dịch này không?",
     "minAmount": "Tối thiểu",
     "maxAmount": "Tối đa",
+    "amountRange": "Khoảng số tiền",
+    "account": "Tài khoản",
     "allCategories": "Tất cả",
     "recategorize": "Phân loại lại",
     "deleteSelected": "Xóa",
