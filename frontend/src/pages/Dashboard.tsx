@@ -18,7 +18,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { useGreeting } from '@/hooks/useGreeting'
 import { useProfile } from '@/services/rewards-service'
-const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalendar').then(m => ({ default: m.SpendingCalendar })))
+const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalendar'))
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'

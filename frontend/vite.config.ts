@@ -69,8 +69,8 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react/jsx-runtime'],
-          'vendor-router': ['@tanstack/react-router', '@tanstack/router-vite-plugin'],
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-router': ['@tanstack/react-router'],
           'vendor-query': ['@tanstack/react-query'],
           'vendor-charts': ['recharts'],
           'vendor-i18n': ['react-i18next', 'i18next'],
