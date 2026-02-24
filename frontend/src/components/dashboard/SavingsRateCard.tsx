@@ -10,9 +10,9 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
   const { t } = useTranslation('common')
 
   const getStatus = () => {
-    if (rate >= 20) return { color: 'text-green-600 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-900/30', label: t('dashboard.savingsGood', 'Healthy') }
+    if (rate >= 20) return { color: 'text-income-600 dark:text-income-300', bg: 'bg-income-100 dark:bg-income-900/30', label: t('dashboard.savingsGood', 'Healthy') }
     if (rate >= 10) return { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', label: t('dashboard.savingsFair', 'Fair') }
-    return { color: 'text-red-600 dark:text-red-400', bg: 'bg-red-100 dark:bg-red-900/30', label: t('dashboard.savingsLow', 'Low') }
+    return { color: 'text-expense-600 dark:text-expense-300', bg: 'bg-expense-100 dark:bg-expense-900/30', label: t('dashboard.savingsLow', 'Low') }
   }
 
   const status = getStatus()
@@ -39,7 +39,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
         <div
           className={cn(
             'h-full rounded-full animate-progress-fill',
-            rate >= 20 ? 'bg-green-500' : rate >= 10 ? 'bg-amber-500' : 'bg-red-500'
+            rate >= 20 ? 'bg-income-600' : rate >= 10 ? 'bg-amber-500' : 'bg-expense-600'
           )}
           style={{ width: `${Math.min(100, rate)}%` }}
         />

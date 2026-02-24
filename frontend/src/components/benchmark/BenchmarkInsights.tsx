@@ -34,7 +34,7 @@ export function BenchmarkInsights({ insights, overCategories, underCategories }:
             {/* Over budget categories */}
             {overCategories.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-red-600 dark:text-red-400">
+                <div className="flex items-center gap-2 text-sm font-medium text-expense-600 dark:text-expense-300">
                   <TrendingUp className="w-4 h-4" />
                   {t('benchmark.spendingMore', 'Spending more than average')}
                 </div>
@@ -44,8 +44,8 @@ export function BenchmarkInsights({ insights, overCategories, underCategories }:
                       key={category}
                       className={cn(
                         'px-2.5 py-1 text-xs font-medium rounded-full',
-                        'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300',
-                        'border border-red-200 dark:border-red-800'
+                        'bg-expense-50 dark:bg-expense-900/20 text-expense-600 dark:text-expense-300',
+                        'border border-expense-300 dark:border-expense-900'
                       )}
                     >
                       {category}
@@ -58,7 +58,7 @@ export function BenchmarkInsights({ insights, overCategories, underCategories }:
             {/* Under budget categories */}
             {underCategories.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium text-green-600 dark:text-green-400">
+                <div className="flex items-center gap-2 text-sm font-medium text-income-600 dark:text-income-300">
                   <TrendingDown className="w-4 h-4" />
                   {t('benchmark.spendingLess', 'Spending less than average')}
                 </div>
@@ -68,8 +68,8 @@ export function BenchmarkInsights({ insights, overCategories, underCategories }:
                       key={category}
                       className={cn(
                         'px-2.5 py-1 text-xs font-medium rounded-full',
-                        'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300',
-                        'border border-green-200 dark:border-green-800'
+                        'bg-income-50 dark:bg-income-900/20 text-income-600 dark:text-income-300',
+                        'border border-income-300 dark:border-income-900'
                       )}
                     >
                       {category}

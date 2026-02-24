@@ -21,8 +21,8 @@ export function MetricCard({
   const { t } = useTranslation('common')
 
   const getTrendColor = () => {
-    if (trend === 'positive') return 'text-green-600 dark:text-green-400'
-    if (trend === 'negative') return 'text-red-600 dark:text-red-400'
+    if (trend === 'positive') return 'text-income-600 dark:text-income-300'
+    if (trend === 'negative') return 'text-expense-600 dark:text-expense-300'
     return 'text-gray-500 dark:text-gray-400'
   }
 

@@ -119,7 +119,7 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
           </div>
           <p className={cn(
             'text-4xl sm:text-5xl font-bold font-numbers tracking-tight text-center',
-            netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400'
+            netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-expense-600 dark:text-expense-300'
           )}>
             <CountUp
               end={netWorth}
@@ -133,8 +133,8 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
               <div className={cn(
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium',
                 monthlyNet >= 0
-                  ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
-                  : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'
+                  ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
+                  : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
               )}>
                 {monthlyNet >= 0 ? (
                   <TrendingUp size={14} />
@@ -149,9 +149,9 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
                 <div className={cn(
                   'flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium',
                   monthlyNetChange > 0
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                    ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
                     : monthlyNetChange < 0
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                      ? 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
                       : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                 )}>
                   {monthlyNetChange > 0 ? <TrendingUp size={12} /> : monthlyNetChange < 0 ? <TrendingDown size={12} /> : <Minus size={12} />}
@@ -166,7 +166,7 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className="text-center">
                   <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('dashboard.assets', 'Assets')}</p>
-                  <p className="font-semibold font-numbers text-green-600 dark:text-green-400">
+                  <p className="font-semibold font-numbers text-income-600 dark:text-income-300">
                     {formatCurrencyPrivacy(assets, currency, rates, false, isPrivacyMode)}
                   </p>
                 </div>
@@ -180,7 +180,7 @@ export function NetWorthCard({ monthlyNet, monthlyNetChange }: NetWorthCardProps
                 )}
                 <div className="text-center">
                   <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{t('dashboard.liabilities', 'Liabilities')}</p>
-                  <p className="font-semibold font-numbers text-red-600 dark:text-red-400">
+                  <p className="font-semibold font-numbers text-expense-600 dark:text-expense-300">
                     -{formatCurrencyPrivacy(liabilities, currency, rates, false, isPrivacyMode)}
                   </p>
                 </div>

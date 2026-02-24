@@ -103,7 +103,7 @@ export function BudgetConfirmDialog({
 
             <div className="flex justify-between items-center">
               <span className="text-gray-600 dark:text-gray-400">{t('budget.savingsTarget')}</span>
-              <span className="font-semibold text-green-600 dark:text-green-400">
+              <span className="font-semibold text-income-600 dark:text-income-300">
                 {formatCurrency(savingsTarget)}
               </span>
             </div>
@@ -116,7 +116,7 @@ export function BudgetConfirmDialog({
               </span>
               <span className={cn(
                 'font-semibold',
-                isOverAllocated ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-gray-100'
+                isOverAllocated ? 'text-expense-600 dark:text-expense-300' : 'text-gray-900 dark:text-gray-100'
               )}>
                 {isOverAllocated ? `-${formatCurrency(Math.abs(unallocated))}` : formatCurrency(unallocated)}
               </span>

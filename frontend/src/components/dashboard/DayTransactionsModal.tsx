@@ -73,15 +73,15 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
           </div>
 
           {/* Total Spending */}
-          <div className="px-4 py-3 bg-red-50 dark:bg-red-900/20 border-b border-gray-200 dark:border-gray-700 shrink-0">
+          <div className="px-4 py-3 bg-expense-50 dark:bg-expense-900/20 border-b border-gray-200 dark:border-gray-700 shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <TrendingDown className="w-4 h-4 text-red-500" />
-                <span className="text-sm text-red-600 dark:text-red-400">
+                <TrendingDown className="w-4 h-4 text-expense-600 dark:text-expense-300" />
+                <span className="text-sm text-expense-600 dark:text-expense-300">
                   {t('spendingCalendar.totalSpending', 'Total Spending')}
                 </span>
               </div>
-                <span className="text-lg font-bold text-red-700 dark:text-red-300 font-numbers">
+                <span className="text-lg font-bold text-expense-600 dark:text-expense-300 font-numbers">
                 -{formatCurrency(totalSpending, 'JPY')}
               </span>
             </div>
@@ -97,9 +97,9 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
                 <div className="flex items-center gap-3">
                   <div className={cn(
                     'w-8 h-8 rounded-full flex items-center justify-center text-sm',
-                    tx.type === 'income' 
-                      ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                      : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                    tx.type === 'income'
+                      ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
+                      : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
                   )}>
                     {tx.type === 'income' ? '+' : '-'}
                   </div>
@@ -114,8 +114,8 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
                 </div>
                 <span className={cn(
                   'text-sm font-semibold font-numbers',
-                  tx.type === 'income' 
-                    ? 'text-green-600 dark:text-green-400' 
+                  tx.type === 'income'
+                    ? 'text-income-600 dark:text-income-300'
                     : 'text-gray-900 dark:text-gray-100'
                 )}>
                   {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}

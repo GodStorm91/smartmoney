@@ -184,25 +184,25 @@ export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProp
 
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+        <div className="bg-expense-50 dark:bg-expense-900/20 rounded-lg p-3">
           <div className="flex items-center gap-1.5 mb-1">
-            <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-            <span className="text-xs text-red-600 dark:text-red-400">
+            <TrendingDown className="w-3.5 h-3.5 text-expense-600 dark:text-expense-300" />
+            <span className="text-xs text-expense-600 dark:text-expense-300">
               {t('spendingCalendar.monthlyTotal', 'Monthly')}
             </span>
           </div>
-          <p className="text-sm font-bold text-red-700 dark:text-red-300 font-numbers">
+          <p className="text-sm font-bold text-expense-600 dark:text-expense-300 font-numbers">
             {formatCurrency(monthlyTotal)}
           </p>
         </div>
-        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+        <div className="bg-net-50 dark:bg-net-900/20 rounded-lg p-3">
           <div className="flex items-center gap-1.5 mb-1">
-            <DollarSign className="w-3.5 h-3.5 text-blue-500" />
-            <span className="text-xs text-blue-600 dark:text-blue-400">
+            <DollarSign className="w-3.5 h-3.5 text-net-600 dark:text-net-300" />
+            <span className="text-xs text-net-600 dark:text-net-300">
               {t('spendingCalendar.dailyAvg', 'Daily Avg')}
             </span>
           </div>
-          <p className="text-sm font-bold text-blue-700 dark:text-blue-300 font-numbers">
+          <p className="text-sm font-bold text-net-600 dark:text-net-300 font-numbers">
             {formatCurrency(monthlyAverage)}
           </p>
         </div>

@@ -53,7 +53,7 @@ function ComparisonBadge({ changePercent }: { changePercent: number | null | und
     <span
       className={cn(
         'inline-flex items-center gap-0.5 text-xs font-medium',
-        isUp ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400',
+        isUp ? 'text-expense-600 dark:text-expense-300' : 'text-income-600 dark:text-income-300',
         isSignificant && 'font-bold'
       )}
     >

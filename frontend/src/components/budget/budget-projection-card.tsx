@@ -76,8 +76,8 @@ export function BudgetProjectionCard({
     switch (status) {
       case 'danger':
         return {
-          bg: 'bg-red-100 dark:bg-red-900/30',
-          text: 'text-red-700 dark:text-red-400',
+          bg: 'bg-expense-100 dark:bg-expense-900/30',
+          text: 'text-expense-600 dark:text-expense-300',
           icon: AlertTriangle,
           label: t('budget.projection.status.overBudget'),
           message: t('budget.projection.overBy', { amount: formatCurrency(projectedTotal - totalBudget) })
@@ -92,8 +92,8 @@ export function BudgetProjectionCard({
         }
       default:
         return {
-          bg: 'bg-green-100 dark:bg-green-900/30',
-          text: 'text-green-700 dark:text-green-400',
+          bg: 'bg-income-100 dark:bg-income-900/30',
+          text: 'text-income-600 dark:text-income-300',
           icon: CheckCircle,
           label: t('budget.projection.status.onTrack'),
           message: t('budget.projection.underBy', { amount: formatCurrency(totalBudget - projectedTotal) })
@@ -156,11 +156,11 @@ export function BudgetProjectionCard({
           </div>
 
           {/* Safe Daily Rate */}
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+          <div className="p-3 bg-income-50 dark:bg-income-900/20 rounded-lg">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
               {t('budget.projection.safePace')}
             </p>
-            <p className="text-xl font-bold text-green-700 dark:text-green-400">
+            <p className="text-xl font-bold text-income-600 dark:text-income-300">
               {safeDaily > 0 ? formatCurrency(safeDaily) : '—'}
               {safeDaily > 0 && <span className="text-xs font-normal text-gray-500">/{t('day')}</span>}
             </p>

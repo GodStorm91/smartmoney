@@ -16,9 +16,9 @@ export function TrendChartCard({ data, className }: TrendChartCardProps) {
   const [selectedMetric, setSelectedMetric] = useState<'net' | 'income' | 'expense'>('net')
 
   const metricConfig = {
-    net: { label: t('chart.net'), color: '#3B82F6', bg: 'bg-blue-50 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
-    income: { label: t('chart.income'), color: '#22C55E', bg: 'bg-green-50 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
-    expense: { label: t('chart.expense'), color: '#EF4444', bg: 'bg-red-50 dark:bg-red-900/30', text: 'text-red-600 dark:text-red-400' },
+    net: { label: t('chart.net'), color: '#3B82F6', bg: 'bg-net-50 dark:bg-net-900/20', text: 'text-net-600 dark:text-net-300' },
+    income: { label: t('chart.income'), color: '#22C55E', bg: 'bg-income-50 dark:bg-income-900/20', text: 'text-income-600 dark:text-income-300' },
+    expense: { label: t('chart.expense'), color: '#EF4444', bg: 'bg-expense-50 dark:bg-expense-900/20', text: 'text-expense-600 dark:text-expense-300' },
   }
 
   return (

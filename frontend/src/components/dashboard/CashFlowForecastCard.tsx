@@ -101,8 +101,8 @@ export function CashFlowForecastCard() {
           <div className={cn(
             "p-4 rounded-lg",
             isPositiveChange
-              ? "bg-green-50 dark:bg-green-900/20"
-              : "bg-red-50 dark:bg-red-900/20"
+              ? "bg-income-50 dark:bg-income-900/20"
+              : "bg-expense-50 dark:bg-expense-900/20"
           )}>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
               {t('forecast.projectedBalance', { month: lastMonth?.month.split('-')[1] })}
@@ -110,16 +110,16 @@ export function CashFlowForecastCard() {
             <p className={cn(
               "text-2xl font-bold",
               isPositiveChange
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
+                ? "text-income-600 dark:text-income-300"
+                : "text-expense-600 dark:text-expense-300"
             )}>
               {formatCurrency(summary.end_balance, currency, exchangeRates?.rates || {}, false)}
             </p>
             <div className={cn(
               "flex items-center gap-1 mt-1 text-sm",
               isPositiveChange
-                ? "text-green-600 dark:text-green-400"
-                : "text-red-600 dark:text-red-400"
+                ? "text-income-600 dark:text-income-300"
+                : "text-expense-600 dark:text-expense-300"
             )}>
               {isPositiveChange ? (
                 <TrendingUp className="w-4 h-4" />
@@ -142,7 +142,7 @@ export function CashFlowForecastCard() {
               "text-2xl font-bold",
               summary.avg_monthly_net >= 0
                 ? "text-gray-900 dark:text-gray-100"
-                : "text-red-600 dark:text-red-400"
+                : "text-expense-600 dark:text-expense-300"
             )}>
               {summary.avg_monthly_net >= 0 ? '+' : ''}
               {formatCurrency(summary.avg_monthly_net, currency, exchangeRates?.rates || {}, false)}

@@ -175,7 +175,7 @@ export function SpendingInsightsCard({
             className={cn(
               'flex items-start gap-3 p-3 rounded-lg transition-colors',
               insight.type === 'warning' && 'bg-amber-50 dark:bg-amber-900/20',
-              insight.type === 'positive' && 'bg-green-50 dark:bg-green-900/20',
+              insight.type === 'positive' && 'bg-income-50 dark:bg-income-900/20',
               insight.type === 'neutral' && 'bg-gray-50 dark:bg-gray-800/50'
             )}
           >
@@ -183,7 +183,7 @@ export function SpendingInsightsCard({
               className={cn(
                 'p-1.5 rounded-full flex-shrink-0',
                 insight.type === 'warning' && 'bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400',
-                insight.type === 'positive' && 'bg-green-100 text-green-600 dark:bg-green-800 dark:text-green-400',
+                insight.type === 'positive' && 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300',
                 insight.type === 'neutral' && 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
               )}
             >
@@ -200,7 +200,7 @@ export function SpendingInsightsCard({
                     className={cn(
                       'text-sm font-semibold flex-shrink-0',
                       insight.type === 'warning' && 'text-amber-600 dark:text-amber-400',
-                      insight.type === 'positive' && 'text-green-600 dark:text-green-400',
+                      insight.type === 'positive' && 'text-income-600 dark:text-income-300',
                       insight.type === 'neutral' && 'text-gray-600 dark:text-gray-400'
                     )}
                   >

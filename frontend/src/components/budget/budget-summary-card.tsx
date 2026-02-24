@@ -83,7 +83,7 @@ export function BudgetSummaryCard({
           {previousMonth && incomeDiff !== 0 && (
             <div className={cn(
               "flex items-center gap-1 mt-1 text-xs",
-              incomeDiff > 0 ? "text-green-600" : "text-red-600"
+              incomeDiff > 0 ? "text-income-600" : "text-expense-600"
             )}>
               {incomeDiff > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               <span>{incomeDiff > 0 ? '+' : ''}{formatBudgetCurrency(incomeDiff)}</span>
@@ -92,9 +92,9 @@ export function BudgetSummaryCard({
         </div>
 
         {budget.savings_target !== undefined && budget.savings_target > 0 && (
-          <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+          <div className="bg-income-50 dark:bg-income-900/20 p-4 rounded-lg">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.savingsTarget')}</p>
-            <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            <p className="text-2xl font-bold text-income-600 dark:text-income-300">
               {formatBudgetCurrency(budget.savings_target)}
             </p>
           </div>
@@ -117,7 +117,7 @@ export function BudgetSummaryCard({
           {previousMonth && allocatedDiff !== 0 && (
             <div className={cn(
               "flex items-center gap-1 mt-1 text-xs",
-              allocatedDiff > 0 ? "text-red-600" : "text-green-600"
+              allocatedDiff > 0 ? "text-expense-600" : "text-income-600"
             )}>
               {allocatedDiff > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
               <span>{allocatedDiff > 0 ? '+' : ''}{formatBudgetCurrency(allocatedDiff)}</span>

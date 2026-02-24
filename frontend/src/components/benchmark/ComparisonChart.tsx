@@ -123,7 +123,7 @@ export function ComparisonChart({ comparison }: ComparisonChartProps) {
                       <span className="text-xs text-gray-500 dark:text-gray-400">{t('benchmark.difference', 'Difference')}:</span>
                       <span className={cn(
                         'text-xs font-semibold flex items-center gap-1',
-                        status === 'over' ? 'text-red-600 dark:text-red-400' : status === 'under' ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400'
+                        status === 'over' ? 'text-expense-600 dark:text-expense-300' : status === 'under' ? 'text-income-600 dark:text-income-300' : 'text-gray-600 dark:text-gray-400'
                       )}>
                         {status === 'over' && <TrendingUp className="w-3 h-3" />}
                         {status === 'under' && <TrendingDown className="w-3 h-3" />}

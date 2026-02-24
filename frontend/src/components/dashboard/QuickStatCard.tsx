@@ -21,8 +21,8 @@ export function QuickStatCard({ label, value, change, isPositive, formatCurrency
         <div className={cn(
           'flex items-center gap-1 mt-1 text-xs font-medium',
           (isPositive && change > 0) || (!isPositive && change < 0)
-            ? 'text-green-600 dark:text-green-400'
-            : 'text-red-600 dark:text-red-400'
+            ? 'text-income-600 dark:text-income-300'
+            : 'text-expense-600 dark:text-expense-300'
         )}>
           {change > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           {Math.abs(change)}%

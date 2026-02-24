@@ -39,6 +39,13 @@ export function HeroMetrics({ analytics, displayCurrency = 'JPY' }: HeroMetricsP
   return (
     <div className="grid grid-cols-2 gap-3 sm:gap-4">
       <MetricCard
+        label={t('analytics.heroNet')}
+        value={formatCurrency(net_cashflow, displayCurrency)}
+        change={comparison?.net_change}
+        trend={getNetTrend()}
+        className="col-span-2"
+      />
+      <MetricCard
         label={t('analytics.heroIncome')}
         value={formatCurrency(total_income, displayCurrency)}
         change={comparison?.income_change}
@@ -51,12 +58,6 @@ export function HeroMetrics({ analytics, displayCurrency = 'JPY' }: HeroMetricsP
         trend={getExpenseTrend()}
       />
       <MetricCard
-        label={t('analytics.heroNet')}
-        value={formatCurrency(net_cashflow, displayCurrency)}
-        change={comparison?.net_change}
-        trend={getNetTrend()}
-      />
-      <MetricCard
         label={t('analytics.heroTopCategory')}
         value={top_category?.name || '-'}
         subtitle={
@@ -64,6 +65,7 @@ export function HeroMetrics({ analytics, displayCurrency = 'JPY' }: HeroMetricsP
             ? `${formatCurrency(top_category.amount, displayCurrency)} (${top_category.percentage}%)`
             : undefined
         }
+        className="col-span-2"
       />
     </div>
   )

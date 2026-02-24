@@ -71,12 +71,12 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
         </p>
         <p className={cn(
           'text-3xl font-bold',
-          currentNet >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+          currentNet >= 0 ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
         )}>
           {formatCurrency(currentNet, currency, exchangeRates?.rates || {}, false)}
         </p>
         {currentNet >= 0 && (
-          <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+          <p className="text-sm text-income-600 dark:text-income-300 mt-1">
             {t('analytics.positiveCashFlow')}
           </p>
         )}
@@ -173,7 +173,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
       <div className="flex items-center justify-center gap-2 py-2 border-t border-gray-100 dark:border-gray-800">
         <span className={cn(
           'text-sm font-medium',
-          isPositiveChange ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+          isPositiveChange ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
         )}>
           {isPositiveChange ? '▲' : '▼'} {Math.abs(changePercent).toFixed(1)}%
         </span>

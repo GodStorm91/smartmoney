@@ -45,7 +45,7 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
 
       <p className={cn(
         'text-3xl sm:text-4xl font-bold font-numbers tracking-tight',
-        netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-red-600 dark:text-red-400'
+        netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-expense-600 dark:text-expense-300'
       )}>
         {formatCurrency(netWorth)}
       </p>
@@ -54,8 +54,8 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
         <div className={cn(
           'inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-xs font-medium',
           monthlyNet >= 0
-            ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
-            : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+            ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
+            : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
         )}>
           {monthlyNet >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
           {monthlyNet >= 0 ? '+' : ''}{formatCurrency(monthlyNet)}
@@ -67,13 +67,13 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-xs">{t('dashboard.assets', 'Assets')}</p>
-              <p className="font-semibold text-green-600 dark:text-green-400">
+              <p className="font-semibold text-income-600 dark:text-income-300">
                 {formatCurrency(summary?.total_income || 0)}
               </p>
             </div>
             <div>
               <p className="text-gray-500 dark:text-gray-400 text-xs">{t('dashboard.expenses', 'Expenses')}</p>
-              <p className="font-semibold text-red-600 dark:text-red-400">
+              <p className="font-semibold text-expense-600 dark:text-expense-300">
                 {formatCurrency(summary?.total_expense || 0)}
               </p>
             </div>

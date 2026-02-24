@@ -139,7 +139,7 @@ export function RecurringSuggestionsCard({
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-gray-500 dark:text-gray-400">
                     <span className={cn(
                       'font-numbers',
-                      suggestion.is_income ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                      suggestion.is_income ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                     )}>
                       {suggestion.is_income ? '+' : '-'}
                       {CURRENCY_SYMBOLS['JPY']}{suggestion.amount.toLocaleString()}

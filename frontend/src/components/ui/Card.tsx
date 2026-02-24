@@ -3,6 +3,7 @@ import { cn } from '@/utils/cn'
 interface CardProps {
   children: React.ReactNode
   className?: string
+  style?: React.CSSProperties
   hover?: boolean
   variant?: 'default' | 'glass' | 'gradient' | 'elevated'
   role?: string
@@ -10,14 +11,15 @@ interface CardProps {
   onClick?: () => void
 }
 
-export function Card({ children, className, hover = false, variant = 'default', onClick, ...props }: CardProps) {
+export function Card({ children, className, style, hover = false, variant = 'default', onClick, ...props }: CardProps) {
   return (
     <div
+      style={style}
       className={cn(
         'rounded-xl border transition-all duration-200 p-4 sm:p-5',
         // Variants
         variant === 'default' && 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm',
-        variant === 'glass' && 'bg-white/70 dark:bg-gray-800/70 backdrop-blur-xl border-white/20 dark:border-gray-700/50 shadow-sm',
+        variant === 'glass' && 'bg-white/90 dark:bg-gray-800/88 backdrop-blur-md border-white/30 dark:border-gray-700/50 shadow-sm',
         variant === 'gradient' && 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50 shadow-sm',
         variant === 'elevated' && 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-md hover:shadow-lg',
         // Hover
@@ -54,8 +56,9 @@ export function CardHeader({ children, className }: CardHeaderProps) {
 interface CardTitleProps {
   children: React.ReactNode
   className?: string
+  as?: 'h2' | 'h3' | 'h4' | 'h5'
 }
 
-export function CardTitle({ children, className }: CardTitleProps) {
-  return <h3 className={cn('text-lg font-semibold', className)}>{children}</h3>
+export function CardTitle({ children, className, as: Tag = 'h3' }: CardTitleProps) {
+  return <Tag className={cn('text-lg font-semibold', className)}>{children}</Tag>
 }

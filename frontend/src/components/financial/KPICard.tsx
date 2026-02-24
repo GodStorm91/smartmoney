@@ -13,31 +13,38 @@ interface KPICardProps {
   icon: React.ReactNode
   type?: 'income' | 'expense' | 'net'
   clickable?: boolean
+  className?: string
   'aria-label'?: string
 }
 
-export function KPICard({ title, amount, change, icon, type, clickable, ...props }: KPICardProps) {
+const shadowStyles: Record<string, React.CSSProperties> = {
+  income: { boxShadow: '0 4px 20px hsl(142 30% 50% / 0.12)' },
+  expense: { boxShadow: '0 4px 20px hsl(350 40% 55% / 0.12)' },
+  net: { boxShadow: '0 4px 20px hsl(213 38% 55% / 0.12)' },
+}
+
+export function KPICard({ title, amount, change, icon, type, clickable, className, ...props }: KPICardProps) {
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
   const colorClasses = {
     income: {
-      bg: 'bg-green-50 dark:bg-green-900/20',
-      text: 'text-green-700 dark:text-green-400',
-      badge: 'text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/30',
-      icon: 'text-green-600 dark:text-green-500',
+      bg: 'bg-income-50 dark:bg-income-900/20',
+      text: 'text-income-600 dark:text-income-300',
+      badge: 'text-income-600 dark:text-income-300 bg-income-100 dark:bg-income-900/30',
+      icon: 'text-income-600 dark:text-income-300',
     },
     expense: {
-      bg: 'bg-red-50 dark:bg-red-900/20',
-      text: 'text-red-700 dark:text-red-400',
-      badge: 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-900/30',
-      icon: 'text-red-600 dark:text-red-500',
+      bg: 'bg-expense-50 dark:bg-expense-900/20',
+      text: 'text-expense-600 dark:text-expense-300',
+      badge: 'text-expense-600 dark:text-expense-300 bg-expense-100 dark:bg-expense-900/30',
+      icon: 'text-expense-600 dark:text-expense-300',
     },
     net: {
-      bg: 'bg-blue-50 dark:bg-blue-900/20',
-      text: 'text-blue-700 dark:text-blue-400',
-      badge: 'text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30',
-      icon: 'text-blue-600 dark:text-blue-500',
+      bg: 'bg-net-50 dark:bg-net-900/20',
+      text: 'text-net-600 dark:text-net-300',
+      badge: 'text-net-600 dark:text-net-300 bg-net-100 dark:bg-net-900/30',
+      icon: 'text-net-600 dark:text-net-300',
     },
   }
 
@@ -46,7 +53,8 @@ export function KPICard({ title, amount, change, icon, type, clickable, ...props
   return (
     <Card
       hover={clickable}
-      className={clickable ? 'transition-all duration-300 hover:-translate-y-1' : undefined}
+      className={cn(clickable && 'transition-all duration-300 hover:-translate-y-1', className)}
+      style={type ? shadowStyles[type] : undefined}
       role="region"
       {...props}
     >
@@ -65,7 +73,7 @@ export function KPICard({ title, amount, change, icon, type, clickable, ...props
         )}
       </div>
       <div>
-        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{title}</p>
+        <p className="text-sm font-medium text-gray-400 dark:text-gray-500 mb-1">{title}</p>
         <p className={cn('text-2xl sm:text-3xl font-bold font-numbers tracking-tight', colors.text)}>
           {formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
         </p>

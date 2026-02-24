@@ -26,8 +26,8 @@ export function KpiRow({ summary, formatCurrency, accounts, exchangeRates = {} }
     .reduce((sum, a) => sum + Math.abs(convertToJpy(a.current_balance, a.currency || 'JPY', exchangeRates)), 0) || 0
 
   const kpis = [
-    { label: 'Assets', value: assets, color: 'text-green-600 dark:text-green-400' },
-    { label: 'Liabilities', value: liabilities, color: 'text-red-600 dark:text-red-400' },
+    { label: 'Assets', value: assets, color: 'text-income-600 dark:text-income-300' },
+    { label: 'Liabilities', value: liabilities, color: 'text-expense-600 dark:text-expense-300' },
     { label: 'Transactions', value: summary?.transaction_count || 0, color: 'text-gray-900 dark:text-gray-100', isCount: true },
   ]
 

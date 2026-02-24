@@ -98,8 +98,8 @@ export function MonthComparisonCard({ currentMonth, previousMonth }: MonthCompar
                       className={cn(
                         'flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full',
                         metric.isPositive
-                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                          : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                          ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
+                          : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
                       )}
                     >
                       {metric.isPositive ? (
@@ -134,7 +134,7 @@ export function MonthComparisonCard({ currentMonth, previousMonth }: MonthCompar
                   <div
                     className={cn(
                       'h-full rounded-full transition-all duration-500',
-                      metric.isPositive ? 'bg-green-500' : metric.isNeutral ? 'bg-gray-400' : 'bg-red-500'
+                      metric.isPositive ? 'bg-income-600' : metric.isNeutral ? 'bg-gray-400' : 'bg-expense-600'
                     )}
                     style={{
                       width: `${Math.min(100, Math.max(0, (metric.current / Math.max(metric.current, metric.previous)) * 100))}%`,

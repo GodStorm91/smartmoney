@@ -131,7 +131,7 @@ export function SavingsRecommendations({
                     <Badge variant="default" className="text-xs">
                       {rec.category}
                     </Badge>
-                    <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                    <span className="text-xs text-income-600 dark:text-income-300 font-medium">
                       +{formatCurrency(rec.potential_savings)}
                     </span>
                   </div>
@@ -149,15 +149,15 @@ export function SavingsRecommendations({
           ))}
 
           {result.total_potential > 0 && (
-            <Card className="p-4 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+            <Card className="p-4 bg-income-50 dark:bg-income-900/20 border-income-300 dark:border-income-900">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <PiggyBank className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  <span className="font-medium text-green-700 dark:text-green-300">
+                  <PiggyBank className="w-5 h-5 text-income-600 dark:text-income-300" />
+                  <span className="font-medium text-income-600 dark:text-income-300">
                     {t('savings.totalPotential', 'Total Potential Savings')}
                   </span>
                 </div>
-                <span className="text-xl font-bold text-green-700 dark:text-green-300">
+                <span className="text-xl font-bold text-income-600 dark:text-income-300">
                   {formatCurrency(result.total_potential)}
                 </span>
               </div>

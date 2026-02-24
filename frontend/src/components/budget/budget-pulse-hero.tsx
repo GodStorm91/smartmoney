@@ -61,7 +61,7 @@ export function BudgetPulseHero({
   const health = useMemo(() => {
     if (totalSpent > totalAllocated) return {
       label: t('budget.health.overBudgetStatus'), status: 'danger' as const,
-      color: 'text-red-600 dark:text-red-400', bg: 'bg-red-50 dark:bg-red-900/30', ring: 'ring-red-200 dark:ring-red-800'
+      color: 'text-expense-600 dark:text-expense-300', bg: 'bg-expense-50 dark:bg-expense-900/20', ring: 'ring-expense-300 dark:ring-expense-900'
     }
     if (spentPercent > 95) return {
       label: t('budget.health.almostFull'), status: 'warning' as const,
@@ -73,7 +73,7 @@ export function BudgetPulseHero({
     }
     return {
       label: t('budget.health.onTrack'), status: 'good' as const,
-      color: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/30', ring: 'ring-green-200 dark:ring-green-800'
+      color: 'text-income-600 dark:text-income-300', bg: 'bg-income-50 dark:bg-income-900/20', ring: 'ring-income-300 dark:ring-income-900'
     }
   }, [totalSpent, totalAllocated, spentPercent, t])
 
@@ -105,7 +105,7 @@ export function BudgetPulseHero({
 
         <p className={cn(
           'text-4xl font-extrabold tracking-tight',
-          availableToSpend < 0 ? 'text-red-600 dark:text-red-400' : health.color
+          availableToSpend < 0 ? 'text-expense-600 dark:text-expense-300' : health.color
         )}>
           {availableToSpend < 0 && '−'}{fmt(Math.abs(availableToSpend))}
         </p>
@@ -115,9 +115,9 @@ export function BudgetPulseHero({
           <div
             className={cn(
               'h-full rounded-full transition-all duration-700 ease-out',
-              availableToSpend < 0 ? 'bg-red-500' :
+              availableToSpend < 0 ? 'bg-expense-600' :
               availablePercent < 20 ? 'bg-amber-500' :
-              availablePercent < 40 ? 'bg-yellow-500' : 'bg-green-500'
+              availablePercent < 40 ? 'bg-yellow-500' : 'bg-income-600'
             )}
             style={{ width: `${Math.min(100, Math.max(0, availablePercent))}%` }}
           />
@@ -149,7 +149,7 @@ export function BudgetPulseHero({
           <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.projection.safePace')}
           </p>
-          <p className="text-lg font-bold leading-tight text-green-600 dark:text-green-400">
+          <p className="text-lg font-bold leading-tight text-income-600 dark:text-income-300">
             {safeDaily > 0 ? fmtCompact(safeDaily) : '—'}
             {safeDaily > 0 && (
               <span className="text-[10px] font-normal opacity-50">{t('budget.pulse.perDay')}</span>
