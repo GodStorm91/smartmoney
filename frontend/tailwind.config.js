@@ -67,6 +67,11 @@ export default {
         'slide-up': 'slideUp 0.3s ease-out',
         'fade-in-up': 'fadeInUp 0.3s ease-out both',
         'fade-in-down': 'fadeInDown 0.15s ease-out both',
+        'toast-in': 'toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'toast-out': 'toastOut 0.2s cubic-bezier(0.4, 0, 1, 1) both',
+        'modal-in': 'modalIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'scale-in': 'scaleIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'slide-down': 'slideDown 0.2s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
       keyframes: {
         fadeIn: {

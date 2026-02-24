@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useLocation } from '@tanstack/react-router'
 import { cn } from '@/utils/cn'
 
@@ -8,36 +8,49 @@ interface PageTransitionProps {
 }
 
 /**
- * PageTransition - Adds smooth fade-in animation when navigating between pages
+ * PageTransition - Smooth fade + subtle slide on route changes.
+ * Uses opacity + translateY for GPU-composited performance.
  */
 export function PageTransition({ children, className }: PageTransitionProps) {
   const location = useLocation()
-  const [isVisible, setIsVisible] = useState(false)
+  const [phase, setPhase] = useState<'enter' | 'exit'>('enter')
   const [displayedChildren, setDisplayedChildren] = useState(children)
+  const prevPathRef = useRef(location.pathname)
 
   useEffect(() => {
-    // Fade out
-    setIsVisible(false)
+    // Skip animation on first mount
+    if (prevPathRef.current === location.pathname) {
+      setDisplayedChildren(children)
+      return
+    }
+    prevPathRef.current = location.pathname
 
-    // Small delay then update content and fade in
+    // Phase 1: fade out current content
+    setPhase('exit')
+
+    // Phase 2: swap content and fade in
     const timer = setTimeout(() => {
       setDisplayedChildren(children)
-      setIsVisible(true)
-    }, 100)
+      setPhase('enter')
+    }, 120)
 
     return () => clearTimeout(timer)
-  }, [location.pathname]) // Re-trigger on route change
+  }, [location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Also update children when they change (but don't trigger animation)
+  // Update children without animation when content changes on same route
   useEffect(() => {
-    setDisplayedChildren(children)
-  }, [children])
+    if (prevPathRef.current === location.pathname) {
+      setDisplayedChildren(children)
+    }
+  }, [children, location.pathname])
 
   return (
     <div
       className={cn(
-        'transition-all duration-300 ease-out',
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2',
+        'transition-[opacity,transform] ease-out',
+        phase === 'enter'
+          ? 'duration-250 opacity-100 translate-y-0'
+          : 'duration-100 opacity-0 translate-y-1',
         className
       )}
     >

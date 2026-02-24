@@ -458,6 +458,191 @@
     100% { opacity: 1; transform: scale(1); }
   }
 
+  /* === Toast Notifications === */
+  .animate-toast-in {
+    animation: toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes toastIn {
+    from {
+      opacity: 0;
+      transform: translateX(100%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  .animate-toast-out {
+    animation: toastOut 0.2s cubic-bezier(0.4, 0, 1, 1) both;
+  }
+
+  @keyframes toastOut {
+    from {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%) scale(0.95);
+    }
+  }
+
+  /* === Modal entrance === */
+  .animate-modal-in {
+    animation: modalIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes modalIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* === Confetti animations === */
+  .animate-confetti-fall {
+    animation: confettiFall linear both;
+  }
+
+  @keyframes confettiFall {
+    0% {
+      opacity: 1;
+      transform: translateY(-10vh);
+    }
+    75% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100vh);
+    }
+  }
+
+  .animate-confetti-spin {
+    animation: confettiSpin linear infinite;
+    animation-duration: inherit;
+  }
+
+  @keyframes confettiSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(720deg); }
+  }
+
+  /* === Success Checkmark (SVG path draw + circle) === */
+  .animate-checkmark-circle {
+    animation: checkmarkCircle 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes checkmarkCircle {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-checkmark {
+    animation: checkmarkDraw 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes checkmarkDraw {
+    from {
+      stroke-dashoffset: 50;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* === FAB menu item staggered entry === */
+  .animate-fab-item {
+    opacity: 0;
+    animation: fabItemIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--fab-index, 0) * 40ms);
+  }
+
+  @keyframes fabItemIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* === Bottom nav active indicator slide === */
+  .animate-nav-indicator {
+    animation: navIndicatorIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes navIndicatorIn {
+    from {
+      transform: translateX(-50%) scaleX(0);
+    }
+    to {
+      transform: translateX(-50%) scaleX(1);
+    }
+  }
+
+  /* === Backdrop blur entrance === */
+  .animate-backdrop {
+    animation: backdropIn 0.2s ease-out both;
+  }
+
+  @keyframes backdropIn {
+    from {
+      opacity: 0;
+      backdrop-filter: blur(0);
+    }
+    to {
+      opacity: 1;
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  /* === Slide-down for dropdowns/menus === */
+  .animate-slide-down {
+    animation: slideDown 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scaleY(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scaleY(1);
+    }
+  }
+
+  /* === Scale-in for popovers === */
+  .animate-scale-in {
+    animation: scaleIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   /* Hide scrollbar utility */
   .scrollbar-hide {
     -ms-overflow-style: none;

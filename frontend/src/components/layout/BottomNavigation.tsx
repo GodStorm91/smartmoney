@@ -96,7 +96,7 @@ export function BottomNavigation() {
     <>
       {isMoreOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm animate-fade-in"
           onClick={() => setIsMoreOpen(false)}
         />
       )}
@@ -213,7 +213,7 @@ export function BottomNavigation() {
                 )}
               >
                 {active && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary-500 dark:bg-primary-400 rounded-full" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary-500 dark:bg-primary-400 rounded-full animate-nav-indicator" />
                 )}
                 <div className={cn(
                   'p-2 rounded-xl transition-colors',
@@ -238,7 +238,7 @@ export function BottomNavigation() {
             )}
           >
             {isMoreOpen && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary-500 dark:bg-primary-400 rounded-full" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary-500 dark:bg-primary-400 rounded-full animate-nav-indicator" />
             )}
             <div className={cn(
               'p-2 rounded-xl transition-colors',

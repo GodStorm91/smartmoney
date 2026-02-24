@@ -79,7 +79,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-[101] md:hidden"
+          className="fixed inset-0 bg-black/30 z-[101] md:hidden animate-fade-in"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -95,14 +95,12 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
                 onClick={action.onClick}
                 className={cn(
                   'flex items-center gap-3 pl-4 pr-5 py-3 rounded-full text-white shadow-lg',
-                  'transform transition-all duration-200',
-                  'animate-in fade-in slide-in-from-bottom-2',
+                  'animate-fab-item',
                   action.color
                 )}
                 style={{
-                  animationDelay: `${index * 50}ms`,
-                  animationFillMode: 'both',
-                }}
+                  '--fab-index': index,
+                } as React.CSSProperties}
               >
                 {action.icon}
                 <span className="text-sm font-medium whitespace-nowrap">{action.label}</span>
