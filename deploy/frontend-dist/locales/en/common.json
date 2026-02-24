@@ -139,7 +139,15 @@
     "goals": "Goals",
     "createFirstGoal": "Create your first goal",
     "goalMotivation": "Track your savings progress",
-    "noTransactions": "No transactions yet"
+    "noTransactions": "No transactions yet",
+    "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
+    "greetingEvening": "Good evening",
+    "greetingNight": "Good night",
+    "subtitleMorning": "Start your day with a quick overview",
+    "subtitleAfternoon": "Here's how your finances look today",
+    "subtitleEvening": "Let's review today's activity",
+    "subtitleNight": "Your financial snapshot"
   },
   "spendingCalendar": {
     "title": "Spending Calendar",

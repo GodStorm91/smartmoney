@@ -136,7 +136,15 @@
     "goals": "目標",
     "createFirstGoal": "最初の目標を作成",
     "goalMotivation": "貯蓄進捗を追跡",
-    "noTransactions": "取引がありません"
+    "noTransactions": "取引がありません",
+    "greetingMorning": "おはようございます",
+    "greetingAfternoon": "こんにちは",
+    "greetingEvening": "こんばんは",
+    "greetingNight": "お疲れさまです",
+    "subtitleMorning": "今日の財務状況を確認しましょう",
+    "subtitleAfternoon": "今日の収支をチェック",
+    "subtitleEvening": "今日の活動を振り返りましょう",
+    "subtitleNight": "本日のまとめ"
   },
   "spendingCalendar": {
     "title": "支出カレンダー",
