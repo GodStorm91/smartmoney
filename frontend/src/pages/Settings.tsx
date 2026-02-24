@@ -69,7 +69,6 @@ export function Settings() {
   const [linkCopied, setLinkCopied] = useState(false)
   const [linkCountdown, setLinkCountdown] = useState<string>('')
   const [linkExpired, setLinkExpired] = useState(false)
-  const [linkExpired, setLinkExpired] = useState(false)
   
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
