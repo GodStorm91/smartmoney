@@ -232,14 +232,14 @@ export default function Accounts() {
       {/* Total Balance Summary */}
       {hasAccounts && hasFilteredResults && (
         <div className="mb-6">
-          <Card variant="glass" className="!p-4">
+          <Card variant="glass" className="!p-5 bg-hero-gradient">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <p className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
                   {isSearching ? t('account.filteredBalance', 'Filtered Balance') : t('account.totalBalance', 'Total Balance')}
                 </p>
                 <p className={cn(
-                  'text-2xl sm:text-3xl font-bold font-mono mt-1',
+                  'text-3xl sm:text-4xl font-extrabold font-numbers mt-1.5 tracking-tighter',
                   totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                 )}>
                   {formatCurrencyPrivacy(totalBalance, 'JPY', exchangeRates?.rates || {}, true, isPrivacyMode)}

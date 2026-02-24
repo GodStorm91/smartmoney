@@ -36,11 +36,11 @@ export function KpiRow({ summary, formatCurrency, accounts, exchangeRates = {} }
       {kpis.map((kpi, idx) => (
         <div
           key={kpi.label}
-          className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg animate-stagger-in"
+          className="text-center p-3 bg-gray-50/80 dark:bg-gray-800/80 rounded-xl border border-gray-100 dark:border-gray-700/50 animate-stagger-in"
           style={{ '--stagger-index': idx } as React.CSSProperties}
         >
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{kpi.label}</p>
-          <p className={cn('text-sm font-semibold font-numbers', kpi.color)}>
+          <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wider">{kpi.label}</p>
+          <p className={cn('text-base font-bold font-numbers', kpi.color)}>
             {kpi.isCount ? (
               <CountUp end={kpi.value} duration={800} />
             ) : (

@@ -13,8 +13,8 @@ interface QuickStatCardProps {
 export function QuickStatCard({ label, value, change, isPositive, formatCurrency }: QuickStatCardProps) {
   return (
     <Card className="p-4">
-      <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</p>
-      <p className="text-xl font-bold font-numbers text-gray-900 dark:text-gray-100">
+      <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{label}</p>
+      <p className="text-2xl font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight">
         {formatCurrency(value)}
       </p>
       {change !== 0 && (

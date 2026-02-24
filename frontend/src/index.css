@@ -643,6 +643,54 @@
     }
   }
 
+  /* Progress bar glow effect — uses accent color */
+  .progress-glow {
+    box-shadow: 0 0 8px 1px hsl(var(--primary-500) / 0.35);
+  }
+
+  .dark .progress-glow {
+    box-shadow: 0 0 10px 2px hsl(var(--primary-500) / 0.25);
+  }
+
+  /* Elevated card shadow — richer depth */
+  .shadow-card {
+    box-shadow:
+      0 1px 2px hsl(var(--primary-900) / 0.04),
+      0 4px 12px hsl(var(--primary-900) / 0.06);
+  }
+
+  .dark .shadow-card {
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.2),
+      0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Hero gradient for key surfaces */
+  .bg-hero-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary-50)) 0%,
+      hsl(var(--primary-100) / 0.5) 50%,
+      hsl(var(--net-50) / 0.3) 100%
+    );
+  }
+
+  .dark .bg-hero-gradient {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary-900) / 0.3) 0%,
+      hsl(var(--gray-800, 25 17% 18%)) 50%,
+      hsl(var(--net-900) / 0.2) 100%
+    );
+  }
+
+  /* Accent border glow for focused/active cards */
+  .ring-glow {
+    box-shadow:
+      0 0 0 2px hsl(var(--primary-500) / 0.2),
+      0 0 12px hsl(var(--primary-500) / 0.1);
+  }
+
   /* Hide scrollbar utility */
   .scrollbar-hide {
     -ms-overflow-style: none;

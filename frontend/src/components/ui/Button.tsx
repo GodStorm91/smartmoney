@@ -23,7 +23,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           'active:scale-[0.97] active:transition-none',
           'disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100',
           {
-            'bg-primary-500 text-white hover:bg-primary-600 shadow-sm hover:shadow-md hover:-translate-y-0.5': variant === 'primary',
+            'bg-primary-600 text-white hover:bg-primary-700 shadow-md hover:shadow-lg hover:-translate-y-0.5': variant === 'primary',
             'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-600 hover:-translate-y-0.5': variant === 'secondary',
             'border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800': variant === 'outline',
             'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:-translate-y-0.5': variant === 'ghost',

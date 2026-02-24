@@ -18,9 +18,9 @@ export function Card({ children, className, style, hover = false, variant = 'def
       className={cn(
         'rounded-xl border transition-all duration-200 p-4 sm:p-5',
         // Variants
-        variant === 'default' && 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-sm',
-        variant === 'glass' && 'bg-white/90 dark:bg-gray-800/88 backdrop-blur-md border-white/30 dark:border-gray-700/50 shadow-sm',
-        variant === 'gradient' && 'bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 border-gray-200/50 dark:border-gray-700/50 shadow-sm',
+        variant === 'default' && 'bg-white dark:bg-gray-800 border-gray-200/80 dark:border-gray-700/80 shadow-card',
+        variant === 'glass' && 'bg-white/90 dark:bg-gray-800/88 backdrop-blur-md border-white/30 dark:border-gray-700/50 shadow-card',
+        variant === 'gradient' && 'bg-gradient-to-br from-white to-primary-50/30 dark:from-gray-800 dark:to-primary-900/10 border-gray-200/50 dark:border-gray-700/50 shadow-card',
         variant === 'elevated' && 'bg-white dark:bg-gray-800 border-gray-100 dark:border-gray-700 shadow-md hover:shadow-lg',
         // Hover
         hover && 'hover:shadow-md hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer',

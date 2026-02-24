@@ -34,10 +34,14 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center bg-hero-gradient px-4 relative overflow-hidden">
+      {/* Decorative orbs */}
+      <div className="absolute top-1/4 -left-20 w-64 h-64 rounded-full bg-primary-300/20 dark:bg-primary-700/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 -right-20 w-72 h-72 rounded-full bg-net-300/15 dark:bg-net-800/10 blur-3xl pointer-events-none" />
+
+      <Card className="w-full max-w-md p-8 relative animate-fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
             SmartMoney
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">

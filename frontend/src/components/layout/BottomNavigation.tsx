@@ -197,7 +197,7 @@ export function BottomNavigation() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 md:hidden safe-area-bottom shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200/60 dark:border-gray-700/60 z-50 md:hidden safe-area-bottom shadow-[0_-4px_16px_-2px_rgba(0,0,0,0.12)]">
         <div className="flex items-stretch justify-around h-[calc(4rem+env(safe-area-inset-bottom,0px))]">
           {navItems.map((item) => {
             const active = isActive(item.path)
@@ -213,13 +213,13 @@ export function BottomNavigation() {
                 )}
               >
                 {active && (
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary-500 dark:bg-primary-400 rounded-full animate-nav-indicator" />
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-primary-600 dark:bg-primary-400 rounded-full animate-nav-indicator" />
                 )}
                 <div className={cn(
                   'p-2 rounded-xl transition-colors',
-                  active && 'bg-primary-50 dark:bg-primary-900/20'
+                  active && 'bg-primary-100/80 dark:bg-primary-900/30'
                 )}>
-                  <item.icon className="w-6 h-6" strokeWidth={active ? 2 : 1.5} />
+                  <item.icon className="w-6 h-6" strokeWidth={active ? 2.2 : 1.5} />
                 </div>
                 <span className="text-[10px] font-medium mt-1 truncate max-w-full px-0.5">
                   {t(item.labelKey)}

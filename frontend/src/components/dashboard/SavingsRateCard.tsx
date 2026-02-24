@@ -28,17 +28,17 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
         </span>
       </div>
       <div className="flex items-end gap-2">
-        <span className="text-3xl font-bold font-numbers text-gray-900 dark:text-gray-100">
+        <span className="text-4xl font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tighter">
           {Math.round(rate)}%
         </span>
-        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1.5">
           {t('dashboard.ofIncome', 'of income')}
         </span>
       </div>
-      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-3 overflow-hidden">
+      <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-3 overflow-hidden">
         <div
           className={cn(
-            'h-full rounded-full animate-progress-fill',
+            'h-full rounded-full animate-progress-fill progress-glow',
             rate >= 20 ? 'bg-income-600' : rate >= 10 ? 'bg-amber-500' : 'bg-expense-600'
           )}
           style={{ width: `${Math.min(100, rate)}%` }}

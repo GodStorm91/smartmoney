@@ -143,10 +143,10 @@ export function Dashboard() {
   return (
     <div className="min-h-screen pb-32">
       {/* Sticky Header with personalized greeting */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 overflow-hidden">
-        {/* Pastel decorative orbs */}
-        <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-primary-200/30 dark:bg-primary-800/20 blur-2xl pointer-events-none" />
-        <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-net-100/40 dark:bg-net-900/20 blur-2xl pointer-events-none" />
+      <div className="sticky top-0 z-10 bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60 overflow-hidden">
+        {/* Decorative orbs — richer presence */}
+        <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-primary-300/25 dark:bg-primary-700/15 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-full bg-net-300/20 dark:bg-net-800/15 blur-3xl pointer-events-none" />
 
         <div className="relative max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-3">
@@ -167,10 +167,10 @@ export function Dashboard() {
             </button>
           </div>
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               {emoji} {greeting}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {greetingSubtitle}
             </p>
           </div>
@@ -207,12 +207,12 @@ export function Dashboard() {
                   style={{ '--stagger-index': idx } as React.CSSProperties}
                 >
                   <div className={cn(
-                    'w-12 h-12 rounded-xl flex items-center justify-center',
+                    'w-14 h-14 rounded-2xl flex items-center justify-center shadow-md',
                     'transition-all duration-150 ease-out hover:scale-[1.08] hover:shadow-lg active:scale-95 active:duration-[50ms]',
                     'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                     action.color
                   )}>
-                    <Icon className="w-5 h-5 text-white" />
+                    <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
                   <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                     {action.label}

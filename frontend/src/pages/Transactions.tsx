@@ -655,8 +655,8 @@ export function Transactions() {
                 : ''
             }`}
           >
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.income')}</p>
-            <p className="text-2xl font-bold font-numbers text-green-600 dark:text-green-400">
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.income')}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-green-600 dark:text-green-400 tracking-tight">
               {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -670,8 +670,8 @@ export function Transactions() {
                 : ''
             }`}
           >
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.expense')}</p>
-            <p className="text-2xl font-bold font-numbers text-red-600 dark:text-red-400">
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.expense')}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-red-600 dark:text-red-400 tracking-tight">
               {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -686,8 +686,8 @@ export function Transactions() {
                 : 'border-primary-200 dark:border-primary-800 bg-primary-50/30 dark:bg-primary-900/10'
             )}
           >
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('transactions.difference')}</p>
-            <p className="text-2xl font-bold font-numbers text-blue-600 dark:text-blue-400">
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.difference')}</p>
+            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-blue-600 dark:text-blue-400 tracking-tight">
               {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>

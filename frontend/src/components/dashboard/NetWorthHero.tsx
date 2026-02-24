@@ -29,22 +29,22 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
     <Card
       variant="gradient"
       className={cn(
-        'cursor-pointer transition-all duration-300',
-        expanded && 'shadow-lg'
+        'cursor-pointer transition-all duration-300 bg-hero-gradient',
+        expanded ? 'shadow-lg ring-glow' : 'hover:shadow-lg'
       )}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-          <Wallet className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+      <div className="flex items-center gap-2 mb-3">
+        <div className="p-2 bg-primary-200/60 dark:bg-primary-800/40 rounded-xl">
+          <Wallet className="w-5 h-5 text-primary-700 dark:text-primary-300" />
         </div>
-        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
           {t('dashboard.netWorth', 'Net Worth')}
         </span>
       </div>
 
       <p className={cn(
-        'text-3xl sm:text-4xl font-bold font-numbers tracking-tight',
+        'text-4xl sm:text-5xl font-extrabold font-numbers tracking-tighter',
         netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-expense-600 dark:text-expense-300'
       )}>
         {formatCurrency(netWorth)}
@@ -52,7 +52,7 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
 
       {monthlyNet !== 0 && (
         <div className={cn(
-          'inline-flex items-center gap-1 mt-2 px-2 py-0.5 rounded-full text-xs font-medium',
+          'inline-flex items-center gap-1 mt-3 px-2.5 py-1 rounded-full text-xs font-semibold',
           monthlyNet >= 0
             ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
             : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
