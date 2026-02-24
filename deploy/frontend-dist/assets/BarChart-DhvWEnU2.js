@@ -1,0 +1,1 @@
+import{x as a,E as i,O as s}from"./generateCategoricalChart-OHS7fmG5.js";import{X as t,Y as r}from"./YAxis-bfxb-hpB.js";var x=a({chartName:"BarChart",GraphicalChild:i,defaultTooltipEventType:"axis",validateTooltipEventTypes:["axis","item"],axisComponents:[{axisType:"xAxis",AxisComp:t},{axisType:"yAxis",AxisComp:r}],formatAxisMap:s});export{x as B};
