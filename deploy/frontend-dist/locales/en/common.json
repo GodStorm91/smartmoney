@@ -810,24 +810,26 @@
     "account": "Account",
     "accounts": "Accounts",
     "selectAccount": "Select account",
-    "manageYourAccounts": "Manage your accounts",
-    "createAccount": "Create Account",
+    "subtitle": "Track balances across all your accounts",
+    "manageYourAccounts": "Track balances across all your accounts",
+    "createAccount": "Add Account",
     "editAccount": "Edit Account",
-    "showInactive": "Show inactive accounts",
+    "showInactive": "Show closed accounts",
     "noAccounts": "No accounts",
     "createFirstAccount": "Create your first account",
     "name": "Account Name",
-    "namePlaceholder": "e.g., Main Bank Account",
+    "namePlaceholder": "e.g., Savings at Mizuho",
     "accountType": "Account Type",
-    "initialBalance": "Initial Balance",
-    "initialBalanceDate": "Initial Balance Date",
+    "initialBalance": "Starting Balance",
+    "initialBalanceDate": "As of Date",
+    "initialBalanceDateHint": "When was this balance accurate?",
     "currency": "Currency",
     "notes": "Notes",
-    "notesPlaceholder": "Notes about this account...",
+    "notesPlaceholder": "e.g., joint account, emergency fund...",
     "currentBalance": "Current Balance",
     "transactions": "Transactions",
     "edit": "Edit",
-    "inactive": "Inactive",
+    "inactive": "Closed",
     "type": {
       "bank": "Bank Account",
       "cash": "Cash",
@@ -838,23 +840,25 @@
       "crypto": "Crypto",
       "other": "Other"
     },
-    "desiredCurrentBalance": "Desired Current Balance",
-    "desiredBalancePlaceholder": "Enter desired balance",
+    "desiredCurrentBalance": "Actual Balance",
+    "desiredBalancePlaceholder": "What's the real balance right now?",
+    "reconcileHint": "Check your bank or wallet and enter the real balance to reconcile",
     "balanceAdjustment": "Balance Adjustment",
-    "adjustmentAmount": "Adjustment",
-    "confirmAdjustment": "Confirm Adjustment",
-    "cancelAdjustment": "Cancel Adjustment",
+    "adjustmentAmount": "Difference",
+    "confirmAdjustment": "Apply Adjustment",
+    "cancelAdjustment": "Cancel",
     "adjustmentWarning": "This will create a balance adjustment transaction",
-    "adjustmentConfirmTitle": "⚠️ Confirm Balance Adjustment",
+    "adjustmentConfirmTitle": "Confirm Balance Adjustment",
+    "adjustmentConfirmMessage": "This will create an adjustment of {{amount}} to match your real balance.",
     "adjustmentDetails": "Adjustment details:",
     "adjustmentCurrent": "Current balance:",
     "adjustmentNew": "New balance:",
-    "hasTransactionsInfo": "This account has {{count}} transactions. To adjust the balance, enter the desired amount below.",
+    "hasTransactionsInfo": "This account has {{count}} transactions. Enter your actual balance below to reconcile.",
     "errors": {
-      "loadFailed": "Failed to load accounts",
-      "nameRequired": "Account name is required",
-      "dateRequired": "Initial balance date is required",
-      "submitFailed": "Failed to save account"
+      "loadFailed": "Couldn't load your accounts. Check your connection and try again.",
+      "nameRequired": "Give this account a name",
+      "dateRequired": "Pick the date this balance was accurate",
+      "submitFailed": "Couldn't save this account. Please try again."
     }
   },
   "auth": {
@@ -902,6 +906,8 @@
     "largeTransactionThreshold": "Large Transaction Threshold",
     "largeTransactionThresholdDescription": "Exclude transactions above this amount from goal achievability calculations",
     "largeTransactionThresholdHint": "Set to 0 to disable. Large one-time expenses (medical, etc.) can skew monthly averages.",
+    "generalDescription": "Currency and basic preferences",
+    "budgetDescription": "Budget behavior and alerts",
     "saveFailed": "Failed to save settings",
     "sections": {
       "appearance": "Appearance",
@@ -933,7 +939,9 @@
       "linkCopied": "Copied!",
       "linkExpires": "Expires in {{minutes}}m {{seconds}}s",
       "linkExpired": "Link expired",
-      "scanQR": "Scan with your iPhone"
+      "scanQR": "Scan with your iPhone",
+      "generateFailed": "Failed to generate link",
+      "copyFailed": "Failed to copy link"
     }
   },
   "appearance": {
@@ -954,7 +962,16 @@
       "draculaLight": "Dracula Light"
     },
     "themeControlled": "Controlled by theme",
+    "language": "Language",
     "accentColor": "Accent Color",
+    "colors": {
+      "emerald": "Emerald",
+      "ocean": "Ocean",
+      "royal": "Royal",
+      "sunset": "Sunset",
+      "rose": "Rose",
+      "teal": "Teal"
+    },
     "displayMode": "Display Mode",
     "pro": "Pro",
     "proDesc": "Full access, all items visible",
@@ -2053,9 +2070,9 @@
       "cta": "Create Budget"
     },
     "accounts": {
-      "title": "No accounts added yet",
-      "description": "Add your bank accounts, credit cards, or cash to track balances",
-      "cta": "Add Account"
+      "title": "No accounts yet",
+      "description": "Add your bank, credit card, or cash accounts to start tracking balances",
+      "cta": "Add Your First Account"
     },
     "categories": {
       "title": "No spending data yet",
