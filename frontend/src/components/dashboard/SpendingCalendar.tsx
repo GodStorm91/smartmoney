@@ -44,7 +44,7 @@ function getSpendingLevel(amount: number) {
   return SPENDING_LEVELS[5]
 }
 
-export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProps) {
+export default function SpendingCalendar({ className, onDayClick }: SpendingCalendarProps) {
   const { t, i18n } = useTranslation('common')
   const { currency } = useSettings()
   const { isPrivacyMode } = usePrivacy()
@@ -320,5 +320,3 @@ export function SpendingCalendar({ className, onDayClick }: SpendingCalendarProp
     </Card>
   )
 }
-
-export default SpendingCalendar

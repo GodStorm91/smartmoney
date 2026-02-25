@@ -110,6 +110,15 @@ export function Dashboard() {
 
   const isLoading = summaryLoading || trendsLoading || goalsLoading
 
+  // useCallback hooks must be declared before any early returns (Rules of Hooks)
+  const formatCurrency = useCallback((amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode),
+    [currency, exchangeRates?.rates, isPrivacyMode])
+
+  const formatTransactionCurrency = useCallback((amount: number, txCurrency: string = 'JPY') =>
+    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode),
+    [exchangeRates?.rates, isPrivacyMode])
+
   const currentMonth = monthlyTrends?.[monthlyTrends.length - 1]
   const savingsRate = currentMonth && currentMonth.income > 0
     ? ((currentMonth.income - currentMonth.expenses) / currentMonth.income) * 100
@@ -133,14 +142,6 @@ export function Dashboard() {
   }
 
   if (isLoading) return <DashboardSkeleton />
-
-  const formatCurrency = useCallback((amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode),
-    [currency, exchangeRates?.rates, isPrivacyMode])
-
-  const formatTransactionCurrency = useCallback((amount: number, txCurrency: string = 'JPY') =>
-    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode),
-    [exchangeRates?.rates, isPrivacyMode])
 
   return (
     <div className="min-h-screen pb-32">
