@@ -237,6 +237,7 @@ export function Dashboard() {
               change={5.2}
               isPositive
               formatCurrency={formatCurrency}
+              className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
             />
           </div>
           <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
@@ -246,6 +247,7 @@ export function Dashboard() {
               change={-2.1}
               isPositive={false}
               formatCurrency={formatCurrency}
+              className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
             />
           </div>
         </div>
@@ -253,37 +255,42 @@ export function Dashboard() {
         <SavingsRateCard rate={savingsRate} />
 
         {/* 7. Recent Transactions */}
-        <Card className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-              {t('dashboard.recentTransactions', 'Recent')}
-            </h3>
+        <Card className="p-4 shadow-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                <Receipt className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+              </div>
+              <h3 className="font-bold text-gray-900 dark:text-gray-100">
+                {t('dashboard.recentTransactions', 'Recent')}
+              </h3>
+            </div>
             <Link
               to="/transactions"
-              className="text-xs font-medium text-primary-600 dark:text-primary-400 flex items-center gap-0.5"
+              className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
             >
-              {t('viewAll')} <ArrowRight className="w-3 h-3" />
+              {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
           {recentTransactions && recentTransactions.length > 0 ? (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {recentTransactions.slice(0, 5).map((tx, idx) => (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
+                  className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
                   style={{ '--stagger-index': idx } as React.CSSProperties}
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
-                      'w-8 h-8 rounded-full flex items-center justify-center text-sm',
+                      'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold',
                       tx.type === 'income'
-                        ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-                        : 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                        ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
+                        : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
                     )}>
                       {tx.type === 'income' ? '+' : '-'}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                         {tx.description || tx.category}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -292,9 +299,9 @@ export function Dashboard() {
                     </div>
                   </div>
                   <span className={cn(
-                    'text-sm font-semibold font-numbers',
+                    'text-base font-bold font-numbers tracking-tight',
                     tx.type === 'income'
-                      ? 'text-green-600 dark:text-green-400'
+                      ? 'text-income-600 dark:text-income-300'
                       : 'text-gray-900 dark:text-gray-100'
                   )}>
                     {tx.type === 'income' ? '+' : '-'}{formatTransactionCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}
@@ -309,7 +316,7 @@ export function Dashboard() {
               title={t('emptyState.dashboardRecent.title', 'No recent activity')}
               description={t('emptyState.dashboardRecent.description', 'Your latest transactions will appear here')}
               action={
-                <Link to="/transactions" className="text-sm font-medium text-primary-600 dark:text-primary-400">
+                <Link to="/transactions" className="text-sm font-semibold text-primary-600 dark:text-primary-400">
                   {t('emptyState.transactions.cta', 'Add Transaction')}
                 </Link>
               }
@@ -324,16 +331,21 @@ export function Dashboard() {
 
         {/* 9. Goals Progress (limit 2) */}
         {goalsProgress && goalsProgress.length > 0 && (
-          <Card className="p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                {t('dashboard.goals', 'Goals')}
-              </h3>
+          <Card className="p-4 shadow-card">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-pink-100 dark:bg-pink-900/30">
+                  <Target className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+                </div>
+                <h3 className="font-bold text-gray-900 dark:text-gray-100">
+                  {t('dashboard.goals', 'Goals')}
+                </h3>
+              </div>
               <Link
                 to="/goals"
-                className="text-xs font-medium text-primary-600 dark:text-primary-400 flex items-center gap-0.5"
+                className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
               >
-                {t('viewAll')} <ArrowRight className="w-3 h-3" />
+                {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
             <div className="space-y-3">
@@ -359,19 +371,20 @@ export function Dashboard() {
         {/* Fallback for no goals */}
         {(!goalsProgress || goalsProgress.length === 0) && goals && goals.length === 0 && (
           <Link to="/goals">
-            <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer">
+            <Card className="p-4 shadow-card border-2 border-dashed border-pink-200 dark:border-pink-800/40 hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-lg transition-all cursor-pointer group">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-pink-100 dark:bg-pink-900/30 rounded-lg">
+                <div className="p-2.5 bg-pink-100 dark:bg-pink-900/30 rounded-xl group-hover:scale-110 transition-transform">
                   <Target className="w-5 h-5 text-pink-600 dark:text-pink-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-gray-100">
+                  <p className="font-bold text-gray-900 dark:text-gray-100">
                     {t('dashboard.createFirstGoal', 'Create your first goal')}
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {t('dashboard.goalMotivation', 'Track your savings progress')}
                   </p>
                 </div>
+                <ArrowRight className="w-4 h-4 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
               </div>
             </Card>
           </Link>
