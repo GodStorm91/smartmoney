@@ -31,10 +31,10 @@ export function PeriodToggle({ selected, onChange, className }: PeriodToggleProp
           key={value}
           onClick={() => onChange(value)}
           className={cn(
-            'px-3 py-1.5 text-sm font-medium rounded-md transition-all',
+            'px-3 py-1.5 text-sm font-semibold rounded-md transition-colors',
             value === selected
-              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+              ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-md'
+              : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
           )}
         >
           {t(labelKey)}

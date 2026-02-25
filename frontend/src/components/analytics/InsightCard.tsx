@@ -61,7 +61,7 @@ export function InsightCard({
       className={cn(
         'rounded-xl p-4 border-l-4 min-w-0',
         'bg-white dark:bg-gray-800',
-        'shadow-sm',
+        'shadow-card',
         SEVERITY_STYLES[insight.severity] || SEVERITY_STYLES.info
       )}
     >
@@ -70,18 +70,18 @@ export function InsightCard({
           {INSIGHT_ICONS[insight.type] || '💡'}
         </span>
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
+          <h4 className="font-bold text-gray-900 dark:text-gray-100 truncate">
             {insight.title}
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {insight.message}
           </p>
           {insight.amount && (
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-1">
+            <p className="text-base font-bold font-numbers text-gray-800 dark:text-gray-200 mt-1.5">
               {formatCurrency(insight.amount, displayCurrency)}
               {insight.percentage_change && (
                 <span className={cn(
-                  'ml-2',
+                  'ml-2 text-sm font-semibold',
                   insight.percentage_change > 0 ? 'text-red-600' : 'text-green-600'
                 )}>
                   {insight.percentage_change > 0 ? '+' : ''}{insight.percentage_change}%
@@ -91,7 +91,7 @@ export function InsightCard({
           )}
           <Button
             variant="ghost"
-            className="mt-2 p-0 h-auto text-sm text-primary-600 hover:text-primary-700"
+            className="mt-2 p-0 h-auto text-sm font-semibold text-primary-600 hover:text-primary-700"
             onClick={handleCTAClick}
           >
             {getCTAText()} →

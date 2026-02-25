@@ -8,6 +8,7 @@ interface MetricCardProps {
   trend?: 'positive' | 'negative' | 'neutral'
   subtitle?: string
   className?: string
+  hero?: boolean
 }
 
 export function MetricCard({
@@ -17,6 +18,7 @@ export function MetricCard({
   trend = 'neutral',
   subtitle,
   className,
+  hero = false,
 }: MetricCardProps) {
   const { t } = useTranslation('common')
 
@@ -36,20 +38,23 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm',
+        'bg-white dark:bg-gray-800 rounded-xl p-4 shadow-card',
         'border border-gray-100 dark:border-gray-700',
         className
       )}
     >
-      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
         {label}
       </p>
-      <p className="text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
+      <p className={cn(
+        'font-extrabold tracking-tight text-gray-900 dark:text-gray-100 font-numbers truncate',
+        hero ? 'text-3xl sm:text-4xl tracking-tighter' : 'text-2xl'
+      )}>
         {value}
       </p>
       {(change !== null && change !== undefined) && (
-        <div className={cn('flex items-center gap-1 mt-1', getTrendColor())}>
-          <span className="text-sm font-medium">
+        <div className={cn('flex items-center gap-1.5 mt-1.5', getTrendColor())}>
+          <span className="text-sm font-semibold">
             {getTrendIcon()} {Math.abs(change).toFixed(1)}%
           </span>
           <span className="text-xs text-gray-400">
@@ -58,7 +63,7 @@ export function MetricCard({
         </div>
       )}
       {subtitle && (
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 truncate">
+        <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mt-1.5 truncate">
           {subtitle}
         </p>
       )}

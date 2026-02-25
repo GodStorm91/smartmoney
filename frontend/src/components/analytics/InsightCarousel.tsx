@@ -77,10 +77,10 @@ export function InsightCarousel({
               key={index}
               aria-label={`Go to insight ${index + 1}`}
               className={cn(
-                'w-2 h-2 rounded-full transition-all',
+                'h-2 rounded-full transition-[width,background-color] duration-200',
                 index === selectedIndex
-                  ? 'bg-primary-600 w-4'
-                  : 'bg-gray-300 dark:bg-gray-600'
+                  ? 'bg-primary-600 w-5'
+                  : 'bg-gray-300 dark:bg-gray-600 w-2'
               )}
               onClick={() => emblaApi?.scrollTo(index)}
             />

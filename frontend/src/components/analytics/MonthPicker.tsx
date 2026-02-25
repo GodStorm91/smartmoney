@@ -1,4 +1,5 @@
 import { subMonths, addMonths } from 'date-fns'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatMonth } from '@/utils/formatDate'
 import { cn } from '@/utils/cn'
 
@@ -35,9 +36,9 @@ export function MonthPicker({ selectedMonth, onChange, className }: MonthPickerP
         )}
         aria-label="Previous month"
       >
-        ←
+        <ChevronLeft className="w-5 h-5" />
       </button>
-      <span className="min-w-[140px] text-center font-medium text-gray-900 dark:text-gray-100">
+      <span className="min-w-[140px] text-center font-semibold text-gray-900 dark:text-gray-100">
         {formatMonth(selectedMonth)}
       </span>
       <button
@@ -51,7 +52,7 @@ export function MonthPicker({ selectedMonth, onChange, className }: MonthPickerP
         )}
         aria-label="Next month"
       >
-        →
+        <ChevronRight className="w-5 h-5" />
       </button>
     </div>
   )

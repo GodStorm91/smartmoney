@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useSearch } from '@tanstack/react-router'
+import { BarChart3, PieChart, TrendingUp, Sparkles, ChevronDown } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { IncomeExpenseBarChart } from '@/components/charts/IncomeExpenseBarChart'
@@ -113,7 +114,7 @@ export function Analytics() {
     <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
           {t('analytics.title')}
         </h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -129,9 +130,9 @@ export function Analytics() {
             aria-selected={activeTab === 'overview'}
             onClick={() => setActiveTab('overview')}
             className={cn(
-              'px-4 py-2 text-sm font-medium rounded-full transition-colors',
+              'px-5 py-2 text-sm font-semibold rounded-full transition-colors',
               activeTab === 'overview'
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-600 text-white shadow-md'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             )}
           >
@@ -142,9 +143,9 @@ export function Analytics() {
             aria-selected={activeTab === 'report'}
             onClick={() => setActiveTab('report')}
             className={cn(
-              'px-4 py-2 text-sm font-medium rounded-full transition-colors',
+              'px-5 py-2 text-sm font-semibold rounded-full transition-colors',
               activeTab === 'report'
-                ? 'bg-primary-500 text-white'
+                ? 'bg-primary-600 text-white shadow-md'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
             )}
           >
@@ -195,10 +196,15 @@ export function Analytics() {
           {/* Charts Section */}
           <div ref={chartSectionRef} className="space-y-6">
             {/* Income vs Expense Chart */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {t('analytics.incomeVsExpense')}
-              </h3>
+            <Card className="shadow-card">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                  <BarChart3 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {t('analytics.incomeVsExpense')}
+                </h3>
+              </div>
               <ZoomableChart className="h-64 sm:h-80">
                 {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
                   <IncomeExpenseBarChart data={analytics.monthly_trends} />
@@ -211,10 +217,15 @@ export function Analytics() {
             </Card>
 
             {/* Category Breakdown */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {t('analytics.categoryBreakdown')}
-              </h3>
+            <Card className="shadow-card">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                  <PieChart className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {t('analytics.categoryBreakdown')}
+                </h3>
+              </div>
               <ZoomableChart className="h-64 sm:h-80">
                 {analytics?.category_breakdown && analytics.category_breakdown.length > 0 ? (
                   <CategoryBarChart data={analytics.category_breakdown} />
@@ -227,13 +238,17 @@ export function Analytics() {
             </Card>
 
             {/* Monthly Cash Flow */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {t('analytics.monthlyCashFlow')}
-              </h3>
+            <Card className="shadow-card">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="p-1.5 rounded-lg bg-net-100 dark:bg-net-900/30">
+                  <TrendingUp className="w-4 h-4 text-net-600 dark:text-net-300" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {t('analytics.monthlyCashFlow')}
+                </h3>
+              </div>
               <div className="h-64 sm:h-80">
                 {analytics?.monthly_trends && analytics.monthly_trends.length > 0 ? (
-                  // Use CashFlowSummary for sparse data (< 3 points), TrendLineChart otherwise
                   analytics.monthly_trends.length < 3 ? (
                     <CashFlowSummary
                       data={analytics.monthly_trends}
@@ -254,25 +269,25 @@ export function Analytics() {
           </div>
 
           {/* AI Tools - Collapsible Section */}
-          <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+          <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-card">
             <button
               onClick={() => setAiToolsExpanded(!aiToolsExpanded)}
               className={cn(
-                'w-full px-4 py-3 flex items-center justify-between',
-                'bg-gray-50 dark:bg-gray-800',
-                'text-left font-medium text-gray-900 dark:text-gray-100'
+                'w-full px-4 py-3.5 flex items-center justify-between',
+                'bg-gray-50/80 dark:bg-gray-800/80',
+                'text-left font-semibold text-gray-900 dark:text-gray-100'
               )}
             >
-              <span className="flex items-center gap-2">
-                <span>🤖</span>
+              <span className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                </div>
                 {t('analytics.aiTools')}
               </span>
-              <span className={cn(
-                'transform transition-transform',
-                aiToolsExpanded ? 'rotate-180' : ''
-              )}>
-                ▼
-              </span>
+              <ChevronDown className={cn(
+                'w-4 h-4 text-gray-500 transition-transform duration-200',
+                aiToolsExpanded && 'rotate-180'
+              )} />
             </button>
             {aiToolsExpanded && (
               <div className="p-4 space-y-4 bg-white dark:bg-gray-900">
