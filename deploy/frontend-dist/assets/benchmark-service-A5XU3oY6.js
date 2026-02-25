@@ -1,0 +1,1 @@
+import{w as o}from"./index-V2SVG0IT.js";async function n(){return(await o.get("/api/user/household-profile")).data}async function r(e){return(await o.put("/api/user/household-profile",e)).data}async function t(){return(await o.get("/api/benchmarks/comparison")).data}export{t as a,n as g,r as u};
