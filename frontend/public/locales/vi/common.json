@@ -76,12 +76,10 @@
     "quickActions": "Thao tác nhanh"
   },
   "quickActions": {
-    "addTransaction": "Thêm",
-    "scan": "Quét",
-    "upload": "Tải lên",
-    "analytics": "Phân tích",
-    "accounts": "Tài khoản",
-    "goals": "Mục tiêu"
+    "viewBudget": "Xem ngân sách",
+    "viewTransactions": "Xem giao dịch",
+    "viewAnalytics": "Xem phân tích",
+    "viewGoals": "Xem mục tiêu"
   },
   "pullToRefresh": {
     "pull": "Kéo để làm mới",
@@ -1480,12 +1478,6 @@
     "clearHistory": "Xóa lịch sử",
     "clearHistoryConfirm": "Xóa toàn bộ lịch sử trò chuyện? Hành động này không thể hoàn tác."
   },
-  "quickActions": {
-    "viewBudget": "Xem ngân sách",
-    "viewTransactions": "Xem giao dịch",
-    "viewAnalytics": "Xem phân tích",
-    "viewGoals": "Xem mục tiêu"
-  },
   "transfer": {
     "title": "Chuyển tiền giữa tài khoản",
     "exchangeTitle": "Đổi ngoại tệ",
@@ -1509,7 +1501,8 @@
       "toRequired": "Vui lòng chọn tài khoản đích",
       "sameAccount": "Không thể chuyển đến cùng tài khoản",
       "amountRequired": "Số tiền là bắt buộc"
-    }
+    },
+    "createRecurring": "Tạo định kỳ"
   },
   "ai": {
     "categoryCleanup": "AI Phân loại",
@@ -1645,8 +1638,8 @@
     "add_bill": "Thêm hóa đơn",
     "edit_bill": "Chỉnh sửa hóa đơn",
     "tabs": {
-      "list": "Danh sách",
-      "calendar": "Lịch"
+      "details": "Chi tiết",
+      "reminders": "Nhắc nhở"
     },
     "status": {
       "paid": "Đã thanh toán",
@@ -1764,10 +1757,6 @@
     "total_bills": "Tổng hóa đơn",
     "paid": "Đã thanh toán",
     "unpaid": "Chưa thanh toán",
-    "tabs": {
-      "details": "Chi tiết",
-      "reminders": "Nhắc nhở"
-    },
     "partialPayment": {
       "title": "Thanh toán một phần",
       "paid": "Đã thanh toán",
@@ -1926,7 +1915,15 @@
     "shortDate": "{{day}}/{{month}}",
     "shortDateWithWeekday": "{{weekday}}, {{day}}/{{month}}",
     "fullDate": "Ngày {{day}} tháng {{month}}, {{year}}",
-    "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+    "weekdays": [
+      "CN",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7"
+    ]
   },
   "relocation": {
     "benchmark": "Chuẩn",

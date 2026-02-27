@@ -79,12 +79,10 @@
     "quickActions": "Quick Actions"
   },
   "quickActions": {
-    "addTransaction": "Add",
-    "scan": "Scan",
-    "upload": "Upload",
-    "analytics": "Analytics",
-    "accounts": "Accounts",
-    "goals": "Goals"
+    "viewBudget": "View Budget",
+    "viewTransactions": "View Transactions",
+    "viewAnalytics": "View Analytics",
+    "viewGoals": "View Goals"
   },
   "pullToRefresh": {
     "pull": "Pull to refresh",
@@ -185,15 +183,43 @@
     }
   },
   "alerts": {
-    "title": "Smart Alerts",
-    "overspending": "Overspending Alert",
-    "overspendingDesc": "Expenses exceed income by {{amount}}",
-    "lowSavings": "Low Savings Rate",
-    "lowSavingsDesc": "Only saving {{rate}}% of income",
-    "budgetExceeded": "Budget Exceeded",
-    "budgetExceededDesc": "{{category}} is {{amount}} over budget",
-    "goalDeadline": "Goal Deadline",
-    "goalDeadlineDesc": "{{name}}: {{days}} days left, {{progress}}% complete"
+    "title": "Alerts",
+    "view_details": "View details",
+    "over_budget": {
+      "title": "Over Budget",
+      "message": "{{budget}} is over budget by {{amount}}"
+    },
+    "threshold_80": {
+      "title": "Near Limit",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "threshold_50": {
+      "title": "Halfway There",
+      "message": "{{budget}} has reached {{percentage}}% of budget"
+    },
+    "near_limit": {
+      "title": "Approaching Limit"
+    },
+    "halfway": {
+      "title": "Halfway Through Budget"
+    },
+    "bill_due": {
+      "title": "Bill Due",
+      "message": "{{bill}} is due ({{amount}})"
+    },
+    "default": {
+      "message": "You have a new alert"
+    },
+    "budget_progress": {
+      "message": "{{budget}}: {{spent}} of {{limit}}"
+    },
+    "remaining": "Remaining",
+    "left": "Left",
+    "over_by": "Over by {{amount}}",
+    "thresholds": {
+      "next": "Next threshold",
+      "at_threshold": "At {{percentage}}%"
+    }
   },
   "comparison": {
     "title": "Month vs Month",
@@ -205,18 +231,20 @@
   },
   "insights": {
     "title": "Spending Insights",
-    "highSpending": "High Spending Alert",
-    "highSpendingDesc": "You're spending {{ratio}}% of your income",
-    "goodSavings": "Great Savings!",
-    "goodSavingsDesc": "You're saving {{ratio}}% of your income",
-    "spendingUp": "Spending Increased",
-    "spendingUpDesc": "Up {{change}}% from last month",
-    "spendingDown": "Spending Decreased",
-    "spendingDownDesc": "Down {{change}}% from last month",
-    "topCategory": "Top Category: {{category}}",
-    "topCategoryDesc": "{{percentage}}% of your spending",
-    "unusualSpending": "Unusual: {{category}}",
-    "unusualSpendingDesc": "Up {{change}}% vs last month"
+    "noInsights": "No notable spending patterns detected",
+    "insightsHint": "Keep tracking to see personalized insights",
+    "viewTransactions": "View Transactions",
+    "viewBreakdown": "View Breakdown",
+    "learnMore": "Learn More",
+    "type": {
+      "spending_trend": "Spending Trend",
+      "budget_warning": "Budget Warning",
+      "budget_info": "Budget Info",
+      "goal_progress": "Goal Progress",
+      "forecast": "Forecast",
+      "savings_alert": "Savings Alert",
+      "savings_positive": "Great Savings"
+    }
   },
   "transactions": {
     "title": "Transactions",
@@ -329,24 +357,24 @@
     "bannerDismiss": "Dismiss"
   },
   "receipt": {
-    "title": "Receipt Scanner",
     "scanReceipt": "Scan Receipt",
-    "scanReceiptDesc": "Upload receipt image to automatically extract transaction data",
-    "uploadReceipt": "Upload Receipt",
-    "receiptHistory": "Receipt History",
-    "noReceipts": "No receipts uploaded yet",
-    "scanning": "Scanning...",
-    "processing": "Processing",
-    "createTransaction": "Create Transaction",
-    "editDetails": "Edit Details",
-    "amount": "Amount",
-    "merchant": "Merchant",
-    "date": "Date",
-    "category": "Category",
-    "delete": "Delete Receipt",
-    "deleteConfirm": "Are you sure you want to delete this receipt?",
-    "uploaded": "Uploaded",
-    "extracted": "Extracted"
+    "takePhoto": "Take Photo",
+    "dropOrClick": "Drop image here or click to upload",
+    "supportedFormats": "JPG, PNG, HEIC supported",
+    "retake": "Retake",
+    "usePhoto": "Use Photo",
+    "scan": "Scan",
+    "analyzing": "Analyzing receipt with AI...",
+    "scanError": "Failed to scan receipt. Please try again.",
+    "cameraError": "Could not access camera",
+    "startingCamera": "Starting camera...",
+    "invalidFile": "Please select an image file",
+    "processError": "Failed to process image",
+    "processing": "Processing...",
+    "receipt": "Receipt",
+    "attachReceipt": "Attach Receipt",
+    "viewReceipt": "View Receipt",
+    "uploading": "Uploading..."
   },
   "upload": {
     "title": "CSV Upload",
@@ -1416,26 +1444,6 @@
     "syncNow": "Sync now",
     "syncPending": "Sync {{count}} pending"
   },
-  "receipt": {
-    "scanReceipt": "Scan Receipt",
-    "takePhoto": "Take Photo",
-    "dropOrClick": "Drop image here or click to upload",
-    "supportedFormats": "JPG, PNG, HEIC supported",
-    "retake": "Retake",
-    "usePhoto": "Use Photo",
-    "scan": "Scan",
-    "analyzing": "Analyzing receipt with AI...",
-    "scanError": "Failed to scan receipt. Please try again.",
-    "cameraError": "Could not access camera",
-    "startingCamera": "Starting camera...",
-    "invalidFile": "Please select an image file",
-    "processError": "Failed to process image",
-    "processing": "Processing...",
-    "receipt": "Receipt",
-    "attachReceipt": "Attach Receipt",
-    "viewReceipt": "View Receipt",
-    "uploading": "Uploading..."
-  },
   "quickEntry": {
     "add": "Quick Add",
     "enterAmount": "Enter Amount",
@@ -1527,12 +1535,6 @@
     "clearHistory": "Clear history",
     "clearHistoryConfirm": "Clear all chat history? This cannot be undone."
   },
-  "quickActions": {
-    "viewBudget": "View Budget",
-    "viewTransactions": "View Transactions",
-    "viewAnalytics": "View Analytics",
-    "viewGoals": "View Goals"
-  },
   "transfer": {
     "title": "Transfer Between Accounts",
     "exchangeTitle": "Currency Exchange",
@@ -1556,7 +1558,8 @@
       "toRequired": "Please select destination account",
       "sameAccount": "Cannot transfer to the same account",
       "amountRequired": "Amount is required"
-    }
+    },
+    "createRecurring": "Create Recurring"
   },
   "ai": {
     "categoryCleanup": "AI Category Cleanup",
@@ -1776,8 +1779,8 @@
     "add_bill": "Add Bill",
     "edit_bill": "Edit Bill",
     "tabs": {
-      "list": "List",
-      "calendar": "Calendar"
+      "details": "Details",
+      "reminders": "Reminders"
     },
     "status": {
       "paid": "Paid",
@@ -1797,9 +1800,27 @@
     "reminder": {
       "no_reminder": "No reminder",
       "one_day": "1 day before",
+      "two_days": "2 days before",
       "three_days": "3 days before",
       "five_days": "5 days before",
-      "one_week": "1 week before"
+      "one_week": "1 week before",
+      "two_weeks": "2 weeks before",
+      "enable": "Enable Reminder",
+      "enableDescription": "Get notified before this bill is due",
+      "daysBefore": "Remind me",
+      "time": "Reminder Time",
+      "customSchedules": "Custom Reminder Schedules",
+      "addSchedule": "Add Schedule",
+      "noSchedules": "No custom schedules",
+      "editSchedule": "Edit Schedule",
+      "deleteConfirm": "Are you sure you want to delete this schedule?",
+      "scheduleType": "Schedule Type",
+      "daysBeforeValue": "{{count}} days before",
+      "type": {
+        "daysBefore": "Days Before Due",
+        "specificDate": "Specific Date",
+        "recurring": "Recurring"
+      }
     },
     "reminder_days": "{{count}} day before",
     "reminder_days_notice": "{{count}} day notice",
@@ -1877,35 +1898,6 @@
     "total_bills": "Total Bills",
     "paid": "Paid",
     "unpaid": "Unpaid",
-    "tabs": {
-      "details": "Details",
-      "reminders": "Reminders"
-    },
-    "reminder": {
-      "no_reminder": "No reminder",
-      "one_day": "1 day before",
-      "two_days": "2 days before",
-      "three_days": "3 days before",
-      "five_days": "5 days before",
-      "one_week": "1 week before",
-      "two_weeks": "2 weeks before",
-      "enable": "Enable Reminder",
-      "enableDescription": "Get notified before this bill is due",
-      "daysBefore": "Remind me",
-      "time": "Reminder Time",
-      "customSchedules": "Custom Reminder Schedules",
-      "addSchedule": "Add Schedule",
-      "noSchedules": "No custom schedules",
-      "editSchedule": "Edit Schedule",
-      "deleteConfirm": "Are you sure you want to delete this schedule?",
-      "scheduleType": "Schedule Type",
-      "daysBeforeValue": "{{count}} days before",
-      "type": {
-        "daysBefore": "Days Before Due",
-        "specificDate": "Specific Date",
-        "recurring": "Recurring"
-      }
-    },
     "partialPayment": {
       "title": "Partial Payment",
       "paid": "Paid",
@@ -1917,45 +1909,6 @@
       "alertInfo": "Payment Reminder",
       "alertDescription": "Send a reminder about the remaining balance of {{amount}} for this bill.",
       "sendAlert": "Send Reminder"
-    }
-  },
-  "alerts": {
-    "title": "Alerts",
-    "view_details": "View details",
-    "over_budget": {
-      "title": "Over Budget",
-      "message": "{{budget}} is over budget by {{amount}}"
-    },
-    "threshold_80": {
-      "title": "Near Limit",
-      "message": "{{budget}} has reached {{percentage}}% of budget"
-    },
-    "threshold_50": {
-      "title": "Halfway There",
-      "message": "{{budget}} has reached {{percentage}}% of budget"
-    },
-    "near_limit": {
-      "title": "Approaching Limit"
-    },
-    "halfway": {
-      "title": "Halfway Through Budget"
-    },
-    "bill_due": {
-      "title": "Bill Due",
-      "message": "{{bill}} is due ({{amount}})"
-    },
-    "default": {
-      "message": "You have a new alert"
-    },
-    "budget_progress": {
-      "message": "{{budget}}: {{spent}} of {{limit}}"
-    },
-    "remaining": "Remaining",
-    "left": "Left",
-    "over_by": "Over by {{amount}}",
-    "thresholds": {
-      "next": "Next threshold",
-      "at_threshold": "At {{percentage}}%"
     }
   },
   "anomaly": {
@@ -1990,23 +1943,6 @@
       "enabledTypes": "Enabled Detection Types",
       "save": "Save Settings",
       "saved": "Settings saved"
-    }
-  },
-  "insights": {
-    "title": "Spending Insights",
-    "noInsights": "No notable spending patterns detected",
-    "insightsHint": "Keep tracking to see personalized insights",
-    "viewTransactions": "View Transactions",
-    "viewBreakdown": "View Breakdown",
-    "learnMore": "Learn More",
-    "type": {
-      "spending_trend": "Spending Trend",
-      "budget_warning": "Budget Warning",
-      "budget_info": "Budget Info",
-      "goal_progress": "Goal Progress",
-      "forecast": "Forecast",
-      "savings_alert": "Savings Alert",
-      "savings_positive": "Great Savings"
     }
   },
   "savings": {
@@ -2118,7 +2054,15 @@
     "shortDate": "{{month}}/{{day}}",
     "shortDateWithWeekday": "{{weekday}}, {{month}}/{{day}}",
     "fullDate": "{{month}} {{day}}, {{year}}",
-    "weekdays": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ]
   },
   "relocation": {
     "benchmark": "Benchmark",

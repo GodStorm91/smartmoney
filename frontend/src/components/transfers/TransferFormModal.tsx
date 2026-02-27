@@ -2,12 +2,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, X, RefreshCw } from 'lucide-react'
+import { ArrowRight, X, RefreshCw, Repeat } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Button } from '@/components/ui/Button'
+import { RecurringOptions } from '@/components/transactions/RecurringOptions'
 import { useAccounts } from '@/hooks/useAccounts'
 import { useRatesMap } from '@/hooks/useExchangeRates'
 import { createTransfer, createExchange } from '@/services/transfer-service'
+import { createRecurringTransaction, type FrequencyType, type RecurringTransactionCreate } from '@/services/recurring-service'
 import { fetchTransactions } from '@/services/transaction-service'
 import { toStorageAmount, formatCurrency } from '@/utils/formatCurrency'
 import type { TransferCreate, ExchangeCreate } from '@/types/transfer'
@@ -56,6 +58,13 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
   // Exchange mode state
   const [isExchangeMode, setIsExchangeMode] = useState(false)
   const [linkToIncomeId, setLinkToIncomeId] = useState<number | null>(null)
+
+  // Recurring state
+  const [isRecurring, setIsRecurring] = useState(false)
+  const [frequency, setFrequency] = useState<FrequencyType>('monthly')
+  const [dayOfWeek, setDayOfWeek] = useState(0)
+  const [dayOfMonth, setDayOfMonth] = useState(new Date().getDate())
+  const [intervalDays, setIntervalDays] = useState(7)
 
   // Get selected accounts
   const fromAccount = useMemo(
@@ -119,6 +128,11 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
       setErrors({})
       setIsExchangeMode(false)
       setLinkToIncomeId(null)
+      setIsRecurring(false)
+      setFrequency('monthly')
+      setDayOfWeek(0)
+      setDayOfMonth(new Date().getDate())
+      setIntervalDays(7)
     }
   }, [isOpen, accounts])
 
@@ -146,7 +160,17 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
     },
   })
 
-  const mutation = isExchangeMode ? exchangeMutation : transferMutation
+  // Mutation for recurring transfer
+  const recurringMutation = useMutation({
+    mutationFn: createRecurringTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] })
+      queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      onClose()
+    },
+  })
+
+  const mutation = isRecurring ? recurringMutation : isExchangeMode ? exchangeMutation : transferMutation
 
   // Validation
   const validate = (): boolean => {
@@ -177,12 +201,33 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
     e.preventDefault()
     if (!validate()) return
 
-    // Convert amounts to storage format (cents for decimal currencies like USD)
     const fromCurrency = fromAccount?.currency || 'JPY'
     const toCurrency = toAccount?.currency || 'JPY'
 
+    // Recurring transfer — route to recurring API
+    if (isRecurring) {
+      const recurringData: RecurringTransactionCreate = {
+        description: description.trim() || `${fromAccount?.name} → ${toAccount?.name}`,
+        amount: toStorageAmount(parseNumber(fromAmount), fromCurrency),
+        category: 'Transfer',
+        account_id: fromAccountId,
+        is_income: false,
+        is_transfer: true,
+        to_account_id: toAccountId,
+        transfer_fee_amount: !isExchangeMode && feeAmount ? toStorageAmount(parseNumber(feeAmount), fromCurrency) : null,
+        currency: fromCurrency,
+        frequency,
+        day_of_week: frequency === 'weekly' ? dayOfWeek : null,
+        day_of_month: frequency === 'monthly' ? dayOfMonth : null,
+        interval_days: frequency === 'custom' ? intervalDays : null,
+        start_date: date,
+      }
+      recurringMutation.mutate(recurringData)
+      return
+    }
+
+    // One-time transfer
     if (isExchangeMode) {
-      // Exchange mode - use exchange API
       const exchangeData: ExchangeCreate = {
         date,
         from_account_id: fromAccountId!,
@@ -194,7 +239,6 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
       }
       exchangeMutation.mutate(exchangeData)
     } else {
-      // Regular transfer mode
       const data: TransferCreate = {
         from_account_id: fromAccountId!,
         to_account_id: toAccountId!,
@@ -205,7 +249,6 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
         description: description.trim() || undefined,
       }
 
-      // Calculate exchange rate if cross-currency
       if (fromAccount && toAccount && fromAccount.currency !== toAccount.currency) {
         data.exchange_rate = parseNumber(toAmount) / parseNumber(fromAmount)
       }
@@ -415,7 +458,7 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
           {/* Date */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('transfer.date')}
+              {isRecurring ? t('recurring.startDate') : t('transfer.date')}
             </label>
             <input
               type="date"
@@ -424,6 +467,34 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
               className="w-full h-12 px-4 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
             />
           </div>
+
+          {/* Recurring Toggle */}
+          <div className="flex items-center gap-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+            <label className="flex items-center gap-2 cursor-pointer text-sm text-gray-600 dark:text-gray-400">
+              <input
+                type="checkbox"
+                checked={isRecurring}
+                onChange={e => setIsRecurring(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <Repeat className="w-4 h-4" />
+              {t('recurring.makeRecurring')}
+            </label>
+          </div>
+
+          {/* Recurring Options */}
+          {isRecurring && (
+            <RecurringOptions
+              frequency={frequency}
+              setFrequency={setFrequency}
+              dayOfWeek={dayOfWeek}
+              setDayOfWeek={setDayOfWeek}
+              dayOfMonth={dayOfMonth}
+              setDayOfMonth={setDayOfMonth}
+              intervalDays={intervalDays}
+              setIntervalDays={setIntervalDays}
+            />
+          )}
 
           {/* Description */}
           <div>
@@ -459,7 +530,7 @@ export function TransferFormModal({ isOpen, onClose }: TransferFormModalProps) {
               loading={mutation.isPending}
               className="flex-1 h-12 bg-blue-600 hover:bg-blue-700"
             >
-              {t('transfer.create')}
+              {isRecurring ? t('transfer.createRecurring', 'Create Recurring') : t('transfer.create')}
             </Button>
           </div>
         </form>
