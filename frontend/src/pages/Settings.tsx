@@ -41,6 +41,21 @@ import { exportForIOS, generateExportLink } from '@/services/export-service'
 import { QRCodeSVG } from 'qrcode.react'
 import { cn } from '@/utils/cn'
 
+// Section color map — each section gets a distinct color identity
+const SECTION_COLORS: Record<string, { bg: string; text: string; activeBg: string; activeText: string }> = {
+  appearance:    { bg: 'bg-violet-100 dark:bg-violet-900/30',  text: 'text-violet-600 dark:text-violet-400',  activeBg: 'bg-violet-100 dark:bg-violet-900/30',  activeText: 'text-violet-700 dark:text-violet-400' },
+  general:       { bg: 'bg-primary-100 dark:bg-primary-900/30', text: 'text-primary-600 dark:text-primary-400', activeBg: 'bg-primary-100 dark:bg-primary-900/30', activeText: 'text-primary-700 dark:text-primary-400' },
+  household:     { bg: 'bg-blue-100 dark:bg-blue-900/30',      text: 'text-blue-600 dark:text-blue-400',      activeBg: 'bg-blue-100 dark:bg-blue-900/30',      activeText: 'text-blue-700 dark:text-blue-400' },
+  budget:        { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', activeBg: 'bg-emerald-100 dark:bg-emerald-900/30', activeText: 'text-emerald-700 dark:text-emerald-400' },
+  categories:    { bg: 'bg-amber-100 dark:bg-amber-900/30',    text: 'text-amber-600 dark:text-amber-400',    activeBg: 'bg-amber-100 dark:bg-amber-900/30',    activeText: 'text-amber-700 dark:text-amber-400' },
+  sources:       { bg: 'bg-indigo-100 dark:bg-indigo-900/30',  text: 'text-indigo-600 dark:text-indigo-400',  activeBg: 'bg-indigo-100 dark:bg-indigo-900/30',  activeText: 'text-indigo-700 dark:text-indigo-400' },
+  recurring:     { bg: 'bg-teal-100 dark:bg-teal-900/30',      text: 'text-teal-600 dark:text-teal-400',      activeBg: 'bg-teal-100 dark:bg-teal-900/30',      activeText: 'text-teal-700 dark:text-teal-400' },
+  notifications: { bg: 'bg-rose-100 dark:bg-rose-900/30',      text: 'text-rose-600 dark:text-rose-400',      activeBg: 'bg-rose-100 dark:bg-rose-900/30',      activeText: 'text-rose-700 dark:text-rose-400' },
+  crypto:        { bg: 'bg-cyan-100 dark:bg-cyan-900/30',      text: 'text-cyan-600 dark:text-cyan-400',      activeBg: 'bg-cyan-100 dark:bg-cyan-900/30',      activeText: 'text-cyan-700 dark:text-cyan-400' },
+  anomaly:       { bg: 'bg-orange-100 dark:bg-orange-900/30',  text: 'text-orange-600 dark:text-orange-400',  activeBg: 'bg-orange-100 dark:bg-orange-900/30',  activeText: 'text-orange-700 dark:text-orange-400' },
+  export:        { bg: 'bg-sky-100 dark:bg-sky-900/30',        text: 'text-sky-600 dark:text-sky-400',        activeBg: 'bg-sky-100 dark:bg-sky-900/30',        activeText: 'text-sky-700 dark:text-sky-400' },
+}
+
 // Settings sections for navigation
 const SECTIONS = [
   { id: 'appearance', labelKey: 'settings.sections.appearance', icon: Palette },
@@ -231,7 +246,7 @@ export function Settings() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2.5 tracking-tight">
             <SettingsIcon className="w-5 h-5 text-primary-600" />
             {t('settings.title')}
           </h1>
@@ -247,15 +262,16 @@ export function Settings() {
               {SECTIONS.map((section) => {
                 const Icon = section.icon
                 const isActive = activeSection === section.id
+                const colors = SECTION_COLORS[section.id]
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all',
+                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors',
                       isActive
-                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? cn(colors?.activeBg, colors?.activeText)
+                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                     )}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -272,14 +288,14 @@ export function Settings() {
       <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
         {/* Appearance */}
         <div className={cn('space-y-4', activeSection !== 'appearance' && 'hidden')}>
-          <SectionCard icon={Palette} title={t('appearance.title', 'Appearance')} description={t('appearance.subtitle', 'Theme, colors, and display preferences')}>
+          <SectionCard sectionId="appearance" icon={Palette} title={t('appearance.title', 'Appearance')} description={t('appearance.subtitle', 'Theme, colors, and display preferences')}>
             <AppearanceSettings />
           </SectionCard>
         </div>
 
         {/* General Settings */}
         <div className={cn('space-y-4', activeSection !== 'general' && 'hidden')}>
-          <SectionCard icon={SettingsIcon} title={t('settings.general')} description={t('settings.generalDescription', 'Currency and basic preferences')}>
+          <SectionCard sectionId="general" icon={SettingsIcon} title={t('settings.general')} description={t('settings.generalDescription', 'Currency and basic preferences')}>
             <div className="space-y-4">
               <Select
                 label={t('settings.currency')}
@@ -308,7 +324,7 @@ export function Settings() {
 
         {/* Household Profile */}
         <div className={cn('space-y-4', activeSection !== 'household' && 'hidden')}>
-          <SectionCard icon={Users} title={t('settings.householdProfile', 'Household Profile')} description={t('settings.householdProfileDescription', 'Family size, prefecture, and income bracket for spending benchmarks')}>
+          <SectionCard sectionId="household" icon={Users} title={t('settings.householdProfile', 'Household Profile')} description={t('settings.householdProfileDescription', 'Family size, prefecture, and income bracket for spending benchmarks')}>
             <HouseholdProfileForm
               profile={householdProfile || null}
               onSave={(profile) => updateProfileMutation.mutate(profile)}
@@ -319,7 +335,7 @@ export function Settings() {
 
         {/* Budget Settings */}
         <div className={cn('space-y-4', activeSection !== 'budget' && 'hidden')}>
-          <SectionCard icon={Wallet} title={t('settings.budgetSettings')} description={t('settings.budgetDescription', 'Budget behavior and alerts')}>
+          <SectionCard sectionId="budget" icon={Wallet} title={t('settings.budgetSettings')} description={t('settings.budgetDescription', 'Budget behavior and alerts')}>
             <div className="space-y-4">
               <ToggleSetting
                 label={t('settings.budgetCarryOver')}
@@ -368,9 +384,9 @@ export function Settings() {
           >
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {settings?.sources?.map((source, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <span className="text-gray-900 dark:text-gray-100">{source}</span>
-                  <button className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm">
+                <div key={idx} className="flex items-center justify-between p-3 bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/20 rounded-xl">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">{source}</span>
+                  <button className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold">
                     {t('settings.delete')}
                   </button>
                 </div>
@@ -404,7 +420,7 @@ export function Settings() {
 
         {/* Export to iOS */}
         <div className={cn('space-y-4', activeSection !== 'export' && 'hidden')}>
-          <SectionCard icon={Smartphone} title={t('settings.export.title')} description={t('settings.export.description')}>
+          <SectionCard sectionId="export" icon={Smartphone} title={t('settings.export.title')} description={t('settings.export.description')}>
             <div className="space-y-4">
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('settings.export.instructions')}
@@ -561,17 +577,19 @@ interface SectionCardProps {
   description?: string
   children: React.ReactNode
   className?: string
+  sectionId?: string
 }
 
-function SectionCard({ icon: Icon, title, description, children, className }: SectionCardProps) {
+function SectionCard({ icon: Icon, title, description, children, className, sectionId }: SectionCardProps) {
+  const colors = sectionId ? SECTION_COLORS[sectionId] : null
   return (
-    <Card className={cn('', className)}>
+    <Card className={cn('shadow-card', className)}>
       <div className="flex items-start gap-3 mb-4">
-        <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-          <Icon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+        <div className={cn('p-2 rounded-xl', colors?.bg || 'bg-primary-100 dark:bg-primary-900/30')}>
+          <Icon className={cn('w-5 h-5', colors?.text || 'text-primary-600 dark:text-primary-400')} />
         </div>
         <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">{title}</h3>
+          <h3 className="font-bold text-gray-900 dark:text-gray-100">{title}</h3>
           {description && (
             <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
           )}
@@ -592,9 +610,9 @@ interface ToggleSettingProps {
 
 function ToggleSetting({ label, description, checked, onChange }: ToggleSettingProps) {
   return (
-    <div className="flex items-start justify-between py-1">
+    <div className="flex items-start justify-between py-2">
       <div className="flex-1 pr-4">
-        <label className="font-medium text-gray-900 dark:text-white block">{label}</label>
+        <label className="font-semibold text-gray-900 dark:text-white block">{label}</label>
         {description && (
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{description}</p>
         )}
@@ -603,12 +621,12 @@ function ToggleSetting({ label, description, checked, onChange }: ToggleSettingP
         onClick={() => onChange(!checked)}
         className={cn(
           'relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0',
-          checked ? 'bg-primary-600' : 'bg-gray-300 dark:bg-gray-600'
+          checked ? 'bg-emerald-500 dark:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-600'
         )}
       >
         <span
           className={cn(
-            'inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm',
+            'inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-md',
             checked ? 'translate-x-6' : 'translate-x-1'
           )}
         />

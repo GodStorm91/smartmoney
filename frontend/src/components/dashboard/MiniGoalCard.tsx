@@ -18,9 +18,9 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
   const isOnTrack = progress.achievability?.current_monthly_net >= progress.achievability?.required_monthly
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-50/80 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700/50">
+    <div className="flex items-center gap-3 p-3.5 bg-gray-50/80 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700/50">
       <div className={cn(
-        'w-10 h-10 rounded-xl flex items-center justify-center text-xs font-extrabold',
+        'w-11 h-11 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0',
         isOnTrack
           ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
           : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
@@ -28,13 +28,13 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
         {progressPct >= 100 ? '🎉' : `${Math.round(progressPct)}%`}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
           {t('goals.yearGoal', { years })}
         </p>
-        <p className="text-xs font-medium font-numbers text-gray-500 dark:text-gray-400">
+        <p className="text-xs font-bold font-numbers text-gray-500 dark:text-gray-400 mt-0.5">
           {formatCurrency(progress.total_saved)}
         </p>
-        <div className="w-full h-2 bg-gray-200 dark:bg-gray-600 rounded-full mt-1.5 overflow-hidden">
+        <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-600 rounded-full mt-2 overflow-hidden">
           <div
             className={cn(
               'h-full rounded-full animate-progress-fill',

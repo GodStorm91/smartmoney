@@ -19,23 +19,23 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
 
   return (
     <Card className="p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-gray-600 dark:text-gray-400">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em]">
           {t('dashboard.savingsRate', 'Savings Rate')}
         </span>
-        <span className={cn('text-xs font-medium px-2 py-0.5 rounded-full', status.bg, status.color)}>
+        <span className={cn('text-[11px] font-bold px-2.5 py-1 rounded-full', status.bg, status.color)}>
           {status.label}
         </span>
       </div>
-      <div className="flex items-end gap-2">
-        <span className="text-4xl font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tighter">
+      <div className="flex items-baseline gap-2">
+        <span className="text-[2.75rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-[-0.03em] leading-none">
           {Math.round(rate)}%
         </span>
-        <span className="text-sm text-gray-500 dark:text-gray-400 mb-1.5">
+        <span className="text-xs font-medium text-gray-400 dark:text-gray-400">
           {t('dashboard.ofIncome', 'of income')}
         </span>
       </div>
-      <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full mt-3 overflow-hidden">
+      <div className="w-full h-3 bg-gray-100 dark:bg-gray-700/60 rounded-full mt-4 overflow-hidden">
         <div
           className={cn(
             'h-full rounded-full animate-progress-fill progress-glow',

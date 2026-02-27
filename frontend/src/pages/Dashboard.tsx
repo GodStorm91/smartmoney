@@ -145,21 +145,17 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen pb-32">
-      {/* Sticky Header with personalized greeting */}
-      <div className="sticky top-0 z-10 bg-white/85 dark:bg-gray-900/85 backdrop-blur-xl border-b border-gray-200/60 dark:border-gray-700/60 overflow-hidden">
-        {/* Decorative orbs — richer presence */}
-        <div className="absolute -top-6 -right-6 w-40 h-40 rounded-full bg-primary-300/25 dark:bg-primary-700/15 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-full bg-net-300/20 dark:bg-net-800/15 blur-3xl pointer-events-none" />
-
-        <div className="relative max-w-2xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between mb-3">
+      {/* Sticky Header — confident, content-driven */}
+      <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+        <div className="max-w-2xl mx-auto px-4 py-3.5">
+          <div className="flex items-center justify-between mb-2">
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() - 1); setCurrentDate(d) }}
               className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h1 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em]">
               {formatMonth(currentDate)}
             </h1>
             <button
@@ -170,10 +166,10 @@ export function Dashboard() {
             </button>
           </div>
           <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+            <h2 className="text-[1.75rem] sm:text-[2rem] font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
               {emoji} {greeting}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
               {greetingSubtitle}
             </p>
           </div>
@@ -181,15 +177,17 @@ export function Dashboard() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
         {/* 1. Onboarding (auto-hides after completion) */}
         <OnboardingChecklist />
 
         {/* 2. Proxy Receivables (self-handles empty state) */}
         <ProxyReceivablesWidget />
 
-        {/* 3. Net Worth Hero */}
-        <NetWorthHero summary={summary} />
+        {/* 3. Net Worth Hero — THE focal point */}
+        <div className="pt-1">
+          <NetWorthHero summary={summary} />
+        </div>
 
         {/* 4. Alerts (merged smart + anomaly) */}
         <DashboardAlerts alerts={alerts} unreadAnomalyCount={unreadAnomalies?.count} />
@@ -206,7 +204,7 @@ export function Dashboard() {
                 <Link
                   key={idx}
                   to={action.to}
-                  className="flex flex-col items-center gap-1.5 p-1 animate-stagger-in"
+                  className="flex flex-col items-center gap-2 p-1 animate-stagger-in"
                   style={{ '--stagger-index': idx } as React.CSSProperties}
                 >
                   <div className={cn(
@@ -217,7 +215,7 @@ export function Dashboard() {
                   )}>
                     <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
-                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                  <span className="text-[11px] font-bold text-gray-600 dark:text-gray-400">
                     {action.label}
                   </span>
                 </Link>
@@ -226,42 +224,44 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* 6. Monthly Summary (KPI + Income/Expense + Savings Rate) */}
-        <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} exchangeRates={exchangeRates?.rates || {}} />
+        {/* 6. Monthly Summary — financial snapshot cluster */}
+        <div className="space-y-3">
+          <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} exchangeRates={exchangeRates?.rates || {}} />
 
-        <div className="grid grid-cols-2 gap-3">
-          <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
-            <QuickStatCard
-              label={t('dashboard.income', 'Income')}
-              value={currentMonth?.income || 0}
-              change={5.2}
-              isPositive
-              formatCurrency={formatCurrency}
-              className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+              <QuickStatCard
+                label={t('dashboard.income', 'Income')}
+                value={currentMonth?.income || 0}
+                change={5.2}
+                isPositive
+                formatCurrency={formatCurrency}
+                className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
+              />
+            </div>
+            <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
+              <QuickStatCard
+                label={t('dashboard.expenses', 'Expenses')}
+                value={currentMonth?.expenses || 0}
+                change={-2.1}
+                isPositive={false}
+                formatCurrency={formatCurrency}
+                className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
+              />
+            </div>
           </div>
-          <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
-            <QuickStatCard
-              label={t('dashboard.expenses', 'Expenses')}
-              value={currentMonth?.expenses || 0}
-              change={-2.1}
-              isPositive={false}
-              formatCurrency={formatCurrency}
-              className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
-            />
-          </div>
+
+          <SavingsRateCard rate={savingsRate} />
         </div>
-
-        <SavingsRateCard rate={savingsRate} />
 
         {/* 7. Recent Transactions */}
         <Card className="p-4 shadow-card">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+              <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
                 <Receipt className="w-4 h-4 text-primary-600 dark:text-primary-400" />
               </div>
-              <h3 className="font-bold text-gray-900 dark:text-gray-100">
+              <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
                 {t('dashboard.recentTransactions', 'Recent')}
               </h3>
             </div>
@@ -334,10 +334,10 @@ export function Dashboard() {
           <Card className="p-4 shadow-card">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-lg bg-pink-100 dark:bg-pink-900/30">
+                <div className="p-1.5 rounded-xl bg-pink-100 dark:bg-pink-900/30">
                   <Target className="w-4 h-4 text-pink-600 dark:text-pink-400" />
                 </div>
-                <h3 className="font-bold text-gray-900 dark:text-gray-100">
+                <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
                   {t('dashboard.goals', 'Goals')}
                 </h3>
               </div>

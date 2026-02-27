@@ -29,22 +29,23 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
     <Card
       variant="gradient"
       className={cn(
-        'cursor-pointer transition-all duration-300 bg-hero-gradient',
-        expanded ? 'shadow-lg ring-glow' : 'hover:shadow-lg'
+        'cursor-pointer transition-all duration-300 bg-hero-gradient overflow-hidden relative',
+        expanded ? 'shadow-hero ring-glow' : 'hover:shadow-hero'
       )}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="flex items-center gap-2 mb-3">
-        <div className="p-2 bg-primary-200/60 dark:bg-primary-800/40 rounded-xl">
-          <Wallet className="w-5 h-5 text-primary-700 dark:text-primary-300" />
-        </div>
-        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
+      {/* Subtle accent stripe at top */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-net-300 opacity-60" />
+
+      <div className="flex items-center gap-2 mb-1 pt-1">
+        <Wallet className="w-4 h-4 text-primary-600 dark:text-primary-300" />
+        <span className="text-[11px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.15em]">
           {t('dashboard.netWorth', 'Net Worth')}
         </span>
       </div>
 
       <p className={cn(
-        'text-4xl sm:text-5xl font-extrabold font-numbers tracking-tighter',
+        'text-[2.75rem] sm:text-[3.5rem] font-extrabold font-numbers tracking-[-0.02em] sm:tracking-[-0.03em] leading-tight',
         netWorth >= 0 ? 'text-gray-900 dark:text-gray-100' : 'text-expense-600 dark:text-expense-300'
       )}>
         {formatCurrency(netWorth)}
@@ -52,28 +53,31 @@ export function NetWorthHero({ summary }: NetWorthHeroProps) {
 
       {monthlyNet !== 0 && (
         <div className={cn(
-          'inline-flex items-center gap-1 mt-3 px-2.5 py-1 rounded-full text-xs font-semibold',
+          'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-bold',
           monthlyNet >= 0
-            ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
-            : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
+            ? 'bg-income-100/80 text-income-600 dark:bg-income-900/40 dark:text-income-300'
+            : 'bg-expense-100/80 text-expense-600 dark:bg-expense-900/40 dark:text-expense-300'
         )}>
-          {monthlyNet >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+          {monthlyNet >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
           {monthlyNet >= 0 ? '+' : ''}{formatCurrency(monthlyNet)}
+          <span className="text-[10px] font-medium opacity-70 ml-0.5">
+            {t('dashboard.thisMonth', 'this month')}
+          </span>
         </div>
       )}
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+        <div className="mt-5 pt-4 border-t border-gray-200/40 dark:border-gray-700/40">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{t('dashboard.assets', 'Assets')}</p>
-              <p className="font-semibold text-income-600 dark:text-income-300">
+              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-0.5">{t('dashboard.assets', 'Assets')}</p>
+              <p className="text-lg font-bold font-numbers text-income-600 dark:text-income-300">
                 {formatCurrency(summary?.total_income || 0)}
               </p>
             </div>
             <div>
-              <p className="text-gray-500 dark:text-gray-400 text-xs">{t('dashboard.expenses', 'Expenses')}</p>
-              <p className="font-semibold text-expense-600 dark:text-expense-300">
+              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-0.5">{t('dashboard.expenses', 'Expenses')}</p>
+              <p className="text-lg font-bold font-numbers text-expense-600 dark:text-expense-300">
                 {formatCurrency(summary?.total_expense || 0)}
               </p>
             </div>
