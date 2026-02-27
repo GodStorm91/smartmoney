@@ -15,6 +15,6 @@ rm -rf "$SERVE_DIR/assets"
 cp -r "$FRONTEND_DIR/dist/"* "$SERVE_DIR/"
 
 echo "Reloading nginx..."
-nginx -s reload
+docker exec smartmoney-nginx nginx -s reload
 
 echo "Deploy complete!"
