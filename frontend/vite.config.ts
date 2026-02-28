@@ -46,22 +46,11 @@ export default defineConfig({
               },
             },
           },
-          // API GET requests - NetworkFirst with cache fallback
+          // API requests — never cache, always fetch from network
           {
             urlPattern: /\/api\/.*$/i,
-            handler: 'NetworkFirst',
+            handler: 'NetworkOnly',
             method: 'GET',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24, // 24 hours
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-              networkTimeoutSeconds: 10,
-            },
           },
         ],
       },
