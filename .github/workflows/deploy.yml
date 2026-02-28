@@ -97,16 +97,22 @@ jobs:
 
             echo "=== Auto-deploying main branch ==="
 
-            # Pull latest code (frontend-dist is inside deploy/)
+            # Pull latest code
             cd $REPO_DIR
             git fetch origin main
             git reset --hard origin/main
 
-            # Sync frontend-dist to nginx volume mount directory
-            NGINX_VOLUME_DIR="/var/www/smartmoney/deploy/frontend-dist"
-            echo "Syncing frontend files to nginx volume..."
-            rm -rf "$NGINX_VOLUME_DIR/assets" "$NGINX_VOLUME_DIR/locales" "$NGINX_VOLUME_DIR/icons"
-            cp -r $DEPLOY_DIR/frontend-dist/* "$NGINX_VOLUME_DIR/"
+            # Build frontend from source (never use stale committed dist)
+            echo "Building frontend..."
+            cd $REPO_DIR/frontend
+            npm ci
+            npm run build
+
+            # Deploy fresh build to nginx serve directory
+            SERVE_DIR="$DEPLOY_DIR/frontend-dist"
+            echo "Deploying frontend build..."
+            rm -rf "$SERVE_DIR"/*
+            cp -r dist/* "$SERVE_DIR/"
 
             cd $DEPLOY_DIR
 
@@ -188,16 +194,10 @@ jobs:
             npm ci
             npm run build
 
-            # Copy frontend to deploy dir and nginx volume
-            echo "Copying frontend files..."
+            # Deploy fresh build to nginx serve directory
+            echo "Deploying frontend build..."
             rm -rf $DEPLOY_DIR/frontend-dist/*
             cp -r dist/* $DEPLOY_DIR/frontend-dist/
-
-            # Sync to nginx volume mount directory
-            NGINX_VOLUME_DIR="/var/www/smartmoney/deploy/frontend-dist"
-            echo "Syncing frontend files to nginx volume..."
-            rm -rf "$NGINX_VOLUME_DIR/assets" "$NGINX_VOLUME_DIR/locales" "$NGINX_VOLUME_DIR/icons"
-            cp -r dist/* "$NGINX_VOLUME_DIR/"
 
             cd $DEPLOY_DIR
 
