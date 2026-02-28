@@ -12,7 +12,8 @@ cd "$FRONTEND_DIR"
 npm run build 2>&1 | tail -8
 
 echo "Copying to serve directory..."
-rm -rf "$SERVE_DIR/assets"
+# Clean everything and copy fresh to avoid stale index.html / assets
+rm -rf "$SERVE_DIR"/*
 cp -r "$FRONTEND_DIR/dist/"* "$SERVE_DIR/"
 
 echo "Reloading nginx..."
