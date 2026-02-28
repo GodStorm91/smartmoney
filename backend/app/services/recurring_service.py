@@ -111,18 +111,25 @@ class RecurringTransactionService:
         end_date = data.pop("end_date", None)
         auto_submit = data.pop("auto_submit", False)
 
-        # Calculate initial next_run_date
-        next_run = RecurringTransactionService.calculate_next_run_date(
-            frequency=data["frequency"],
-            current_date=start_date,
-            interval_days=data.get("interval_days"),
-            day_of_week=data.get("day_of_week"),
-            day_of_month=data.get("day_of_month"),
-            month_of_year=data.get("month_of_year"),
-        )
+        # If start_date <= today, the first transaction should be created
+        # immediately and next_run advances to the next occurrence.
+        today = date.today()
+        create_now = start_date <= today
 
-        # If the calculated date is before start_date, use start_date
-        if next_run < start_date:
+        if create_now:
+            # First run is today (or in the past) — will execute immediately
+            initial_run_date = start_date
+            next_run = RecurringTransactionService.calculate_next_run_date(
+                frequency=data["frequency"],
+                current_date=start_date,
+                interval_days=data.get("interval_days"),
+                day_of_week=data.get("day_of_week"),
+                day_of_month=data.get("day_of_month"),
+                month_of_year=data.get("month_of_year"),
+            )
+        else:
+            # Future start — no immediate transaction, first run on start_date
+            initial_run_date = None
             next_run = start_date
 
         recurring = RecurringTransaction(
@@ -130,11 +137,29 @@ class RecurringTransactionService:
             start_date=start_date,
             end_date=end_date,
             next_run_date=next_run,
+            last_run_date=initial_run_date,  # prevents scheduler double-processing
             auto_submit=auto_submit,
             **data,
         )
 
         db.add(recurring)
+        db.flush()  # get recurring.id and relationships before creating transactions
+
+        # Create initial transaction(s) immediately if start_date <= today
+        if create_now:
+            # Temporarily set next_run_date to start_date for _create_* methods
+            saved_next_run = recurring.next_run_date
+            recurring.next_run_date = start_date
+            if recurring.is_transfer:
+                RecurringTransactionService._create_transfer_transactions(
+                    db, recurring
+                )
+            else:
+                RecurringTransactionService._create_single_transaction(
+                    db, recurring
+                )
+            recurring.next_run_date = saved_next_run
+
         db.commit()
         db.refresh(recurring)
         return recurring
