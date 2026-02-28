@@ -4,7 +4,8 @@ set -e
 
 DEPLOY_DIR="/var/www/smartmoney"
 FRONTEND_DIR="$DEPLOY_DIR/frontend"
-SERVE_DIR="$DEPLOY_DIR/deploy/frontend-dist"
+# Nginx Docker container mounts from /root/smartmoney, not /var/www/smartmoney
+SERVE_DIR="/root/smartmoney/deploy/frontend-dist"
 
 echo "Building frontend..."
 cd "$FRONTEND_DIR"
