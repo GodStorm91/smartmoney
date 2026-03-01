@@ -120,6 +120,37 @@ async def get_spending_insights(
     }
 
 
+@router.get("/velocity")
+async def get_spending_velocity(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get current month spending velocity (daily burn rate)."""
+    return AnalyticsService.get_spending_velocity(db=db, user_id=current_user.id)
+
+
+@router.get("/yoy")
+async def get_year_over_year(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get year-over-year monthly comparison."""
+    return AnalyticsService.get_year_over_year(db=db, user_id=current_user.id)
+
+
+@router.get("/daily")
+async def get_daily_spending(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get daily spending data for heatmap visualization."""
+    return AnalyticsService.get_daily_spending(
+        db=db, user_id=current_user.id, start_date=start_date, end_date=end_date
+    )
+
+
 @router.get("/forecast")
 async def get_cashflow_forecast(
     months: int = Query(6, ge=1, le=24, description="Number of months to forecast"),

@@ -501,7 +501,26 @@
     "thisMonth": "This Month",
     "average": "3-Month Avg",
     "vsAverage": "vs average",
-    "goal": "Goal"
+    "goal": "Goal",
+    "yoy": {
+      "title": "Year-over-Year",
+      "thisYear": "This Year",
+      "lastYear": "Last Year",
+      "expenses": "Expenses",
+      "income": "Income",
+      "change": "{{percent}}% vs last year",
+      "increase": "increase",
+      "decrease": "decrease",
+      "noData": "Not enough data for comparison"
+    },
+    "heatmap": {
+      "title": "Spending Heatmap",
+      "noData": "No spending data for this period",
+      "dailyAvg": "Daily Average",
+      "less": "Less",
+      "more": "More",
+      "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    }
   },
   "goals": {
     "title": "Long-term Goals",
@@ -2217,5 +2236,13 @@
     "dismissed": "Marked as not duplicate",
     "source": "Source",
     "review": "Review Duplicates"
+  },
+  "velocity": {
+    "title": "Spending Velocity",
+    "perDay": "/day",
+    "projected": "Projected this month",
+    "dayProgress": "Day {{current}}/{{total}}",
+    "vsLastMonth": "vs last month",
+    "noData": "No spending data this month"
   }
 }

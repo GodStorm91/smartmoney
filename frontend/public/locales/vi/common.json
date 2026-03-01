@@ -383,7 +383,26 @@
     "thisMonth": "Tháng này",
     "average": "TB 3 tháng",
     "vsAverage": "so với TB",
-    "goal": "Mục tiêu"
+    "goal": "Mục tiêu",
+    "yoy": {
+      "title": "So sánh năm trước",
+      "thisYear": "Năm nay",
+      "lastYear": "Năm ngoái",
+      "expenses": "Chi tiêu",
+      "income": "Thu nhập",
+      "change": "{{percent}}% so với năm ngoái",
+      "increase": "tăng",
+      "decrease": "giảm",
+      "noData": "Không đủ dữ liệu để so sánh"
+    },
+    "heatmap": {
+      "title": "Bản đồ nhiệt chi tiêu",
+      "noData": "Không có dữ liệu chi tiêu trong khoảng thời gian này",
+      "dailyAvg": "Trung bình theo ngày",
+      "less": "Ít",
+      "more": "Nhiều",
+      "weekdays": ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+    }
   },
   "goals": {
     "title": "Mục tiêu dài hạn",
@@ -2080,5 +2099,13 @@
     "dismissed": "Đã đánh dấu là không trùng lặp",
     "source": "Nguồn",
     "review": "Xem xét trùng lặp"
+  },
+  "velocity": {
+    "title": "Tốc độ chi tiêu",
+    "perDay": "/ngày",
+    "projected": "Dự kiến tháng này",
+    "dayProgress": "Ngày {{current}}/{{total}}",
+    "vsLastMonth": "so với tháng trước",
+    "noData": "Không có dữ liệu chi tiêu tháng này"
   }
 }

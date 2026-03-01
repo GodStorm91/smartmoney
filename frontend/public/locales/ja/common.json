@@ -419,7 +419,26 @@
     "thisMonth": "今月",
     "average": "3ヶ月平均",
     "vsAverage": "平均比",
-    "goal": "目標"
+    "goal": "目標",
+    "yoy": {
+      "title": "前年比較",
+      "thisYear": "今年",
+      "lastYear": "昨年",
+      "expenses": "支出",
+      "income": "収入",
+      "change": "前年比{{percent}}%",
+      "increase": "増加",
+      "decrease": "減少",
+      "noData": "比較に十分なデータがありません"
+    },
+    "heatmap": {
+      "title": "支出ヒートマップ",
+      "noData": "この期間の支出データがありません",
+      "dailyAvg": "曜日別平均",
+      "less": "少",
+      "more": "多",
+      "weekdays": ["月", "火", "水", "木", "金", "土", "日"]
+    }
   },
   "goals": {
     "title": "長期目標",
@@ -2132,5 +2151,13 @@
     "dismissed": "重複ではないとしてマークしました",
     "source": "ソース",
     "review": "重複を確認"
+  },
+  "velocity": {
+    "title": "支出ペース",
+    "perDay": "/日",
+    "projected": "今月の予測合計",
+    "dayProgress": "{{current}}日目/{{total}}日",
+    "vsLastMonth": "先月比",
+    "noData": "今月の支出データがありません"
   }
 }

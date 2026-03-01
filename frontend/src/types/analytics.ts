@@ -52,6 +52,18 @@ export interface SpendingInsightsResponse {
   generated_at: string
 }
 
+// Heatmap types
+export interface DailySpendingEntry {
+  date: string        // "2026-03-01"
+  amount: number      // JPY
+  day_of_week: number // 0=Monday, 6=Sunday
+}
+
+export interface DailySpendingResponse {
+  daily_data: DailySpendingEntry[]
+  day_of_week_avg: Record<string, number> // "0"–"6" -> JPY average
+}
+
 // Forecast types
 export interface ForecastMonth {
   month: string

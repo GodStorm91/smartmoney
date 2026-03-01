@@ -24,6 +24,7 @@ import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModa
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
 import { NetWorthTrendChart } from '@/components/dashboard/NetWorthTrendChart'
 import { CashFlowForecastCard } from '@/components/dashboard/CashFlowForecastCard'
+import { SpendingVelocityCard } from '@/components/dashboard/SpendingVelocityCard'
 import { InsightCards } from '@/components/dashboard/InsightCards'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
@@ -233,6 +234,9 @@ export function Dashboard() {
 
         {/* 3.6 Cashflow Forecast */}
         <CashFlowForecastCard />
+
+        {/* 3.65 Spending Velocity */}
+        <SpendingVelocityCard />
 
         {/* 3.7 AI Insights */}
         {liveInsights && liveInsights.insights.length > 0 && (
