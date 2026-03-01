@@ -3,6 +3,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Lightbulb, Plus, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -49,6 +50,7 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
   const dismissMutation = useMutation({
     mutationFn: dismissRecurringSuggestion,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['recurring-suggestions'] }),
+    onError: () => toast.error(t('recurring.dismissFailed', 'Failed to dismiss. Please try again.')),
   })
 
   // Filter to expense-only suggestions
@@ -98,7 +100,7 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
                     <span className="font-numbers text-expense-600 dark:text-expense-300">
                       -{fmt(s.amount)}
                     </span>
-                    <span>{s.frequency}</span>
+                    <span>{t(`recurring.${s.frequency}`, s.frequency)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -110,7 +112,7 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
                     onClick={() => dismissMutation.mutate(s.hash)}
                     disabled={dismissMutation.isPending}
                     className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                    title={t('recurring.suggestions.dismiss', 'Dismiss')}
+                    aria-label={t('recurring.suggestions.dismiss', 'Dismiss')}
                   >
                     <X className="w-4 h-4" />
                   </button>

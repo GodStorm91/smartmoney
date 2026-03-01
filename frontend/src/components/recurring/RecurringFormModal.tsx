@@ -1,10 +1,11 @@
 /**
  * RecurringFormModal - Create/edit recurring transaction
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { X, ArrowLeftRight } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -35,6 +36,22 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
   const queryClient = useQueryClient()
   const { data: accounts } = useAccounts()
   const { data: categoryTree } = useCategoryTree()
+  const modalRef = useRef<HTMLDivElement>(null)
+  const titleId = 'recurring-form-title'
+
+  // Close on Escape key
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+  }, [onClose])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown)
+      // Focus the modal when it opens
+      modalRef.current?.focus()
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [isOpen, handleKeyDown])
 
   // Flatten category tree for select options
   const flattenCategories = (parents: CategoryParent[] = []): { name: string }[] => {
@@ -109,7 +126,11 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
     mutationFn: createRecurringTransaction,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] })
+      toast.success(t('recurring.created', 'Recurring transaction created'))
       onClose()
+    },
+    onError: () => {
+      toast.error(t('recurring.createFailed', 'Failed to create. Please try again.'))
     },
   })
 
@@ -118,16 +139,26 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
       updateRecurringTransaction(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] })
+      toast.success(t('recurring.updated', 'Recurring transaction updated'))
       onClose()
+    },
+    onError: () => {
+      toast.error(t('recurring.updateFailed', 'Failed to update. Please try again.'))
     },
   })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const parsedAmount = Math.round(Number(amount))
+    if (!parsedAmount || parsedAmount <= 0) {
+      toast.error(t('recurring.invalidAmount', 'Please enter a valid amount'))
+      return
+    }
+
     const data: RecurringTransactionCreate = {
-      description,
-      amount: parseInt(amount, 10),
+      description: description.trim(),
+      amount: parsedAmount,
       category: isTransfer ? 'Transfer' : category,
       account_id: accountId,
       is_income: isTransfer ? false : isIncome,
@@ -154,23 +185,29 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
   if (!isOpen) return null
 
   const modalContent = (
-    <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4" role="presentation">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
 
       {/* Modal - allows vertical scroll */}
       <div
-        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl w-[calc(100%-2rem)] max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden outline-none"
         style={{ touchAction: 'pan-y' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          <h2 id={titleId} className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {editItem ? t('recurring.edit') : t('recurring.add')}
           </h2>
           <button
             onClick={onClose}
             className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+            aria-label={t('button.close', 'Close')}
           >
             <X className="w-5 h-5" />
           </button>

@@ -4,21 +4,20 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Lightbulb, X, Plus, ChevronDown, ChevronUp } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import {
   fetchRecurringSuggestions,
   dismissRecurringSuggestion,
   type RecurringSuggestion,
 } from '@/services/recurring-service'
-
-const CURRENCY_SYMBOLS: Record<string, string> = {
-  JPY: '¥',
-  USD: '$',
-  VND: '₫',
-}
 
 interface RecurringSuggestionsCardProps {
   onCreateFromSuggestion: (suggestion: RecurringSuggestion) => void
@@ -29,6 +28,11 @@ export function RecurringSuggestionsCard({
 }: RecurringSuggestionsCardProps) {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
+  const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
+  const { data: exchangeRates } = useExchangeRates()
+  const fmt = (amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
   const [isExpanded, setIsExpanded] = useState(true)
   const [dismissingHash, setDismissingHash] = useState<string | null>(null)
 
@@ -46,6 +50,7 @@ export function RecurringSuggestionsCard({
     },
     onError: () => {
       setDismissingHash(null)
+      toast.error(t('recurring.dismissFailed', 'Failed to dismiss. Please try again.'))
     },
   })
 
@@ -141,8 +146,7 @@ export function RecurringSuggestionsCard({
                       'font-numbers',
                       suggestion.is_income ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                     )}>
-                      {suggestion.is_income ? '+' : '-'}
-                      {CURRENCY_SYMBOLS['JPY']}{suggestion.amount.toLocaleString()}
+                      {suggestion.is_income ? '+' : '-'}{fmt(suggestion.amount)}
                     </span>
                     <span>{suggestion.category}</span>
                     <span>{formatFrequency(suggestion)}</span>

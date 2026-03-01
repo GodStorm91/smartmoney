@@ -1,7 +1,7 @@
 /**
  * Recurring Transactions Page
  */
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { Plus, RefreshCw } from 'lucide-react'
@@ -24,7 +24,19 @@ function getInitialTab(): TabKey {
 export default function Recurring() {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
-  const [activeTab, setActiveTab] = useState<TabKey>(getInitialTab)
+  const [activeTab, setActiveTabState] = useState<TabKey>(getInitialTab)
+
+  // Sync tab to URL without full navigation
+  const setActiveTab = useCallback((tab: TabKey) => {
+    setActiveTabState(tab)
+    const url = new URL(window.location.href)
+    if (tab === 'all') {
+      url.searchParams.delete('tab')
+    } else {
+      url.searchParams.set('tab', tab)
+    }
+    window.history.replaceState({}, '', url.toString())
+  }, [])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedSuggestion, setSelectedSuggestion] = useState<RecurringSuggestion | null>(null)
 
