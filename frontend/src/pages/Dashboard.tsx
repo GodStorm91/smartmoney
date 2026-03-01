@@ -23,7 +23,6 @@ import { InsightCards } from '@/components/dashboard/InsightCards'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
 import { HealthScoreCard } from '@/components/dashboard/HealthScoreCard'
-import { KpiRow } from '@/components/dashboard/KpiRow'
 import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts'
 import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard'
 import { DashboardGoalsSection } from '@/components/dashboard/DashboardGoalsSection'
@@ -219,40 +218,7 @@ export function Dashboard() {
         {/* 1. Onboarding (auto-hides after completion) */}
         <OnboardingChecklist />
 
-        {/* 2. Proxy Receivables (self-handles empty state) */}
-        <ProxyReceivablesWidget />
-
-        {/* 3. Net Worth Hero — THE focal point */}
-        <div className="pt-1">
-          <NetWorthHero summary={summary} accounts={accounts || []} />
-        </div>
-
-        {/* 3.5 Net Worth Trend */}
-        <NetWorthTrendChart data={monthlyTrends} />
-
-        {/* 3.6 Cashflow Forecast */}
-        <CashFlowForecastCard />
-
-        {/* 3.65 Spending Velocity */}
-        <SpendingVelocityCard />
-
-        {/* 3.7 AI Insights */}
-        {liveInsights && liveInsights.insights.length > 0 && (
-          <InsightCards insights={liveInsights.insights} />
-        )}
-
-        {/* 4. Alerts (merged smart + anomaly) */}
-        <DashboardAlerts
-          alerts={alerts}
-          unreadAnomalyCount={unreadAnomalies?.count}
-          budgetAlerts={budgetAlerts?.alerts || []}
-          onDismissBudgetAlert={(id) => markAlertReadMutation.mutate(id)}
-        />
-
-        {/* 4.5 Report Banner (first 7 days of month) */}
-        <ReportBanner />
-
-        {/* 5. Quick Actions */}
+        {/* 2. Quick Actions — primary interaction point */}
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex gap-3 pb-2 min-w-max">
             {quickActions.map((action, idx) => {
@@ -281,10 +247,27 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* 6. Monthly Summary — financial snapshot cluster */}
-        <div className="space-y-3">
-          <KpiRow summary={summary} formatCurrency={formatCurrency} accounts={accounts || []} exchangeRates={exchangeRates?.rates || {}} />
+        {/* 3. Net Worth Hero — THE focal point */}
+        <div className="pt-1">
+          <NetWorthHero summary={summary} accounts={accounts || []} />
+        </div>
 
+        {/* 4. Alerts (merged smart + anomaly + budget) */}
+        <DashboardAlerts
+          alerts={alerts}
+          unreadAnomalyCount={unreadAnomalies?.count}
+          budgetAlerts={budgetAlerts?.alerts || []}
+          onDismissBudgetAlert={(id) => markAlertReadMutation.mutate(id)}
+        />
+
+        {/* 4.5 Report Banner (first 7 days of month) */}
+        <ReportBanner />
+
+        {/* 5. Proxy Receivables (self-handles empty state) */}
+        <ProxyReceivablesWidget />
+
+        {/* 6. Monthly Summary — income/expenses + savings rate */}
+        <div className="space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
               <QuickStatCard
@@ -311,28 +294,42 @@ export function Dashboard() {
           <SavingsRateCard rate={savingsRate} />
         </div>
 
-        {/* 6.5 Financial Health Score */}
+        {/* 7. Net Worth Trend */}
+        <NetWorthTrendChart data={monthlyTrends} />
+
+        {/* 8. Cashflow Forecast */}
+        <CashFlowForecastCard />
+
+        {/* 9. Spending Velocity */}
+        <SpendingVelocityCard />
+
+        {/* 10. AI Insights */}
+        {liveInsights && liveInsights.insights.length > 0 && (
+          <InsightCards insights={liveInsights.insights} />
+        )}
+
+        {/* 11. Financial Health Score */}
         {healthScore && <HealthScoreCard data={healthScore} />}
 
-        {/* 7. Recent Transactions */}
+        {/* 12. Recent Transactions */}
         <RecentTransactionsCard
           transactions={recentTransactions}
           formatCurrency={formatTransactionCurrency}
         />
 
-        {/* 8. Spending Calendar (lazy-loaded — pulls date-fns) */}
+        {/* 13. Spending Calendar (lazy-loaded) */}
         <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
           <SpendingCalendar onDayClick={handleDayClick} />
         </Suspense>
 
-        {/* 9. Goals Progress */}
+        {/* 14. Goals Progress */}
         <DashboardGoalsSection
           goalsProgress={goalsProgress}
           goalsCount={goals?.length ?? 0}
           formatCurrency={formatTransactionCurrency}
         />
 
-        {/* 10. Subscriptions Widget */}
+        {/* 15. Subscriptions Widget */}
         <SubscriptionsWidget
           recurringTxns={recurringTxns}
           formatCurrency={formatCurrency}

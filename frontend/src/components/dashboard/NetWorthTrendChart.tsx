@@ -48,7 +48,7 @@ export function NetWorthTrendChart({ data }: NetWorthTrendChartProps) {
   if (!chartData || chartData.length === 0) return null
 
   return (
-    <Card className="p-4 shadow-card">
+    <Card className="p-4">
       <div className="flex items-center gap-2 mb-4">
         <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
           <TrendingUp className="w-4 h-4 text-primary-600 dark:text-primary-400" />
