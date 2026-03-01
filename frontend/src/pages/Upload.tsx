@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { useXPGain } from '@/hooks/useXPGain'
 import { Card } from '@/components/ui/Card'
 import { UploadDropZone } from '@/components/upload/UploadDropZone'
 import { UploadHistoryList } from '@/components/upload/UploadHistoryList'
@@ -20,6 +21,7 @@ export function Upload() {
   const [fileItems, setFileItems] = useState<FileUploadItem[]>([])
   const [selectedAccountId, setSelectedAccountId] = useState<number | undefined>()
   const queryClient = useQueryClient()
+  const { showReceiptUploadedXP } = useXPGain()
 
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
@@ -126,6 +128,7 @@ export function Upload() {
         } : f)
       )
       invalidateAfterUpload()
+      showReceiptUploadedXP()
     } catch (error) {
       console.error('Upload failed:', error)
 

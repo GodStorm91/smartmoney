@@ -118,10 +118,12 @@ export function MultipleFileUploadList({
 
       {/* Completion Message */}
       {allCompleted && (
-        <div className={`flex items-center gap-2 text-sm p-3 rounded-lg ${
-          errorFiles.length > 0 ? 'text-yellow-800 bg-yellow-50' : 'text-green-800 bg-green-50'
+        <div className={`flex items-center gap-2 text-sm p-3 rounded-lg animate-scale-in ${
+          errorFiles.length > 0
+            ? 'text-amber-800 bg-amber-50 dark:text-amber-300 dark:bg-amber-900/20'
+            : 'text-income-800 bg-income-50 dark:text-income-300 dark:bg-income-900/20'
         }`}>
-          <svg className="h-5 w-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="h-5 w-5 flex-shrink-0 animate-success-pop" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
           <span>

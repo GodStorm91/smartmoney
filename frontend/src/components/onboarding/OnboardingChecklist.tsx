@@ -6,7 +6,9 @@ import { fetchAccounts } from '@/services/account-service'
 import { fetchTransactions } from '@/services/transaction-service'
 import { fetchGoals } from '@/services/goal-service'
 import { Card } from '@/components/ui/Card'
-import { useState, useEffect } from 'react'
+import { Confetti } from '@/components/ui/Confetti'
+import { useState, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 interface OnboardingStep {
   id: string
@@ -20,6 +22,8 @@ interface OnboardingStep {
 export function OnboardingChecklist() {
   const { t } = useTranslation('common')
   const [isDismissed, setIsDismissed] = useState(false)
+  const [showCelebration, setShowCelebration] = useState(false)
+  const celebratedRef = useRef(false)
 
   // Check localStorage for dismissed state
   useEffect(() => {
@@ -81,9 +85,29 @@ export function OnboardingChecklist() {
   const allComplete = completedCount === steps.length
   const progress = Math.round((completedCount / steps.length) * 100)
 
-  // Don't show if dismissed or all complete
-  if (isDismissed || allComplete) {
+  // Celebrate when all steps complete (once per session)
+  useEffect(() => {
+    if (allComplete && !isDismissed && !celebratedRef.current) {
+      celebratedRef.current = true
+      setShowCelebration(true)
+      toast.success(t('onboarding.complete', 'Setup complete — you\'re all set!'))
+      // Auto-dismiss after celebration
+      const timer = setTimeout(() => {
+        localStorage.setItem('onboarding_dismissed', 'true')
+        setIsDismissed(true)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [allComplete, isDismissed, t])
+
+  // Don't show if dismissed (but show briefly during celebration)
+  if (isDismissed && !showCelebration) {
     return null
+  }
+
+  // Show celebration confetti
+  if (showCelebration) {
+    return <Confetti active duration={3000} pieces={60} onComplete={() => setShowCelebration(false)} />
   }
 
   const handleDismiss = () => {

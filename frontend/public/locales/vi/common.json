@@ -1893,52 +1893,52 @@
   },
   "emptyState": {
     "transactions": {
-      "title": "Chưa có giao dịch nào",
-      "description": "Tải lên CSV hoặc thêm giao dịch đầu tiên để bắt đầu theo dõi",
+      "title": "Câu chuyện tài chính bắt đầu từ đây",
+      "description": "Tải lên CSV hoặc thêm giao dịch đầu tiên — mọi hành trình đều bắt đầu từ bước đầu tiên",
       "cta": "Thêm giao dịch"
     },
     "goals": {
-      "title": "Đặt mục tiêu tiết kiệm đầu tiên",
-      "description": "Xác định mục tiêu 1, 3, 5 hoặc 10 năm và theo dõi tiến trình",
+      "title": "Ước mơ lớn, bắt đầu nhỏ",
+      "description": "Đặt mục tiêu tiết kiệm 1, 3, 5 hoặc 10 năm và theo dõi sự phát triển",
       "cta": "Tạo mục tiêu"
     },
     "budget": {
-      "title": "Chưa có ngân sách cho tháng này",
-      "description": "Tạo ngân sách để theo dõi chi tiêu theo kế hoạch",
+      "title": "Kiểm soát tháng này",
+      "description": "Một ngân sách đơn giản giúp bạn chi tiêu tự tin hơn",
       "cta": "Tạo ngân sách"
     },
     "accounts": {
-      "title": "Chưa có tài khoản nào",
-      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để bắt đầu theo dõi số dư",
+      "title": "Hãy bắt đầu sắp xếp",
+      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để thấy bức tranh toàn cảnh",
       "cta": "Thêm tài khoản đầu tiên"
     },
     "categories": {
-      "title": "Chưa có dữ liệu chi tiêu",
-      "description": "Thêm giao dịch để xem phân tích chi tiêu theo danh mục",
+      "title": "Khám phá chi tiêu của bạn",
+      "description": "Thêm giao dịch để tìm hiểu tiền của bạn đi đâu",
       "cta": "Thêm giao dịch"
     },
     "analytics": {
-      "title": "Không đủ dữ liệu để phân tích",
-      "description": "Thêm ít nhất một tháng giao dịch để xem xu hướng",
+      "title": "Phân tích sắp sẵn sàng",
+      "description": "Thêm ít nhất một tháng giao dịch để khám phá xu hướng và mẫu hình",
       "cta": "Tải lên CSV"
     },
     "bills": {
-      "title": "Chưa có hóa đơn nào",
-      "description": "Thêm hóa đơn định kỳ để nhận nhắc nhở trước hạn thanh toán",
+      "title": "Không bao giờ quên thanh toán",
+      "description": "Theo dõi hóa đơn định kỳ và nhận nhắc nhở nhẹ nhàng trước hạn",
       "cta": "Thêm hóa đơn"
     },
     "recurring": {
-      "title": "Chưa có giao dịch định kỳ",
-      "description": "Thiết lập theo dõi tự động cho các chi phí thường xuyên",
+      "title": "Tự động hóa thói quen",
+      "description": "Thiết lập theo dõi chi phí thường xuyên để không bỏ sót",
       "cta": "Thêm giao dịch định kỳ"
     },
     "dashboardRecent": {
-      "title": "Chưa có hoạt động gần đây",
+      "title": "Đã cập nhật đầy đủ",
       "description": "Các giao dịch mới nhất sẽ hiển thị tại đây"
     },
     "welcome": {
       "title": "Chào mừng đến SmartMoney",
-      "description": "Bắt đầu bằng cách thêm tài khoản và nhập giao dịch",
+      "description": "Người bạn đồng hành tài chính — hãy cùng bắt đầu",
       "cta": "Bắt đầu"
     }
   },

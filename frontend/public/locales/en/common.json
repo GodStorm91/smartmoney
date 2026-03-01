@@ -2042,52 +2042,52 @@
   },
   "emptyState": {
     "transactions": {
-      "title": "No transactions yet",
-      "description": "Upload a CSV or add your first transaction to start tracking",
+      "title": "Your financial story starts here",
+      "description": "Upload a CSV or add your first transaction — every journey begins with a single step",
       "cta": "Add Transaction"
     },
     "goals": {
-      "title": "Set your first savings goal",
-      "description": "Define targets for 1, 3, 5, or 10 years and track your progress",
+      "title": "Dream big, start small",
+      "description": "Set a savings goal for 1, 3, 5, or 10 years and watch your progress grow",
       "cta": "Create Goal"
     },
     "budget": {
-      "title": "No budget set for this month",
-      "description": "Create a budget to track spending against your plan",
+      "title": "Take control of this month",
+      "description": "A simple budget helps you spend with confidence",
       "cta": "Create Budget"
     },
     "accounts": {
-      "title": "No accounts yet",
-      "description": "Add your bank, credit card, or cash accounts to start tracking balances",
+      "title": "Let's get organized",
+      "description": "Add your bank, credit card, or cash accounts to see the full picture",
       "cta": "Add Your First Account"
     },
     "categories": {
-      "title": "No spending data yet",
-      "description": "Add transactions to see your spending breakdown by category",
+      "title": "Your spending story awaits",
+      "description": "Add transactions to uncover where your money goes",
       "cta": "Add Transaction"
     },
     "analytics": {
-      "title": "Not enough data for analytics",
-      "description": "Add at least one month of transactions to see trends and insights",
+      "title": "Insights are on the way",
+      "description": "Add at least one month of transactions to unlock trends and patterns",
       "cta": "Upload CSV"
     },
     "bills": {
-      "title": "No bills to track",
-      "description": "Add recurring bills to get reminders before due dates",
+      "title": "Never miss a payment",
+      "description": "Track recurring bills and get gentle reminders before due dates",
       "cta": "Add Bill"
     },
     "recurring": {
-      "title": "No recurring transactions",
-      "description": "Set up automated tracking for regular expenses",
+      "title": "Automate the routine",
+      "description": "Set up tracking for regular expenses so nothing slips through",
       "cta": "Add Recurring"
     },
     "dashboardRecent": {
-      "title": "No recent activity",
-      "description": "Your latest transactions will appear here"
+      "title": "All caught up",
+      "description": "Your latest transactions will appear here as you go"
     },
     "welcome": {
       "title": "Welcome to SmartMoney",
-      "description": "Start by adding an account and importing your transactions",
+      "description": "Your personal finance companion — let's get started together",
       "cta": "Get Started"
     }
   },

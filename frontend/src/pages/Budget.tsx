@@ -27,6 +27,7 @@ import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useXPGain } from '@/hooks/useXPGain'
 import { useBudgetTabState } from '@/hooks/useBudgetTabState'
 import { cn } from '@/utils/cn'
+import { toast } from 'sonner'
 import type { Budget, Transaction } from '@/types'
 import type { BudgetTab } from '@/hooks/useBudgetTabState'
 
@@ -389,7 +390,7 @@ export function BudgetPage() {
       {/* Save Confirmation Dialog */}
       <BudgetConfirmDialog
         isOpen={showConfirmDialog}
-        onConfirm={async () => { await queryClient.refetchQueries({ queryKey: ['budget'] }); setDraftBudget(null); setShowConfirmDialog(false) }}
+        onConfirm={async () => { await queryClient.refetchQueries({ queryKey: ['budget'] }); setDraftBudget(null); setShowConfirmDialog(false); toast.success(t('budget.saved', 'Budget saved')) }}
         onCancel={() => setShowConfirmDialog(false)}
         monthlyIncome={displayBudget?.monthly_income || 0}
         totalAllocated={totalAllocated}
