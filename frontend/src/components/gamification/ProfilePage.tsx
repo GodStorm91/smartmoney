@@ -5,7 +5,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { useProfile, useAvatars, useGamificationStats, useActivateAvatar, useUploadCustomAvatar, useDeleteAvatar } from '@/services/rewards-service';
+import { useProfile, useAvatars, useActivateAvatar, useUploadCustomAvatar, useDeleteAvatar } from '@/services/rewards-service';
+import { useGamificationStats } from '@/services/gamification-service';
 import { toast } from 'sonner';
 import { convertHeicToJpeg, isHeicFile } from '@/utils/heic-converter';
 

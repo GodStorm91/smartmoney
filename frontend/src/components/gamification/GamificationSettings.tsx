@@ -2,12 +2,12 @@ import React from 'react';
 import { Settings, Bell, Volume2, Share2, Trophy, Target, Flame } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
-import { useSettings, useUpdateSettings } from '@/services/rewards-service';
+import { useRewardsSettings, useUpdateRewardsSettings } from '@/services/rewards-service';
 import { toast } from 'sonner';
 
 export const GamificationSettings: React.FC = () => {
-  const { data: settings, isLoading } = useSettings();
-  const updateSettings = useUpdateSettings();
+  const { data: settings, isLoading } = useRewardsSettings();
+  const updateSettings = useUpdateRewardsSettings();
 
   const handleToggle = (key: string) => (checked: boolean) => {
     updateSettings.mutate({ [key]: checked }, {

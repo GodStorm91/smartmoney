@@ -250,16 +250,16 @@ export const useFeatureAccess = (featureCode: string) => useQuery({
   enabled: !!featureCode,
 });
 
-export const useSettings = () => useQuery({
-  queryKey: ['settings'],
+export const useRewardsSettings = () => useQuery({
+  queryKey: ['rewards', 'settings'],
   queryFn: () => rewardsService.getSettings(),
 });
 
-export const useUpdateSettings = () => {
+export const useUpdateRewardsSettings = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (settings: Partial<Settings>) => rewardsService.updateSettings(settings),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['settings'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['rewards', 'settings'] }),
   });
 };
 
@@ -280,10 +280,4 @@ export const useInitializeRewards = () => {
   });
 };
 
-export const useGamificationStats = () => useQuery({
-  queryKey: ['gamification-stats'],
-  queryFn: () => {
-    // Import dynamically to avoid circular dependency
-    return import('./gamification-service').then(m => m.gamificationService.getStats());
-  },
-});
+// useGamificationStats is exported from gamification-service.ts — import from there

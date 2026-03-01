@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { gamificationService, Achievement } from '@/services/gamification-service'
+import { useGamificationStats, gamificationService, type Achievement } from '@/services/gamification-service'
 import { useProfile } from '@/services/rewards-service'
 import { useXPToast } from './XPToast'
 import { HeroProgressCard } from './HeroProgressCard'
@@ -24,10 +24,7 @@ export function GamificationDashboard() {
   const [lastUnlockedIds, setLastUnlockedIds] = useState<Set<number>>(new Set())
   const [levelUpData, setLevelUpData] = useState<{ newLevel: number } | null>(null)
 
-  const { data: stats, refetch: refetchStats } = useQuery({
-    queryKey: ['gamification-stats'],
-    queryFn: () => gamificationService.getStats(),
-  })
+  const { data: stats, refetch: refetchStats } = useGamificationStats()
 
   const { data: achievementsData, refetch: refetchAchievements } = useQuery({
     queryKey: ['achievements'],

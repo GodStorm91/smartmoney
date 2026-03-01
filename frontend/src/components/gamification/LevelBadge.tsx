@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Star, Trophy } from 'lucide-react'
-import { useGamificationStats } from '@/services/rewards-service'
+import { useGamificationStats } from '@/services/gamification-service'
 
 export function LevelBadge() {
   const { t } = useTranslation('common');
