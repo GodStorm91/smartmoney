@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pencil, Trash2 } from 'lucide-react'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { Button } from '@/components/ui/Button'
-import { useCustomCategories, useDeleteUserCategory } from '@/hooks/useCategories'
+import { useCategoryTree, useDeleteCategory } from '@/hooks/useCategories'
 import { CreateCategoryModal } from '@/components/transactions/CreateCategoryModal'
 import { EditCategoryModal } from '@/components/transactions/EditCategoryModal'
 
@@ -16,8 +16,29 @@ interface Category {
 
 export function CategoryManagementSection() {
   const { t } = useTranslation('common')
-  const { data: categories = [], isLoading } = useCustomCategories()
-  const deleteMutation = useDeleteUserCategory()
+  const { data: tree, isLoading } = useCategoryTree()
+  const deleteMutation = useDeleteCategory()
+
+  // Flatten category tree into a list of custom (non-system) categories
+  const categories = useMemo(() => {
+    if (!tree) return []
+    const result: Category[] = []
+    for (const parent of tree.expense ?? []) {
+      for (const child of parent.children ?? []) {
+        if (!child.is_system) {
+          result.push({ id: child.id, name: child.name, icon: child.icon, type: 'expense' })
+        }
+      }
+    }
+    for (const parent of tree.income ?? []) {
+      for (const child of parent.children ?? []) {
+        if (!child.is_system) {
+          result.push({ id: child.id, name: child.name, icon: child.icon, type: 'income' })
+        }
+      }
+    }
+    return result
+  }, [tree])
 
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
