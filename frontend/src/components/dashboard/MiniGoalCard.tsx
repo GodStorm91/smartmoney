@@ -22,23 +22,36 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
       <div className={cn(
         'w-11 h-11 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0',
         isOnTrack
-          ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
-          : 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400'
+          ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
+          : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
       )}>
         {progressPct >= 100 ? '🎉' : `${Math.round(progressPct)}%`}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
-          {t('goals.yearGoal', { years })}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+            {t('goals.yearGoal', { years })}
+          </p>
+          <span className={cn(
+            'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
+            isOnTrack
+              ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
+              : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
+          )}>
+            {isOnTrack ? t('goals.onTrack') : t('goals.behind')}
+          </span>
+        </div>
         <p className="text-xs font-bold font-numbers text-gray-500 dark:text-gray-400 mt-0.5">
           {formatCurrency(progress.total_saved)}
+          <span className="font-normal ml-1.5">
+            {t('goals.monthsLeft', { count: progress.months_remaining ?? progress.achievability?.months_remaining ?? 0 })}
+          </span>
         </p>
         <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-600 rounded-full mt-2 overflow-hidden">
           <div
             className={cn(
               'h-full rounded-full animate-progress-fill',
-              isOnTrack ? 'bg-green-500' : 'bg-amber-500'
+              isOnTrack ? 'bg-income-600' : 'bg-amber-500'
             )}
             style={{ width: `${progressPct}%` }}
           />

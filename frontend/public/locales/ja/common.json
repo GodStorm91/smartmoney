@@ -142,7 +142,8 @@
     "subtitleMorning": "今日の財務状況を確認しましょう",
     "subtitleAfternoon": "今日の収支をチェック",
     "subtitleEvening": "今日の活動を振り返りましょう",
-    "subtitleNight": "本日のまとめ"
+    "subtitleNight": "本日のまとめ",
+    "subscriptions": "サブスクリプション"
   },
   "spendingCalendar": {
     "title": "支出カレンダー",
@@ -188,7 +189,10 @@
     "budgetExceeded": "予算超過",
     "budgetExceededDesc": "{{category}}が予算を{{amount}}超過しています",
     "goalDeadline": "目標期限",
-    "goalDeadlineDesc": "{{name}}: 残り{{days}}日、{{progress}}%達成"
+    "goalDeadlineDesc": "{{name}}: 残り{{days}}日、{{progress}}%達成",
+    "budgetWarning": "{{category}}: {{pct}}%使用済み",
+    "budgetRemaining": "残り{{amount}}",
+    "budgetOverspent": "予算オーバー！"
   },
   "comparison": {
     "title": "月間比較",
@@ -500,7 +504,12 @@
       "alreadySet": "設定済み",
       "ariaDisabled": "{{label}} - 設定済み",
       "ariaCreate": "{{label}}を作成"
-    }
+    },
+    "onTrack": "順調",
+    "behind": "遅れ",
+    "monthsLeft": "残り{{count}}ヶ月",
+    "saveSuggestion": "目標達成には月{{amount}}の貯蓄が必要",
+    "milestone": "{{years}}年目標の{{pct}}%達成！"
   },
   "common": {
     "loading": "読み込み中...",
@@ -2054,5 +2063,25 @@
     "setupHint": "設定画面で世帯人数、都道府県、年収を設定してください。",
     "errorTitle": "比較データの読み込みに失敗しました",
     "errorMessage": "取引が記録されていることを確認してから、もう一度お試しください。"
+  },
+  "export": {
+    "csv": "CSVエクスポート",
+    "csvSuccess": "CSVエクスポート完了",
+    "csvDateRange": "期間",
+    "startDate": "開始日",
+    "endDate": "終了日"
+  },
+  "subscriptions": {
+    "title": "サブスクリプション",
+    "monthlyTotal": "月額合計",
+    "perMonth": "/月",
+    "yearly": "年額: {{amount}}",
+    "detected": "検出されたサブスク",
+    "confirm": "確認",
+    "tab": {
+      "all": "すべて",
+      "subscriptions": "サブスク"
+    },
+    "noSubscriptions": "アクティブなサブスクはありません"
   }
 }

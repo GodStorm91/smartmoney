@@ -161,3 +161,19 @@ export async function restoreBudgetVersion(budgetId: number): Promise<Budget> {
   const response = await apiClient.post<Budget>(`/api/budgets/${budgetId}/restore`)
   return response.data
 }
+
+/**
+ * Fetch budget alerts
+ */
+export async function fetchBudgetAlerts(unreadOnly: boolean = true) {
+  const response = await apiClient.get('/api/budgets/alerts', { params: { unread_only: unreadOnly } })
+  return response.data
+}
+
+/**
+ * Mark a budget alert as read
+ */
+export async function markBudgetAlertRead(alertId: number) {
+  const response = await apiClient.get(`/api/budgets/alerts/${alertId}/read`)
+  return response.data
+}

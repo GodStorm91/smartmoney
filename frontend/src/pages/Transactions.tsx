@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, X, Filter, ChevronDown, Pencil, Trash2 } from 'lucide-react'
+import { ArrowLeft, X, Filter, ChevronDown, Pencil, Trash2, Download } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -556,6 +556,14 @@ export function Transactions() {
                 'w-4 h-4 transition-transform',
                 isFilterExpanded && 'rotate-180'
               )} />
+            </button>
+
+            <button
+              onClick={() => exportTransactionsCsv(sortedTransactions, filters.start_date, filters.end_date)}
+              className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              title={t('export.csv', 'Export CSV')}
+            >
+              <Download className="w-4 h-4" />
             </button>
 
             <div className="flex gap-1 overflow-x-auto scrollbar-hide flex-1">

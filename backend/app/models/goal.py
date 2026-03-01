@@ -17,6 +17,7 @@ class Goal(Base):
     years: Mapped[int] = mapped_column(Integer, nullable=False)  # 1, 3, 5, or 10
     target_amount: Mapped[int] = mapped_column(BigInteger, nullable=False)  # JPY in integers
     start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    last_milestone_pct: Mapped[int | None] = mapped_column(Integer, nullable=True, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
 
     # Foreign Keys

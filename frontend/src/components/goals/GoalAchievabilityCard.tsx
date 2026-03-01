@@ -65,24 +65,18 @@ export function GoalAchievabilityCard({
     return t('goal.insight.everyBitCounts')
   }
 
-  // Get status color
-  const statusColor = isCompleted
-    ? 'text-emerald-600 dark:text-emerald-400'
-    : isOnPace
-      ? 'text-emerald-600 dark:text-emerald-400'
-      : 'text-amber-600 dark:text-amber-400'
+  // Get status color — use semantic income-* tokens for on-track/completed
+  const statusColor = isCompleted || isOnPace
+    ? 'text-income-600 dark:text-income-300'
+    : 'text-amber-600 dark:text-amber-400'
 
-  const statusBg = isCompleted
-    ? 'bg-emerald-50 dark:bg-emerald-900/20'
-    : isOnPace
-      ? 'bg-emerald-50 dark:bg-emerald-900/20'
-      : 'bg-amber-50 dark:bg-amber-900/20'
+  const statusBg = isCompleted || isOnPace
+    ? 'bg-income-50 dark:bg-income-900/20'
+    : 'bg-amber-50 dark:bg-amber-900/20'
 
-  const progressColor = isCompleted
-    ? 'bg-emerald-500'
-    : isOnPace
-      ? 'bg-emerald-500'
-      : 'bg-amber-500'
+  const progressColor = isCompleted || isOnPace
+    ? 'bg-income-600'
+    : 'bg-amber-500'
 
   return (
     <div className={cn(
@@ -104,8 +98,8 @@ export function GoalAchievabilityCard({
           <div className={cn(
             'flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium',
             isCompleted || isOnPace
-              ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400'
-              : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
+              ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
+              : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
           )}>
             {isCompleted ? '🎉' : isOnPace ? <Check className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
             {isCompleted ? t('goal.status.completed') : isOnPace ? t('goal.status.onTrack') : t('goal.status.behind')}
@@ -134,12 +128,28 @@ export function GoalAchievabilityCard({
               )}
             </div>
           </div>
-          <div className="w-full h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className={cn('h-full rounded-full transition-[width] duration-500', progressColor)}
-              style={{ width: `${Math.min(100, progressPercentage)}%` }}
-            />
+          <div className="relative w-full h-2.5">
+            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className={cn('h-full rounded-full transition-[width] duration-500', progressColor)}
+                style={{ width: `${Math.min(100, progressPercentage)}%` }}
+              />
+            </div>
+            {[25, 50, 75].map((pct) => (
+              <div
+                key={pct}
+                className="absolute top-0 w-0.5 h-full bg-gray-400/50 dark:bg-gray-500/50"
+                style={{ left: `${pct}%` }}
+              />
+            ))}
           </div>
+          {!isOnPace && !isCompleted && (
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5">
+              {t('goal.saveToStayOnTrack', {
+                amount: formatCurrencyPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+              })}
+            </p>
+          )}
         </div>
 
         {/* Insight */}
@@ -189,7 +199,7 @@ export function GoalAchievabilityCard({
 
         {/* Delete Confirmation */}
         {showDeleteConfirm && onDelete && (
-          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 animate-in slide-in-from-top-2">
+          <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 animate-fade-in">
             <p className="text-xs text-center text-gray-600 dark:text-gray-400 mb-2">
               {t('goal.deleteConfirm')}
             </p>
@@ -216,7 +226,7 @@ export function GoalAchievabilityCard({
 
       {/* Expandable Details */}
       {showDetails && (
-        <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 animate-in slide-in-from-top-2">
+        <div className="px-4 pb-4 pt-2 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 animate-fade-in">
           {/* Monthly Breakdown */}
           <div className="grid grid-cols-2 gap-3 text-center">
             <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
@@ -225,10 +235,10 @@ export function GoalAchievabilityCard({
               </p>
               <p className={cn(
                 'text-sm font-semibold',
-                isOnPace ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                isOnPace ? 'text-income-600 dark:text-income-300' : 'text-amber-600 dark:text-amber-400'
               )}>
                 {formatCurrencyCompactPrivacy(achievability.current_monthly_net, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-                <span className="text-xs font-normal text-gray-400">/mo</span>
+                <span className="text-xs font-normal text-gray-400">/{t('subscriptions.mo', 'mo')}</span>
               </p>
             </div>
             <div className="p-2 bg-white dark:bg-gray-800 rounded-lg">
@@ -237,7 +247,7 @@ export function GoalAchievabilityCard({
               </p>
               <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {formatCurrencyCompactPrivacy(achievability.required_monthly, currency, exchangeRates?.rates || {}, false, isPrivacyMode)}
-                <span className="text-xs font-normal text-gray-400">/mo</span>
+                <span className="text-xs font-normal text-gray-400">/{t('subscriptions.mo', 'mo')}</span>
               </p>
             </div>
           </div>

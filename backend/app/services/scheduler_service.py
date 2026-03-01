@@ -5,6 +5,8 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
+from .budget_monitoring_job import BudgetMonitoringJob
+from .goal_service import GoalService
 from .recurring_service import RecurringTransactionService
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,21 @@ class SchedulerService:
                 name="Process due recurring transactions",
                 replace_existing=True,
             )
-            logger.info("Scheduler initialized with midnight job")
+            self._scheduler.add_job(
+                self._check_budget_thresholds,
+                CronTrigger(hour=8, minute=0),
+                id="check_budgets",
+                name="Check budget thresholds",
+                replace_existing=True,
+            )
+            self._scheduler.add_job(
+                self._check_goal_milestones,
+                CronTrigger(hour=9, minute=0),
+                id="check_goal_milestones",
+                name="Check goal milestones",
+                replace_existing=True,
+            )
+            logger.info("Scheduler initialized with midnight, budget check, and goal milestone jobs")
         except ImportError:
             logger.warning("APScheduler not installed, scheduler will not run automatically")
             self._scheduler = None
@@ -55,6 +71,37 @@ class SchedulerService:
         if self._scheduler and self._scheduler.running:
             self._scheduler.shutdown(wait=False)
             logger.info("Scheduler stopped")
+
+    def _check_budget_thresholds(self):
+        """Internal method called by scheduler to check budget thresholds."""
+        from ..database import SessionLocal
+
+        db = SessionLocal()
+        try:
+            job = BudgetMonitoringJob()
+            result = job.check_all_budgets(db)
+            if result["alerts_created"] > 0:
+                logger.info(f"Created {result['alerts_created']} budget alert(s)")
+        finally:
+            db.close()
+
+    def _check_goal_milestones(self):
+        """Internal method called by scheduler to check goal milestones."""
+        from ..database import SessionLocal
+        from ..models.user import User
+
+        db = SessionLocal()
+        try:
+            users = db.query(User).all()
+            for user in users:
+                try:
+                    milestones = GoalService.check_milestones(db, user.id)
+                    if milestones:
+                        logger.info(f"User {user.id}: {len(milestones)} goal milestone(s) reached")
+                except Exception as e:
+                    logger.error(f"Error checking milestones for user {user.id}: {e}")
+        finally:
+            db.close()
 
     def _process_due_transactions(self):
         """Internal method called by scheduler."""

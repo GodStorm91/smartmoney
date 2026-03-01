@@ -376,6 +376,64 @@ class GoalService:
         }
 
     @staticmethod
+    def check_milestones(db: Session, user_id: int) -> list[dict]:
+        """Check all goals for milestone achievements and create notifications.
+
+        Returns list of milestones reached.
+        """
+        from ..models.notification import InAppNotification
+
+        goals = GoalService.get_all_goals(db, user_id)
+        milestones_reached = []
+        milestone_thresholds = [25, 50, 75, 90, 100]
+
+        for goal in goals:
+            # Determine start date
+            if goal.start_date:
+                start_date = goal.start_date
+            else:
+                first_tx = (
+                    db.query(func.min(Transaction.date))
+                    .filter(Transaction.user_id == user_id, ~Transaction.is_transfer)
+                    .scalar()
+                )
+                start_date = first_tx or date.today()
+
+            total_saved = GoalService._calculate_net_savings(db, user_id, start_date)
+            if goal.target_amount <= 0:
+                continue
+
+            current_pct = (total_saved / goal.target_amount) * 100
+            last_pct = goal.last_milestone_pct or 0
+
+            for threshold in milestone_thresholds:
+                if current_pct >= threshold and last_pct < threshold:
+                    # Create notification
+                    notification = InAppNotification(
+                        user_id=user_id,
+                        type="goal_milestone",
+                        title=f"Goal Milestone: {threshold}%",
+                        message=f"{threshold}% of your {goal.years}-year goal reached!",
+                        data={"goal_id": goal.id, "milestone_pct": threshold, "years": goal.years},
+                        priority=2 if threshold >= 75 else 3,
+                        action_url="/goals",
+                        action_label="View Goals",
+                    )
+                    db.add(notification)
+
+                    goal.last_milestone_pct = threshold
+                    milestones_reached.append({
+                        "goal_id": goal.id,
+                        "years": goal.years,
+                        "milestone_pct": threshold,
+                    })
+
+        if milestones_reached:
+            db.commit()
+
+        return milestones_reached
+
+    @staticmethod
     def _generate_recommendation(
         status_tier: str,
         monthly_gap: int,

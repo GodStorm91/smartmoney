@@ -1,13 +1,16 @@
 """Export API routes for iOS app data transfer."""
+import csv
+import io
 import json
 import os
 import re
 import time
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from typing import Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
@@ -209,6 +212,70 @@ def _build_export_data(db: Session, user_id: int) -> dict:
             },
         },
     }
+
+
+@router.get("/csv")
+async def export_csv(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    category: Optional[str] = Query(None),
+    account_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Export transactions as CSV with optional filters."""
+    query = (
+        db.query(Transaction)
+        .filter(Transaction.user_id == current_user.id)
+        .order_by(Transaction.date.desc())
+    )
+    if start_date:
+        query = query.filter(Transaction.date >= start_date)
+    if end_date:
+        query = query.filter(Transaction.date <= end_date)
+    if category:
+        query = query.filter(Transaction.category == category)
+    if account_id:
+        query = query.filter(Transaction.account_id == account_id)
+
+    transactions = query.all()
+
+    # Build account name lookup
+    account_ids = {tx.account_id for tx in transactions if tx.account_id}
+    accounts_map: dict[int, str] = {}
+    if account_ids:
+        accs = db.query(Account).filter(Account.id.in_(account_ids)).all()
+        accounts_map = {a.id: a.name for a in accs}
+
+    output = io.StringIO()
+    output.write("\ufeff")  # BOM for Excel Japanese text
+    writer = csv.writer(output)
+    writer.writerow([
+        "Date", "Description", "Amount", "Currency", "Type",
+        "Category", "Subcategory", "Source", "Account", "Notes",
+    ])
+    for tx in transactions:
+        writer.writerow([
+            tx.date.isoformat(),
+            tx.description,
+            tx.amount,
+            tx.currency,
+            "income" if tx.is_income else "expense",
+            tx.category,
+            tx.subcategory or "",
+            tx.source,
+            accounts_map.get(tx.account_id, "") if tx.account_id else "",
+            tx.notes or "",
+        ])
+
+    output.seek(0)
+    today = datetime.utcnow().strftime("%Y-%m-%d")
+    filename = f"smartmoney-transactions-{today}.csv"
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.get("/ios")

@@ -37,7 +37,7 @@ import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileFor
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 import { getHouseholdProfile, updateHouseholdProfile } from '@/services/benchmark-service'
 import { toast } from 'sonner'
-import { exportForIOS, generateExportLink } from '@/services/export-service'
+import { exportForIOS, exportCsvFromServer, generateExportLink } from '@/services/export-service'
 import { QRCodeSVG } from 'qrcode.react'
 import { cn } from '@/utils/cn'
 
@@ -84,6 +84,10 @@ export function Settings() {
   const [linkCopied, setLinkCopied] = useState(false)
   const [linkCountdown, setLinkCountdown] = useState<string>('')
   const [linkExpired, setLinkExpired] = useState(false)
+  const [isExportingCsv, setIsExportingCsv] = useState(false)
+  const [csvExportSuccess, setCsvExportSuccess] = useState(false)
+  const [csvStartDate, setCsvStartDate] = useState('')
+  const [csvEndDate, setCsvEndDate] = useState('')
   
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
@@ -177,6 +181,23 @@ export function Settings() {
       toast.error(t('settings.export.error'))
     } finally {
       setIsExporting(false)
+    }
+  }
+
+  const handleExportCsv = async () => {
+    setIsExportingCsv(true)
+    setCsvExportSuccess(false)
+    try {
+      await exportCsvFromServer({
+        startDate: csvStartDate || undefined,
+        endDate: csvEndDate || undefined,
+      })
+      setCsvExportSuccess(true)
+      setTimeout(() => setCsvExportSuccess(false), 3000)
+    } catch {
+      toast.error(t('export.csvError', 'Failed to export CSV'))
+    } finally {
+      setIsExportingCsv(false)
     }
   }
 
@@ -470,6 +491,52 @@ export function Settings() {
                   {t('settings.export.success')}
                 </div>
               )}
+
+              {/* CSV Export */}
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                  {t('export.csv', 'Export CSV')}
+                </h4>
+                <div className="flex gap-2 mb-3">
+                  <Input
+                    type="date"
+                    value={csvStartDate}
+                    onChange={(e) => setCsvStartDate(e.target.value)}
+                    label={t('export.startDate', 'Start Date')}
+                  />
+                  <Input
+                    type="date"
+                    value={csvEndDate}
+                    onChange={(e) => setCsvEndDate(e.target.value)}
+                    label={t('export.endDate', 'End Date')}
+                  />
+                </div>
+                <Button
+                  onClick={handleExportCsv}
+                  disabled={isExportingCsv}
+                  variant="outline"
+                  className="w-full"
+                  size="lg"
+                >
+                  {isExportingCsv ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      {t('settings.export.exporting')}
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      {t('export.csv', 'Export CSV')}
+                    </>
+                  )}
+                </Button>
+                {csvExportSuccess && (
+                  <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 mt-2">
+                    <Check className="w-4 h-4" />
+                    {t('export.csvSuccess', 'CSV exported successfully')}
+                  </div>
+                )}
+              </div>
 
               {/* Generated Link Section */}
               {generatedLink && !linkExpired && (

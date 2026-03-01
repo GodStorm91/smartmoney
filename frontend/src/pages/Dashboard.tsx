@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense, useMemo, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
@@ -11,7 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRight,
-  Receipt
+  Receipt,
+  CreditCard
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -21,6 +22,7 @@ import { useProfile } from '@/services/rewards-service'
 const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalendar'))
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
+import { NetWorthTrendChart } from '@/components/dashboard/NetWorthTrendChart'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
 import { MiniGoalCard } from '@/components/dashboard/MiniGoalCard'
@@ -33,7 +35,9 @@ import { formatMonth, formatDate } from '@/utils/formatDate'
 import { fetchDashboardSummary, fetchMonthlyTrends } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
 import { fetchTransactions } from '@/services/transaction-service'
+import { fetchRecurringTransactions, type RecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { getUnreadAnomalyCount } from '@/services/anomaly-service'
+import { fetchBudgetAlerts, markBudgetAlertRead } from '@/services/budget-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -93,6 +97,24 @@ export function Dashboard() {
     queryFn: getUnreadAnomalyCount,
   })
 
+  const { data: recurringTxns } = useQuery({
+    queryKey: ['recurring-transactions', true],
+    queryFn: () => fetchRecurringTransactions(true),
+    staleTime: 5 * 60 * 1000,
+  })
+
+  const queryClient = useQueryClient()
+
+  const { data: budgetAlerts } = useQuery({
+    queryKey: ['budget-alerts'],
+    queryFn: () => fetchBudgetAlerts(true),
+  })
+
+  const markAlertReadMutation = useMutation({
+    mutationFn: markBudgetAlertRead,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['budget-alerts'] }),
+  })
+
   const [selectedDayTransactions, setSelectedDayTransactions] = useState<Transaction[] | null>(null)
   const [selectedDayDate, setSelectedDayDate] = useState<string | null>(null)
 
@@ -146,7 +168,7 @@ export function Dashboard() {
   return (
     <div className="min-h-screen pb-32">
       {/* Sticky Header — confident, content-driven */}
-      <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-700/50">
+      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50">
         <div className="max-w-2xl mx-auto px-4 py-3.5">
           <div className="flex items-center justify-between mb-2">
             <button
@@ -186,11 +208,19 @@ export function Dashboard() {
 
         {/* 3. Net Worth Hero — THE focal point */}
         <div className="pt-1">
-          <NetWorthHero summary={summary} />
+          <NetWorthHero summary={summary} accounts={accounts || []} />
         </div>
 
+        {/* 3.5 Net Worth Trend */}
+        <NetWorthTrendChart data={monthlyTrends} />
+
         {/* 4. Alerts (merged smart + anomaly) */}
-        <DashboardAlerts alerts={alerts} unreadAnomalyCount={unreadAnomalies?.count} />
+        <DashboardAlerts
+          alerts={alerts}
+          unreadAnomalyCount={unreadAnomalies?.count}
+          budgetAlerts={budgetAlerts?.alerts || []}
+          onDismissBudgetAlert={(id) => markAlertReadMutation.mutate(id)}
+        />
 
         {/* 4.5 Report Banner (first 7 days of month) */}
         <ReportBanner />
@@ -284,8 +314,8 @@ export function Dashboard() {
                     <div className={cn(
                       'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold',
                       tx.type === 'income'
-                        ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300'
-                        : 'bg-expense-100 text-expense-600 dark:bg-expense-900/30 dark:text-expense-300'
+                        ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
+                        : 'bg-expense-100 text-expense-600 dark:bg-expense-900/20 dark:text-expense-300'
                     )}>
                       {tx.type === 'income' ? '+' : '-'}
                     </div>
@@ -389,6 +419,57 @@ export function Dashboard() {
             </Card>
           </Link>
         )}
+
+        {/* 10. Subscriptions Widget */}
+        {(() => {
+          const subs = (recurringTxns || []).filter(
+            (r: RecurringTransaction) => !r.is_income && !r.is_transfer
+          )
+          if (subs.length === 0) return null
+          const toMo = (amt: number, freq: FrequencyType) => {
+            switch (freq) {
+              case 'daily': return amt * 30
+              case 'weekly': return amt * 4.33
+              case 'biweekly': return amt * 2.17
+              case 'yearly': return amt / 12
+              default: return amt
+            }
+          }
+          const monthlyTotal = subs.reduce((s, r) => s + toMo(r.amount, r.frequency), 0)
+          return (
+            <Card className="p-4 shadow-card">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                    <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+                    {t('subscriptions.title', 'Subscriptions')}: {formatCurrency(monthlyTotal)}/{t('subscriptions.mo', 'mo')}
+                  </h3>
+                </div>
+                <Link
+                  to="/recurring"
+                  search={{ tab: 'subscriptions' }}
+                  className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
+                >
+                  {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+              <div className="space-y-1">
+                {subs.slice(0, 3).map((sub) => (
+                  <div key={sub.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {sub.description}
+                    </p>
+                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
+                      {formatCurrency(toMo(sub.amount, sub.frequency))}/{t('subscriptions.mo', 'mo')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )
+        })()}
       </div>
 
       {/* Day Detail Modal */}

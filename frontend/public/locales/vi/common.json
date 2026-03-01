@@ -142,7 +142,8 @@
     "subtitleMorning": "Bắt đầu ngày mới với tổng quan tài chính",
     "subtitleAfternoon": "Xem tình hình tài chính hôm nay",
     "subtitleEvening": "Cùng xem lại hoạt động hôm nay",
-    "subtitleNight": "Tổng kết tài chính hôm nay"
+    "subtitleNight": "Tổng kết tài chính hôm nay",
+    "subscriptions": "Đăng ký"
   },
   "spendingCalendar": {
     "title": "Lịch chi tiêu",
@@ -188,7 +189,10 @@
     "budgetExceeded": "Vượt Ngân sách",
     "budgetExceededDesc": "{{category}} vượt ngân sách {{amount}}",
     "goalDeadline": "Hạn chót Mục tiêu",
-    "goalDeadlineDesc": "{{name}}: còn {{days}} ngày, hoàn thành {{progress}}%"
+    "goalDeadlineDesc": "{{name}}: còn {{days}} ngày, hoàn thành {{progress}}%",
+    "budgetWarning": "{{category}}: đã chi {{pct}}%",
+    "budgetRemaining": "Còn lại {{amount}}",
+    "budgetOverspent": "Vượt ngân sách!"
   },
   "comparison": {
     "title": "So sánh Tháng",
@@ -464,7 +468,12 @@
       "alreadySet": "Đã thiết lập",
       "ariaDisabled": "{{label}} - Đã thiết lập",
       "ariaCreate": "Tạo {{label}}"
-    }
+    },
+    "onTrack": "Đúng tiến độ",
+    "behind": "Chậm tiến độ",
+    "monthsLeft": "Còn {{count}} tháng",
+    "saveSuggestion": "Tiết kiệm {{amount}}/tháng để đạt mục tiêu",
+    "milestone": "Đã đạt {{pct}}% mục tiêu {{years}} năm!"
   },
   "common": {
     "loading": "Đang tải...",
@@ -2002,5 +2011,25 @@
     "setupHint": "Vào Cài đặt để cấu hình quy mô gia đình, tỉnh/thành và mức thu nhập.",
     "errorTitle": "Không thể tải dữ liệu so sánh",
     "errorMessage": "Vui lòng đảm bảo bạn đã ghi lại các giao dịch và thử lại."
+  },
+  "export": {
+    "csv": "Xuất CSV",
+    "csvSuccess": "Xuất CSV thành công",
+    "csvDateRange": "Khoảng thời gian",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc"
+  },
+  "subscriptions": {
+    "title": "Đăng ký định kỳ",
+    "monthlyTotal": "Tổng hàng tháng",
+    "perMonth": "/tháng",
+    "yearly": "Hàng năm: {{amount}}",
+    "detected": "Đăng ký phát hiện được",
+    "confirm": "Xác nhận",
+    "tab": {
+      "all": "Tất cả",
+      "subscriptions": "Đăng ký"
+    },
+    "noSubscriptions": "Không có đăng ký hoạt động"
   }
 }

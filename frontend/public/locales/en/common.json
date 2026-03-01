@@ -145,7 +145,8 @@
     "subtitleMorning": "Start your day with a quick overview",
     "subtitleAfternoon": "Here's how your finances look today",
     "subtitleEvening": "Let's review today's activity",
-    "subtitleNight": "Your financial snapshot"
+    "subtitleNight": "Your financial snapshot",
+    "subscriptions": "Subscriptions"
   },
   "spendingCalendar": {
     "title": "Spending Calendar",
@@ -219,7 +220,10 @@
     "thresholds": {
       "next": "Next threshold",
       "at_threshold": "At {{percentage}}%"
-    }
+    },
+    "budgetWarning": "{{category}}: {{pct}}% spent",
+    "budgetRemaining": "{{amount}} remaining",
+    "budgetOverspent": "Over budget!"
   },
   "comparison": {
     "title": "Month vs Month",
@@ -309,7 +313,12 @@
     "transactionCsvDesc": "Export all transactions to CSV format",
     "generatePdf": "Generate PDF",
     "downloading": "Downloading...",
-    "download": "Download"
+    "download": "Download",
+    "csv": "Export CSV",
+    "csvSuccess": "CSV exported successfully",
+    "csvDateRange": "Date range",
+    "startDate": "Start date",
+    "endDate": "End date"
   },
   "report": {
     "title": "Monthly Report",
@@ -577,7 +586,12 @@
       "alreadySet": "Already set",
       "ariaDisabled": "{{label}} - Already set",
       "ariaCreate": "Create {{label}}"
-    }
+    },
+    "onTrack": "On track",
+    "monthsLeft": "{{count}} months left",
+    "saveSuggestion": "Save {{amount}}/month to stay on track",
+    "milestone": "{{pct}}% of your {{years}}-year goal reached!",
+    "behind": "Behind"
   },
   "common": {
     "loading": "Loading...",
@@ -2141,5 +2155,18 @@
     "setupHint": "Go to Settings to configure your family size, prefecture, and income bracket.",
     "errorTitle": "Failed to load comparison data",
     "errorMessage": "Please ensure you have transactions recorded and try again."
+  },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "monthlyTotal": "Monthly total",
+    "perMonth": "/month",
+    "yearly": "Yearly: {{amount}}",
+    "detected": "Detected subscriptions",
+    "confirm": "Confirm",
+    "tab": {
+      "all": "All",
+      "subscriptions": "Subscriptions"
+    },
+    "noSubscriptions": "No active subscriptions"
   }
 }
