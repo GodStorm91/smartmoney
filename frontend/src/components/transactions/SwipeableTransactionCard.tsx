@@ -259,7 +259,13 @@ export function SwipeableTransactionCard({
         onClick={handleCardClick}
         onContextMenu={handleContextMenu}
       >
-        <Card className="cursor-pointer active:scale-[0.98] transition-transform">
+        <Card className={`cursor-pointer active:scale-[0.98] transition-transform border-l-[3px] ${
+          transaction.is_transfer
+            ? 'border-l-blue-400 dark:border-l-blue-500'
+            : transaction.type === 'income'
+              ? 'border-l-income-300 dark:border-l-income-600'
+              : 'border-l-expense-300 dark:border-l-expense-600'
+        }`}>
           <div className="flex justify-between items-start mb-2">
             <div>
               <p className="font-medium text-gray-900 dark:text-gray-50">{transaction.description}</p>
@@ -270,8 +276,8 @@ export function SwipeableTransactionCard({
                 transaction.is_transfer
                   ? 'text-blue-500 dark:text-blue-400'
                   : transaction.type === 'income'
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-red-600 dark:text-red-400'
+                    ? 'text-income-600 dark:text-income-300'
+                    : 'text-expense-600 dark:text-expense-300'
               }`}
             >
               {formatCurrencySignedPrivacy(
@@ -285,7 +291,7 @@ export function SwipeableTransactionCard({
             </p>
           </div>
           <div className="flex gap-2 text-xs">
-            <Badge>{transaction.category}</Badge>
+            <Badge variant={transaction.is_transfer ? 'info' : transaction.type === 'income' ? 'success' : 'error'}>{transaction.category}</Badge>
             <span className="text-gray-600 dark:text-gray-400">{transaction.source}</span>
           </div>
         </Card>

@@ -859,7 +859,13 @@ export function Transactions() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
                 {displayedTransactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <tr key={tx.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                    tx.is_transfer
+                      ? 'border-l-[3px] border-l-blue-400 dark:border-l-blue-500'
+                      : tx.type === 'income'
+                        ? 'border-l-[3px] border-l-income-300 dark:border-l-income-600'
+                        : 'border-l-[3px] border-l-expense-300 dark:border-l-expense-600'
+                  }`}>
                     <td className="px-4 py-4">
                       <input
                         type="checkbox"
@@ -870,9 +876,9 @@ export function Transactions() {
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{formatDate(tx.date)}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{tx.description}</td>
-                    <td className="px-6 py-4"><Badge variant={tx.type === 'income' ? 'info' : 'default'}>{tx.category}</Badge></td>
+                    <td className="px-6 py-4"><Badge variant={tx.is_transfer ? 'info' : tx.type === 'income' ? 'success' : 'error'}>{tx.category}</Badge></td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{tx.source}</td>
-                    <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.is_transfer ? 'text-blue-500 dark:text-blue-400' : tx.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                    <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.is_transfer ? 'text-blue-500 dark:text-blue-400' : tx.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'}`}>
                       {formatCurrencySignedPrivacy(tx.amount, tx.type, tx.currency || 'JPY', rates, true, isPrivacyMode)}
                     </td>
                     <td className="px-6 py-4">
@@ -907,10 +913,10 @@ export function Transactions() {
                 groupedTransactions.map((group) => (
                   <div key={group.date}>
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      <h3 className="text-xs font-bold uppercase tracking-wide text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-full">
                         {formatDateHeader(group.date)}
                       </h3>
-                      <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+                      <div className="flex-1 h-px bg-primary-100 dark:bg-primary-800/30" />
                     </div>
                     <div className="space-y-3">
                       {group.transactions.map((tx) => (
