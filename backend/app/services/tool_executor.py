@@ -72,6 +72,8 @@ class ToolExecutor:
             return self._update_budget(params)
         elif tool_name == "get_spending_benchmark":
             return self._get_spending_benchmark(params)
+        elif tool_name == "what_if_scenario":
+            return self._what_if_scenario(params)
         else:
             raise ValueError(f"Unknown tool: {tool_name}")
 
@@ -721,3 +723,86 @@ class ToolExecutor:
                 "error": "execution",
                 "message": f"Failed to get spending benchmark: {str(e)}",
             }
+
+    def _what_if_scenario(self, params: dict[str, Any]) -> dict[str, Any]:
+        """Run a what-if financial scenario projection.
+
+        Args:
+            params: Tool parameters (monthly_income_change, monthly_expense_change, months)
+
+        Returns:
+            Baseline vs scenario comparison with goal impact
+        """
+        from .forecast_service import ForecastService
+
+        income_change = params.get("monthly_income_change", 0)
+        expense_change = params.get("monthly_expense_change", 0)
+        months = params.get("months", 12)
+
+        monthly_net_change = income_change - expense_change
+
+        if monthly_net_change == 0:
+            return {
+                "success": False,
+                "message": "No changes specified. Provide monthly_income_change or monthly_expense_change."
+            }
+
+        # Get baseline forecast
+        try:
+            baseline = ForecastService.get_cashflow_forecast(
+                self.db, self.user_id, months=months, include_actual=0
+            )
+        except Exception as e:
+            logger.error(f"Forecast failed: {e}", exc_info=True)
+            return {"success": False, "message": "Could not generate forecast"}
+
+        baseline_end = baseline["summary"]["end_balance"]
+        baseline_monthly_net = baseline["summary"]["avg_monthly_net"]
+
+        # Calculate scenario
+        scenario_end = baseline_end + (monthly_net_change * months)
+        scenario_monthly_net = baseline_monthly_net + monthly_net_change
+
+        # Months until negative balance in scenario
+        current_balance = baseline["current_balance"]
+        months_until_negative = None
+        if scenario_monthly_net < 0:
+            months_until_negative = max(1, int(-current_balance / scenario_monthly_net))
+
+        # Impact on goals
+        goals = self.goal_service.get_all_goals(self.db, self.user_id)
+        goal_impacts = []
+        for goal in goals:
+            progress = self.goal_service.calculate_goal_progress(self.db, self.user_id, goal)
+            remaining = progress.get("remaining_amount", 0) if isinstance(progress, dict) else 0
+            if remaining > 0 and monthly_net_change > 0:
+                months_saved = remaining / monthly_net_change
+                goal_impacts.append({
+                    "goal": f"{goal.years}-year goal",
+                    "target": goal.target_amount,
+                    "months_accelerated": round(months_saved, 1)
+                })
+
+        return {
+            "success": True,
+            "scenario": {
+                "monthly_income_change": income_change,
+                "monthly_expense_change": expense_change,
+                "monthly_net_change": monthly_net_change
+            },
+            "baseline": {
+                "end_balance": baseline_end,
+                "avg_monthly_net": baseline_monthly_net,
+            },
+            "projected": {
+                "end_balance": scenario_end,
+                "avg_monthly_net": scenario_monthly_net,
+                "months_until_negative": months_until_negative,
+            },
+            "difference": {
+                "end_balance_change": scenario_end - baseline_end,
+                "total_impact_over_period": monthly_net_change * months,
+            },
+            "goal_impacts": goal_impacts,
+            "projection_months": months
+        }

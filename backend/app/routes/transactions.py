@@ -105,6 +105,44 @@ async def get_transactions(
     }
 
 
+@router.get("/duplicates")
+def get_duplicates(
+    threshold: float = 0.75,
+    date_window: int = 3,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Find fuzzy duplicate transactions."""
+    duplicates = TransactionService.find_fuzzy_duplicates(
+        db, current_user.id,
+        threshold=threshold,
+        date_window_days=date_window
+    )
+    return {"duplicates": duplicates, "count": len(duplicates)}
+
+
+@router.post("/duplicates/resolve")
+def resolve_duplicate(
+    action: str,
+    keep_id: int,
+    remove_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Resolve a duplicate pair by merging or dismissing."""
+    if action == "merge":
+        tx = TransactionService.get_transaction(db, current_user.id, remove_id)
+        if not tx:
+            raise HTTPException(status_code=404, detail="Transaction not found")
+        db.delete(tx)
+        db.commit()
+        return {"success": True, "action": "merged", "kept_id": keep_id, "removed_id": remove_id}
+    elif action == "dismiss":
+        return {"success": True, "action": "dismissed"}
+    else:
+        raise HTTPException(status_code=400, detail="Action must be 'merge' or 'dismiss'")
+
+
 @router.get("/{transaction_id}", response_model=TransactionResponse)
 async def get_transaction(
     transaction_id: int,

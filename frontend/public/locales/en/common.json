@@ -2203,5 +2203,19 @@
     "good": "Good",
     "fair": "Fair",
     "needsWork": "Needs Work"
+  },
+  "duplicates": {
+    "title": "Duplicate Transactions",
+    "found": "{{count}} potential duplicates found",
+    "none": "No duplicates found",
+    "similarity": "{{percent}}% match",
+    "daysApart": "{{days}} day(s) apart",
+    "keepLeft": "Keep Left",
+    "keepRight": "Keep Right",
+    "keepBoth": "Keep Both",
+    "merged": "Duplicate removed",
+    "dismissed": "Marked as not duplicate",
+    "source": "Source",
+    "review": "Review Duplicates"
   }
 }

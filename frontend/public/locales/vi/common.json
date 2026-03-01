@@ -2066,5 +2066,19 @@
     "good": "Tốt",
     "fair": "Trung bình",
     "needsWork": "Cần cải thiện"
+  },
+  "duplicates": {
+    "title": "Giao dịch trùng lặp",
+    "found": "Tìm thấy {{count}} cặp có thể trùng lặp",
+    "none": "Không tìm thấy giao dịch trùng lặp",
+    "similarity": "Khớp {{percent}}%",
+    "daysApart": "Cách {{days}} ngày",
+    "keepLeft": "Giữ bên trái",
+    "keepRight": "Giữ bên phải",
+    "keepBoth": "Giữ cả hai",
+    "merged": "Đã xóa giao dịch trùng lặp",
+    "dismissed": "Đã đánh dấu là không trùng lặp",
+    "source": "Nguồn",
+    "review": "Xem xét trùng lặp"
   }
 }

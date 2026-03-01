@@ -178,5 +178,30 @@ def get_tool_definitions() -> list[dict[str, Any]]:
                 "properties": {},
                 "required": []
             }
+        },
+        {
+            "name": "what_if_scenario",
+            "description": "Run a what-if financial scenario. Use this when the user asks hypothetical questions like 'What if I save ¥20,000 more?', 'What if my rent increases?', 'What if I cut dining expenses by 50%?'. Shows projected impact on cashflow and goals.",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "monthly_income_change": {
+                        "type": "integer",
+                        "description": "Monthly income change in JPY (positive = more income, negative = less)"
+                    },
+                    "monthly_expense_change": {
+                        "type": "integer",
+                        "description": "Monthly expense change in JPY (positive = more expense, negative = less expense/savings)"
+                    },
+                    "months": {
+                        "type": "integer",
+                        "description": "Number of months to project. Defaults to 12.",
+                        "minimum": 1,
+                        "maximum": 24,
+                        "default": 12
+                    }
+                },
+                "required": []
+            }
         }
     ]

@@ -1,5 +1,5 @@
 """Transaction service for CRUD operations and filtering."""
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
 
 from sqlalchemy import func
@@ -244,6 +244,92 @@ class TransactionService:
         db.delete(transaction)
         db.commit()
         return True
+
+    @staticmethod
+    def find_fuzzy_duplicates(
+        db: Session,
+        user_id: int,
+        threshold: float = 0.75,
+        date_window_days: int = 3,
+        limit: int = 50
+    ) -> list[dict]:
+        """Find likely duplicate transactions using fuzzy matching.
+
+        Groups transactions by: same amount + similar description + close dates.
+        Uses SequenceMatcher for description similarity (no external deps needed).
+        """
+        from difflib import SequenceMatcher
+
+        # Get recent transactions (last 6 months to keep it fast)
+        six_months_ago = date.today() - timedelta(days=180)
+        transactions = db.query(Transaction).filter(
+            Transaction.user_id == user_id,
+            Transaction.date >= six_months_ago
+        ).order_by(Transaction.date.desc()).all()
+
+        # Group by amount for O(n) instead of O(n²)
+        amount_groups: dict[int, list] = {}
+        for tx in transactions:
+            amount_groups.setdefault(tx.amount, []).append(tx)
+
+        duplicates = []
+        seen_pairs = set()
+
+        for amount, group in amount_groups.items():
+            if len(group) < 2:
+                continue
+
+            for i, tx1 in enumerate(group):
+                for tx2 in group[i+1:]:
+                    pair_key = (min(tx1.id, tx2.id), max(tx1.id, tx2.id))
+                    if pair_key in seen_pairs:
+                        continue
+
+                    # Check date proximity
+                    date_diff = abs((tx1.date - tx2.date).days)
+                    if date_diff > date_window_days:
+                        continue
+
+                    # Check description similarity
+                    similarity = SequenceMatcher(
+                        None,
+                        tx1.description.lower(),
+                        tx2.description.lower()
+                    ).ratio()
+
+                    if similarity >= threshold:
+                        seen_pairs.add(pair_key)
+                        duplicates.append({
+                            "transaction_1": {
+                                "id": tx1.id,
+                                "date": tx1.date.isoformat(),
+                                "description": tx1.description,
+                                "amount": tx1.amount,
+                                "currency": tx1.currency,
+                                "category": tx1.category,
+                                "source": tx1.source,
+                                "type": "income" if tx1.is_income else "expense",
+                                "account_id": tx1.account_id,
+                            },
+                            "transaction_2": {
+                                "id": tx2.id,
+                                "date": tx2.date.isoformat(),
+                                "description": tx2.description,
+                                "amount": tx2.amount,
+                                "currency": tx2.currency,
+                                "category": tx2.category,
+                                "source": tx2.source,
+                                "type": "income" if tx2.is_income else "expense",
+                                "account_id": tx2.account_id,
+                            },
+                            "similarity": round(similarity, 2),
+                            "date_diff_days": date_diff,
+                        })
+
+                        if len(duplicates) >= limit:
+                            return sorted(duplicates, key=lambda d: d["similarity"], reverse=True)
+
+        return sorted(duplicates, key=lambda d: d["similarity"], reverse=True)
 
     @staticmethod
     def get_summary(

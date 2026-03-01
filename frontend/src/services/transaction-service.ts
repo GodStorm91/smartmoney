@@ -178,3 +178,54 @@ export async function fetchTransactionSuggestions(
   )
   return response.data
 }
+
+/**
+ * Duplicate detection types
+ */
+export interface DuplicateTransaction {
+  id: number
+  date: string
+  description: string
+  amount: number
+  currency: string
+  category: string
+  source: string
+  type: 'income' | 'expense'
+  account_id: number | null
+}
+
+export interface DuplicatePair {
+  transaction_1: DuplicateTransaction
+  transaction_2: DuplicateTransaction
+  similarity: number
+  date_diff_days: number
+}
+
+export interface DuplicatesResponse {
+  duplicates: DuplicatePair[]
+  count: number
+}
+
+/**
+ * Fetch potential duplicate transaction pairs
+ */
+export async function fetchDuplicates(threshold = 0.75, dateWindow = 3): Promise<DuplicatesResponse> {
+  const { data } = await apiClient.get<DuplicatesResponse>('/api/transactions/duplicates', {
+    params: { threshold, date_window: dateWindow }
+  })
+  return data
+}
+
+/**
+ * Resolve a duplicate pair by merging or dismissing
+ */
+export async function resolveDuplicate(
+  action: 'merge' | 'dismiss',
+  keepId: number,
+  removeId: number
+): Promise<{ success: boolean }> {
+  const { data } = await apiClient.post<{ success: boolean }>('/api/transactions/duplicates/resolve', null, {
+    params: { action, keep_id: keepId, remove_id: removeId }
+  })
+  return data
+}

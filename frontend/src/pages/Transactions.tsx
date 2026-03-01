@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, X, Filter, ChevronDown, Pencil, Trash2, Download } from 'lucide-react'
+import { ArrowLeft, X, Filter, ChevronDown, Pencil, Trash2, Download, Copy } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
@@ -21,10 +21,11 @@ import { DeleteConfirmDialog } from '@/components/transactions/DeleteConfirmDial
 import { BulkRecategorizeModal } from '@/components/transactions/BulkRecategorizeModal'
 import { BulkDeleteConfirmDialog } from '@/components/transactions/BulkDeleteConfirmDialog'
 import { ReceiptScannerModal } from '@/components/receipts/ReceiptScannerModal'
+import { DuplicateReviewModal } from '@/components/transactions/DuplicateReviewModal'
 import { formatCurrencyPrivacy, formatCurrencySignedPrivacy, CURRENCY_DECIMALS, toStorageAmount } from '@/utils/formatCurrency'
 import { formatDate, getCurrentMonthRange, formatDateHeader } from '@/utils/formatDate'
 import { exportTransactionsCsv } from '@/utils/exportCsv'
-import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory, createTransaction } from '@/services/transaction-service'
+import { fetchTransactions, deleteTransaction, bulkDeleteTransactions, bulkUpdateCategory, createTransaction, fetchDuplicates } from '@/services/transaction-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useRatesMap } from '@/hooks/useExchangeRates'
@@ -240,6 +241,7 @@ export function Transactions() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [isBulkRecategorizeOpen, setIsBulkRecategorizeOpen] = useState(false)
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false)
+  const [isDuplicateReviewOpen, setIsDuplicateReviewOpen] = useState(false)
 
   // Merge accountId from URL directly into filters for the query
   // This ensures the query always uses the current URL accountId, not stale state
@@ -252,6 +254,13 @@ export function Transactions() {
     queryKey: ['transactions', effectiveFilters],
     queryFn: () => fetchTransactions(effectiveFilters),
   })
+
+  const { data: duplicatesData } = useQuery({
+    queryKey: ['transaction-duplicates'],
+    queryFn: () => fetchDuplicates(0.75, 3),
+    staleTime: 5 * 60 * 1000,
+  })
+  const duplicateCount = duplicatesData?.count ?? 0
 
   useEffect(() => {
     setSelectedIds(new Set())
@@ -564,6 +573,25 @@ export function Transactions() {
               title={t('export.csv', 'Export CSV')}
             >
               <Download className="w-4 h-4" />
+            </button>
+
+            <button
+              onClick={() => setIsDuplicateReviewOpen(true)}
+              className={cn(
+                'relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap',
+                duplicateCount > 0
+                  ? 'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-300 hover:bg-warning-200 dark:hover:bg-warning-800/40'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              )}
+              title={t('duplicates.review')}
+            >
+              <Copy className="w-4 h-4" />
+              <span className="hidden sm:inline">{t('duplicates.review')}</span>
+              {duplicateCount > 0 && (
+                <span className="inline-flex items-center justify-center bg-warning-500 text-white text-[10px] font-black rounded-full w-4 h-4 leading-none">
+                  {duplicateCount}
+                </span>
+              )}
             </button>
 
             <div className="flex gap-1 overflow-x-auto scrollbar-hide flex-1">
@@ -1020,6 +1048,11 @@ export function Transactions() {
         isOpen={isReceiptScannerOpen}
         onClose={() => setIsReceiptScannerOpen(false)}
         onScanComplete={handleReceiptScanComplete}
+      />
+
+      <DuplicateReviewModal
+        isOpen={isDuplicateReviewOpen}
+        onClose={() => setIsDuplicateReviewOpen(false)}
       />
 
       {/* FAB Button */}

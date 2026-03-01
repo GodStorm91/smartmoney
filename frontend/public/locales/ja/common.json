@@ -2118,5 +2118,19 @@
     "good": "良好",
     "fair": "普通",
     "needsWork": "要改善"
+  },
+  "duplicates": {
+    "title": "重複取引",
+    "found": "{{count}}件の重複候補が見つかりました",
+    "none": "重複は見つかりませんでした",
+    "similarity": "{{percent}}%一致",
+    "daysApart": "{{days}}日の差",
+    "keepLeft": "左を残す",
+    "keepRight": "右を残す",
+    "keepBoth": "両方を残す",
+    "merged": "重複を削除しました",
+    "dismissed": "重複ではないとしてマークしました",
+    "source": "ソース",
+    "review": "重複を確認"
   }
 }
