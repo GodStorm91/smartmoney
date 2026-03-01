@@ -46,7 +46,7 @@ export function InsightCards({ insights }: InsightCardsProps) {
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   return (
-    <Card className="p-4 shadow-card">
+    <Card className="p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/30">
@@ -74,7 +74,7 @@ export function InsightCards({ insights }: InsightCardsProps) {
               className="flex items-start gap-3 py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
               style={{ '--stagger-index': idx } as React.CSSProperties}
             >
-              <div className={cn('p-1.5 rounded-lg shrink-0 mt-0.5', config.bg)}>
+              <div className={cn('p-1.5 rounded-xl shrink-0 mt-0.5', config.bg)}>
                 <Icon className={cn('w-3.5 h-3.5', config.color)} />
               </div>
               <div className="flex-1 min-w-0">

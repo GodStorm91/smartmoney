@@ -1,21 +1,15 @@
-import { useState, lazy, Suspense, useMemo, useCallback } from 'react'
+import { useState, lazy, Suspense, useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import {
-  Target,
   Plus,
   Camera,
   Upload,
   PieChart,
   ChevronLeft,
   ChevronRight,
-  ArrowRight,
-  Receipt,
-  CreditCard
 } from 'lucide-react'
-import { Card } from '@/components/ui/Card'
-import { EmptyState } from '@/components/ui/EmptyState'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { useGreeting } from '@/hooks/useGreeting'
 import { useProfile } from '@/services/rewards-service'
@@ -28,19 +22,21 @@ import { SpendingVelocityCard } from '@/components/dashboard/SpendingVelocityCar
 import { InsightCards } from '@/components/dashboard/InsightCards'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
-import { MiniGoalCard } from '@/components/dashboard/MiniGoalCard'
 import { HealthScoreCard } from '@/components/dashboard/HealthScoreCard'
 import { KpiRow } from '@/components/dashboard/KpiRow'
 import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts'
+import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard'
+import { DashboardGoalsSection } from '@/components/dashboard/DashboardGoalsSection'
+import { SubscriptionsWidget } from '@/components/dashboard/SubscriptionsWidget'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
 import { ReportBanner } from '@/components/dashboard/ReportBanner'
-import { formatMonth, formatDate } from '@/utils/formatDate'
+import { formatMonth } from '@/utils/formatDate'
 import { fetchHealthScore } from '@/services/health-score-service'
 import { fetchDashboardSummary, fetchMonthlyTrends } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
 import { fetchTransactions } from '@/services/transaction-service'
-import { fetchRecurringTransactions, type RecurringTransaction, type FrequencyType } from '@/services/recurring-service'
+import { fetchRecurringTransactions } from '@/services/recurring-service'
 import { getUnreadAnomalyCount } from '@/services/anomaly-service'
 import { fetchBudgetAlerts, markBudgetAlertRead } from '@/services/budget-service'
 import { getLiveInsights } from '@/services/insight-service'
@@ -192,21 +188,23 @@ export function Dashboard() {
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() - 1); setCurrentDate(d) }}
               className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label={t('dashboard.prevMonth', 'Previous month')}
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.1em]">
+            <h1 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.12em]">
               {formatMonth(currentDate)}
             </h1>
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() + 1); setCurrentDate(d) }}
               className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              aria-label={t('dashboard.nextMonth', 'Next month')}
             >
               <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
           </div>
           <div>
-            <h2 className="text-[1.75rem] sm:text-[2rem] font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
+            <h2 className="text-[1.875rem] sm:text-[2.25rem] font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
               {emoji} {greeting}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
@@ -317,191 +315,28 @@ export function Dashboard() {
         {healthScore && <HealthScoreCard data={healthScore} />}
 
         {/* 7. Recent Transactions */}
-        <Card className="p-4 shadow-card">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
-                <Receipt className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-              </div>
-              <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-                {t('dashboard.recentTransactions', 'Recent')}
-              </h3>
-            </div>
-            <Link
-              to="/transactions"
-              className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
-            >
-              {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-          {recentTransactions && recentTransactions.length > 0 ? (
-            <div className="space-y-1">
-              {recentTransactions.slice(0, 5).map((tx, idx) => (
-                <div
-                  key={tx.id}
-                  className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
-                  style={{ '--stagger-index': idx } as React.CSSProperties}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold',
-                      tx.type === 'income'
-                        ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
-                        : 'bg-expense-100 text-expense-600 dark:bg-expense-900/20 dark:text-expense-300'
-                    )}>
-                      {tx.type === 'income' ? '+' : '-'}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                        {tx.description || tx.category}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(tx.date, 'MM/dd')}
-                      </p>
-                    </div>
-                  </div>
-                  <span className={cn(
-                    'text-base font-bold font-numbers tracking-tight',
-                    tx.type === 'income'
-                      ? 'text-income-600 dark:text-income-300'
-                      : 'text-gray-900 dark:text-gray-100'
-                  )}>
-                    {tx.type === 'income' ? '+' : '-'}{formatTransactionCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              compact
-              icon={<Receipt />}
-              title={t('emptyState.dashboardRecent.title', 'No recent activity')}
-              description={t('emptyState.dashboardRecent.description', 'Your latest transactions will appear here')}
-              action={
-                <Link to="/transactions" className="text-sm font-semibold text-primary-600 dark:text-primary-400">
-                  {t('emptyState.transactions.cta', 'Add Transaction')}
-                </Link>
-              }
-            />
-          )}
-        </Card>
+        <RecentTransactionsCard
+          transactions={recentTransactions}
+          formatCurrency={formatTransactionCurrency}
+        />
 
         {/* 8. Spending Calendar (lazy-loaded — pulls date-fns) */}
         <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
           <SpendingCalendar onDayClick={handleDayClick} />
         </Suspense>
 
-        {/* 9. Goals Progress (limit 2) */}
-        {goalsProgress && goalsProgress.length > 0 && (
-          <Card className="p-4 shadow-card">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 rounded-xl bg-pink-100 dark:bg-pink-900/30">
-                  <Target className="w-4 h-4 text-pink-600 dark:text-pink-400" />
-                </div>
-                <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-                  {t('dashboard.goals', 'Goals')}
-                </h3>
-              </div>
-              <Link
-                to="/goals"
-                className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
-              >
-                {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {goalsProgress.slice(0, 2).map((progress, idx) => (
-                progress.achievability && (
-                  <div
-                    key={progress.goal_id}
-                    className="animate-stagger-in"
-                    style={{ '--stagger-index': idx } as React.CSSProperties}
-                  >
-                    <MiniGoalCard
-                      years={progress.years}
-                      progress={progress}
-                      formatCurrency={formatTransactionCurrency}
-                    />
-                  </div>
-                )
-              ))}
-            </div>
-          </Card>
-        )}
-
-        {/* Fallback for no goals */}
-        {(!goalsProgress || goalsProgress.length === 0) && goals && goals.length === 0 && (
-          <Link to="/goals">
-            <Card className="p-4 shadow-card border-2 border-dashed border-pink-200 dark:border-pink-800/40 hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-lg transition-all cursor-pointer group">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-pink-100 dark:bg-pink-900/30 rounded-xl group-hover:scale-110 transition-transform">
-                  <Target className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-                </div>
-                <div>
-                  <p className="font-bold text-gray-900 dark:text-gray-100">
-                    {t('dashboard.createFirstGoal', 'Create your first goal')}
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t('dashboard.goalMotivation', 'Track your savings progress')}
-                  </p>
-                </div>
-                <ArrowRight className="w-4 h-4 text-gray-400 ml-auto group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Card>
-          </Link>
-        )}
+        {/* 9. Goals Progress */}
+        <DashboardGoalsSection
+          goalsProgress={goalsProgress}
+          goalsCount={goals?.length ?? 0}
+          formatCurrency={formatTransactionCurrency}
+        />
 
         {/* 10. Subscriptions Widget */}
-        {(() => {
-          const subs = (recurringTxns || []).filter(
-            (r: RecurringTransaction) => !r.is_income && !r.is_transfer
-          )
-          if (subs.length === 0) return null
-          const toMo = (amt: number, freq: FrequencyType) => {
-            switch (freq) {
-              case 'daily': return amt * 30
-              case 'weekly': return amt * 4.33
-              case 'biweekly': return amt * 2.17
-              case 'yearly': return amt / 12
-              default: return amt
-            }
-          }
-          const monthlyTotal = subs.reduce((s, r) => s + toMo(r.amount, r.frequency), 0)
-          return (
-            <Card className="p-4 shadow-card">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                    <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-                    {t('subscriptions.title', 'Subscriptions')}: {formatCurrency(monthlyTotal)}/{t('subscriptions.mo', 'mo')}
-                  </h3>
-                </div>
-                <Link
-                  to="/recurring"
-                  search={{ tab: 'subscriptions' }}
-                  className="text-xs font-semibold text-primary-600 dark:text-primary-400 flex items-center gap-1 hover:gap-1.5 transition-all"
-                >
-                  {t('viewAll')} <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-              <div className="space-y-1">
-                {subs.slice(0, 3).map((sub) => (
-                  <div key={sub.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                      {sub.description}
-                    </p>
-                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
-                      {formatCurrency(toMo(sub.amount, sub.frequency))}/{t('subscriptions.mo', 'mo')}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          )
-        })()}
+        <SubscriptionsWidget
+          recurringTxns={recurringTxns}
+          formatCurrency={formatCurrency}
+        />
       </div>
 
       {/* Day Detail Modal */}
