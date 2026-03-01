@@ -76,12 +76,10 @@
     "quickActions": "Thao tác nhanh"
   },
   "quickActions": {
-    "addTransaction": "Thêm",
-    "scan": "Quét",
-    "upload": "Tải lên",
-    "analytics": "Phân tích",
-    "accounts": "Tài khoản",
-    "goals": "Mục tiêu"
+    "viewBudget": "Xem ngân sách",
+    "viewTransactions": "Xem giao dịch",
+    "viewAnalytics": "Xem phân tích",
+    "viewGoals": "Xem mục tiêu"
   },
   "pullToRefresh": {
     "pull": "Kéo để làm mới",
@@ -144,7 +142,8 @@
     "subtitleMorning": "Bắt đầu ngày mới với tổng quan tài chính",
     "subtitleAfternoon": "Xem tình hình tài chính hôm nay",
     "subtitleEvening": "Cùng xem lại hoạt động hôm nay",
-    "subtitleNight": "Tổng kết tài chính hôm nay"
+    "subtitleNight": "Tổng kết tài chính hôm nay",
+    "subscriptions": "Đăng ký"
   },
   "spendingCalendar": {
     "title": "Lịch chi tiêu",
@@ -190,7 +189,10 @@
     "budgetExceeded": "Vượt Ngân sách",
     "budgetExceededDesc": "{{category}} vượt ngân sách {{amount}}",
     "goalDeadline": "Hạn chót Mục tiêu",
-    "goalDeadlineDesc": "{{name}}: còn {{days}} ngày, hoàn thành {{progress}}%"
+    "goalDeadlineDesc": "{{name}}: còn {{days}} ngày, hoàn thành {{progress}}%",
+    "budgetWarning": "{{category}}: đã chi {{pct}}%",
+    "budgetRemaining": "Còn lại {{amount}}",
+    "budgetOverspent": "Vượt ngân sách!"
   },
   "comparison": {
     "title": "So sánh Tháng",
@@ -201,7 +203,8 @@
     "thisMonth": "Tháng này"
   },
   "insights": {
-    "title": "Phân tích Chi tiêu",
+    "title": "Phân tích",
+    "items": "mục",
     "highSpending": "Cảnh báo Chi tiêu Cao",
     "highSpendingDesc": "Bạn đang chi {{ratio}}% thu nhập",
     "goodSavings": "Tiết kiệm Tuyệt vời!",
@@ -213,7 +216,15 @@
     "topCategory": "Danh mục lớn nhất: {{category}}",
     "topCategoryDesc": "{{percentage}}% tổng chi tiêu",
     "unusualSpending": "Bất thường: {{category}}",
-    "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước"
+    "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước",
+    "viewAll": "Xem tất cả",
+    "showLess": "Thu gọn",
+    "spendingSpike": "Chi tiêu tăng đột biến",
+    "savingsWin": "Tiết kiệm thành công",
+    "budgetPace": "Tiến độ ngân sách",
+    "goalPace": "Tiến độ mục tiêu",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "generatedAt": "Cập nhật {{time}}"
   },
   "transactions": {
     "title": "Giao dịch",
@@ -466,7 +477,12 @@
       "alreadySet": "Đã thiết lập",
       "ariaDisabled": "{{label}} - Đã thiết lập",
       "ariaCreate": "Tạo {{label}}"
-    }
+    },
+    "onTrack": "Đúng tiến độ",
+    "behind": "Chậm tiến độ",
+    "monthsLeft": "Còn {{count}} tháng",
+    "saveSuggestion": "Tiết kiệm {{amount}}/tháng để đạt mục tiêu",
+    "milestone": "Đã đạt {{pct}}% mục tiêu {{years}} năm!"
   },
   "common": {
     "loading": "Đang tải...",
@@ -1480,12 +1496,6 @@
     "clearHistory": "Xóa lịch sử",
     "clearHistoryConfirm": "Xóa toàn bộ lịch sử trò chuyện? Hành động này không thể hoàn tác."
   },
-  "quickActions": {
-    "viewBudget": "Xem ngân sách",
-    "viewTransactions": "Xem giao dịch",
-    "viewAnalytics": "Xem phân tích",
-    "viewGoals": "Xem mục tiêu"
-  },
   "transfer": {
     "title": "Chuyển tiền giữa tài khoản",
     "exchangeTitle": "Đổi ngoại tệ",
@@ -1509,7 +1519,8 @@
       "toRequired": "Vui lòng chọn tài khoản đích",
       "sameAccount": "Không thể chuyển đến cùng tài khoản",
       "amountRequired": "Số tiền là bắt buộc"
-    }
+    },
+    "createRecurring": "Tạo định kỳ"
   },
   "ai": {
     "categoryCleanup": "AI Phân loại",
@@ -1645,8 +1656,8 @@
     "add_bill": "Thêm hóa đơn",
     "edit_bill": "Chỉnh sửa hóa đơn",
     "tabs": {
-      "list": "Danh sách",
-      "calendar": "Lịch"
+      "details": "Chi tiết",
+      "reminders": "Nhắc nhở"
     },
     "status": {
       "paid": "Đã thanh toán",
@@ -1764,10 +1775,6 @@
     "total_bills": "Tổng hóa đơn",
     "paid": "Đã thanh toán",
     "unpaid": "Chưa thanh toán",
-    "tabs": {
-      "details": "Chi tiết",
-      "reminders": "Nhắc nhở"
-    },
     "partialPayment": {
       "title": "Thanh toán một phần",
       "paid": "Đã thanh toán",
@@ -1926,7 +1933,15 @@
     "shortDate": "{{day}}/{{month}}",
     "shortDateWithWeekday": "{{weekday}}, {{day}}/{{month}}",
     "fullDate": "Ngày {{day}} tháng {{month}}, {{year}}",
-    "weekdays": ["CN", "T2", "T3", "T4", "T5", "T6", "T7"]
+    "weekdays": [
+      "CN",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7"
+    ]
   },
   "relocation": {
     "benchmark": "Chuẩn",
@@ -2005,5 +2020,35 @@
     "setupHint": "Vào Cài đặt để cấu hình quy mô gia đình, tỉnh/thành và mức thu nhập.",
     "errorTitle": "Không thể tải dữ liệu so sánh",
     "errorMessage": "Vui lòng đảm bảo bạn đã ghi lại các giao dịch và thử lại."
+  },
+  "export": {
+    "csv": "Xuất CSV",
+    "csvSuccess": "Xuất CSV thành công",
+    "csvDateRange": "Khoảng thời gian",
+    "startDate": "Ngày bắt đầu",
+    "endDate": "Ngày kết thúc"
+  },
+  "subscriptions": {
+    "title": "Đăng ký định kỳ",
+    "monthlyTotal": "Tổng hàng tháng",
+    "perMonth": "/tháng",
+    "mo": "tháng",
+    "yr": "năm",
+    "next": "Tiếp theo",
+    "yearly": "Hàng năm: {{amount}}",
+    "detected": "Đăng ký phát hiện được",
+    "confirm": "Xác nhận",
+    "uncategorized": "Khác",
+    "empty": "Không có đăng ký hoạt động",
+    "suggestionsTitle": "Phát hiện chi phí định kỳ",
+    "suggestionsSubtitle": "Xác nhận để theo dõi đăng ký",
+    "high": "Cao",
+    "medium": "Trung bình",
+    "low": "Thấp",
+    "tab": {
+      "all": "Tất cả",
+      "subscriptions": "Đăng ký"
+    },
+    "noSubscriptions": "Không có đăng ký hoạt động"
   }
 }

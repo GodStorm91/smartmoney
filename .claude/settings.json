@@ -12,7 +12,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/scout-block.js"
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/scout-block.sh"
           }
         ]
       }

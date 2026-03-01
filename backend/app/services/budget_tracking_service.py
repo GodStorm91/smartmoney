@@ -115,49 +115,38 @@ class BudgetTrackingService:
         return allocation_name
 
     @staticmethod
-    def _get_spending_for_category(
-        category_spending: dict[str, int],
-        category_name: str,
-        hierarchy: dict[str, list[str]]
-    ) -> int:
-        """Get total spending for a category including all its children.
+    def _build_child_to_parent_map(hierarchy: dict[str, list[str]]) -> dict[str, str]:
+        """Build lowercase child-name -> parent-name lookup from hierarchy."""
+        child_to_parent: dict[str, str] = {}
+        for parent, children in hierarchy.items():
+            for child in children:
+                child_to_parent[child.lower()] = parent
+        return child_to_parent
 
-        Uses case-insensitive matching so "mortgage housing" matches "Mortgage".
+    @staticmethod
+    def _tx_matches_category(
+        tx_lower: str,
+        lower_set: set[str],
+        child_to_parent: dict[str, str],
+        resolved_key: str,
+    ) -> bool:
+        """Check if a transaction category matches a budget allocation.
 
-        Args:
-            category_spending: Dict of category name -> spending amount
-            category_name: The budget allocation category name
-            hierarchy: Parent -> children mapping
-
-        Returns:
-            Total spending amount for category and all children
+        Tries: exact match in lower_set, then DB-hierarchy parent lookup via
+        child_to_parent, then alias lookup via CATEGORY_ALIASES.
         """
-        # Resolve allocation name to best matching hierarchy key
-        resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
-            category_name, hierarchy
-        )
-        # Get all category names to sum (parent + children)
-        categories_to_sum = hierarchy.get(resolved_key, [category_name])
-
-        # Build lowercase set for case-insensitive matching
-        lower_set = {name.lower() for name in categories_to_sum}
-
-        total = 0
-        for tx_cat, amount in category_spending.items():
-            # Check if any word in the transaction category matches a known category
-            tx_lower = tx_cat.lower() if tx_cat else ""
-            if tx_lower in lower_set:
-                total += amount
-            else:
-                # Check if any known category name appears as a word in the transaction category
-                # e.g. "mortgage housing" contains "mortgage" and "housing"
-                tx_words = tx_lower.split()
-                for word in tx_words:
-                    if word in lower_set:
-                        total += amount
-                        break
-
-        return total
+        if tx_lower in lower_set:
+            return True
+        # Check if tx category is a known child whose parent matches
+        parent = child_to_parent.get(tx_lower)
+        if parent and parent == resolved_key:
+            return True
+        # Check consolidated aliases
+        from .budget_prompt_helpers import CATEGORY_ALIASES
+        alias_parent = CATEGORY_ALIASES.get(tx_lower)
+        if alias_parent and alias_parent == resolved_key:
+            return True
+        return False
 
     @staticmethod
     def _get_spending_for_category_with_matched(
@@ -167,33 +156,27 @@ class BudgetTrackingService:
     ) -> tuple[int, set[str]]:
         """Get total spending for a category, returning matched transaction category keys.
 
-        Same logic as _get_spending_for_category but also tracks which
-        transaction categories were consumed so we can detect uncategorized ones.
+        Uses hierarchy parent lookup and consolidated aliases for robust matching.
 
         Returns:
             Tuple of (total spending, set of matched transaction category keys)
         """
-        # Resolve allocation name to best matching hierarchy key
         resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
             category_name, hierarchy
         )
         categories_to_sum = hierarchy.get(resolved_key, [category_name])
         lower_set = {name.lower() for name in categories_to_sum}
+        child_to_parent = BudgetTrackingService._build_child_to_parent_map(hierarchy)
 
         total = 0
         matched: set[str] = set()
         for tx_cat, amount in category_spending.items():
             tx_lower = tx_cat.lower() if tx_cat else ""
-            if tx_lower in lower_set:
+            if BudgetTrackingService._tx_matches_category(
+                tx_lower, lower_set, child_to_parent, resolved_key
+            ):
                 total += amount
                 matched.add(tx_cat)
-            else:
-                tx_words = tx_lower.split()
-                for word in tx_words:
-                    if word in lower_set:
-                        total += amount
-                        matched.add(tx_cat)
-                        break
 
         return total, matched
 
@@ -414,7 +397,15 @@ class BudgetTrackingService:
         resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
             category, hierarchy
         )
-        categories_to_query = hierarchy.get(resolved_key, [category])
+        categories_to_query = list(hierarchy.get(resolved_key, [category]))
+
+        # Also include legacy/alias names that resolve to this parent
+        from .budget_prompt_helpers import CATEGORY_ALIASES
+        for alias, parent in CATEGORY_ALIASES.items():
+            if parent == resolved_key and alias not in [c.lower() for c in categories_to_query]:
+                categories_to_query.append(alias)
+                # Add title-cased version too (transactions may store "Healthcare" not "healthcare")
+                categories_to_query.append(alias.title())
 
         # Get exchange rates for currency conversion
         rates = ExchangeRateService.get_cached_rates(db)

@@ -509,11 +509,11 @@ export function Transactions() {
         </Button>
       )}
 
-      <div className="mb-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+      <div className="mb-8">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-50 mb-1 tracking-tight">
           {t('transactions.title')}
         </h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">{t('transactions.subtitle')}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t('transactions.subtitle')}</p>
       </div>
 
       <Card className="mb-4">
@@ -539,16 +539,16 @@ export function Transactions() {
             <button
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                'flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all',
                 isFilterExpanded || activeFilterCount > 0
-                  ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                  ? 'bg-primary-600 text-white dark:bg-primary-500 shadow-sm'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               )}
             >
               <Filter className="w-4 h-4" />
               {t('button.filter', 'Filter')}
               {activeFilterCount > 0 && (
-                <span className="bg-primary-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                <span className="bg-white/20 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -653,18 +653,19 @@ export function Transactions() {
       {/* Summary - clickable to filter by type */}
       {/* When filtering by account: amounts are in account's native currency */}
       {/* When viewing all: amounts are aggregated in JPY (base currency) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
         <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
           <Card
             onClick={() => handleTypeFilter('income')}
-            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+            className={cn(
+              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-income-600 dark:border-l-income-300',
               typeParam === 'income'
-                ? 'ring-2 ring-green-500 dark:ring-green-400 bg-green-50/50 dark:bg-green-900/20'
+                ? 'ring-2 ring-income-600 dark:ring-income-300 bg-income-50 dark:bg-income-900/20'
                 : ''
-            }`}
+            )}
           >
-            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.income')}</p>
-            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-green-600 dark:text-green-400 tracking-tight">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.income')}</p>
+            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-income-600 dark:text-income-300 tracking-tight leading-none">
               {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -672,14 +673,15 @@ export function Transactions() {
         <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
           <Card
             onClick={() => handleTypeFilter('expense')}
-            className={`cursor-pointer transition-all hover:shadow-md hover:scale-[1.01] ${
+            className={cn(
+              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-expense-600 dark:border-l-expense-300',
               typeParam === 'expense'
-                ? 'ring-2 ring-red-500 dark:ring-red-400 bg-red-50/50 dark:bg-red-900/20'
+                ? 'ring-2 ring-expense-600 dark:ring-expense-300 bg-expense-50 dark:bg-expense-900/20'
                 : ''
-            }`}
+            )}
           >
-            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.expense')}</p>
-            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-red-600 dark:text-red-400 tracking-tight">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.expense')}</p>
+            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none">
               {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -688,14 +690,14 @@ export function Transactions() {
           <Card
             onClick={() => typeParam ? navigate({ to: '/transactions', search: (prev) => ({ ...prev, type: undefined }) }) : undefined}
             className={cn(
-              'transition-all',
+              'transition-all border-l-4 border-l-net-600 dark:border-l-net-300',
               typeParam
-                ? 'cursor-pointer hover:shadow-md hover:scale-[1.01]'
-                : 'border-primary-200 dark:border-primary-800 bg-primary-50/30 dark:bg-primary-900/10'
+                ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
+                : 'bg-net-50/40 dark:bg-net-900/10'
             )}
           >
-            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">{t('transactions.difference')}</p>
-            <p className="text-2xl sm:text-3xl font-extrabold font-numbers text-blue-600 dark:text-blue-400 tracking-tight">
+            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.difference')}</p>
+            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-net-600 dark:text-net-300 tracking-tight leading-none">
               {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -795,11 +797,11 @@ export function Transactions() {
       ) : transactions && transactions.length > 0 ? (
         <div className={`transition-opacity duration-150 ${isSorting ? 'opacity-50' : 'opacity-100'}`}>
           {/* Desktop Table */}
-          <Card className="hidden md:block overflow-hidden">
+          <Card className="hidden md:block overflow-hidden shadow-sm">
             <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
+              <thead className="bg-gray-100/80 dark:bg-gray-700/70 border-b-2 border-gray-200 dark:border-gray-600">
                 <tr>
-                  <th className="px-4 py-4 w-12">
+                  <th className="px-4 py-3.5 w-12">
                     <input
                       type="checkbox"
                       checked={allSelected}
@@ -807,62 +809,33 @@ export function Transactions() {
                       className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                     />
                   </th>
-                  <th
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
-                    onClick={() => handleSort('date')}
-                  >
-                    <span className="flex items-center gap-1">
-                      {t('transactions.date')}
-                      {sortField === 'date' && (
-                        <span className="text-primary-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                  {([
+                    { field: 'date' as SortField, label: t('transactions.date'), align: 'text-left' },
+                    { field: 'description' as SortField, label: t('transactions.description'), align: 'text-left' },
+                    { field: 'category' as SortField, label: t('transactions.category'), align: 'text-left' },
+                    { field: 'source' as SortField, label: t('transactions.source'), align: 'text-left' },
+                    { field: 'amount' as SortField, label: t('transactions.amount'), align: 'text-right' },
+                  ]).map(({ field, label, align }) => (
+                    <th
+                      key={field}
+                      className={cn(
+                        'px-6 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] cursor-pointer select-none transition-colors',
+                        sortField === field
+                          ? 'text-primary-700 dark:text-primary-300 bg-primary-50/50 dark:bg-primary-900/20'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600/30',
+                        align
                       )}
-                    </span>
-                  </th>
-                  <th
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
-                    onClick={() => handleSort('description')}
-                  >
-                    <span className="flex items-center gap-1">
-                      {t('transactions.description')}
-                      {sortField === 'description' && (
-                        <span className="text-primary-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </span>
-                  </th>
-                  <th
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
-                    onClick={() => handleSort('category')}
-                  >
-                    <span className="flex items-center gap-1">
-                      {t('transactions.category')}
-                      {sortField === 'category' && (
-                        <span className="text-primary-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </span>
-                  </th>
-                  <th
-                    className="px-6 py-4 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
-                    onClick={() => handleSort('source')}
-                  >
-                    <span className="flex items-center gap-1">
-                      {t('transactions.source')}
-                      {sortField === 'source' && (
-                        <span className="text-primary-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </span>
-                  </th>
-                  <th
-                    className="px-6 py-4 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600/50 select-none"
-                    onClick={() => handleSort('amount')}
-                  >
-                    <span className="flex items-center justify-end gap-1">
-                      {t('transactions.amount')}
-                      {sortField === 'amount' && (
-                        <span className="text-primary-600">{sortDirection === 'asc' ? '↑' : '↓'}</span>
-                      )}
-                    </span>
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase w-24">{t('transactions.actions')}</th>
+                      onClick={() => handleSort(field)}
+                    >
+                      <span className={cn('flex items-center gap-1.5', align === 'text-right' && 'justify-end')}>
+                        {label}
+                        {sortField === field && (
+                          <span className="text-primary-600 dark:text-primary-400 text-xs font-black">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                        )}
+                      </span>
+                    </th>
+                  ))}
+                  <th className="px-6 py-3.5 text-center text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-[0.12em] w-24">{t('transactions.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
@@ -921,10 +894,10 @@ export function Transactions() {
                 groupedTransactions.map((group) => (
                   <div key={group.date}>
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xs font-bold uppercase tracking-wide text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/20 px-3 py-1 rounded-full">
+                      <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary-700 dark:text-primary-300 bg-primary-100/80 dark:bg-primary-900/20 px-3.5 py-1.5 rounded-full">
                         {formatDateHeader(group.date)}
                       </h3>
-                      <div className="flex-1 h-px bg-primary-100 dark:bg-primary-800/30" />
+                      <div className="flex-1 h-px bg-primary-200/60 dark:bg-primary-800/30" />
                     </div>
                     <div className="space-y-3">
                       {group.transactions.map((tx) => (
@@ -977,9 +950,10 @@ export function Transactions() {
 
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg p-4 z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 dark:bg-gray-950 border-t-2 border-primary-500 shadow-2xl p-4 z-40 animate-fade-in">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <span className="text-sm font-bold text-white">
+              <span className="inline-flex items-center justify-center bg-primary-500 text-white text-xs font-black rounded-full w-6 h-6 mr-2">{selectedIds.size}</span>
               {t('transactions.selectedCount', '{{count}} selected', { count: selectedIds.size })}
             </span>
             <div className="flex gap-3">

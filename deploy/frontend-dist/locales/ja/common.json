@@ -76,12 +76,10 @@
     "quickActions": "クイックアクション"
   },
   "quickActions": {
-    "addTransaction": "追加",
-    "scan": "スキャン",
-    "upload": "アップロード",
-    "analytics": "分析",
-    "accounts": "口座",
-    "goals": "目標"
+    "viewBudget": "予算を見る",
+    "viewTransactions": "取引を見る",
+    "viewAnalytics": "分析を見る",
+    "viewGoals": "目標を見る"
   },
   "pullToRefresh": {
     "pull": "引っ張って更新",
@@ -144,7 +142,8 @@
     "subtitleMorning": "今日の財務状況を確認しましょう",
     "subtitleAfternoon": "今日の収支をチェック",
     "subtitleEvening": "今日の活動を振り返りましょう",
-    "subtitleNight": "本日のまとめ"
+    "subtitleNight": "本日のまとめ",
+    "subscriptions": "サブスクリプション"
   },
   "spendingCalendar": {
     "title": "支出カレンダー",
@@ -190,7 +189,10 @@
     "budgetExceeded": "予算超過",
     "budgetExceededDesc": "{{category}}が予算を{{amount}}超過しています",
     "goalDeadline": "目標期限",
-    "goalDeadlineDesc": "{{name}}: 残り{{days}}日、{{progress}}%達成"
+    "goalDeadlineDesc": "{{name}}: 残り{{days}}日、{{progress}}%達成",
+    "budgetWarning": "{{category}}: {{pct}}%使用済み",
+    "budgetRemaining": "残り{{amount}}",
+    "budgetOverspent": "予算オーバー！"
   },
   "comparison": {
     "title": "月間比較",
@@ -201,19 +203,30 @@
     "thisMonth": "今月"
   },
   "insights": {
-    "title": "支出インサイト",
-    "highSpending": "支出過多アラート",
-    "highSpendingDesc": "収入の{{ratio}}%を支出しています",
-    "goodSavings": "優秀な貯蓄率！",
-    "goodSavingsDesc": "収入の{{ratio}}%を貯蓄しています",
-    "spendingUp": "支出増加",
-    "spendingUpDesc": "先月比{{change}}%増",
-    "spendingDown": "支出減少",
-    "spendingDownDesc": "先月比{{change}}%減",
-    "topCategory": "最大カテゴリ: {{category}}",
-    "topCategoryDesc": "支出の{{percentage}}%を占めています",
-    "unusualSpending": "異常: {{category}}",
-    "unusualSpendingDesc": "先月比{{change}}%増"
+    "title": "インサイト",
+    "items": "件",
+    "noInsights": "特筆すべき支出パターンは検出されません",
+    "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
+    "viewAll": "すべて表示",
+    "showLess": "折りたたむ",
+    "viewTransactions": "取引を見る",
+    "viewBreakdown": "内訳を見る",
+    "learnMore": "詳細を見る",
+    "spendingSpike": "支出急増",
+    "savingsWin": "節約達成",
+    "budgetPace": "予算ペース",
+    "goalPace": "目標ペース",
+    "savingsRate": "貯蓄率",
+    "generatedAt": "{{time}}に更新",
+    "type": {
+      "spending_trend": "支出トレンド",
+      "budget_warning": "予算警告",
+      "budget_info": "予算情報",
+      "goal_progress": "目標進捗",
+      "forecast": "予測",
+      "savings_alert": "貯蓄アラート",
+      "savings_positive": "優れた貯蓄"
+    }
   },
   "transactions": {
     "title": "取引履歴",
@@ -500,7 +513,12 @@
       "alreadySet": "設定済み",
       "ariaDisabled": "{{label}} - 設定済み",
       "ariaCreate": "{{label}}を作成"
-    }
+    },
+    "onTrack": "順調",
+    "behind": "遅れ",
+    "monthsLeft": "残り{{count}}ヶ月",
+    "saveSuggestion": "目標達成には月{{amount}}の貯蓄が必要",
+    "milestone": "{{years}}年目標の{{pct}}%達成！"
   },
   "common": {
     "loading": "読み込み中...",
@@ -1485,12 +1503,6 @@
     "clearHistory": "履歴をクリア",
     "clearHistoryConfirm": "すべてのチャット履歴を削除しますか？この操作は元に戻せません。"
   },
-  "quickActions": {
-    "viewBudget": "予算を見る",
-    "viewTransactions": "取引を見る",
-    "viewAnalytics": "分析を見る",
-    "viewGoals": "目標を見る"
-  },
   "transfer": {
     "title": "口座間振替",
     "exchangeTitle": "通貨両替",
@@ -1514,7 +1526,8 @@
       "toRequired": "振替先を選択してください",
       "sameAccount": "同じ口座には振替できません",
       "amountRequired": "金額は必須です"
-    }
+    },
+    "createRecurring": "定期作成"
   },
   "ai": {
     "categoryCleanup": "AIカテゴリ整理",
@@ -1730,21 +1743,14 @@
       "saveError": "プロフィールの更新に失敗しました"
     }
   },
-  "insights": {
-    "title": "支出インサイト",
-    "spendingDecreased": "{{category}}の支出が減少しました",
-    "spendingIncreased": "{{category}}の支出が増加しました",
-    "decreasePercent": "先月比{{percent}}減",
-    "increasePercent": "先月比{{percent}}増"
-  },
   "bills": {
     "pageTitle": "請求・医療費",
     "pageSubtitle": "定期的な請求とリマインダーを追跡・管理",
     "add_bill": "請求を追加",
     "edit_bill": "請求を編集",
     "tabs": {
-      "list": "リスト",
-      "calendar": "カレンダー"
+      "details": "詳細",
+      "reminders": "リマインダー"
     },
     "status": {
       "paid": "支払い済み",
@@ -1764,9 +1770,27 @@
     "reminder": {
       "no_reminder": "リマインダーなし",
       "one_day": "1日前",
+      "two_days": "2日前",
       "three_days": "3日前",
       "five_days": "5日前",
-      "one_week": "1週間前"
+      "one_week": "1週間前",
+      "two_weeks": "2週間前",
+      "enable": "リマインダーを有効にする",
+      "enableDescription": "請求の支払い期限前に通知を受け取る",
+      "daysBefore": "通知を受け取る",
+      "time": "通知時間",
+      "customSchedules": "カスタムリマインダースケジュール",
+      "addSchedule": "スケジュールを追加",
+      "noSchedules": "カスタムスケジュールはありません",
+      "editSchedule": "スケジュールを編集",
+      "deleteConfirm": "このスケジュールを削除してもよろしいですか？",
+      "scheduleType": "スケジュールの種類",
+      "daysBeforeValue": "{{count}}日前",
+      "type": {
+        "daysBefore": "支払い期限の何日前",
+        "specificDate": "特定の日付",
+        "recurring": "繰り返し"
+      }
     },
     "reminder_days": "{{count}}日前",
     "reminder_days_notice": "{{count}}日前に通知",
@@ -1844,35 +1868,6 @@
     "total_bills": "総請求数",
     "paid": "支払い済み",
     "unpaid": "未払い",
-    "tabs": {
-      "details": "詳細",
-      "reminders": "リマインダー"
-    },
-    "reminder": {
-      "no_reminder": "リマインダーなし",
-      "one_day": "1日前",
-      "two_days": "2日前",
-      "three_days": "3日前",
-      "five_days": "5日前",
-      "one_week": "1週間前",
-      "two_weeks": "2週間前",
-      "enable": "リマインダーを有効にする",
-      "enableDescription": "請求の支払い期限前に通知を受け取る",
-      "daysBefore": "通知を受け取る",
-      "time": "通知時間",
-      "customSchedules": "カスタムリマインダースケジュール",
-      "addSchedule": "スケジュールを追加",
-      "noSchedules": "カスタムスケジュールはありません",
-      "editSchedule": "スケジュールを編集",
-      "deleteConfirm": "このスケジュールを削除してもよろしいですか？",
-      "scheduleType": "スケジュールの種類",
-      "daysBeforeValue": "{{count}}日前",
-      "type": {
-        "daysBefore": "支払い期限の何日前",
-        "specificDate": "特定の日付",
-        "recurring": "繰り返し"
-      }
-    },
     "partialPayment": {
       "title": "部分支払い",
       "paid": "支払い済み",
@@ -1891,7 +1886,15 @@
     "shortDate": "{{month}}月{{day}}日",
     "shortDateWithWeekday": "{{month}}月{{day}}日 ({{weekday}})",
     "fullDate": "{{year}}年{{month}}月{{day}}日",
-    "weekdays": ["日", "月", "火", "水", "木", "金", "土"]
+    "weekdays": [
+      "日",
+      "月",
+      "火",
+      "水",
+      "木",
+      "金",
+      "土"
+    ]
   },
   "anomaly": {
     "title": "異常検知",
@@ -1925,23 +1928,6 @@
       "enabledTypes": "有効な検知タイプ",
       "save": "設定を保存",
       "saved": "設定を保存しました"
-    }
-  },
-  "insights": {
-    "title": "支出インサイト",
-    "noInsights": "特筆すべき支出パターンは検出されません",
-    "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
-    "viewTransactions": "取引を見る",
-    "viewBreakdown": "内訳を見る",
-    "learnMore": "詳細を見る",
-    "type": {
-      "spending_trend": "支出トレンド",
-      "budget_warning": "予算警告",
-      "budget_info": "予算情報",
-      "goal_progress": "目標進捗",
-      "forecast": "予測",
-      "savings_alert": "貯蓄アラート",
-      "savings_positive": "優れた貯蓄"
     }
   },
   "savings": {
@@ -2086,5 +2072,51 @@
     "setupHint": "設定画面で世帯人数、都道府県、年収を設定してください。",
     "errorTitle": "比較データの読み込みに失敗しました",
     "errorMessage": "取引が記録されていることを確認してから、もう一度お試しください。"
+  },
+  "export": {
+    "csv": "CSVエクスポート",
+    "csvSuccess": "CSVエクスポート完了",
+    "csvDateRange": "期間",
+    "startDate": "開始日",
+    "endDate": "終了日"
+  },
+  "subscriptions": {
+    "title": "サブスクリプション",
+    "monthlyTotal": "月額合計",
+    "perMonth": "/月",
+    "mo": "月",
+    "yr": "年",
+    "next": "次回",
+    "yearly": "年額: {{amount}}",
+    "detected": "検出されたサブスク",
+    "confirm": "確認",
+    "uncategorized": "その他",
+    "empty": "アクティブなサブスクはありません",
+    "suggestionsTitle": "定期的な支出を検出しました",
+    "suggestionsSubtitle": "確認してサブスクとして追跡",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "tab": {
+      "all": "すべて",
+      "subscriptions": "サブスク"
+    },
+    "noSubscriptions": "アクティブなサブスクはありません"
+  },
+  "healthScore": {
+    "title": "家計の健全度",
+    "score": "スコア",
+    "grade": "グレード",
+    "savingsRate": "貯蓄率",
+    "budgetAdherence": "予算遵守",
+    "debtRatio": "負債比率",
+    "emergencyFund": "緊急資金",
+    "goalProgress": "目標進捗",
+    "consistency": "記録の一貫性",
+    "tips": "改善のヒント",
+    "excellent": "優秀",
+    "good": "良好",
+    "fair": "普通",
+    "needsWork": "要改善"
   }
 }

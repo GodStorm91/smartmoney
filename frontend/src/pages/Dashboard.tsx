@@ -28,12 +28,14 @@ import { InsightCards } from '@/components/dashboard/InsightCards'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
 import { MiniGoalCard } from '@/components/dashboard/MiniGoalCard'
+import { HealthScoreCard } from '@/components/dashboard/HealthScoreCard'
 import { KpiRow } from '@/components/dashboard/KpiRow'
 import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
 import { ReportBanner } from '@/components/dashboard/ReportBanner'
 import { formatMonth, formatDate } from '@/utils/formatDate'
+import { fetchHealthScore } from '@/services/health-score-service'
 import { fetchDashboardSummary, fetchMonthlyTrends } from '@/services/analytics-service'
 import { fetchGoals, fetchGoalProgress } from '@/services/goal-service'
 import { fetchTransactions } from '@/services/transaction-service'
@@ -122,6 +124,12 @@ export function Dashboard() {
     queryKey: ['live-insights'],
     queryFn: () => getLiveInsights(10),
     staleTime: 30 * 60 * 1000,
+  })
+
+  const { data: healthScore } = useQuery({
+    queryKey: ['health-score'],
+    queryFn: fetchHealthScore,
+    staleTime: 60 * 60 * 1000,
   })
 
   const [selectedDayTransactions, setSelectedDayTransactions] = useState<Transaction[] | null>(null)
@@ -300,6 +308,9 @@ export function Dashboard() {
 
           <SavingsRateCard rate={savingsRate} />
         </div>
+
+        {/* 6.5 Financial Health Score */}
+        {healthScore && <HealthScoreCard data={healthScore} />}
 
         {/* 7. Recent Transactions */}
         <Card className="p-4 shadow-card">

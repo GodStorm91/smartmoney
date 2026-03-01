@@ -14,18 +14,29 @@ from ..utils.currency_utils import convert_to_jpy
 
 logger = logging.getLogger(__name__)
 
-# Common AI-invented names mapped to real parent categories
-_CATEGORY_ALIASES: dict[str, str] = {
+# Consolidated mapping of AI-invented/legacy names to canonical parent categories.
+# Canonical parents: Food, Housing, Transportation, Entertainment, Shopping, Health, Communication, Other
+# Shared by budget_prompt_helpers.normalize_category_name and budget_service.normalize_allocation_category
+CATEGORY_ALIASES: dict[str, str] = {
+    # Food variants
     "dining": "Food", "groceries": "Food",
     "food & dining": "Food", "food & groceries": "Food",
+    # Housing variants
     "housing & utilities": "Housing", "rent": "Housing", "utilities": "Housing",
+    # Health variants
     "insurance & medical": "Health", "medical": "Health", "healthcare": "Health",
+    # Shopping variants
     "personal & discretionary": "Shopping", "personal expenses": "Shopping",
+    # Entertainment variants
     "personal & entertainment": "Entertainment", "leisure": "Entertainment",
+    # Other variants
     "gifts & transfers": "Other", "miscellaneous": "Other",
+    "education": "Other", "tuition": "Other", "school": "Other",
+    "baby/education": "Other",
+    # Communication variants
     "telecom": "Communication", "phone": "Communication", "internet": "Communication",
+    # Transportation variants
     "transit": "Transportation", "transport": "Transportation", "commute": "Transportation",
-    "education": "Education", "tuition": "Education", "school": "Education",
 }
 
 
@@ -95,7 +106,7 @@ def normalize_category_name(name: str, valid_categories: list[str]) -> str:
         return lower_map[name.lower()]
 
     # Alias lookup
-    alias_match = _CATEGORY_ALIASES.get(name.lower())
+    alias_match = CATEGORY_ALIASES.get(name.lower())
     if alias_match and alias_match in valid_categories:
         return alias_match
 
@@ -122,7 +133,7 @@ def build_budget_prompt(
 ) -> str:
     """Build prompt for Claude AI budget generation."""
     language_map = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}
-    language_name = language_map.get(language, "Japanese")
+    language_name = language_map.get(language, "English")
 
     income_display = f"\u00a5{monthly_income:,}"
 

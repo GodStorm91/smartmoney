@@ -2050,5 +2050,21 @@
       "subscriptions": "Đăng ký"
     },
     "noSubscriptions": "Không có đăng ký hoạt động"
+  },
+  "healthScore": {
+    "title": "Sức khỏe tài chính",
+    "score": "Điểm",
+    "grade": "Xếp hạng",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "budgetAdherence": "Tuân thủ ngân sách",
+    "debtRatio": "Tỷ lệ nợ",
+    "emergencyFund": "Quỹ khẩn cấp",
+    "goalProgress": "Tiến độ mục tiêu",
+    "consistency": "Tính nhất quán theo dõi",
+    "tips": "Mẹo cải thiện",
+    "excellent": "Xuất sắc",
+    "good": "Tốt",
+    "fair": "Trung bình",
+    "needsWork": "Cần cải thiện"
   }
 }

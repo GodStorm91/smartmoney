@@ -4,27 +4,15 @@ from typing import Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models.budget import Budget, BudgetAllocation, BudgetFeedback
-
-# Mapping of common AI-generated category names to real parent categories.
-# Used both at budget creation time and in the data migration.
-CATEGORY_NAME_MAPPING: dict[str, str] = {
-    "Food & Dining": "Food",
-    "Housing & Utilities": "Housing",
-    "Insurance & Medical": "Health",
-    "Personal & Entertainment": "Entertainment",
-    "Gifts & Transfers": "Other",
-    "Personal Expenses": "Shopping",
-    "Personal & Discretionary": "Shopping",
-    "Utilities": "Housing",
-}
+from ..services.budget_prompt_helpers import CATEGORY_ALIASES
 
 
 def normalize_allocation_category(name: str) -> str:
     """Normalize a budget allocation category name to a real parent category.
 
-    Checks the static mapping first, returns original name if no match.
+    Uses the consolidated CATEGORY_ALIASES dict from budget_prompt_helpers.
     """
-    return CATEGORY_NAME_MAPPING.get(name, name)
+    return CATEGORY_ALIASES.get(name.lower(), name)
 
 
 class BudgetService:
@@ -34,7 +22,7 @@ class BudgetService:
     def _normalize_allocations(allocations: list[dict]) -> list[dict]:
         """Normalize and merge allocation category names.
 
-        Applies CATEGORY_NAME_MAPPING to each allocation's category.
+        Applies CATEGORY_ALIASES to each allocation's category.
         If two allocations end up with the same category, their amounts
         are summed and reasonings are concatenated.
 
