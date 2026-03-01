@@ -17,7 +17,8 @@ ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_ed25519 root@money.khanh.page << 'D
 set -e
 
 DEPLOY_DIR="/var/www/smartmoney"
-NGINX_DIR="/var/www/smartmoney/deploy/frontend-dist"
+# Docker compose runs from /root/smartmoney/deploy and mounts ./frontend-dist
+NGINX_DIR="/root/smartmoney/deploy/frontend-dist"
 
 echo "🔨 Building frontend..."
 cd "$DEPLOY_DIR/frontend"
@@ -33,7 +34,7 @@ npm run build
 echo "📁 Deploying build files to nginx directory..."
 # Remove old files in nginx directory
 rm -rf "$NGINX_DIR/assets" "$NGINX_DIR/locales" "$NGINX_DIR/icons"
-rm -f "$NGINX_DIR/index.html" "$NGINX_DIR/manifest.json" "$NGINX_DIR/registerSW.js" "$NGINX_DIR/sw.js" "$NGINX_DIR/workbox-58bd4dca.js"
+rm -f "$NGINX_DIR/index.html" "$NGINX_DIR/manifest.json" "$NGINX_DIR/registerSW.js" "$NGINX_DIR/sw.js" "$NGINX_DIR"/workbox-*.js
 
 # Copy new build from frontend/dist to nginx directory
 cp -r dist/* "$NGINX_DIR/"
