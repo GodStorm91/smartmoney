@@ -1,8 +1,8 @@
 # SmartMoney Cashflow Tracker - Project Roadmap
 
 **Version:** 1.2
-**Last Updated:** 2025-11-25
-**Current Release:** v0.2.1 (Production Deployed)
+**Last Updated:** 2026-03-01
+**Current Release:** v0.3.0 (Production Deployed)
 **Status:** ✅ Live at https://money.khanh.page
 
 ---
@@ -250,6 +250,89 @@ Production readiness, deployment automation, and enhanced user experience featur
 - `frontend/src/index.css` - Dark body styles
 - `frontend/src/main.tsx` - ThemeProvider wrapper
 - `public/locales/{en,ja,vi}/common.json` - Translations
+
+---
+
+### v0.3.0 - Phase 1 Quick Wins Sprint (2026-03-01) ✅
+
+**Release Date:** 2026-03-01
+**Status:** Complete - Production Deployed
+**Build:** TypeScript ✅ | Production build 4.39s
+**Story Points:** 13 SP total (5 features)
+
+#### Features Shipped
+
+**1. CSV Export (2 SP):**
+- ✅ Server-side CSV endpoint `GET /api/export/csv` with date/category/account filters
+- ✅ BOM prefix for Excel Japanese text compatibility
+- ✅ Client-side export button on Transactions page (instant, no API call)
+- ✅ Server-side export from Settings page with date range picker
+- ✅ Columns: Date, Description, Amount, Currency, Type, Category, Subcategory, Source, Account, Notes
+
+**2. Net Worth Dashboard (3 SP):**
+- ✅ Real net worth from account balances (assets − liabilities), not monthly cashflow
+- ✅ Shared `netWorthCalc.ts` utility (ASSET_TYPES, convertToJpy, calculateNetWorth)
+- ✅ Expanded view shows true Assets / Liabilities breakdown
+- ✅ Monthly net change badge preserved as "this month" indicator
+- ✅ Net Worth Trend Chart (Recharts AreaChart) with cumulative monthly data
+
+**3. Spending Alerts on Dashboard (2 SP):**
+- ✅ Budget monitoring scheduler job (daily at 8am)
+- ✅ Threshold alerts: 50%, 80%, 100%, over-budget
+- ✅ Dashboard alert cards with progress bars + color coding (amber/orange/red)
+- ✅ Mark-as-read on dismiss, link to Budget page
+
+**4. Subscription Tracker (3 SP):**
+- ✅ "Subscriptions" tab on Recurring page (expense-only filter)
+- ✅ Monthly total + yearly projection header card
+- ✅ Amount normalization (weekly×4.33, biweekly×2.17, yearly÷12)
+- ✅ Category grouping with subtotals
+- ✅ Subscription suggestions from auto-detected patterns (confirm/dismiss)
+- ✅ Dashboard widget: "Subscriptions: ¥XX,XXX/mo" with top 3 items
+
+**5. Goal Enhancements (3 SP):**
+- ✅ Milestone tracking at 25/50/75/90/100% thresholds
+- ✅ `last_milestone_pct` column on goals table (alembic migration, idempotent)
+- ✅ `InAppNotification` with type `goal_milestone` on milestone hit
+- ✅ Scheduler job for milestone checks (daily at 9am)
+- ✅ Milestone markers on progress bar + "On track" / "Behind" badges
+- ✅ Time remaining + monthly savings suggestion on goal cards
+
+#### Design Normalization
+
+Post-implementation design audit aligned all new features with design system:
+- Semantic color tokens (`income-*`, `expense-*`) instead of raw Tailwind colors
+- Dark mode opacity standard (`/20`) for semantic tints
+- Letter-spacing `tracking-[0.12em]` for micro-labels
+- Custom animations (`animate-fade-in`) instead of tailwindcss-animate plugin
+- `formatCurrencyPrivacy()` instead of hardcoded currency symbols
+- All labels i18n'd via `useTranslation('common')`
+- `<Button>` component instead of raw `<button>` elements
+
+#### Files Created
+- `frontend/src/utils/netWorthCalc.ts` — shared net worth calculation
+- `frontend/src/components/dashboard/NetWorthTrendChart.tsx` — trend chart
+- `frontend/src/components/recurring/SubscriptionSummary.tsx` — subscription view
+- `frontend/src/components/recurring/SubscriptionSuggestions.tsx` — pattern detection UI
+- `backend/alembic/versions/20260301_1406_*.py` — goal milestone migration
+- `backend/alembic/versions/20260301_1408_*.py` — goal milestone migration (chain)
+
+#### Files Modified
+- `backend/app/routes/export.py` — CSV endpoint
+- `backend/app/services/scheduler_service.py` — budget + goal cron jobs
+- `backend/app/services/goal_service.py` — milestone check method
+- `backend/app/models/goal.py` — last_milestone_pct column
+- `frontend/src/pages/Dashboard.tsx` — new widgets, alerts, props
+- `frontend/src/pages/Transactions.tsx` — CSV export button
+- `frontend/src/pages/Recurring.tsx` — subscriptions tab
+- `frontend/src/pages/Settings.tsx` — CSV export section
+- `frontend/src/components/dashboard/NetWorthHero.tsx` — real net worth
+- `frontend/src/components/dashboard/KpiRow.tsx` — shared util + i18n
+- `frontend/src/components/dashboard/DashboardAlerts.tsx` — budget alerts
+- `frontend/src/components/dashboard/MiniGoalCard.tsx` — design tokens
+- `frontend/src/components/goals/GoalAchievabilityCard.tsx` — design tokens + milestones
+- `frontend/src/services/export-service.ts` — server CSV function
+- `frontend/public/locales/{en,ja,vi}/common.json` — ~15 new keys each
 
 ---
 
@@ -1302,6 +1385,31 @@ Production readiness, deployment automation, and enhanced user experience featur
 - `src/components/budget/budget-summary-card.tsx` - Save button implementation
 - `src/components/budget/budget-allocation-list.tsx` - Swipe gesture handlers
 - `public/locales/{en,ja,vi}/common.json` - Translation strings
+
+---
+
+### v0.3.0 - Phase 1 Quick Wins Sprint (2026-03-01) ✅
+
+**Added:**
+- CSV export endpoint with filters (date, category, account) + BOM for Excel JP compat
+- Real net worth dashboard from account balances (not cashflow)
+- Net Worth Trend Chart (Recharts AreaChart)
+- Budget spending alerts on dashboard (50/80/100% thresholds)
+- Subscription tracker tab on Recurring page with monthly totals + suggestions
+- Goal milestone notifications at 25/50/75/90/100% + progress badges
+- Shared `netWorthCalc.ts` utility
+- ~45 new i18n keys across en/ja/vi
+
+**Fixed:**
+- NetWorthHero showing monthly cashflow instead of real net worth
+- Hardcoded currency symbols replaced with `formatCurrencyPrivacy()`
+- Raw Tailwind colors normalized to semantic design tokens (`income-*`, `expense-*`)
+- Alembic migration made idempotent for pre-existing columns
+
+**Technical Details:**
+- 3 new scheduler jobs (budget check 8am, goal milestones 9am)
+- Design system normalization pass (colors, animations, dark mode, i18n)
+- 6 new files, 15 modified files, 2 alembic migrations
 
 ---
 
