@@ -10,9 +10,24 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
   const { t } = useTranslation('common')
 
   const getStatus = () => {
-    if (rate >= 20) return { color: 'text-income-600 dark:text-income-300', bg: 'bg-income-100 dark:bg-income-900/30', label: t('dashboard.savingsGood', 'Healthy') }
-    if (rate >= 10) return { color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30', label: t('dashboard.savingsFair', 'Fair') }
-    return { color: 'text-expense-600 dark:text-expense-300', bg: 'bg-expense-100 dark:bg-expense-900/30', label: t('dashboard.savingsLow', 'Low') }
+    if (rate >= 20) return {
+      color: 'text-income-600 dark:text-income-300',
+      bg: 'bg-income-100 dark:bg-income-900/30',
+      label: t('dashboard.savingsGood', 'Healthy'),
+      tip: t('dashboard.savingsTipGood', 'Your future self thanks you'),
+    }
+    if (rate >= 10) return {
+      color: 'text-amber-600 dark:text-amber-400',
+      bg: 'bg-amber-100 dark:bg-amber-900/30',
+      label: t('dashboard.savingsFair', 'Fair'),
+      tip: t('dashboard.savingsTipFair', 'Small increases add up fast'),
+    }
+    return {
+      color: 'text-expense-600 dark:text-expense-300',
+      bg: 'bg-expense-100 dark:bg-expense-900/30',
+      label: t('dashboard.savingsLow', 'Low'),
+      tip: t('dashboard.savingsTipLow', 'Every yen saved counts'),
+    }
   }
 
   const status = getStatus()
@@ -44,6 +59,9 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
           style={{ width: `${Math.min(100, rate)}%` }}
         />
       </div>
+      <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2.5 font-medium italic">
+        {status.tip}
+      </p>
     </Card>
   )
 }

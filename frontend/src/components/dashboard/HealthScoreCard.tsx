@@ -37,11 +37,11 @@ function barBg(score: number, max: number): string {
   return 'bg-expense-500'
 }
 
-function getGradeLabelKey(grade: string): { key: string; fallback: string } {
-  if (grade === 'A+' || grade === 'A') return { key: 'healthScore.excellent', fallback: 'Excellent' }
-  if (grade === 'B+' || grade === 'B') return { key: 'healthScore.good', fallback: 'Good' }
-  if (grade === 'C') return { key: 'healthScore.fair', fallback: 'Fair' }
-  return { key: 'healthScore.needsWork', fallback: 'Needs Work' }
+function getGradeInfo(grade: string): { key: string; fallback: string; tipKey: string; tipFallback: string } {
+  if (grade === 'A+' || grade === 'A') return { key: 'healthScore.excellent', fallback: 'Excellent', tipKey: 'healthScore.tipExcellent', tipFallback: 'You\'re in great shape — keep going' }
+  if (grade === 'B+' || grade === 'B') return { key: 'healthScore.good', fallback: 'Good', tipKey: 'healthScore.tipGood', tipFallback: 'Solid foundations — room to grow' }
+  if (grade === 'C') return { key: 'healthScore.fair', fallback: 'Fair', tipKey: 'healthScore.tipFair', tipFallback: 'A few changes can make a big difference' }
+  return { key: 'healthScore.needsWork', fallback: 'Needs Work', tipKey: 'healthScore.tipNeedsWork', tipFallback: 'Small steps lead to big progress' }
 }
 
 export function HealthScoreCard({ data }: HealthScoreCardProps) {
@@ -115,7 +115,10 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
           </div>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 font-medium">
-          {t(getGradeLabelKey(grade).key, getGradeLabelKey(grade).fallback)}
+          {t(getGradeInfo(grade).key, getGradeInfo(grade).fallback)}
+        </p>
+        <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1 italic">
+          {t(getGradeInfo(grade).tipKey, getGradeInfo(grade).tipFallback)}
         </p>
       </div>
 

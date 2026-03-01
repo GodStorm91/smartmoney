@@ -56,7 +56,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
 
       {monthlyNet !== 0 && (
         <div className={cn(
-          'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-bold',
+          'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-bold animate-scale-in',
           monthlyNet >= 0
             ? 'bg-income-100/80 text-income-600 dark:bg-income-900/20 dark:text-income-300'
             : 'bg-expense-100/80 text-expense-600 dark:bg-expense-900/20 dark:text-expense-300'

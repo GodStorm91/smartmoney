@@ -21,9 +21,11 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
     <div className="flex items-center gap-3 p-3.5 bg-gray-50/80 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700/50">
       <div className={cn(
         'w-11 h-11 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0',
-        isOnTrack
-          ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
-          : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
+        progressPct >= 100
+          ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300 animate-success-pop'
+          : isOnTrack
+            ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
+            : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'
       )}>
         {progressPct >= 100 ? '🎉' : `${Math.round(progressPct)}%`}
       </div>
