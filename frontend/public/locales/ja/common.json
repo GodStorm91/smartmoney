@@ -203,12 +203,21 @@
     "thisMonth": "今月"
   },
   "insights": {
-    "title": "支出インサイト",
+    "title": "インサイト",
+    "items": "件",
     "noInsights": "特筆すべき支出パターンは検出されません",
     "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
+    "viewAll": "すべて表示",
+    "showLess": "折りたたむ",
     "viewTransactions": "取引を見る",
     "viewBreakdown": "内訳を見る",
     "learnMore": "詳細を見る",
+    "spendingSpike": "支出急増",
+    "savingsWin": "節約達成",
+    "budgetPace": "予算ペース",
+    "goalPace": "目標ペース",
+    "savingsRate": "貯蓄率",
+    "generatedAt": "{{time}}に更新",
     "type": {
       "spending_trend": "支出トレンド",
       "budget_warning": "予算警告",
@@ -2075,13 +2084,39 @@
     "title": "サブスクリプション",
     "monthlyTotal": "月額合計",
     "perMonth": "/月",
+    "mo": "月",
+    "yr": "年",
+    "next": "次回",
     "yearly": "年額: {{amount}}",
     "detected": "検出されたサブスク",
     "confirm": "確認",
+    "uncategorized": "その他",
+    "empty": "アクティブなサブスクはありません",
+    "suggestionsTitle": "定期的な支出を検出しました",
+    "suggestionsSubtitle": "確認してサブスクとして追跡",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
     "tab": {
       "all": "すべて",
       "subscriptions": "サブスク"
     },
     "noSubscriptions": "アクティブなサブスクはありません"
+  },
+  "healthScore": {
+    "title": "家計の健全度",
+    "score": "スコア",
+    "grade": "グレード",
+    "savingsRate": "貯蓄率",
+    "budgetAdherence": "予算遵守",
+    "debtRatio": "負債比率",
+    "emergencyFund": "緊急資金",
+    "goalProgress": "目標進捗",
+    "consistency": "記録の一貫性",
+    "tips": "改善のヒント",
+    "excellent": "優秀",
+    "good": "良好",
+    "fair": "普通",
+    "needsWork": "要改善"
   }
 }

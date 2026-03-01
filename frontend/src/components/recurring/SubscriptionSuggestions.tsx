@@ -57,31 +57,32 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
   if (expenseSuggestions.length === 0) return null
 
   return (
-    <Card className="p-5 border-l-4 border-l-amber-400 bg-amber-50/50 dark:bg-amber-950/20">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-amber-100 dark:bg-amber-900/20 rounded-lg">
-          <Lightbulb className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+    <Card className="border-l-4 border-l-amber-400 bg-amber-50/50 dark:bg-amber-950/20">
+      <div className="flex items-center gap-2.5 mb-4">
+        <div className="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/20">
+          <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('subscriptions.suggestionsTitle', 'We detected these recurring charges')}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {t('subscriptions.suggestionsSubtitle', 'Confirm to track them as subscriptions')}
           </p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        {expenseSuggestions.map((s) => {
+      <div className="space-y-2">
+        {expenseSuggestions.map((s, idx) => {
           const badge = getConfidenceBadge(s.confidence)
           return (
             <div
               key={s.hash}
               className={cn(
-                'p-3 rounded-lg border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700',
+                'p-3 rounded-lg border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 animate-stagger-in',
                 dismissMutation.isPending && dismissMutation.variables === s.hash && 'opacity-50'
               )}
+              style={{ '--stagger-index': idx } as React.CSSProperties}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">

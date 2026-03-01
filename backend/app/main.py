@@ -51,6 +51,7 @@ from .routes.transfers import router as transfers_router
 from .routes.upload import router as upload_router
 from .routes.exchange_rates import router as exchange_rates_router
 from .routes.export import router as export_router
+from .routes.health_score import router as health_score_router
 from .routes.user_categories import router as user_categories_router
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
@@ -290,6 +291,60 @@ def scheduled_bill_reminders():
         db.close()
 
 
+def scheduled_insight_generation():
+    """Background job to generate daily spending insights for all users."""
+    db = SessionLocal()
+    try:
+        from .models.user import User
+        from .services.insight_generator_service import InsightGeneratorService
+        from .services.notification_service import NotificationService
+        import asyncio
+
+        service = InsightGeneratorService()
+        notification_service = NotificationService()
+        users = db.query(User).filter(User.is_active == True).all()
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        for user in users:
+            try:
+                insights = loop.run_until_complete(
+                    service.generate_dashboard_insights(db, user.id)
+                )
+                loop.run_until_complete(
+                    service.save_insights_to_db(db, user.id, insights)
+                )
+
+                # Create notifications for warning-level insights (priority 1-2)
+                for insight in insights:
+                    if insight.get("priority", 5) <= 2:
+                        loop.run_until_complete(
+                            notification_service.send_notification(
+                                db=db,
+                                user_id=user.id,
+                                notification_type="spending_insight",
+                                title=insight["title"],
+                                message=insight["message"],
+                                data=insight.get("data"),
+                                priority=insight.get("priority", 3),
+                                action_url=insight.get("action_url"),
+                                action_label=insight.get("action_label"),
+                            )
+                        )
+
+                if insights:
+                    logger.info(f"User {user.id}: generated {len(insights)} insight(s)")
+            except Exception as e:
+                logger.error(f"Insight generation failed for user {user.id}: {e}")
+
+        loop.close()
+    except Exception as e:
+        logger.error(f"Scheduled insight generation failed: {e}")
+    finally:
+        db.close()
+
+
 def scheduled_export_cleanup():
     """Clean up expired export files (older than 10 minutes)."""
     import time
@@ -411,6 +466,17 @@ async def startup_event():
     )
     logger.info("Export cleanup scheduled (every 5 minutes)")
 
+    # Schedule daily insight generation at 7 AM UTC
+    scheduler.add_job(
+        scheduled_insight_generation,
+        trigger="cron",
+        hour=7,
+        minute=0,
+        id="insight_generation",
+        replace_existing=True,
+    )
+    logger.info("Insight generation scheduled (daily at 7 AM UTC)")
+
     # Ensure exports directory exists
     exports_dir = os.path.join(uploads_dir, "exports")
     os.makedirs(exports_dir, exist_ok=True)
@@ -467,6 +533,7 @@ app.include_router(notifications_router)
 app.include_router(relocation_router)
 app.include_router(theme_router)
 app.include_router(export_router)
+app.include_router(health_score_router)
 
 
 # Root endpoints

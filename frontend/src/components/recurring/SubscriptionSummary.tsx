@@ -80,12 +80,12 @@ export function SubscriptionSummary() {
   return (
     <div className="space-y-4">
       {/* Totals card */}
-      <Card className="p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-            <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+      <Card>
+        <div className="flex items-center gap-2.5 mb-3">
+          <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
+            <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('subscriptions.title', 'Subscriptions')}
           </h3>
         </div>
@@ -112,9 +112,13 @@ export function SubscriptionSummary() {
                 {fmt(catMonthly)}/{t('subscriptions.mo', 'mo')}
               </span>
             </div>
-            <div className="space-y-2">
-              {items.map((sub) => (
-                <div key={sub.id} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+            <div className="space-y-1">
+              {items.map((sub, idx) => (
+                <div
+                  key={sub.id}
+                  className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
+                  style={{ '--stagger-index': idx } as React.CSSProperties}
+                >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                       {sub.description}

@@ -458,121 +458,90 @@ Post-implementation design audit aligned all new features with design system:
 
 ---
 
-### v0.4.0 - User Experience Enhancements
+### v0.4.0 - AI Insights Sprint (Planned)
 
-**Timeline:** 3-4 weeks
-**Priority:** Medium
-**Dependencies:** v0.3.0 (requires stable UI)
+**Timeline:** Q2 2026 (3-4 weeks)
+**Priority:** High
+**Dependencies:** v0.3.0 ✅
+**Reference:** [Brainstorm Report](./260301-ai-features-brainstorm.md) | [AI Research](./ai-research-index.md)
 
 #### Features
 
-**Dark Mode:**
-- [x] System preference detection ✅ (2025-11-26)
-- [x] Manual toggle (header button) ✅ (2025-11-26)
-- [x] Persistent preference (localStorage) ✅ (2025-11-26)
-- [ ] Color palette for dark theme
-- [ ] Chart color adjustments
+**Cashflow Forecasting (3 SP):**
+- [ ] 3-month spending/income prediction based on history + recurring
+- [ ] Backend endpoint using statsmodels (ARIMA/ETS)
+- [ ] Dashboard widget: projected balance by month end
+- [ ] Alert on predicted cashflow shortfall
+- [ ] Confidence intervals (upper/lower bounds)
 
-**Mobile Responsive Improvements:**
-- [ ] Touch-optimized charts (pinch zoom, swipe)
-- [ ] Mobile navigation drawer
-- [ ] Simplified mobile dashboard layout
-- [ ] Bottom navigation bar (mobile)
-- [ ] Gesture controls (swipe to delete transaction)
+**Proactive AI Insights (3 SP):**
+- [ ] Weekly AI financial digest via existing Claude API
+- [ ] Insights: spending anomalies, goal pace, budget trends, savings tips
+- [ ] Cron job generates insights, stores as InAppNotification
+- [ ] Dashboard insight cards with actionable recommendations
+- [ ] i18n for all 3 locales (en/ja/vi)
 
-**Keyboard Shortcuts:**
-- [ ] `Ctrl+U` - Upload CSV
-- [ ] `Ctrl+N` - New transaction
-- [ ] `Ctrl+F` - Focus search
-- [ ] `Ctrl+K` - Command palette
-- [ ] `Esc` - Close modal
-- [ ] `?` - Show shortcuts help
-
-**Bulk Transaction Operations:**
-- [ ] Bulk import from multiple CSV files
-- [ ] Bulk recategorize by pattern
-  - Example: "Amazon" → "Shopping"
-- [ ] Bulk tag transactions
-- [ ] Undo bulk operations
-
-**Category Customization UI:**
-- [ ] Add custom categories
-- [ ] Edit category names/colors
-- [ ] Category hierarchy (parent/child)
-- [ ] Category icons
-- [ ] Import/export category mappings
+**Financial Health Score (2 SP):**
+- [ ] Composite 0-100 score (savings rate, debt ratio, emergency fund, goal progress, budget adherence)
+- [ ] Dashboard hero widget alongside net worth
+- [ ] Score breakdown with improvement tips
+- [ ] Historical score trend
 
 #### Success Criteria
 
-- [ ] Dark mode toggle <100ms
-- [ ] Mobile dashboard loads <1s on 4G
-- [ ] Keyboard shortcuts 100% functional
-- [ ] Bulk recategorize 1000 transactions <2s
-- [ ] Custom category saved persistently
-
-#### Technical Improvements
-
-- [ ] CSS-in-JS for theme switching
-- [ ] Service worker for offline support
-- [ ] Keyboard event handler system
-- [ ] Local storage abstraction layer
+- [ ] Forecast MAPE <15%
+- [ ] AI insights generated weekly without error
+- [ ] Health score renders <100ms
+- [ ] All features work in dark mode + all 3 locales
 
 ---
 
-### v0.5.0 - Data Quality & Intelligence
+### v0.5.0 - UX Enhancements & Data Quality
 
-**Timeline:** 4-5 weeks
+**Timeline:** Q2-Q3 2026 (4-5 weeks)
 **Priority:** Medium
-**Dependencies:** v0.4.0 (requires mature dataset)
+**Dependencies:** v0.4.0
 
 #### Features
 
-**Transaction Categorization Suggestions (ML):**
-- [ ] Train classifier on historical data
-  - Model: Naive Bayes or logistic regression
-  - Features: description keywords, amount range, source
-- [ ] Suggest category during CSV import
-  - Confidence score (low/medium/high)
-- [ ] Learn from user corrections
-  - Incremental model updates
-- [ ] Manual category mapping rules UI
-  - Keyword → category mappings
-  - Regex pattern support
+**Mobile Responsive Improvements:**
+- [ ] Mobile navigation drawer
+- [ ] Bottom navigation bar (mobile)
+- [ ] Simplified mobile dashboard layout
+- [ ] Touch-optimized charts
 
-**Duplicate Detection Improvements:**
-- [ ] Fuzzy matching (Levenshtein distance)
-  - Similar descriptions (90% similarity)
-- [ ] Amount tolerance (±¥10)
-- [ ] Date range tolerance (±2 days)
-- [ ] Merge duplicate detection report
-- [ ] Auto-merge duplicates (optional)
+**Keyboard Shortcuts:**
+- [ ] `Ctrl+K` - Command palette
+- [ ] `Ctrl+N` - New transaction
+- [ ] `Esc` - Close modal
+- [ ] `?` - Show shortcuts help
 
-**Data Import/Export:**
-- [ ] Import from JSON
-- [ ] Import from custom CSV formats
-  - User-defined column mappings UI
-- [ ] Export full database backup (JSON)
-- [ ] Selective export (date range, categories)
+**Enhanced AI Chat Tools:**
+- [ ] `search_transactions` tool in tool executor
+- [ ] `get_spending_summary` tool for NL queries
+- [ ] `what_if_scenario` tool for financial modeling
+- [ ] "How much did I spend on food in January?" → direct answer
 
-**Category Mapping Rules Engine:**
-- [ ] Define rules: "IF description CONTAINS 'Amazon' THEN category = 'Shopping'"
-- [ ] Rule priority (order of application)
-- [ ] Rule testing/preview
-- [ ] Import/export rules (JSON)
+**Data Quality:**
+- [ ] Fuzzy duplicate detection (Levenshtein)
+- [ ] Category mapping rules engine (keyword → category)
+- [ ] Custom CSV column mapping UI
+- [ ] Bulk recategorize by pattern
 
-#### Success Criteria
+**Dark Mode (remaining):**
+- [x] System preference + toggle ✅ (shipped v0.2.3)
+- [x] Color palette + semantic tokens ✅ (shipped v0.3.0)
+- [ ] Chart color auto-adaptation
 
-- [ ] ML categorization accuracy >80%
-- [ ] Duplicate detection recall >95%
-- [ ] Custom CSV format import success rate >90%
-- [ ] Rules engine applies 1000 rules <1s
+#### Note on Already-Shipped Items
 
-#### Technical Improvements
-
-- [ ] scikit-learn integration (ML models)
-- [ ] TF-IDF vectorization for descriptions
-- [ ] Fuzzy matching library (fuzzywuzzy)
-- [ ] Rules engine (Python rules library)
+The following v0.4/v0.5 items from original roadmap shipped under other versions:
+- ✅ Dark mode (v0.2.3)
+- ✅ ML categorization → Claude AI `/api/ai` (live)
+- ✅ Category hierarchy (live)
+- ✅ CSV/JSON export (v0.3.0)
+- ✅ Budget tracking + alerts (v0.3.0)
+- ✅ Category auto-rules (live, `/api/category-rules`)
 
 ---
 
@@ -659,45 +628,32 @@ Post-implementation design audit aligned all new features with design system:
 
 ### v0.8.0 - Insights & Predictions
 
-**Timeline:** Q3 2025 (8-10 weeks)
-**Priority:** Low
-**Dependencies:** v0.7.0 (requires mature analytics)
+**Timeline:** Q3-Q4 2026
+**Priority:** Medium
+**Dependencies:** v0.7.0
 
-#### Features
+#### Already Shipped (under other versions)
 
-**Spending Pattern Analysis:**
-- [ ] Identify recurring expenses (auto-detect subscriptions)
-- [ ] Anomaly detection (unusual spending)
-- [ ] Category spending trends (increasing/decreasing)
-- [ ] Spending by day of week/time of day
+- [x] Recurring expense detection → RecurringSuggestionService (v0.3.0)
+- [x] Anomaly detection → `/api/anomalies` endpoint (live)
+- [x] Budget recommendations → Claude AI budget generation (live)
+- [x] Category spending trends → Analytics page (live)
 
-**Cashflow Forecasting:**
-- [ ] Predict next 3/6/12 months cashflow
-- [ ] Seasonal trend analysis (ARIMA/Prophet)
-- [ ] Confidence intervals (upper/lower bounds)
-- [ ] Alert for predicted cashflow shortfalls
+#### Remaining Features
 
-**Anomaly Detection:**
-- [ ] Flag unusual transactions (amount outliers)
-- [ ] Duplicate transaction warnings (same amount, same day)
-- [ ] Potential fraud detection (merchant pattern changes)
+**Cashflow Forecasting** (moved to v0.4.0):
+- [ ] → See v0.4.0 AI Insights Sprint
 
-**Budget Recommendations:**
-- [ ] Suggest optimal budgets based on historical spending
-- [ ] Identify categories to reduce (highest variance)
-- [ ] Savings rate recommendations
+**Advanced Analytics:**
+- [ ] Spending by day of week/time of day heatmap
+- [ ] Spending velocity analysis (daily average)
+- [ ] Year-over-year comparison chart
+- [ ] What-if scenario modeling
 
 #### Success Criteria
 
-- [ ] Cashflow forecast accuracy (MAPE) <15%
-- [ ] Anomaly detection false positive rate <5%
-- [ ] Budget recommendations accepted by user >60%
-
-#### Technical Improvements
-
-- [ ] Time series forecasting (Prophet/ARIMA)
-- [ ] Anomaly detection (Isolation Forest)
-- [ ] Statistical analysis (NumPy/SciPy)
+- [ ] Forecast MAPE <15% (v0.4.0)
+- [ ] Anomaly false positive rate <5% (tuning existing)
 
 ---
 

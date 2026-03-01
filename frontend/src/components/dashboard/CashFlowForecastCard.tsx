@@ -24,12 +24,12 @@ export function CashFlowForecastCard() {
   if (isLoading) {
     return (
       <Card>
-        <div className="flex items-center gap-2 mb-6">
-          <Skeleton className="h-6 w-6 rounded" />
-          <Skeleton className="h-6 w-48" />
+        <div className="flex items-center gap-2.5 mb-4">
+          <Skeleton className="h-7 w-7 rounded-xl" />
+          <Skeleton className="h-5 w-48" />
         </div>
         <Skeleton className="h-80 w-full rounded-lg" />
-        <div className="mt-6 grid grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-2 gap-4">
           <Skeleton className="h-20 rounded-lg" />
           <Skeleton className="h-20 rounded-lg" />
         </div>
@@ -40,9 +40,11 @@ export function CashFlowForecastCard() {
   if (error || !forecast) {
     return (
       <Card>
-        <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-gray-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+            <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+          </div>
+          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('forecast.title')}
           </h3>
         </div>
@@ -68,10 +70,12 @@ export function CashFlowForecastCard() {
   return (
     <Card>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary-500" />
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
+            <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+          </div>
+          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('forecast.title')}
           </h3>
         </div>

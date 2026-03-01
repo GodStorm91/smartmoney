@@ -63,15 +63,15 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
       {/* Budget Alerts */}
       {hasBudgetAlerts && (
         <div className="space-y-2">
-          {budgetAlerts.map((alert) => {
+          {budgetAlerts.map((alert, idx) => {
             const pct = alert.budget_amount > 0
               ? Math.round((alert.current_spending / alert.budget_amount) * 100)
               : 0
             const over = isOverBudget(alert.alert_type)
             return (
-              <Link key={alert.id} to="/budget" className="block">
+              <Link key={alert.id} to="/budget" className="block animate-stagger-in" style={{ '--stagger-index': idx } as React.CSSProperties}>
                 <div className={cn(
-                  'p-3 rounded-lg border transition-colors',
+                  'p-3 rounded-xl border transition-colors',
                   over
                     ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
                     : 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
@@ -92,7 +92,7 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
                       </button>
                     )}
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-gray-200 dark:bg-gray-700">
+                  <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700">
                     <div
                       className={cn(
                         'h-full rounded-full transition-all',

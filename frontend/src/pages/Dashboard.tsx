@@ -23,6 +23,8 @@ const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalen
 import { DayTransactionsModal } from '@/components/dashboard/DayTransactionsModal'
 import { NetWorthHero } from '@/components/dashboard/NetWorthHero'
 import { NetWorthTrendChart } from '@/components/dashboard/NetWorthTrendChart'
+import { CashFlowForecastCard } from '@/components/dashboard/CashFlowForecastCard'
+import { InsightCards } from '@/components/dashboard/InsightCards'
 import { QuickStatCard } from '@/components/dashboard/QuickStatCard'
 import { SavingsRateCard } from '@/components/dashboard/SavingsRateCard'
 import { MiniGoalCard } from '@/components/dashboard/MiniGoalCard'
@@ -38,6 +40,7 @@ import { fetchTransactions } from '@/services/transaction-service'
 import { fetchRecurringTransactions, type RecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { getUnreadAnomalyCount } from '@/services/anomaly-service'
 import { fetchBudgetAlerts, markBudgetAlertRead } from '@/services/budget-service'
+import { getLiveInsights } from '@/services/insight-service'
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -113,6 +116,12 @@ export function Dashboard() {
   const markAlertReadMutation = useMutation({
     mutationFn: markBudgetAlertRead,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['budget-alerts'] }),
+  })
+
+  const { data: liveInsights } = useQuery({
+    queryKey: ['live-insights'],
+    queryFn: () => getLiveInsights(10),
+    staleTime: 30 * 60 * 1000,
   })
 
   const [selectedDayTransactions, setSelectedDayTransactions] = useState<Transaction[] | null>(null)
@@ -213,6 +222,14 @@ export function Dashboard() {
 
         {/* 3.5 Net Worth Trend */}
         <NetWorthTrendChart data={monthlyTrends} />
+
+        {/* 3.6 Cashflow Forecast */}
+        <CashFlowForecastCard />
+
+        {/* 3.7 AI Insights */}
+        {liveInsights && liveInsights.insights.length > 0 && (
+          <InsightCards insights={liveInsights.insights} />
+        )}
 
         {/* 4. Alerts (merged smart + anomaly) */}
         <DashboardAlerts

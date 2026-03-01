@@ -203,7 +203,8 @@
     "thisMonth": "Tháng này"
   },
   "insights": {
-    "title": "Phân tích Chi tiêu",
+    "title": "Phân tích",
+    "items": "mục",
     "highSpending": "Cảnh báo Chi tiêu Cao",
     "highSpendingDesc": "Bạn đang chi {{ratio}}% thu nhập",
     "goodSavings": "Tiết kiệm Tuyệt vời!",
@@ -215,7 +216,15 @@
     "topCategory": "Danh mục lớn nhất: {{category}}",
     "topCategoryDesc": "{{percentage}}% tổng chi tiêu",
     "unusualSpending": "Bất thường: {{category}}",
-    "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước"
+    "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước",
+    "viewAll": "Xem tất cả",
+    "showLess": "Thu gọn",
+    "spendingSpike": "Chi tiêu tăng đột biến",
+    "savingsWin": "Tiết kiệm thành công",
+    "budgetPace": "Tiến độ ngân sách",
+    "goalPace": "Tiến độ mục tiêu",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "generatedAt": "Cập nhật {{time}}"
   },
   "transactions": {
     "title": "Giao dịch",
@@ -2023,9 +2032,19 @@
     "title": "Đăng ký định kỳ",
     "monthlyTotal": "Tổng hàng tháng",
     "perMonth": "/tháng",
+    "mo": "tháng",
+    "yr": "năm",
+    "next": "Tiếp theo",
     "yearly": "Hàng năm: {{amount}}",
     "detected": "Đăng ký phát hiện được",
     "confirm": "Xác nhận",
+    "uncategorized": "Khác",
+    "empty": "Không có đăng ký hoạt động",
+    "suggestionsTitle": "Phát hiện chi phí định kỳ",
+    "suggestionsSubtitle": "Xác nhận để theo dõi đăng ký",
+    "high": "Cao",
+    "medium": "Trung bình",
+    "low": "Thấp",
     "tab": {
       "all": "Tất cả",
       "subscriptions": "Đăng ký"

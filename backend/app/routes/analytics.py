@@ -118,3 +118,19 @@ async def get_spending_insights(
         "insights": insights,
         "generated_at": datetime.now().isoformat(),
     }
+
+
+@router.get("/forecast")
+async def get_cashflow_forecast(
+    months: int = Query(6, ge=1, le=24, description="Number of months to forecast"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get cash flow forecast with actual + projected months."""
+    from ..services.forecast_service import ForecastService
+
+    return ForecastService.get_cashflow_forecast(
+        db=db,
+        user_id=current_user.id,
+        months=months,
+    )

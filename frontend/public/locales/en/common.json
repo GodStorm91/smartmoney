@@ -234,12 +234,21 @@
     "thisMonth": "This month"
   },
   "insights": {
-    "title": "Spending Insights",
+    "title": "Insights",
+    "items": "items",
     "noInsights": "No notable spending patterns detected",
     "insightsHint": "Keep tracking to see personalized insights",
+    "viewAll": "View all",
+    "showLess": "Show less",
     "viewTransactions": "View Transactions",
     "viewBreakdown": "View Breakdown",
     "learnMore": "Learn More",
+    "spendingSpike": "Spending spike",
+    "savingsWin": "Savings win",
+    "budgetPace": "Budget pace",
+    "goalPace": "Goal pace",
+    "savingsRate": "Savings rate",
+    "generatedAt": "Updated {{time}}",
     "type": {
       "spending_trend": "Spending Trend",
       "budget_warning": "Budget Warning",
@@ -2160,13 +2169,39 @@
     "title": "Subscriptions",
     "monthlyTotal": "Monthly total",
     "perMonth": "/month",
+    "mo": "mo",
+    "yr": "yr",
+    "next": "Next",
     "yearly": "Yearly: {{amount}}",
     "detected": "Detected subscriptions",
     "confirm": "Confirm",
+    "uncategorized": "Other",
+    "empty": "No active subscriptions",
+    "suggestionsTitle": "We detected these recurring charges",
+    "suggestionsSubtitle": "Confirm to track them as subscriptions",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
     "tab": {
       "all": "All",
       "subscriptions": "Subscriptions"
     },
     "noSubscriptions": "No active subscriptions"
+  },
+  "healthScore": {
+    "title": "Financial Health",
+    "score": "Score",
+    "grade": "Grade",
+    "savingsRate": "Savings Rate",
+    "budgetAdherence": "Budget Adherence",
+    "debtRatio": "Debt Ratio",
+    "emergencyFund": "Emergency Fund",
+    "goalProgress": "Goal Progress",
+    "consistency": "Tracking Consistency",
+    "tips": "Improvement Tips",
+    "excellent": "Excellent",
+    "good": "Good",
+    "fair": "Fair",
+    "needsWork": "Needs Work"
   }
 }
