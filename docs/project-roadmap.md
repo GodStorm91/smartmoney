@@ -1,8 +1,8 @@
 # SmartMoney Cashflow Tracker - Project Roadmap
 
-**Version:** 1.2
+**Version:** 1.3
 **Last Updated:** 2026-03-01
-**Current Release:** v0.3.0 (Production Deployed)
+**Current Release:** v0.5.0 (Production Deployed)
 **Status:** ✅ Live at https://money.khanh.page
 
 ---
@@ -458,90 +458,82 @@ Post-implementation design audit aligned all new features with design system:
 
 ---
 
-### v0.4.0 - AI Insights Sprint (Planned)
+### v0.4.0 - Phase 2: AI Insights Sprint (2026-03-01) ✅
 
-**Timeline:** Q2 2026 (3-4 weeks)
-**Priority:** High
-**Dependencies:** v0.3.0 ✅
+**Release Date:** 2026-03-01
+**Status:** Complete - Production Deployed
+**Story Points:** 8 SP total (3 features)
 **Reference:** [Brainstorm Report](./260301-ai-features-brainstorm.md) | [AI Research](./ai-research-index.md)
 
-#### Features
+#### Features Shipped
 
 **Cashflow Forecasting (3 SP):**
-- [ ] 3-month spending/income prediction based on history + recurring
-- [ ] Backend endpoint using statsmodels (ARIMA/ETS)
-- [ ] Dashboard widget: projected balance by month end
-- [ ] Alert on predicted cashflow shortfall
-- [ ] Confidence intervals (upper/lower bounds)
+- ✅ 6-month income/expense projection based on history + recurring transactions
+- ✅ `ForecastService` with variable/recurring expense decomposition
+- ✅ `GET /api/analytics/forecast` endpoint
+- ✅ `CashFlowForecastCard` on Dashboard with projected balance chart
+- ✅ Months-until-negative balance warning
 
 **Proactive AI Insights (3 SP):**
-- [ ] Weekly AI financial digest via existing Claude API
-- [ ] Insights: spending anomalies, goal pace, budget trends, savings tips
-- [ ] Cron job generates insights, stores as InAppNotification
-- [ ] Dashboard insight cards with actionable recommendations
-- [ ] i18n for all 3 locales (en/ja/vi)
+- ✅ `InsightGeneratorService` with daily cron job (7am)
+- ✅ `GET /api/insights` endpoint with limit param
+- ✅ `InsightCards` dashboard widget with actionable recommendations
+- ✅ AI chat tool: `get_insights` for NL queries
+- ✅ i18n for all 3 locales (en/ja/vi)
 
 **Financial Health Score (2 SP):**
-- [ ] Composite 0-100 score (savings rate, debt ratio, emergency fund, goal progress, budget adherence)
-- [ ] Dashboard hero widget alongside net worth
-- [ ] Score breakdown with improvement tips
-- [ ] Historical score trend
+- ✅ Composite 0-100 score (savings rate, debt ratio, emergency fund, goal progress, budget adherence)
+- ✅ `HealthScoreService` + `GET /api/health-score` endpoint
+- ✅ `HealthScoreCard` on Dashboard with grade + component breakdown
+- ✅ Vietnamese i18n keys added (14 keys)
 
-#### Success Criteria
+#### Note on Implementation
 
-- [ ] Forecast MAPE <15%
-- [ ] AI insights generated weekly without error
-- [ ] Health score renders <100ms
-- [ ] All features work in dark mode + all 3 locales
+All 3 backend services + routes + frontend components were implemented in commit `87413e86`. Phase 2 sprint wired remaining Dashboard integration and filled i18n gaps.
 
 ---
 
-### v0.5.0 - UX Enhancements & Data Quality
+### v0.5.0 - Phase 3: Power User Sprint (2026-03-01) ✅
 
-**Timeline:** Q2-Q3 2026 (4-5 weeks)
-**Priority:** Medium
-**Dependencies:** v0.4.0
+**Release Date:** 2026-03-01
+**Status:** Complete - Production Deployed
+**Story Points:** 3 SP total (2 features)
 
-#### Features
+#### Features Shipped
 
-**Mobile Responsive Improvements:**
-- [ ] Mobile navigation drawer
-- [ ] Bottom navigation bar (mobile)
-- [ ] Simplified mobile dashboard layout
-- [ ] Touch-optimized charts
+**What-If Scenario Tool (1 SP):**
+- ✅ `what_if_scenario` tool in AI chat tool executor
+- ✅ Projects cashflow impact of income/expense changes over N months (1-24)
+- ✅ Returns baseline vs scenario comparison (end balance, monthly net)
+- ✅ Goal acceleration calculation (months saved per goal)
+- ✅ Months-until-negative runway projection
+- ✅ Leverages existing `ForecastService` infrastructure
 
-**Keyboard Shortcuts:**
-- [ ] `Ctrl+K` - Command palette
-- [ ] `Ctrl+N` - New transaction
-- [ ] `Esc` - Close modal
-- [ ] `?` - Show shortcuts help
+**Fuzzy Duplicate Detection (2 SP):**
+- ✅ Backend: `find_fuzzy_duplicates()` using `SequenceMatcher` (stdlib, no deps)
+- ✅ Matching: same amount + description similarity (≥75%) + date proximity (±3 days)
+- ✅ `GET /api/transactions/duplicates` with threshold/window params
+- ✅ `POST /api/transactions/duplicates/resolve` (merge/dismiss)
+- ✅ `DuplicateReviewModal`: side-by-side comparison, similarity badge, 3 actions
+- ✅ "Review Duplicates" button on Transactions page with count badge
+- ✅ i18n: 12 keys across en/ja/vi
 
-**Enhanced AI Chat Tools:**
-- [ ] `search_transactions` tool in tool executor
-- [ ] `get_spending_summary` tool for NL queries
-- [ ] `what_if_scenario` tool for financial modeling
-- [ ] "How much did I spend on food in January?" → direct answer
+#### Already-Shipped Items (from original v0.5.0 roadmap)
 
-**Data Quality:**
-- [ ] Fuzzy duplicate detection (Levenshtein)
-- [ ] Category mapping rules engine (keyword → category)
-- [ ] Custom CSV column mapping UI
-- [ ] Bulk recategorize by pattern
+The following planned v0.5.0 items were already shipped in earlier versions:
+- ✅ Mobile navigation drawer + bottom nav (shipped pre-v0.3.0)
+- ✅ Touch-optimized charts: `ZoomableChart` (live)
+- ✅ Ctrl+K command palette: `CommandPalette.tsx` with `cmdk` (live)
+- ✅ Keyboard shortcuts: 15 shortcuts via `useKeyboardShortcuts` hook (live)
+- ✅ `get_transactions` / `get_analytics` AI chat tools (live, 11 tools total)
+- ✅ Category mapping rules engine: `/api/category-rules` (live)
+- ✅ Bulk recategorize: `BulkRecategorizeModal` (live)
+- ✅ Dark mode: system preference + toggle + semantic tokens (v0.2.3, v0.3.0)
 
-**Dark Mode (remaining):**
-- [x] System preference + toggle ✅ (shipped v0.2.3)
-- [x] Color palette + semantic tokens ✅ (shipped v0.3.0)
-- [ ] Chart color auto-adaptation
+#### Remaining (deferred)
 
-#### Note on Already-Shipped Items
-
-The following v0.4/v0.5 items from original roadmap shipped under other versions:
-- ✅ Dark mode (v0.2.3)
-- ✅ ML categorization → Claude AI `/api/ai` (live)
-- ✅ Category hierarchy (live)
-- ✅ CSV/JSON export (v0.3.0)
-- ✅ Budget tracking + alerts (v0.3.0)
-- ✅ Category auto-rules (live, `/api/category-rules`)
+- [ ] Custom CSV column mapping UI (low priority — only 2 CSV formats used)
+- [ ] Chart color auto-adaptation for dark mode (cosmetic)
 
 ---
 
@@ -1366,6 +1358,29 @@ The following v0.4/v0.5 items from original roadmap shipped under other versions
 - 3 new scheduler jobs (budget check 8am, goal milestones 9am)
 - Design system normalization pass (colors, animations, dark mode, i18n)
 - 6 new files, 15 modified files, 2 alembic migrations
+
+---
+
+### v0.4.0 - Phase 2: AI Insights Sprint (2026-03-01) ✅
+
+**Added:**
+- Cashflow forecasting: 6-month projection via `ForecastService` + Dashboard card
+- Proactive AI insights: `InsightGeneratorService` cron (7am) + Dashboard cards
+- Financial health score: composite 0-100 with grade + component breakdown
+- Dashboard wiring: `HealthScoreCard`, `CashFlowForecastCard`
+- Vietnamese healthScore i18n (14 keys)
+
+---
+
+### v0.5.0 - Phase 3: Power User Sprint (2026-03-01) ✅
+
+**Added:**
+- `what_if_scenario` AI chat tool — projects cashflow impact of hypothetical changes
+- Fuzzy duplicate detection backend (`SequenceMatcher`, amount + description + date)
+- `GET /api/transactions/duplicates` + `POST /api/transactions/duplicates/resolve`
+- `DuplicateReviewModal` with side-by-side comparison, merge/dismiss actions
+- "Review Duplicates" button on Transactions page with count badge
+- 12 new i18n keys (duplicates namespace) across en/ja/vi
 
 ---
 
