@@ -26,7 +26,7 @@ _ai_service = ReportAIService()
 async def generate_ai_summary(
     year: int = Path(..., ge=2020, le=2100),
     month: int = Path(..., ge=1, le=12),
-    language: str = Query("ja"),
+    language: str = Query("en"),
     force_regenerate: bool = Query(False),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -69,7 +69,7 @@ async def generate_ai_summary(
 async def get_ai_summary(
     year: int = Path(..., ge=2020, le=2100),
     month: int = Path(..., ge=1, le=12),
-    language: str = Query("ja"),
+    language: str = Query("en"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> AIReportSummary:

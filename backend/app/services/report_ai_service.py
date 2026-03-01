@@ -116,7 +116,7 @@ class ReportAIService:
 def _build_prompt(report: MonthlyUsageReportData, language: str) -> str:
     """Build the AI prompt from report data."""
     lang_map = {"ja": "Japanese", "en": "English", "vi": "Vietnamese"}
-    lang_name = lang_map.get(language, "Japanese")
+    lang_name = lang_map.get(language, "English")
     s = report.summary
 
     focus_lines = ""

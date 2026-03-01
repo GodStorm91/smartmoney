@@ -45,17 +45,17 @@ const bullets = [
 ] as const
 
 export function SmartSummaryCard({ year, month, reportData }: SmartSummaryCardProps) {
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
 
   const { data: cached, refetch } = useQuery({
-    queryKey: ['ai-summary', year, month],
-    queryFn: () => fetchAISummary(year, month),
+    queryKey: ['ai-summary', year, month, i18n.language],
+    queryFn: () => fetchAISummary(year, month, i18n.language),
     staleTime: Infinity,
     retry: false,
   })
 
   const mutation = useMutation({
-    mutationFn: (force: boolean) => generateAISummary(year, month, undefined, force),
+    mutationFn: (force: boolean) => generateAISummary(year, month, i18n.language, force),
     onSuccess: () => { refetch() },
     onError: () => { toast.error(t('report.aiSummaryError')) },
   })

@@ -22,7 +22,7 @@ class ReportAISummary(Base):
     )
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     month: Mapped[int] = mapped_column(Integer, nullable=False)
-    language: Mapped[str] = mapped_column(String(5), default="ja")
+    language: Mapped[str] = mapped_column(String(5), default="en")
     win: Mapped[str] = mapped_column(Text, nullable=False)
     warning: Mapped[str] = mapped_column(Text, nullable=False)
     trend: Mapped[str] = mapped_column(Text, nullable=False)

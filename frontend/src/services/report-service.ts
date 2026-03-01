@@ -50,11 +50,13 @@ export async function generateAISummary(
  */
 export async function fetchAISummary(
   year: number,
-  month: number
+  month: number,
+  language?: string
 ): Promise<AIReportSummary | null> {
   try {
     const response = await apiClient.get<AIReportSummary>(
-      `/api/reports/monthly/${year}/${month}/ai-summary`
+      `/api/reports/monthly/${year}/${month}/ai-summary`,
+      { params: { language } }
     )
     return response.data
   } catch {

@@ -34,8 +34,8 @@ export function ReportBanner({ className }: ReportBannerProps) {
   const shouldShow = dayOfMonth <= 7 && !dismissed
 
   const { data: aiSummary } = useQuery({
-    queryKey: ['ai-summary', year, month],
-    queryFn: () => fetchAISummary(year, month),
+    queryKey: ['ai-summary', year, month, i18n.language],
+    queryFn: () => fetchAISummary(year, month, i18n.language),
     enabled: shouldShow,
     retry: false,
     staleTime: Infinity,
