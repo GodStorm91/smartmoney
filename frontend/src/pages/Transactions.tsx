@@ -681,19 +681,19 @@ export function Transactions() {
       {/* Summary - clickable to filter by type */}
       {/* When filtering by account: amounts are in account's native currency */}
       {/* When viewing all: amounts are aggregated in JPY (base currency) */}
-      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
         <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
           <Card
             onClick={() => handleTypeFilter('income')}
             className={cn(
-              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-income-600 dark:border-l-income-300',
+              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-income-600 dark:border-l-income-300 overflow-hidden !p-3 sm:!p-4',
               typeParam === 'income'
                 ? 'ring-2 ring-income-600 dark:ring-income-300 bg-income-50 dark:bg-income-900/20'
                 : ''
             )}
           >
             <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.income')}</p>
-            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-income-600 dark:text-income-300 tracking-tight leading-none">
+            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-income-600 dark:text-income-300 tracking-tight leading-none truncate">
               {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -702,14 +702,14 @@ export function Transactions() {
           <Card
             onClick={() => handleTypeFilter('expense')}
             className={cn(
-              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-expense-600 dark:border-l-expense-300',
+              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-expense-600 dark:border-l-expense-300 overflow-hidden !p-3 sm:!p-4',
               typeParam === 'expense'
                 ? 'ring-2 ring-expense-600 dark:ring-expense-300 bg-expense-50 dark:bg-expense-900/20'
                 : ''
             )}
           >
             <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.expense')}</p>
-            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none">
+            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none truncate">
               {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
@@ -718,14 +718,14 @@ export function Transactions() {
           <Card
             onClick={() => typeParam ? navigate({ to: '/transactions', search: (prev) => ({ ...prev, type: undefined }) }) : undefined}
             className={cn(
-              'transition-all border-l-4 border-l-net-600 dark:border-l-net-300',
+              'transition-all border-l-4 border-l-net-600 dark:border-l-net-300 overflow-hidden !p-3 sm:!p-4',
               typeParam
                 ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
                 : 'bg-net-50/40 dark:bg-net-900/10'
             )}
           >
             <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.difference')}</p>
-            <p className="text-lg sm:text-2xl lg:text-3xl font-extrabold font-numbers text-net-600 dark:text-net-300 tracking-tight leading-none">
+            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-net-600 dark:text-net-300 tracking-tight leading-none truncate">
               {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
             </p>
           </Card>
