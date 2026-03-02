@@ -251,6 +251,30 @@ async def get_monthly_summary(
     }
 
 
+@router.post("/fix-currencies", status_code=200)
+async def fix_recurring_currencies(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """One-time fix: update recurring transaction currencies to match their linked account."""
+    recurring_list = db.query(RecurringTransaction).filter(
+        RecurringTransaction.user_id == current_user.id,
+        RecurringTransaction.account_id.isnot(None),
+    ).all()
+
+    fixed = 0
+    for r in recurring_list:
+        account = db.query(Account).filter(Account.id == r.account_id).first()
+        if account and account.currency and r.currency != account.currency:
+            r.currency = account.currency
+            fixed += 1
+
+    if fixed:
+        db.commit()
+
+    return {"fixed": fixed, "total_checked": len(recurring_list)}
+
+
 def _to_response(recurring) -> dict:
     """Convert RecurringTransaction model to response dict."""
     return {

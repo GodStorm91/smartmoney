@@ -156,6 +156,10 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
       return
     }
 
+    // Use the selected account's currency (fallback to JPY)
+    const selectedAccount = accounts?.find(a => a.id === accountId)
+    const accountCurrency = selectedAccount?.currency || 'JPY'
+
     const data: RecurringTransactionCreate = {
       description: description.trim(),
       amount: parsedAmount,
@@ -165,6 +169,7 @@ export function RecurringFormModal({ isOpen, onClose, editItem, initialSuggestio
       is_transfer: isTransfer,
       to_account_id: isTransfer ? toAccountId : null,
       transfer_fee_amount: isTransfer && transferFeeAmount ? parseInt(transferFeeAmount, 10) : null,
+      currency: accountCurrency,
       frequency,
       day_of_week: frequency === 'weekly' ? dayOfWeek : null,
       day_of_month: frequency === 'monthly' ? dayOfMonth : null,

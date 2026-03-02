@@ -9,6 +9,7 @@ import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { convertToJpy } from '@/utils/netWorthCalc'
 import { formatDate } from '@/utils/formatDate'
 import { CreditCard } from 'lucide-react'
 import { cn } from '@/utils/cn'
@@ -45,8 +46,16 @@ export function SubscriptionSummary() {
     staleTime: 5 * 60 * 1000,
   })
 
+  const rates = exchangeRates?.rates || {}
+
   const fmt = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, rates, false, isPrivacyMode)
+
+  /** Convert a subscription's amount to display currency (JPY base) then normalize to monthly */
+  const toMonthlyConverted = (r: RecurringTransaction): number => {
+    const converted = convertToJpy(r.amount, r.currency || 'JPY', rates)
+    return toMonthly(converted, r.frequency)
+  }
 
   // Filter to expense-only subscriptions (not income, not transfer)
   const subscriptions = (recurring || []).filter(
@@ -54,7 +63,7 @@ export function SubscriptionSummary() {
   )
 
   const monthlyTotal = subscriptions.reduce(
-    (sum, r) => sum + toMonthly(r.amount, r.frequency), 0
+    (sum, r) => sum + toMonthlyConverted(r), 0
   )
 
   // Group by category
@@ -103,7 +112,7 @@ export function SubscriptionSummary() {
 
       {/* Grouped list */}
       {Object.entries(grouped).map(([category, items]) => {
-        const catMonthly = items.reduce((s, r) => s + toMonthly(r.amount, r.frequency), 0)
+        const catMonthly = items.reduce((s, r) => s + toMonthlyConverted(r), 0)
         return (
           <Card key={category} className="p-4">
             <div className="flex items-center justify-between mb-3">
@@ -136,7 +145,7 @@ export function SubscriptionSummary() {
                     </div>
                   </div>
                   <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
-                    {fmt(toMonthly(sub.amount, sub.frequency))}/{t('subscriptions.mo', 'mo')}
+                    {fmt(toMonthlyConverted(sub))}/{t('subscriptions.mo', 'mo')}
                   </span>
                 </div>
               ))}
