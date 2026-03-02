@@ -15,6 +15,7 @@ import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
+import { convertToJpy } from '@/utils/netWorthCalc'
 import {
   fetchRecurringTransactions,
   deleteRecurringTransaction,
@@ -40,8 +41,19 @@ export function RecurringTransactionsList() {
   const { data: exchangeRates } = useExchangeRates()
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
-  const fmt = (amount: number, txCurrency: string = 'JPY') =>
-    formatCurrencyPrivacy(amount, txCurrency, exchangeRates?.rates || {}, true, isPrivacyMode)
+  const rates = exchangeRates?.rates || {}
+
+  /** Format in native currency (isNativeCurrency=true) */
+  const fmtNative = (amount: number, txCurrency: string = 'JPY') =>
+    formatCurrencyPrivacy(amount, txCurrency, rates, true, isPrivacyMode)
+
+  /** Format in display currency (isNativeCurrency=false, converts from JPY base) */
+  const fmtDisplay = (amount: number) =>
+    formatCurrencyPrivacy(amount, currency, rates, false, isPrivacyMode)
+
+  /** Check if a transaction's currency differs from display currency */
+  const needsConversion = (txCurrency: string) =>
+    txCurrency !== 'JPY' && currency === 'JPY' || txCurrency !== currency
 
   const { data: recurring, isLoading, isError } = useQuery({
     queryKey: ['recurring-transactions'],
@@ -177,7 +189,12 @@ export function RecurringTransactionsList() {
                       'font-numbers',
                       item.is_income ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                     )}>
-                      {item.is_income ? '+' : '-'}{fmt(Math.abs(item.amount), item.currency || 'JPY')}
+                      {item.is_income ? '+' : '-'}{fmtNative(Math.abs(item.amount), item.currency || 'JPY')}
+                      {needsConversion(item.currency || 'JPY') && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-1">
+                          ({fmtDisplay(convertToJpy(Math.abs(item.amount), item.currency || 'JPY', rates))})
+                        </span>
+                      )}
                     </span>
                     <span className="truncate max-w-[120px]">{item.category}</span>
                     <span className="truncate">{formatFrequency(item)}</span>

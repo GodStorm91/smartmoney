@@ -48,8 +48,17 @@ export function SubscriptionSummary() {
 
   const rates = exchangeRates?.rates || {}
 
+  /** Format in display currency (converts from JPY base) */
   const fmt = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, rates, false, isPrivacyMode)
+
+  /** Format in native/original currency */
+  const fmtNative = (amount: number, txCurrency: string) =>
+    formatCurrencyPrivacy(amount, txCurrency, rates, true, isPrivacyMode)
+
+  /** Check if a transaction's currency differs from display currency */
+  const needsConversion = (txCurrency: string) =>
+    txCurrency !== 'JPY' && currency === 'JPY' || txCurrency !== currency
 
   /** Convert a subscription's amount to display currency (JPY base) then normalize to monthly */
   const toMonthlyConverted = (r: RecurringTransaction): number => {
@@ -144,9 +153,16 @@ export function SubscriptionSummary() {
                       </span>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
-                    {fmt(toMonthlyConverted(sub))}/{t('subscriptions.mo', 'mo')}
-                  </span>
+                  <div className="text-right shrink-0 ml-3">
+                    <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers">
+                      {fmtNative(toMonthly(sub.amount, sub.frequency), sub.currency || 'JPY')}/{t('subscriptions.mo', 'mo')}
+                    </span>
+                    {needsConversion(sub.currency || 'JPY') && (
+                      <p className="text-[11px] text-gray-400 dark:text-gray-500 font-numbers">
+                        {fmt(toMonthlyConverted(sub))}
+                      </p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
