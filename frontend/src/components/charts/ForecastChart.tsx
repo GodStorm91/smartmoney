@@ -194,29 +194,11 @@ export function ForecastChart({ data }: ForecastChartProps) {
           name={t('forecast.balance')}
           stroke={balanceColor}
           strokeWidth={2}
-          dot={(props) => {
-            const { cx, cy, payload } = props
-            // Guard against undefined coordinates - return invisible circle
-            if (cx === undefined || cy === undefined) {
-              return <circle cx={0} cy={0} r={0} fill="transparent" />
-            }
-            return (
-              <circle
-                cx={cx}
-                cy={cy}
-                r={payload?.is_actual ? 4 : 5}
-                fill={balanceColor}
-                stroke={payload?.is_actual ? balanceColor : '#fff'}
-                strokeWidth={payload?.is_actual ? 0 : 2}
-                strokeDasharray={payload?.is_actual ? undefined : '2 2'}
-              />
-            )
-          }}
+          dot={{ r: 4, fill: balanceColor, strokeWidth: 0 }}
           activeDot={{ r: 6 }}
           isAnimationActive={true}
           animationBegin={400}
           animationDuration={1000}
-          strokeDasharray={undefined}
         />
       </ComposedChart>
     </ResponsiveContainer>
