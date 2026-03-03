@@ -313,36 +313,6 @@ def get_budget_suggestions(
     }
 
 
-@router.get("/{month}", response_model=BudgetResponse)
-def get_budget_by_month(
-    month: str,
-    db: Annotated[Session, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_user)]
-):
-    """Get budget for specific month.
-
-    Args:
-        month: Month string (YYYY-MM format)
-        db: Database session
-        current_user: Authenticated user
-
-    Returns:
-        Budget for specified month
-
-    Raises:
-        HTTPException: If budget not found
-    """
-    budget = BudgetService.get_budget_by_month(db, current_user.id, month)
-
-    if not budget:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No budget found for month {month}"
-        )
-
-    return budget
-
-
 @router.get("/tracking/current", response_model=BudgetTrackingResponse)
 def get_current_budget_tracking(
     db: Annotated[Session, Depends(get_db)],
@@ -644,6 +614,24 @@ def preview_budget_copy(
         target_month=target_month,
         spending_summary=spending_summary
     )
+
+
+@router.get("/{month}", response_model=BudgetResponse)
+def get_budget_by_month(
+    month: str,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Get budget for specific month (YYYY-MM format)."""
+    budget = BudgetService.get_budget_by_month(db, current_user.id, month)
+
+    if not budget:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No budget found for month {month}"
+        )
+
+    return budget
 
 
 @router.get("/{month}/versions", response_model=list[BudgetVersionResponse])

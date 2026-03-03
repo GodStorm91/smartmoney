@@ -58,6 +58,16 @@ class DismissResponse(BaseModel):
     message: str
 
 
+class LiveInsightsResponse(BaseModel):
+    """Live insights response schema (generated on the fly)."""
+
+    insights: list[dict[str, Any]]
+    count: int
+
+
+# ─── Static path routes MUST come before /{insight_id} ───
+
+
 @router.get("", response_model=list[InsightCardResponse])
 async def get_dashboard_insights(
     limit: int = Query(default=10, le=50),
@@ -93,6 +103,65 @@ async def get_dashboard_insights(
         )
         for insight in insights_db
     ]
+
+
+@router.get("/live", response_model=LiveInsightsResponse)
+async def get_live_insights(
+    limit: int = Query(default=10, le=20),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> LiveInsightsResponse:
+    """
+    Get live insights generated on the fly (not from database).
+
+    Useful for real-time dashboard updates.
+    """
+    service = InsightGeneratorService()
+    insights = await service.generate_dashboard_insights(db, current_user.id, limit=limit)
+
+    return LiveInsightsResponse(insights=insights, count=len(insights))
+
+
+@router.post("/refresh")
+async def refresh_insights(
+    force: bool = Query(default=False),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, Any]:
+    """
+    Trigger insight regeneration.
+
+    Rate limited to prevent abuse.
+    """
+    service = InsightGeneratorService()
+
+    insights = await service.generate_dashboard_insights(db, current_user.id)
+
+    if force:
+        await service.save_insights_to_db(db, current_user.id, insights)
+
+    return {
+        "message": "Insights generated successfully",
+        "count": len(insights),
+        "insights": insights,
+    }
+
+
+@router.get("/unread/count")
+async def get_unread_count(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict[str, int]:
+    """
+    Get count of unread insights.
+    """
+    service = InsightGeneratorService()
+    count = await service.get_unread_count(db, current_user.id)
+
+    return {"count": count}
+
+
+# ─── Parameterized routes (/{insight_id}) AFTER static routes ───
 
 
 @router.get("/{insight_id}", response_model=InsightDetailResponse)
@@ -162,66 +231,3 @@ async def mark_insight_read(
         raise HTTPException(status_code=404, detail="Insight not found")
 
     return DismissResponse(success=True, message="Insight marked as read")
-
-
-@router.post("/refresh")
-async def refresh_insights(
-    force: bool = Query(default=False),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> dict[str, Any]:
-    """
-    Trigger insight regeneration.
-
-    Rate limited to prevent abuse.
-    """
-    service = InsightGeneratorService()
-
-    insights = await service.generate_dashboard_insights(db, current_user.id)
-
-    if force:
-        await service.save_insights_to_db(db, current_user.id, insights)
-
-    return {
-        "message": "Insights generated successfully",
-        "count": len(insights),
-        "insights": insights,
-    }
-
-
-@router.get("/unread/count")
-async def get_unread_count(
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> dict[str, int]:
-    """
-    Get count of unread insights.
-    """
-    service = InsightGeneratorService()
-    count = await service.get_unread_count(db, current_user.id)
-
-    return {"count": count}
-
-
-class LiveInsightsResponse(BaseModel):
-    """Live insights response schema (generated on the fly)."""
-
-    insights: list[dict[str, Any]]
-    count: int
-
-
-@router.get("/live", response_model=LiveInsightsResponse)
-async def get_live_insights(
-    limit: int = Query(default=10, le=20),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-) -> LiveInsightsResponse:
-    """
-    Get live insights generated on the fly (not from database).
-
-    Useful for real-time dashboard updates.
-    """
-    service = InsightGeneratorService()
-    insights = await service.generate_dashboard_insights(db, current_user.id, limit=limit)
-
-    return LiveInsightsResponse(insights=insights, count=len(insights))
