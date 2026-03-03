@@ -27,6 +27,7 @@ import { DashboardAlerts } from '@/components/dashboard/DashboardAlerts'
 import { RecentTransactionsCard } from '@/components/dashboard/RecentTransactionsCard'
 import { DashboardGoalsSection } from '@/components/dashboard/DashboardGoalsSection'
 import { SubscriptionsWidget } from '@/components/dashboard/SubscriptionsWidget'
+import { HoldingsWidget } from '@/components/dashboard/HoldingsWidget'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
 import { ReportBanner } from '@/components/dashboard/ReportBanner'
@@ -310,6 +311,9 @@ export function Dashboard() {
 
         {/* 11. Financial Health Score */}
         {healthScore && <HealthScoreCard data={healthScore} />}
+
+        {/* 11.5. Investment Holdings */}
+        <HoldingsWidget />
 
         {/* 12. Recent Transactions */}
         <RecentTransactionsCard
