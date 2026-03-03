@@ -26,6 +26,13 @@ const DAYS_OF_WEEK = [
   { value: 6, key: 'recurring.days.sunday' },
 ]
 
+const selectClass = cn(
+  'w-full h-12 px-4 border rounded-lg text-sm',
+  'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
+  'border-gray-300',
+  'transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent'
+)
+
 export function RecurringOptions({
   frequency,
   setFrequency,
@@ -39,20 +46,16 @@ export function RecurringOptions({
   const { t } = useTranslation('common')
 
   return (
-    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg space-y-3">
+    <div className="p-4 bg-gray-50 dark:bg-gray-900/50 rounded-xl space-y-4 border border-gray-200 dark:border-gray-700">
       {/* Frequency Selector */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
           {t('recurring.frequency')}
         </label>
         <select
           value={frequency}
           onChange={(e) => setFrequency(e.target.value as FrequencyType)}
-          className={cn(
-            'w-full h-10 px-3 border rounded-lg text-sm',
-            'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-            'border-gray-300'
-          )}
+          className={selectClass}
         >
           <option value="weekly">{t('recurring.weekly')}</option>
           <option value="monthly">{t('recurring.monthly')}</option>
@@ -64,17 +67,13 @@ export function RecurringOptions({
       {/* Weekly: Day of Week */}
       {frequency === 'weekly' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
             {t('recurring.dayOfWeek')}
           </label>
           <select
             value={dayOfWeek}
             onChange={(e) => setDayOfWeek(parseInt(e.target.value))}
-            className={cn(
-              'w-full h-10 px-3 border rounded-lg text-sm',
-              'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-              'border-gray-300'
-            )}
+            className={selectClass}
           >
             {DAYS_OF_WEEK.map((day) => (
               <option key={day.value} value={day.value}>
@@ -88,17 +87,13 @@ export function RecurringOptions({
       {/* Monthly: Day of Month */}
       {frequency === 'monthly' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
             {t('recurring.dayOfMonth')}
           </label>
           <select
             value={dayOfMonth}
             onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
-            className={cn(
-              'w-full h-10 px-3 border rounded-lg text-sm',
-              'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-              'border-gray-300'
-            )}
+            className={selectClass}
           >
             {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
               <option key={day} value={day}>
@@ -112,7 +107,7 @@ export function RecurringOptions({
       {/* Custom: Every N Days */}
       {frequency === 'custom' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
             {t('recurring.everyNDays', { n: intervalDays })}
           </label>
           <input
@@ -121,11 +116,7 @@ export function RecurringOptions({
             max={365}
             value={intervalDays}
             onChange={(e) => setIntervalDays(Math.max(1, Math.min(365, parseInt(e.target.value) || 7)))}
-            className={cn(
-              'w-full h-10 px-3 border rounded-lg text-sm',
-              'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-              'border-gray-300'
-            )}
+            className={cn(selectClass, 'font-numbers')}
           />
         </div>
       )}
