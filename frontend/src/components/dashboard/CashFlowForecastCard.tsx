@@ -5,31 +5,36 @@ import { Card } from '@/components/ui/Card'
 import { ForecastChartLazy } from '@/components/charts/LazyCharts'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { fetchForecast } from '@/services/analytics-service'
-import { formatCurrency } from '@/utils/formatCurrency'
+import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { useSettings } from '@/contexts/SettingsContext'
+import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
 
 export function CashFlowForecastCard() {
   const { t } = useTranslation('common')
   const { currency } = useSettings()
+  const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
 
   const { data: forecast, isLoading, error } = useQuery({
     queryKey: ['forecast', 6],
     queryFn: () => fetchForecast(6),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   })
+
+  const fmt = (amount: number) =>
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   if (isLoading) {
     return (
-      <Card>
-        <div className="flex items-center gap-2.5 mb-4">
+      <Card className="p-4">
+        <div className="flex items-center gap-2.5 mb-3">
           <Skeleton className="h-7 w-7 rounded-xl" />
-          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-4 w-48" />
         </div>
-        <Skeleton className="h-80 w-full rounded-lg" />
-        <div className="mt-4 grid grid-cols-2 gap-4">
+        <Skeleton className="h-56 w-full rounded-lg" />
+        <div className="mt-4 grid grid-cols-2 gap-3">
           <Skeleton className="h-20 rounded-lg" />
           <Skeleton className="h-20 rounded-lg" />
         </div>
@@ -39,8 +44,8 @@ export function CashFlowForecastCard() {
 
   if (error || !forecast) {
     return (
-      <Card>
-        <div className="flex items-center gap-2.5 mb-4">
+      <Card className="p-4">
+        <div className="flex items-center gap-2.5 mb-3">
           <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
             <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
           </div>
@@ -48,9 +53,9 @@ export function CashFlowForecastCard() {
             {t('forecast.title')}
           </h3>
         </div>
-        <div className="flex flex-col items-center justify-center h-64 text-gray-400 dark:text-gray-500">
+        <div className="flex flex-col items-center justify-center h-40 text-gray-400 dark:text-gray-500">
           <AlertTriangle className="w-8 h-8 mb-2" />
-          <p>{t('forecast.error')}</p>
+          <p className="text-sm">{t('forecast.error')}</p>
         </div>
       </Card>
     )
@@ -59,18 +64,15 @@ export function CashFlowForecastCard() {
   const { months, summary, current_balance } = forecast
   const hasData = months && months.length > 0
 
-  // Get the last projected month for display
   const lastMonth = months[months.length - 1]
   const balanceChange = summary.end_balance - current_balance
   const isPositiveChange = balanceChange >= 0
-
-  // Check for negative balance warning
   const hasNegativeWarning = summary.months_until_negative !== null
 
   return (
-    <Card>
+    <Card className="p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
             <Calendar className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -80,78 +82,78 @@ export function CashFlowForecastCard() {
           </h3>
         </div>
         {hasNegativeWarning && (
-          <div className="flex items-center gap-1 text-sm text-amber-600 dark:text-amber-400">
-            <AlertTriangle className="w-4 h-4" />
-            <span>{t('forecast.warningNegative', { months: summary.months_until_negative })}</span>
-          </div>
+          <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400">
+            <AlertTriangle className="w-3 h-3 inline -mt-0.5 mr-1" />
+            {t('forecast.warningNegative', { months: summary.months_until_negative })}
+          </span>
         )}
       </div>
 
       {/* Chart */}
       {hasData ? (
-        <div className="h-80" role="img" aria-label={t('forecast.chartLabel')}>
+        <div className="h-56" role="img" aria-label={t('forecast.chartLabel')}>
           <ForecastChartLazy data={months} />
         </div>
       ) : (
-        <div className="flex items-center justify-center h-80 text-gray-400 dark:text-gray-500">
+        <div className="flex items-center justify-center h-40 text-sm text-gray-400 dark:text-gray-500">
           {t('forecast.noData')}
         </div>
       )}
 
       {/* Summary Stats */}
       {hasData && (
-        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* End Balance */}
           <div className={cn(
-            "p-4 rounded-lg",
+            "p-3 rounded-lg",
             isPositiveChange
               ? "bg-income-50 dark:bg-income-900/20"
               : "bg-expense-50 dark:bg-expense-900/20"
           )}>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+            <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
               {t('forecast.projectedBalance', { month: lastMonth?.month.split('-')[1] })}
             </p>
             <p className={cn(
-              "text-2xl font-bold",
+              "text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none",
               isPositiveChange
                 ? "text-income-600 dark:text-income-300"
                 : "text-expense-600 dark:text-expense-300"
             )}>
-              {formatCurrency(summary.end_balance, currency, exchangeRates?.rates || {}, false)}
+              {fmt(summary.end_balance)}
             </p>
             <div className={cn(
-              "flex items-center gap-1 mt-1 text-sm",
+              "flex items-center gap-1 mt-1.5 text-xs font-bold font-numbers",
               isPositiveChange
                 ? "text-income-600 dark:text-income-300"
                 : "text-expense-600 dark:text-expense-300"
             )}>
               {isPositiveChange ? (
-                <TrendingUp className="w-4 h-4" />
+                <TrendingUp className="w-3.5 h-3.5" />
               ) : (
-                <TrendingDown className="w-4 h-4" />
+                <TrendingDown className="w-3.5 h-3.5" />
               )}
               <span>
                 {isPositiveChange ? '+' : ''}
-                {formatCurrency(balanceChange, currency, exchangeRates?.rates || {}, false)}
+                {fmt(balanceChange)}
               </span>
             </div>
           </div>
 
           {/* Average Monthly Net */}
-          <div className="p-4 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+            <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
               {t('forecast.avgMonthlySavings')}
             </p>
             <p className={cn(
-              "text-2xl font-bold",
+              "text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none",
               summary.avg_monthly_net >= 0
                 ? "text-gray-900 dark:text-gray-100"
                 : "text-expense-600 dark:text-expense-300"
             )}>
               {summary.avg_monthly_net >= 0 ? '+' : ''}
-              {formatCurrency(summary.avg_monthly_net, currency, exchangeRates?.rates || {}, false)}
+              {fmt(summary.avg_monthly_net)}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5 font-medium">
               {t('forecast.perMonth')}
             </p>
           </div>

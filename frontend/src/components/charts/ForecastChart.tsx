@@ -6,10 +6,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Cell,
 } from 'recharts'
 import { useTranslation } from 'react-i18next'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -25,8 +23,9 @@ interface ForecastChartProps {
 
 // Format month key (YYYY-MM) to short display using locale
 function formatMonthLabel(monthKey: string): string {
-  const [year, month] = monthKey.split('-')
-  const date = new Date(parseInt(year), parseInt(month) - 1)
+  const parts = monthKey.split('-')
+  if (parts.length < 2) return monthKey
+  const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1)
   const tag = getLocaleTag()
   return date.toLocaleDateString(tag, { month: 'short' })
 }
@@ -64,58 +63,78 @@ export function ForecastChart({ data }: ForecastChartProps) {
   const lang = i18n.language
   const isDark = resolvedTheme === 'dark'
 
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-sm text-gray-400">
+        {t('forecast.noData', 'No forecast data')}
+      </div>
+    )
+  }
+
   // Theme colors
   const gridColor = isDark ? '#45475a' : '#E5E7EB'
   const axisColor = isDark ? '#a6adc8' : '#6B7280'
   const tooltipBg = isDark ? '#1e1e2e' : '#fff'
   const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
-  const legendColor = isDark ? '#cdd6f4' : '#374151'
-
-  // Colors for actual vs projected
-  const actualIncomeColor = '#4CAF50'
-  const actualExpenseColor = '#F44336'
-  const projectedIncomeColor = '#81C784' // lighter green
-  const projectedExpenseColor = '#E57373' // lighter red
+  const tooltipText = isDark ? '#cdd6f4' : '#374151'
+  const incomeColor = '#4CAF50'
+  const expenseColor = '#F44336'
   const balanceColor = '#2196F3'
 
-  // Add formatted month labels
+  // Transform data: split actual vs projected into separate fields for cleaner rendering
+  // This avoids the fragile Cell pattern that can crash
   const chartData = data.map(d => ({
-    ...d,
     monthLabel: formatMonthLabel(d.month),
+    monthKey: d.month,
+    is_actual: d.is_actual,
+    income: d.income,
+    expense: d.expense,
+    balance: d.balance,
+    net: d.net,
   }))
 
-  // Find the index where projections start
-  const projectionStartIndex = chartData.findIndex(d => !d.is_actual)
+  // Find projection start for reference line
+  const projectionStartIdx = chartData.findIndex(d => !d.is_actual)
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+      <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
         <XAxis
           dataKey="monthLabel"
           stroke={axisColor}
-          style={{ fontSize: '12px', fontFamily: 'Noto Sans JP, sans-serif' }}
+          tick={{ fontSize: 11, fontFamily: 'DM Mono, monospace' }}
+          tickLine={false}
+          axisLine={false}
         />
         <YAxis
           yAxisId="left"
           stroke={axisColor}
-          style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
+          tick={{ fontSize: 10, fontFamily: 'DM Mono, monospace' }}
           tickFormatter={(value) => formatCompact(value, currency, lang)}
+          tickLine={false}
+          axisLine={false}
+          width={55}
         />
         <YAxis
           yAxisId="right"
           orientation="right"
           stroke={balanceColor}
-          style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif' }}
+          tick={{ fontSize: 10, fontFamily: 'DM Mono, monospace' }}
           tickFormatter={(value) => formatCompact(value, currency, lang)}
+          tickLine={false}
+          axisLine={false}
+          width={55}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: tooltipBg,
             border: `1px solid ${tooltipBorder}`,
-            borderRadius: '8px',
-            fontSize: '14px',
-            color: legendColor,
+            borderRadius: '12px',
+            fontSize: '13px',
+            fontFamily: 'DM Mono, monospace',
+            color: tooltipText,
+            padding: '8px 12px',
           }}
           formatter={(value: number, name: string) => [
             formatCurrency(value, currency, exchangeRates?.rates || {}, false),
@@ -123,68 +142,54 @@ export function ForecastChart({ data }: ForecastChartProps) {
           ]}
           labelFormatter={(_, payload) => {
             if (payload && payload[0]) {
-              const item = payload[0].payload as ForecastMonth & { monthLabel: string }
-              return `${item.month} ${item.is_actual ? `(${t('forecast.actual')})` : `(${t('forecast.projected')})`}`
+              const item = payload[0].payload
+              const tag = item.is_actual ? t('forecast.actual') : t('forecast.projected')
+              return `${item.monthKey} (${tag})`
             }
             return ''
           }}
         />
-        <Legend
-          wrapperStyle={{ fontSize: '14px', fontFamily: 'Noto Sans JP, sans-serif', color: legendColor }}
-        />
 
         {/* Reference line at projection start */}
-        {projectionStartIndex > 0 && (
+        {projectionStartIdx > 0 && (
           <ReferenceLine
-            x={chartData[projectionStartIndex]?.monthLabel}
+            yAxisId="left"
+            x={chartData[projectionStartIdx]?.monthLabel}
             stroke={isDark ? '#6c7086' : '#9CA3AF'}
             strokeDasharray="5 5"
             label={{
               value: t('forecast.projected'),
               position: 'top',
               fill: axisColor,
-              fontSize: 11,
+              fontSize: 10,
+              fontFamily: 'DM Mono, monospace',
             }}
           />
         )}
 
-        {/* Income bars */}
+        {/* Income bars — use fill with opacity for projected */}
         <Bar
           yAxisId="left"
           dataKey="income"
           name={t('chart.income')}
-          radius={[4, 4, 0, 0]}
+          fill={incomeColor}
+          fillOpacity={0.85}
+          radius={[3, 3, 0, 0]}
           isAnimationActive={true}
-          animationBegin={0}
-          animationDuration={800}
-        >
-          {chartData.map((entry, index) => (
-            <Cell
-              key={`income-${index}`}
-              fill={entry.is_actual ? actualIncomeColor : projectedIncomeColor}
-              fillOpacity={entry.is_actual ? 1 : 0.7}
-            />
-          ))}
-        </Bar>
+          animationDuration={600}
+        />
 
         {/* Expense bars */}
         <Bar
           yAxisId="left"
           dataKey="expense"
           name={t('chart.expense')}
-          radius={[4, 4, 0, 0]}
+          fill={expenseColor}
+          fillOpacity={0.85}
+          radius={[3, 3, 0, 0]}
           isAnimationActive={true}
-          animationBegin={200}
-          animationDuration={800}
-        >
-          {chartData.map((entry, index) => (
-            <Cell
-              key={`expense-${index}`}
-              fill={entry.is_actual ? actualExpenseColor : projectedExpenseColor}
-              fillOpacity={entry.is_actual ? 1 : 0.7}
-            />
-          ))}
-        </Bar>
+          animationDuration={600}
+        />
 
         {/* Balance line */}
         <Line
@@ -193,12 +198,11 @@ export function ForecastChart({ data }: ForecastChartProps) {
           dataKey="balance"
           name={t('forecast.balance')}
           stroke={balanceColor}
-          strokeWidth={2}
-          dot={{ r: 4, fill: balanceColor, strokeWidth: 0 }}
-          activeDot={{ r: 6 }}
+          strokeWidth={2.5}
+          dot={{ r: 3, fill: balanceColor, strokeWidth: 0 }}
+          activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }}
           isAnimationActive={true}
-          animationBegin={400}
-          animationDuration={1000}
+          animationDuration={800}
         />
       </ComposedChart>
     </ResponsiveContainer>
