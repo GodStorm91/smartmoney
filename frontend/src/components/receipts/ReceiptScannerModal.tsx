@@ -102,7 +102,7 @@ export function ReceiptScannerModal({
               {/* Camera button (primarily for mobile) */}
               <button
                 onClick={() => setMode('camera')}
-                className="w-full h-14 flex items-center justify-center gap-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors"
+                className="w-full h-14 flex items-center justify-center gap-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
               >
                 <Camera size={24} />
                 {t('receipt.takePhoto', 'Take Photo')}
@@ -165,7 +165,7 @@ export function ReceiptScannerModal({
                   <button
                     onClick={handleConfirmImage}
                     disabled={scanMutation.isPending}
-                    className="flex-1 h-12 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                    className="flex-1 h-12 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                   >
                     <Check size={20} />
                     {t('receipt.scan', 'Scan')}

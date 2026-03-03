@@ -61,7 +61,7 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
 
       {error && (
         <Card className="text-center py-10">
-          <p className="text-red-500">{t('report.loadError')}</p>
+          <p className="text-expense-600 dark:text-expense-300">{t('report.loadError')}</p>
         </Card>
       )}
 

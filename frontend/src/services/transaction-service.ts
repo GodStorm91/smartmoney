@@ -165,18 +165,50 @@ export interface TransactionSuggestion {
 }
 
 /**
+ * Auto-category result from suggestions endpoint
+ */
+export interface AutoCategory {
+  category: string
+  parent_category: string | null
+  is_income: boolean
+  confidence: number
+  source: 'history' | 'rule' | 'ai'
+}
+
+interface SuggestionResponse {
+  suggestions: TransactionSuggestion[]
+  auto_category: AutoCategory | null
+}
+
+/**
  * Fetch autocomplete suggestions based on query
  */
 export async function fetchTransactionSuggestions(
   query: string,
   limit: number = 5
-): Promise<TransactionSuggestion[]> {
-  if (!query || query.length < 2) return []
+): Promise<SuggestionResponse> {
+  if (!query || query.length < 2) return { suggestions: [], auto_category: null }
 
-  const response = await apiClient.get<TransactionSuggestion[]>(
+  const response = await apiClient.get<SuggestionResponse>(
     `/api/transactions/suggestions?q=${encodeURIComponent(query)}&limit=${limit}`
   )
   return response.data
+}
+
+/**
+ * Fetch AI inline categorization for a description
+ */
+export async function fetchInlineCategorization(
+  description: string
+): Promise<AutoCategory | null> {
+  try {
+    const response = await apiClient.get<{ auto_category: AutoCategory | null }>(
+      `/api/ai/categorize/inline?description=${encodeURIComponent(description)}`
+    )
+    return response.data.auto_category
+  } catch {
+    return null
+  }
 }
 
 /**

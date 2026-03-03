@@ -17,9 +17,9 @@ const TRANSACTION_ICONS: Record<TransactionType, typeof TrendingUp> = {
 }
 
 const TRANSACTION_COLORS: Record<TransactionType, string> = {
-  purchase: 'text-green-600 bg-green-50 dark:bg-green-900/30',
-  usage: 'text-red-600 bg-red-50 dark:bg-red-900/30',
-  refund: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30',
+  purchase: 'text-income-600 bg-income-50 dark:bg-income-900/30',
+  usage: 'text-expense-600 bg-expense-50 dark:bg-expense-900/30',
+  refund: 'text-net-600 bg-net-50 dark:bg-net-900/30',
   adjustment: 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/30'
 }
 
@@ -79,11 +79,11 @@ export function CreditTransactions() {
             <div className="text-right space-y-2">
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">{t('credits.totalPurchased', 'Total Purchased')}</p>
-                <p className="text-lg font-semibold text-green-600">{balance.lifetime_purchased.toFixed(4)}</p>
+                <p className="text-lg font-semibold text-income-600">{balance.lifetime_purchased.toFixed(4)}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-600 dark:text-gray-400">{t('credits.totalSpent', 'Total Spent')}</p>
-                <p className="text-lg font-semibold text-red-600">{balance.lifetime_spent.toFixed(4)}</p>
+                <p className="text-lg font-semibold text-expense-600">{balance.lifetime_spent.toFixed(4)}</p>
               </div>
             </div>
           </div>
@@ -170,7 +170,7 @@ export function CreditTransactions() {
                   {/* Amount */}
                   <div className={cn(
                     'col-span-2 text-right font-semibold font-mono',
-                    transaction.amount > 0 ? 'text-green-600' : 'text-red-600'
+                    transaction.amount > 0 ? 'text-income-600' : 'text-expense-600'
                   )}>
                     {formatCredits(transaction.amount)}
                   </div>

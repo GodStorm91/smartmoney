@@ -105,7 +105,7 @@ export function BillDetailModal({
           <div className="text-center">
             <p className={cn(
               'text-4xl font-bold',
-              bill.is_paid ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'
+              bill.is_paid ? 'text-income-600 dark:text-income-300' : 'text-gray-900 dark:text-gray-100'
             )}>
               ${Number(bill.amount).toFixed(2)}
             </p>

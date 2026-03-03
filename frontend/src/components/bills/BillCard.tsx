@@ -101,7 +101,7 @@ export function BillCard({
           <div className="text-right">
             <p className={cn(
               'text-lg font-semibold',
-              bill.is_paid ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'
+              bill.is_paid ? 'text-income-600 dark:text-income-300' : 'text-gray-900 dark:text-gray-100'
             )}>
               ${Number(bill.amount).toFixed(2)}
             </p>

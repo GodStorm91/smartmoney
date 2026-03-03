@@ -15,22 +15,22 @@ interface FocusAreasProps {
 function StatusIcon({ status }: { status: string }) {
   switch (status) {
     case 'over_budget':
-      return <CircleAlert className="w-5 h-5 text-red-500 shrink-0" />
+      return <CircleAlert className="w-5 h-5 text-expense-600 shrink-0" />
     case 'threshold_80':
       return <TriangleAlert className="w-5 h-5 text-amber-500 shrink-0" />
     case 'threshold_50':
       return <TriangleAlert className="w-5 h-5 text-yellow-500 shrink-0" />
     default:
-      return <CircleCheck className="w-5 h-5 text-green-500 shrink-0" />
+      return <CircleCheck className="w-5 h-5 text-income-600 shrink-0" />
   }
 }
 
 function statusBg(status: string) {
   switch (status) {
-    case 'over_budget': return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+    case 'over_budget': return 'bg-expense-50 dark:bg-expense-900/20 border-expense-200 dark:border-expense-800'
     case 'threshold_80': return 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
     case 'threshold_50': return 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800'
-    default: return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+    default: return 'bg-income-50 dark:bg-income-900/20 border-income-200 dark:border-income-800'
   }
 }
 

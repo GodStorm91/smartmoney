@@ -887,7 +887,7 @@ export function Transactions() {
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-50">{tx.description}</td>
                     <td className="px-6 py-4"><Badge variant={tx.is_transfer ? 'info' : tx.type === 'income' ? 'success' : 'error'}>{tx.category}</Badge></td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{tx.source}</td>
-                    <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.is_transfer ? 'text-blue-500 dark:text-blue-400' : tx.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'}`}>
+                    <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.is_transfer ? 'text-net-600 dark:text-net-300' : tx.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'}`}>
                       {formatCurrencySignedPrivacy(tx.amount, tx.type, tx.currency || 'JPY', rates, true, isPrivacyMode)}
                     </td>
                     <td className="px-6 py-4">

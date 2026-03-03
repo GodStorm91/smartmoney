@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { RefreshCw, ChevronDown } from 'lucide-react'
+import { RefreshCw, ChevronDown, Sparkles, Loader2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { createTransaction, type TransactionSuggestion } from '@/services/transaction-service'
+import { createTransaction, fetchInlineCategorization, type TransactionSuggestion, type AutoCategory } from '@/services/transaction-service'
 import { createRecurringTransaction, type FrequencyType } from '@/services/recurring-service'
 import { uploadReceipt, type ReceiptData } from '@/services/receipt-service'
 import { useAccounts } from '@/hooks/useAccounts'
@@ -50,7 +50,16 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
   const [isUploadingReceipt, setIsUploadingReceipt] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const fromSuggestionRef = useRef(false)
   const [showMoreOptions, setShowMoreOptions] = useState(false)
+
+  // Auto-categorization state
+  const [autoSuggested, setAutoSuggested] = useState<'history' | 'rule' | 'ai' | null>(null)
+  const [isAiCategorizing, setIsAiCategorizing] = useState(false)
+  const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const manualPickRef = useRef(false)
+  const hadAutoCategoryRef = useRef(false)
+  const categoryRef = useRef('')
 
   // Adjustment state
   const [isAdjustment, setIsAdjustment] = useState(false)
@@ -95,11 +104,20 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
       setDayOfMonth(25)
       setIntervalDays(7)
       setShowMoreOptions(false)
+      setAutoSuggested(null)
+      setIsAiCategorizing(false)
+      manualPickRef.current = false
+      hadAutoCategoryRef.current = false
+      if (aiTimerRef.current) clearTimeout(aiTimerRef.current)
     }
   }, [isOpen, accounts, defaultAccountId])
 
-  // Reset category when switching income/expense
+  // Reset category when switching income/expense — skip if triggered by suggestion
   useEffect(() => {
+    if (fromSuggestionRef.current) {
+      fromSuggestionRef.current = false
+      return
+    }
     setCategory('')
     setParentCategory('')
   }, [isIncome])
@@ -126,15 +144,63 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   }
 
   // Handle autocomplete suggestion selection
-  const handleSuggestionSelect = (suggestion: TransactionSuggestion) => {
+  const handleSuggestionSelect = useCallback((suggestion: TransactionSuggestion) => {
     const amountStr = suggestion.amount.toString()
     setAmount(amountStr)
     setDisplayAmount(formatWithCommas(amountStr))
+    // Set ref BEFORE changing isIncome so the useEffect skips category clear
+    fromSuggestionRef.current = true
     setIsIncome(suggestion.is_income)
     if (suggestion.category) {
       setCategory(suggestion.category)
     }
-  }
+  }, [])
+
+  // Handle auto-category from suggestions (Layer 1)
+  const handleAutoCategory = useCallback((ac: AutoCategory) => {
+    if (manualPickRef.current) return // user already picked manually
+    fromSuggestionRef.current = true
+    setIsIncome(ac.is_income)
+    setCategory(ac.category)
+    setParentCategory(ac.parent_category || '')
+    setAutoSuggested(ac.source)
+    hadAutoCategoryRef.current = true
+  }, [])
+
+  // Keep categoryRef in sync so the AI timer reads the latest value
+  useEffect(() => { categoryRef.current = category }, [category])
+
+  // AI fallback timer (Layer 3): after 1s idle, if no auto_category and no manual pick
+  useEffect(() => {
+    if (aiTimerRef.current) clearTimeout(aiTimerRef.current)
+
+    // Don't fire if conditions aren't met
+    if (
+      description.length < 5 ||
+      hadAutoCategoryRef.current ||
+      manualPickRef.current ||
+      category !== ''
+    ) return
+
+    aiTimerRef.current = setTimeout(async () => {
+      setIsAiCategorizing(true)
+      try {
+        const result = await fetchInlineCategorization(description)
+        if (result && result.confidence >= 0.7 && !manualPickRef.current && categoryRef.current === '') {
+          fromSuggestionRef.current = true
+          setIsIncome(result.is_income)
+          setCategory(result.category)
+          setParentCategory(result.parent_category || '')
+          setAutoSuggested('ai')
+          hadAutoCategoryRef.current = true
+        }
+      } finally {
+        setIsAiCategorizing(false)
+      }
+    }, 1000)
+
+    return () => { if (aiTimerRef.current) clearTimeout(aiTimerRef.current) }
+  }, [description, category])
 
   // Handle receipt scan completion
   const handleScanComplete = (data: ReceiptData) => {
@@ -291,24 +357,26 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
 
           {/* 3. Description with Autocomplete */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t('transaction.description', 'Description')}
             </label>
             <DescriptionAutocomplete
               value={description}
               onChange={setDescription}
               onSuggestionSelect={handleSuggestionSelect}
+              onAutoCategory={handleAutoCategory}
               placeholder={t('transaction.descriptionPlaceholder', 'What was this for?')}
               error={!!errors.description}
+              currencySymbol={currencySymbol}
             />
             {errors.description && (
-              <p className="mt-1 text-sm text-red-500">{errors.description}</p>
+              <p className="mt-1 text-sm text-expense-600 dark:text-expense-300">{errors.description}</p>
             )}
           </div>
 
           {/* 4. Category Picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t('transaction.category', 'Category')}
             </label>
             <HierarchicalCategoryPicker
@@ -316,11 +384,31 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               onSelect={(childName, parentName) => {
                 setCategory(childName)
                 setParentCategory(parentName)
+                setAutoSuggested(null)
+                manualPickRef.current = true
               }}
               isIncome={isIncome}
             />
+            {/* Auto-suggested badge */}
+            {isAiCategorizing && (
+              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                <Loader2 size={12} className="animate-spin" />
+                <span>{t('transaction.aiCategorizing', 'AI categorizing...')}</span>
+              </div>
+            )}
+            {!isAiCategorizing && autoSuggested && category && (
+              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                {autoSuggested === 'ai' ? <Sparkles size={12} /> : <span>•</span>}
+                <span>
+                  {autoSuggested === 'ai'
+                    ? t('transaction.aiSuggested', 'AI-suggested')
+                    : t('transaction.autoSuggested', 'Auto-suggested')}
+                  {' • '}{category}
+                </span>
+              </div>
+            )}
             {errors.category && (
-              <p className="mt-1 text-sm text-red-500">{errors.category}</p>
+              <p className="mt-1 text-sm text-expense-600 dark:text-expense-300">{errors.category}</p>
             )}
             {category && !isAdjustment && (
               <BudgetInsightWidget
@@ -334,7 +422,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
 
           {/* 5. Account Selector */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
               {t('transaction.source', 'Account')}
             </label>
             <select
@@ -342,8 +430,8 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               onChange={(e) => setAccountId(e.target.value ? parseInt(e.target.value) : null)}
               className={cn(
                 'w-full h-12 px-4 border rounded-lg text-base',
-                'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-                errors.source ? 'border-red-500' : 'border-gray-300'
+                'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus-ring',
+                errors.source ? 'border-expense-600' : 'border-gray-300'
               )}
             >
               <option value="">{t('transaction.selectAccount', 'Select account')}</option>
@@ -354,7 +442,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               ))}
             </select>
             {errors.source && (
-              <p className="mt-1 text-sm text-red-500">{errors.source}</p>
+              <p className="mt-1 text-sm text-expense-600 dark:text-expense-300">{errors.source}</p>
             )}
           </div>
 
@@ -387,12 +475,12 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                       type="date"
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className="flex-1 h-12 px-4 border border-gray-300 rounded-lg text-base dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                      className="flex-1 h-12 px-4 border border-gray-300 rounded-lg text-base dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus-ring"
                     />
                     <button
                       type="button"
                       onClick={() => setDate(new Date().toISOString().split('T')[0])}
-                      className="px-4 h-12 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium"
+                      className="px-4 h-12 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg text-sm font-medium focus-ring"
                     >
                       {t('today', 'Today')}
                     </button>
@@ -405,7 +493,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                     type="checkbox"
                     checked={isAdjustment}
                     onChange={(e) => setIsAdjustment(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    className="w-5 h-5 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                   />
                   <div>
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -426,7 +514,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
                       onChange={(e) => setIsRecurring(e.target.checked)}
                       className="w-5 h-5 rounded border-gray-300 text-primary-500 focus:ring-primary-500"
                     />
-                    <RefreshCw className="w-4 h-4 text-blue-500" />
+                    <RefreshCw className="w-4 h-4 text-net-600 dark:text-net-300" />
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('recurring.makeRecurring')}
                     </span>
@@ -472,7 +560,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               loading={createMutation.isPending || recurringMutation.isPending || isUploadingReceipt}
               className={cn(
                 'flex-1 h-12',
-                isRecurring ? 'bg-blue-500 hover:bg-blue-600' : (isIncome ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600')
+                isRecurring ? 'bg-net-600 hover:bg-net-600/90' : (isIncome ? 'bg-income-600 hover:bg-income-600/90' : 'bg-expense-600 hover:bg-expense-600/90')
               )}
             >
               {t('save', 'Save')}
@@ -481,7 +569,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
 
           {/* Error message */}
           {(createMutation.isError || recurringMutation.isError) && (
-            <p className="text-sm text-red-500 text-center">
+            <p className="text-sm text-expense-600 dark:text-expense-300 text-center">
               {t('transaction.errors.createFailed', 'Failed to create transaction')}
             </p>
           )}

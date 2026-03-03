@@ -55,8 +55,8 @@ function InsightCard({ insight }: { insight: SpendingInsight }) {
           <span
             className={`text-sm font-medium px-2 py-1 rounded ${
               insight.percentage_change > 0
-                ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                ? 'bg-expense-100 dark:bg-expense-900/30 text-expense-600 dark:text-expense-300'
+                : 'bg-income-100 dark:bg-income-900/30 text-income-600 dark:text-income-300'
             }`}
           >
             {insight.percentage_change > 0 ? '+' : ''}

@@ -76,15 +76,15 @@ export function BudgetInsightWidget({
   const willExceed = afterSpent > budgeted
 
   const getBarColor = () => {
-    if (afterPercent >= 100) return 'bg-red-500'
+    if (afterPercent >= 100) return 'bg-expense-600'
     if (afterPercent >= 80) return 'bg-amber-500'
-    return 'bg-green-500'
+    return 'bg-income-600'
   }
 
   const getTextColor = () => {
-    if (willExceed) return 'text-red-600 dark:text-red-400'
+    if (willExceed) return 'text-expense-600 dark:text-expense-300'
     if (afterPercent >= 80) return 'text-amber-600 dark:text-amber-400'
-    return 'text-green-600 dark:text-green-400'
+    return 'text-income-600 dark:text-income-300'
   }
 
   return (
@@ -137,7 +137,7 @@ export function BudgetInsightWidget({
 
       {/* Warning if will exceed */}
       {willExceed && transactionAmount > 0 && (
-        <p className="text-xs font-medium text-red-600 dark:text-red-400 mt-1">
+        <p className="text-xs font-medium text-expense-600 dark:text-expense-300 mt-1">
           {t('budget.insight.willExceed')}
         </p>
       )}

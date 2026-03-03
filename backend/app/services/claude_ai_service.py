@@ -199,6 +199,56 @@ Categorize now:"""
         results = json.loads(response_text[start_idx:end_idx])
         return results, usage
 
+    def categorize_single(
+        self,
+        description: str,
+        available_categories: dict[str, list[str]],
+    ) -> tuple[dict, dict[str, int]]:
+        """Categorize a single transaction description using Claude AI.
+
+        Args:
+            description: Transaction description
+            available_categories: Dict of parent_category -> [child_categories]
+
+        Returns:
+            Tuple of (result dict with category/parent/confidence, usage dict)
+        """
+        cat_str = "\n".join([
+            f"  {parent}: {', '.join(children)}"
+            for parent, children in available_categories.items()
+        ])
+
+        prompt = f"""Categorize this financial transaction description into one of the available categories.
+
+Transaction: "{description}"
+
+Available categories:
+{cat_str}
+
+Return only JSON: {{"category": "child_name", "parent": "parent_name", "confidence": 0.0-1.0}}"""
+
+        response = self.client.messages.create(
+            model=self.model,
+            max_tokens=256,
+            temperature=0.1,
+            messages=[{"role": "user", "content": prompt}]
+        )
+
+        usage = {
+            "input_tokens": response.usage.input_tokens,
+            "output_tokens": response.usage.output_tokens,
+        }
+
+        response_text = response.content[0].text
+        start_idx = response_text.find("{")
+        end_idx = response_text.rfind("}") + 1
+
+        if start_idx == -1 or end_idx == 0:
+            raise ValueError("No valid JSON found in Claude response")
+
+        result = json.loads(response_text[start_idx:end_idx])
+        return result, usage
+
     def chat_with_context(
         self,
         db: Session,

@@ -164,8 +164,8 @@ export function Dashboard() {
   const quickActions = [
     { icon: Plus, label: t('quickActions.add', 'Add'), color: 'bg-primary-500', to: '/transactions?action=add-transaction' },
     { icon: Camera, label: t('quickActions.scan', 'Scan'), color: 'bg-purple-500', to: '/transactions?action=scan-receipt' },
-    { icon: Upload, label: t('quickActions.upload', 'Upload'), color: 'bg-blue-500', to: '/upload' },
-    { icon: PieChart, label: t('quickActions.analytics', 'Analytics'), color: 'bg-green-500', to: '/analytics' },
+    { icon: Upload, label: t('quickActions.upload', 'Upload'), color: 'bg-net-600', to: '/upload' },
+    { icon: PieChart, label: t('quickActions.analytics', 'Analytics'), color: 'bg-income-600', to: '/analytics' },
   ]
 
   // Smart alerts

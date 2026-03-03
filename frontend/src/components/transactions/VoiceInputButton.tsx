@@ -112,7 +112,7 @@ export function VoiceInputButton({ onTransactionParsed, className }: VoiceInputB
             </button>
             <button
               onClick={handleConfirm}
-              className="flex-1 px-4 py-3 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+              className="flex-1 px-4 py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-white transition-colors"
             >
               <Check className="w-5 h-5 mx-auto" />
             </button>

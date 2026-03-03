@@ -240,7 +240,7 @@ export default function Accounts() {
                 </p>
                 <p className={cn(
                   'text-3xl sm:text-4xl font-extrabold font-numbers mt-1.5 tracking-tighter',
-                  totalBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                  totalBalance >= 0 ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                 )}>
                   {formatCurrencyPrivacy(totalBalance, 'JPY', exchangeRates?.rates || {}, true, isPrivacyMode)}
                 </p>

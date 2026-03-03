@@ -16,7 +16,7 @@ export function TransactionTypeToggle({ isIncome, onToggle }: TransactionTypeTog
         onClick={() => onToggle(false)}
         className={cn(
           'flex-1 py-3 rounded-md text-sm font-medium transition-colors',
-          !isIncome ? 'bg-red-500 text-white' : 'text-gray-600 dark:text-gray-300'
+          !isIncome ? 'bg-expense-600 text-white' : 'text-gray-600 dark:text-gray-300'
         )}
       >
         {t('transaction.expense', 'Expense')}
@@ -26,7 +26,7 @@ export function TransactionTypeToggle({ isIncome, onToggle }: TransactionTypeTog
         onClick={() => onToggle(true)}
         className={cn(
           'flex-1 py-3 rounded-md text-sm font-medium transition-colors',
-          isIncome ? 'bg-green-500 text-white' : 'text-gray-600 dark:text-gray-300'
+          isIncome ? 'bg-income-600 text-white' : 'text-gray-600 dark:text-gray-300'
         )}
       >
         {t('transaction.income', 'Income')}

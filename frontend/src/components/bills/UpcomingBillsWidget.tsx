@@ -26,12 +26,12 @@ export function UpcomingBillsWidget({
 
   const getUrgencyColor = (bill: UpcomingBill) => {
     const dueDate = new Date(bill.due_date)
-    if (bill.is_paid) return 'bg-green-500'
+    if (bill.is_paid) return 'bg-income-600'
     if (isToday(dueDate)) return 'bg-orange-500'
     const days = differenceInDays(dueDate, new Date())
-    if (days <= 3) return 'bg-red-500'
+    if (days <= 3) return 'bg-expense-600'
     if (days <= 7) return 'bg-yellow-500'
-    return 'bg-blue-500'
+    return 'bg-net-600'
   }
 
   const totalDue = sortedBills.reduce((sum: number, bill: UpcomingBill) => {
@@ -131,7 +131,7 @@ export function UpcomingBillsWidget({
                   <div className={cn(
                     'text-sm font-semibold',
                     bill.is_paid
-                      ? 'text-green-600 dark:text-green-400'
+                      ? 'text-income-600 dark:text-income-300'
                       : 'text-gray-900 dark:text-gray-100'
                   )}>
                     ${Number(bill.amount).toFixed(2)}
@@ -147,7 +147,7 @@ export function UpcomingBillsWidget({
                 <span className="text-sm text-gray-500 dark:text-gray-400">
                   {t('bills.upcoming.total_due')}
                 </span>
-                <span className="text-lg font-semibold text-red-600 dark:text-red-400">
+                <span className="text-lg font-semibold text-expense-600 dark:text-expense-300">
                   ${totalDue.toFixed(2)}
                 </span>
               </div>

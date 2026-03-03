@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from ..auth.dependencies import get_current_user
 from ..database import get_db
 from ..models.user import User
+from ..services.category_rule_service import CategoryRuleService
 from ..services.transaction_service import TransactionService
 from ..utils.csv_parser import CSVParseError, parse_csv
 from ..utils.transaction_hasher import generate_tx_hash
@@ -60,6 +61,9 @@ async def upload_csv(
         # Parse CSV
         transactions_data = parse_csv(file.file, file.filename)
 
+        # Apply keyword rules for transactions categorized as "Other"
+        rules = CategoryRuleService.list_rules(db, current_user.id, active_only=True)
+
         # Add user_id and regenerate tx_hash with user scope
         for tx_data in transactions_data:
             tx_data["user_id"] = current_user.id
@@ -70,6 +74,12 @@ async def upload_csv(
                 tx_data["source"],
                 current_user.id,
             )
+
+            # If static mapper returned "Other", try keyword rules
+            if tx_data.get("category") == "Other" and rules:
+                matched = CategoryRuleService.categorize(tx_data["description"], rules)
+                if matched:
+                    tx_data["category"] = matched
 
         # Bulk create transactions
         created, skipped = TransactionService.bulk_create_transactions(

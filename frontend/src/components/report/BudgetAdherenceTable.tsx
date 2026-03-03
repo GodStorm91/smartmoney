@@ -41,7 +41,7 @@ export function BudgetAdherenceTable({ data }: BudgetAdherenceTableProps) {
           </span>
           <span className={cn(
             'font-medium',
-            data.is_over_budget ? 'text-red-500' : 'text-gray-700 dark:text-gray-300'
+            data.is_over_budget ? 'text-expense-600' : 'text-gray-700 dark:text-gray-300'
           )}>
             {data.percentage_used.toFixed(1)}%
           </span>

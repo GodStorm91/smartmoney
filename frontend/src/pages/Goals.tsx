@@ -172,7 +172,7 @@ export function Goals() {
                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400'
                   : overallStats.onTrackCount > 0
                     ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400'
-                    : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400'
+                    : 'bg-expense-100 text-expense-700 dark:bg-expense-900/40 dark:text-expense-400'
               )}>
                 {overallStats.onTrackCount === overallStats.totalCount ? (
                   <TrendingUp className="w-3.5 h-3.5" />

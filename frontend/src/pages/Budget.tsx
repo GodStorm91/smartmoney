@@ -167,9 +167,9 @@ export function BudgetPage() {
   const healthColor = useMemo(() => {
     if (!tracking) return null
     const ratio = tracking.total_spent / (tracking.total_budgeted || 1)
-    if (ratio > 1) return 'bg-red-500'
+    if (ratio > 1) return 'bg-expense-600'
     if (ratio > 0.85) return 'bg-amber-500'
-    return 'bg-green-500'
+    return 'bg-income-600'
   }, [tracking])
 
   // Compute alert tabs
@@ -227,7 +227,7 @@ export function BudgetPage() {
               {!isCurrentMonth && (
                 <button
                   onClick={goToCurrentMonth}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-green-600 dark:text-green-400"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-income-600 dark:text-income-300"
                   title={t('common.today')}
                 >
                   <CalendarDays className="w-5 h-5" />

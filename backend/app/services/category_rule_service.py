@@ -285,6 +285,71 @@ class CategoryRuleService:
         return "Other"
 
     @staticmethod
+    def learn_from_transaction(
+        db: Session, user_id: int, description: str, category: str
+    ) -> Optional[CategoryRule]:
+        """Learn a keyword rule from a saved transaction.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            description: Transaction description
+            category: Category assigned by user
+
+        Returns:
+            Created rule or None if skipped
+        """
+        # Skip non-informative categories
+        if category in ("Other", "Transfer"):
+            return None
+
+        if not description or not description.strip():
+            return None
+
+        # Extract keyword: first word >= 3 chars
+        words = description.strip().split()
+        keyword = None
+        for word in words:
+            if len(word) >= 3:
+                keyword = word
+                break
+
+        if not keyword:
+            return None
+
+        # Cap: max 200 learned rules (priority <= 3) per user
+        learned_count = db.query(func.count(CategoryRule.id)).filter(
+            CategoryRule.user_id == user_id,
+            CategoryRule.priority <= 3,
+        ).scalar()
+
+        if learned_count >= 200:
+            return None
+
+        # Check if rule already exists for this keyword
+        existing = db.query(CategoryRule).filter(
+            CategoryRule.user_id == user_id,
+            CategoryRule.keyword == keyword,
+        ).first()
+
+        if existing:
+            # Don't overwrite existing rules regardless of category
+            return None
+
+        # Create new learned rule
+        rule = CategoryRule(
+            user_id=user_id,
+            keyword=keyword,
+            category=category,
+            match_type="contains",
+            priority=3,
+        )
+        db.add(rule)
+        db.commit()
+        db.refresh(rule)
+        return rule
+
+    @staticmethod
     def seed_default_rules(db: Session, user_id: int) -> int:
         """Seed default rules for a new user.
 

@@ -178,7 +178,7 @@ export function CameraCapture({ onCapture, onCancel }: CameraCaptureProps) {
             </button>
             <button
               onClick={confirm}
-              className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+              className="flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
             >
               <Check size={20} />
               {t('receipt.usePhoto', 'Use Photo')}

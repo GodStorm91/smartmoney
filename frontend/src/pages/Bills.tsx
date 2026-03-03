@@ -148,7 +148,7 @@ export default function Bills() {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('bills.paid')}
                   </span>
-                  <span className="font-semibold text-green-600 dark:text-green-400">
+                  <span className="font-semibold text-income-600 dark:text-income-300">
                     {bills.filter((b: Bill) => b.is_paid).length}
                   </span>
                 </div>
@@ -156,7 +156,7 @@ export default function Bills() {
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {t('bills.unpaid')}
                   </span>
-                  <span className="font-semibold text-red-600 dark:text-red-400">
+                  <span className="font-semibold text-expense-600 dark:text-expense-300">
                     {bills.filter((b: Bill) => !b.is_paid).length}
                   </span>
                 </div>

@@ -13,7 +13,7 @@ export function AccountSummaryCard({ accounts, totalNetWorth }: AccountSummaryCa
   return (
     <div>
       {/* Net worth highlight */}
-      <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+      <div className="mb-4 p-4 bg-net-50 dark:bg-net-900/20 rounded-lg">
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {t('report.totalNetWorth')}
         </div>

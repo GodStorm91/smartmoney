@@ -82,7 +82,7 @@ export function InsightCard({
               {insight.percentage_change && (
                 <span className={cn(
                   'ml-2 text-sm font-semibold',
-                  insight.percentage_change > 0 ? 'text-red-600' : 'text-green-600'
+                  insight.percentage_change > 0 ? 'text-expense-600' : 'text-income-600'
                 )}>
                   {insight.percentage_change > 0 ? '+' : ''}{insight.percentage_change}%
                 </span>

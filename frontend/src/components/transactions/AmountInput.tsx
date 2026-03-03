@@ -21,7 +21,7 @@ export function AmountInput({ value, displayValue, currencySymbol, onChange, err
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
         {t('transaction.amount', 'Amount')}
       </label>
       <div className="relative">
@@ -36,14 +36,14 @@ export function AmountInput({ value, displayValue, currencySymbol, onChange, err
           placeholder="0"
           autoFocus={autoFocus}
           className={cn(
-            'w-full h-14 pl-10 pr-4 border rounded-lg text-xl text-right font-numbers',
+            'w-full h-14 pl-10 pr-4 border rounded-lg text-xl text-right font-numbers focus-ring',
             'dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
-            error ? 'border-red-500' : 'border-gray-300'
+            error ? 'border-expense-600' : 'border-gray-300'
           )}
         />
       </div>
       {error && (
-        <p className="mt-1 text-sm text-red-500">{error}</p>
+        <p className="mt-1 text-sm text-expense-600 dark:text-expense-300">{error}</p>
       )}
     </div>
   )

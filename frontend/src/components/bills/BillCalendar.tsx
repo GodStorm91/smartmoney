@@ -103,9 +103,9 @@ export function BillCalendar({ onDayClick, className }: BillCalendarProps) {
                   className={cn(
                     'aspect-square p-1 rounded-lg border cursor-pointer transition-all',
                     hasUnpaid
-                      ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20'
+                      ? 'border-expense-200 dark:border-expense-800 bg-expense-50 dark:bg-expense-900/20'
                       : hasBills
-                        ? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'
+                        ? 'border-income-200 dark:border-income-800 bg-income-50 dark:bg-income-900/20'
                         : 'border-gray-100 dark:border-gray-700',
                     'hover:scale-105'
                   )}
@@ -115,9 +115,9 @@ export function BillCalendar({ onDayClick, className }: BillCalendarProps) {
                     <span className={cn(
                       'text-xs font-medium',
                       hasUnpaid
-                        ? 'text-red-600 dark:text-red-400'
+                        ? 'text-expense-600 dark:text-expense-300'
                         : hasBills
-                          ? 'text-green-600 dark:text-green-400'
+                          ? 'text-income-600 dark:text-income-300'
                           : 'text-gray-500 dark:text-gray-400'
                     )}>
                       {day}
@@ -130,8 +130,8 @@ export function BillCalendar({ onDayClick, className }: BillCalendarProps) {
                             className={cn(
                               'w-1.5 h-1.5 rounded-full',
                               bill.is_paid
-                                ? 'bg-green-400'
-                                : 'bg-red-500'
+                                ? 'bg-income-400'
+                                : 'bg-expense-600'
                             )}
                           />
                         ))}
@@ -152,7 +152,7 @@ export function BillCalendar({ onDayClick, className }: BillCalendarProps) {
                 <span className="text-gray-500 dark:text-gray-400">
                   {t('bills.calendar.total_due', 'Total Due')}:
                 </span>
-                <span className="font-semibold text-red-600 dark:text-red-400">
+                <span className="font-semibold text-expense-600 dark:text-expense-300">
                   {calendarData.total_bills_due} bills
                 </span>
               </div>

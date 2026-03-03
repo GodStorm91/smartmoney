@@ -82,7 +82,7 @@ export function HierarchicalCategoryPicker({
         <button
           type="button"
           onClick={handleBack}
-          className="flex items-center gap-2 text-sm text-gray-600 mb-3 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+          className="flex items-center gap-2 text-sm text-gray-600 mb-3 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 rounded-md focus-ring"
         >
           <ChevronLeft className="w-4 h-4" />
           {selectedParent.icon} {selectedParent.name}
@@ -90,14 +90,15 @@ export function HierarchicalCategoryPicker({
 
         {/* Children grid */}
         <div className="grid grid-cols-3 gap-2">
-          {selectedParent.children.map((child) => (
+          {selectedParent.children.map((child, index) => (
             <button
               key={child.id}
               type="button"
               onClick={() => handleChildClick(child)}
+              style={{ '--stagger-index': index } as React.CSSProperties}
               className={cn(
-                'flex flex-col items-center justify-center p-3 rounded-lg',
-                'min-h-[64px] transition-colors',
+                'flex flex-col items-center justify-center p-3 rounded-lg animate-stagger-in',
+                'min-h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500',
                 selected === child.name
                   ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'
                   : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600'
@@ -116,9 +117,9 @@ export function HierarchicalCategoryPicker({
             onClick={() => setShowAddForm(true)}
             className={cn(
               'flex flex-col items-center justify-center p-3 rounded-lg',
-              'min-h-[64px] transition-colors',
+              'min-h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500',
               'bg-gray-50 border-2 border-dashed border-gray-300 hover:bg-gray-100',
-              'dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700'
+              'dark:bg-gray-800 dark:border-gray-500 dark:hover:bg-gray-700'
             )}
           >
             <Plus className="w-6 h-6 mb-1 text-gray-400" />
@@ -166,14 +167,15 @@ export function HierarchicalCategoryPicker({
   // Show parent categories
   return (
     <div className="grid grid-cols-3 gap-2">
-      {categories.map((parent) => (
+      {categories.map((parent, index) => (
         <button
           key={parent.id}
           type="button"
           onClick={() => handleParentClick(parent)}
+          style={{ '--stagger-index': index } as React.CSSProperties}
           className={cn(
-            'flex flex-col items-center justify-center p-3 rounded-lg',
-            'min-h-[64px] transition-colors',
+            'flex flex-col items-center justify-center p-3 rounded-lg animate-stagger-in',
+            'min-h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500',
             findParentForChild(selected)?.id === parent.id
               ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'
               : 'bg-gray-50 border-2 border-transparent hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600'

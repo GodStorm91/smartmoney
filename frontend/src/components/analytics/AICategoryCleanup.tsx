@@ -30,10 +30,10 @@ function SuggestionItem({ suggestion, isSelected, onToggle }: SuggestionItemProp
 
   const confidenceColor =
     suggestion.confidence >= 0.8
-      ? 'text-green-600 dark:text-green-400'
+      ? 'text-income-600 dark:text-income-300'
       : suggestion.confidence >= 0.6
         ? 'text-yellow-600 dark:text-yellow-400'
-        : 'text-red-600 dark:text-red-400'
+        : 'text-expense-600 dark:text-expense-300'
 
   return (
     <div

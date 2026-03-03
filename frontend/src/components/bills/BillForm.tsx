@@ -276,7 +276,7 @@ export function BillForm({ isOpen, onClose, bill, onSuccess }: BillFormProps) {
         </div>
 
         {errors.submit && (
-          <p className="text-sm text-red-500">{errors.submit}</p>
+          <p className="text-sm text-expense-600 dark:text-expense-300">{errors.submit}</p>
         )}
 
         <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">

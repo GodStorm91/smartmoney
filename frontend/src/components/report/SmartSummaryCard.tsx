@@ -39,9 +39,9 @@ function buildFallback(report: MonthlyUsageReportData): AIReportSummary | null {
 }
 
 const bullets = [
-  { key: 'win' as const, Icon: CheckCircle, color: 'text-green-600 dark:text-green-400', bg: 'bg-green-100 dark:bg-green-900/30' },
+  { key: 'win' as const, Icon: CheckCircle, color: 'text-income-600 dark:text-income-300', bg: 'bg-income-100 dark:bg-income-900/30' },
   { key: 'warning' as const, Icon: AlertTriangle, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-100 dark:bg-amber-900/30' },
-  { key: 'trend' as const, Icon: TrendingUp, color: 'text-blue-600 dark:text-blue-400', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+  { key: 'trend' as const, Icon: TrendingUp, color: 'text-net-600 dark:text-net-300', bg: 'bg-net-100 dark:bg-net-900/30' },
 ] as const
 
 export function SmartSummaryCard({ year, month, reportData }: SmartSummaryCardProps) {

@@ -1,10 +1,13 @@
 """AI-powered transaction categorization routes."""
+import time
+from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
@@ -18,6 +21,7 @@ from ..services.claude_ai_service import ClaudeAIService
 from ..services.credit_service import CreditService, InsufficientCreditsError
 from ..services.exchange_rate_service import ExchangeRateService
 from ..services.category_rule_service import CategoryRuleService
+from ..models.credit_transaction import CreditTransaction
 from ..utils.currency_utils import convert_to_jpy
 
 router = APIRouter(prefix="/api/ai", tags=["ai"])
@@ -258,19 +262,28 @@ def apply_categorization_suggestions(
     # Track descriptions for rule creation
     description_to_category = {}
 
+    # Parse approved items
+    approved_map: dict[int, str] = {}
     for item in request.approved:
         tx_id = item.get("transaction_id")
         category = item.get("category")
+        if tx_id and category:
+            approved_map[tx_id] = category
 
-        if not tx_id or not category:
-            continue
+    if not approved_map:
+        return ApplySuggestionsResponse(
+            updated_count=0, rules_created=0, failed_ids=[]
+        )
 
-        # Update transaction
-        tx = db.query(Transaction).filter(
-            Transaction.id == tx_id,
-            Transaction.user_id == current_user.id
-        ).first()
+    # Batch load all transactions in one query
+    transactions = db.query(Transaction).filter(
+        Transaction.id.in_(approved_map.keys()),
+        Transaction.user_id == current_user.id
+    ).all()
+    tx_by_id = {tx.id: tx for tx in transactions}
 
+    for tx_id, category in approved_map.items():
+        tx = tx_by_id.get(tx_id)
         if tx:
             description_to_category[tx.description] = category
             tx.category = category
@@ -544,3 +557,150 @@ def get_budget_categorization_suggestions(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Budget AI categorization failed: {str(e)}"
         )
+
+
+# --- Inline AI categorization (Layer 3) ---
+
+# In-memory cache: (user_id, description_normalized) -> (result_dict, timestamp)
+# NOTE: Cache is per-process; not shared across gunicorn workers.
+# Acceptable for SmartMoney's single-worker deploy. For multi-worker,
+# replace with Redis or DB-backed cache.
+_inline_cache: dict[tuple[int, str], tuple[dict, float]] = {}
+_INLINE_CACHE_TTL = 300  # 5 minutes
+
+_RATE_LIMIT_MAX = 10  # max calls per minute per user
+
+
+def _check_rate_limit_db(db: Session, user_id: int) -> bool:
+    """DB-backed rate limit — works across all workers."""
+    from datetime import datetime, timedelta
+    one_minute_ago = datetime.utcnow() - timedelta(minutes=1)
+    count = db.query(func.count(CreditTransaction.id)).filter(
+        CreditTransaction.user_id == user_id,
+        CreditTransaction.description.like("Inline AI categorization%"),
+        CreditTransaction.created_at >= one_minute_ago,
+    ).scalar()
+    return (count or 0) < _RATE_LIMIT_MAX
+
+
+def _get_cached(user_id: int, description: str) -> dict | None:
+    key = (user_id, description.lower().strip())
+    entry = _inline_cache.get(key)
+    if entry and (time.time() - entry[1]) < _INLINE_CACHE_TTL:
+        return entry[0]
+    if entry:
+        del _inline_cache[key]
+    return None
+
+
+def _set_cached(user_id: int, description: str, result: dict) -> None:
+    key = (user_id, description.lower().strip())
+    _inline_cache[key] = (result, time.time())
+
+
+@router.get("/categorize/inline")
+def categorize_inline(
+    description: str = Query(..., min_length=5),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """AI inline categorization for a single transaction description.
+
+    Used as a fallback when history/rule matching yields no result.
+    """
+    # Check cache first
+    cached = _get_cached(current_user.id, description)
+    if cached:
+        return {"auto_category": cached, "credits_used": 0}
+
+    # Rate limit (DB-backed, works across workers)
+    if not _check_rate_limit_db(db, current_user.id):
+        return {"auto_category": None, "reason": "rate_limited"}
+
+    # Check credits
+    credit_service = CreditService(db)
+    account = credit_service.get_account(current_user.id)
+    if account.balance < Decimal("0.01"):
+        return {"auto_category": None, "reason": "insufficient_credits"}
+
+    # Build category hierarchy (expense + income) — single query
+    all_categories = db.query(Category).filter(
+        (Category.is_system == True) | (Category.user_id == current_user.id),
+    ).all()
+
+    parents_by_id: dict[int, Category] = {}
+    children_by_parent: dict[int, list[str]] = defaultdict(list)
+    for cat in all_categories:
+        if cat.parent_id is None:
+            parents_by_id[cat.id] = cat
+        else:
+            children_by_parent[cat.parent_id].append(cat.name)
+
+    category_hierarchy: dict[str, list[str]] = {}
+    income_parents: set[str] = set()
+    for pid, parent in parents_by_id.items():
+        if parent.type == "income":
+            income_parents.add(parent.name)
+        child_names = children_by_parent.get(pid, [])
+        if child_names:
+            category_hierarchy[parent.name] = child_names
+
+    # Call AI
+    try:
+        ai_service = ClaudeAIService()
+        result, usage = ai_service.categorize_single(
+            description=description,
+            available_categories=category_hierarchy,
+        )
+
+        # Validate category exists in hierarchy
+        ai_category = result.get("category", "")
+        ai_parent = result.get("parent", "")
+        confidence = min(max(float(result.get("confidence", 0.5)), 0.0), 1.0)
+
+        # Check the category is valid
+        valid = False
+        for parent_name, children in category_hierarchy.items():
+            if ai_category in children:
+                ai_parent = parent_name
+                valid = True
+                break
+
+        if not valid:
+            return {"auto_category": None, "reason": "no_match"}
+
+        is_income = ai_parent in income_parents
+
+        # Deduct credits
+        input_cost = Decimal(usage["input_tokens"]) * Decimal("0.080") / Decimal("1000")
+        output_cost = Decimal(usage["output_tokens"]) * Decimal("0.400") / Decimal("1000")
+        total_credits = input_cost + output_cost
+
+        try:
+            credit_service.deduct_credits(
+                user_id=current_user.id,
+                amount=total_credits,
+                transaction_type="usage",
+                description=f"Inline AI categorization ({usage['input_tokens']}+{usage['output_tokens']} tokens)",
+                extra_data={"description": description[:100]},
+            )
+            db.commit()
+        except InsufficientCreditsError:
+            db.rollback()
+            return {"auto_category": None, "reason": "insufficient_credits"}
+
+        auto_category = {
+            "category": ai_category,
+            "parent_category": ai_parent,
+            "is_income": is_income,
+            "confidence": round(confidence, 2),
+            "source": "ai",
+        }
+
+        _set_cached(current_user.id, description, auto_category)
+
+        return {"auto_category": auto_category, "credits_used": float(total_credits)}
+
+    except Exception:
+        db.rollback()
+        return {"auto_category": None, "reason": "ai_error"}
