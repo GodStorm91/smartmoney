@@ -141,7 +141,8 @@ class InsightGeneratorService:
             .filter(
                 and_(
                     Transaction.user_id == user_id,
-                    Transaction.type == "expense",
+                    Transaction.is_income == False,
+                    Transaction.is_transfer == False,
                     Transaction.date >= current_month_start,
                     Transaction.date <= current_month_end,
                 )
@@ -309,7 +310,8 @@ class InsightGeneratorService:
                 .filter(
                     and_(
                         Transaction.user_id == user_id,
-                        Transaction.type == "expense",
+                        Transaction.is_income == False,
+                        Transaction.is_transfer == False,
                         Transaction.date >= month_start,
                         Transaction.date <= month_end,
                     )
@@ -398,7 +400,8 @@ class InsightGeneratorService:
             .filter(
                 and_(
                     Transaction.user_id == user_id,
-                    Transaction.type == "income",
+                    Transaction.is_income == True,
+                    Transaction.is_transfer == False,
                     Transaction.date >= current_month_start,
                     Transaction.date <= current_month_end,
                 )
@@ -412,7 +415,8 @@ class InsightGeneratorService:
             .filter(
                 and_(
                     Transaction.user_id == user_id,
-                    Transaction.type == "expense",
+                    Transaction.is_income == False,
+                    Transaction.is_transfer == False,
                     Transaction.date >= current_month_start,
                     Transaction.date <= current_month_end,
                 )
@@ -438,7 +442,8 @@ class InsightGeneratorService:
             .filter(
                 and_(
                     Transaction.user_id == user_id,
-                    Transaction.type == "expense",
+                    Transaction.is_income == False,
+                    Transaction.is_transfer == False,
                     Transaction.date >= month_start,
                     Transaction.date <= month_end,
                 )
