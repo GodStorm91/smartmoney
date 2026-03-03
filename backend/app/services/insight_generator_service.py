@@ -23,21 +23,19 @@ class InsightGeneratorService:
         """Generate all insights for dashboard display."""
         insights = []
 
-        # 1. Spending trend insights
-        trend_insights = await self._analyze_spending_trends(db, user_id)
-        insights.extend(trend_insights)
-
-        # 2. Budget burn rate insights
-        budget_insights = await self._analyze_budget_burn(db, user_id)
-        insights.extend(budget_insights)
-
-        # 3. Goal progress insights
-        goal_insights = await self._analyze_goal_progress(db, user_id)
-        insights.extend(goal_insights)
-
-        # 4. Forecast insights
-        forecast_insights = await self._generate_forecasts(db, user_id)
-        insights.extend(forecast_insights)
+        # Each section is wrapped in try/except so one failure doesn't break the whole endpoint
+        analyzers = [
+            self._analyze_spending_trends,
+            self._analyze_budget_burn,
+            self._analyze_goal_progress,
+            self._generate_forecasts,
+        ]
+        for analyzer in analyzers:
+            try:
+                result = await analyzer(db, user_id)
+                insights.extend(result)
+            except Exception:
+                pass
 
         # Sort by priority and return top N
         insights.sort(key=lambda x: x.get("priority", 5))
@@ -136,6 +134,17 @@ class InsightGeneratorService:
         if not budget:
             return []
 
+        # Compute total budget from allocations (Budget has no total_amount field)
+        total_budget_amount = (
+            db.query(func.sum(BudgetAllocation.amount))
+            .filter(BudgetAllocation.budget_id == budget.id)
+            .scalar()
+            or 0
+        )
+
+        if total_budget_amount <= 0:
+            return []
+
         current_spending = (
             db.query(func.sum(Transaction.amount))
             .filter(
@@ -155,13 +164,13 @@ class InsightGeneratorService:
         days_in_month = (current_month_end - current_month_start).days + 1
         days_remaining = max(1, days_in_month - day_of_month + 1)
 
-        expected_spending = (budget.total_amount / days_in_month) * day_of_month
+        expected_spending = (total_budget_amount / days_in_month) * day_of_month
         burn_rate = current_spending / expected_spending if expected_spending > 0 else 1
 
         insights = []
 
         if burn_rate > 1.3:
-            projected_over = current_spending - budget.total_amount
+            projected_over = current_spending - total_budget_amount
             insights.append(
                 {
                     "type": "budget_warning",
@@ -170,7 +179,7 @@ class InsightGeneratorService:
                     "priority": 1,
                     "data": {
                         "current_spending": current_spending,
-                        "budget": budget.total_amount,
+                        "budget": total_budget_amount,
                         "burn_rate": burn_rate,
                         "projected_over": projected_over,
                         "days_remaining": days_remaining,
@@ -180,7 +189,7 @@ class InsightGeneratorService:
                 }
             )
         elif burn_rate > 1.1:
-            projected_over = current_spending - budget.total_amount
+            projected_over = current_spending - total_budget_amount
             insights.append(
                 {
                     "type": "budget_warning",
@@ -189,7 +198,7 @@ class InsightGeneratorService:
                     "priority": 2,
                     "data": {
                         "current_spending": current_spending,
-                        "budget": budget.total_amount,
+                        "budget": total_budget_amount,
                         "burn_rate": burn_rate,
                         "projected_over": projected_over,
                         "days_remaining": days_remaining,
@@ -197,7 +206,7 @@ class InsightGeneratorService:
                 }
             )
 
-        remaining_budget = budget.total_amount - current_spending
+        remaining_budget = total_budget_amount - current_spending
         daily_budget = remaining_budget / days_remaining if days_remaining > 0 else 0
 
         if remaining_budget > 0:
@@ -228,67 +237,30 @@ class InsightGeneratorService:
 
         for goal in goals:
             if goal.target_amount and goal.target_amount > 0:
-                current_savings = goal.current_amount or 0
-                progress_pct = (current_savings / goal.target_amount) * 100
+                goal_name = f"{goal.years}-year goal"
+                start_date = goal.start_date or datetime.now().date()
+                end_date = start_date + timedelta(days=365 * goal.years)
+                total_days = max(1, (end_date - start_date).days)
+                today = datetime.now().date()
+                elapsed_days = max(1, (today - start_date).days)
+                expected_progress = min(100, (elapsed_days / total_days) * 100)
 
-                start_date = goal.start_date or datetime.now()
-                end_date = goal.target_date or (start_date + timedelta(days=365 * goal.years))
-                total_days = (end_date - start_date).days
-                elapsed_days = max(1, (datetime.now() - start_date).days)
-                expected_progress = (elapsed_days / total_days) * 100
-
-                if progress_pct < expected_progress * 0.8:
-                    months_behind = (expected_progress - progress_pct) / (
-                        expected_progress / (elapsed_days / 30)
-                    )
+                # Goal model has no current_amount — skip progress tracking
+                # Just provide time-based insight
+                if elapsed_days > total_days:
                     insights.append(
                         {
                             "type": "goal_progress",
-                            "title": f"{goal.name} behind schedule",
-                            "message": f"You're behind schedule on '{goal.name}'. At this pace, you won't reach your goal by {goal.years}-year target.",
+                            "title": f"{goal_name} deadline passed",
+                            "message": f"Your {goal_name} target date has passed. Review your progress.",
                             "priority": 2,
                             "data": {
                                 "goal_id": goal.id,
-                                "goal_name": goal.name,
-                                "current": current_savings,
                                 "target": goal.target_amount,
-                                "progress_percent": progress_pct,
-                                "expected_percent": expected_progress,
-                                "monthly_required": goal.monthly_required or 0,
+                                "years": goal.years,
                             },
-                            "action_url": f"/goals",
+                            "action_url": "/goals",
                             "action_label": "View Goals",
-                        }
-                    )
-                elif progress_pct >= 100:
-                    insights.append(
-                        {
-                            "type": "goal_progress",
-                            "title": f"Goal achieved: {goal.name}!",
-                            "message": f"Congratulations! You've reached your {goal.name} goal!",
-                            "priority": 1,
-                            "data": {
-                                "goal_id": goal.id,
-                                "goal_name": goal.name,
-                                "current": current_savings,
-                                "target": goal.target_amount,
-                            },
-                        }
-                    )
-                elif progress_pct >= expected_progress * 0.9:
-                    insights.append(
-                        {
-                            "type": "goal_progress",
-                            "title": f"Great progress on {goal.name}",
-                            "message": f"You're on track to reach '{goal.name}'! Keep up the good work.",
-                            "priority": 4,
-                            "data": {
-                                "goal_id": goal.id,
-                                "goal_name": goal.name,
-                                "current": current_savings,
-                                "target": goal.target_amount,
-                                "progress_percent": progress_pct,
-                            },
                         }
                     )
 
