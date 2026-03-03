@@ -39,6 +39,7 @@ export const NAV_CONFIG: Record<string, NavItemConfig> = {
   settings: { path: '/settings', icon: Settings, labelKey: 'nav.settings', activeColor: 'text-gray-600 dark:text-gray-400' },
   upload: { path: '/upload', icon: Upload, labelKey: 'header.upload', activeColor: 'text-cyan-600 dark:text-cyan-400' },
   relocation: { path: '/relocation', icon: MapPinned, labelKey: 'nav.relocation', activeColor: 'text-teal-600 dark:text-teal-400' },
+  investments: { path: '/investments', icon: TrendingUp, labelKey: 'holdings.title', activeColor: 'text-emerald-600 dark:text-emerald-400' },
 }
 
 const navItems: NavItemConfig[] = [
@@ -49,6 +50,7 @@ const navItems: NavItemConfig[] = [
 ]
 
 const primaryMenuItems: NavItemConfig[] = [
+  NAV_CONFIG.investments,
   NAV_CONFIG.gamification,
   NAV_CONFIG.analytics,
   NAV_CONFIG.goals,

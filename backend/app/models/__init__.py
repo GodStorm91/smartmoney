@@ -24,6 +24,7 @@ from .exchange_rate import ExchangeRate
 from .gamification import UserGamification, Achievement, UserAchievement, XPEvent
 from .goal import Goal
 from .goal_type import GoalType
+from .holding import Holding, HoldingLot
 from .insight import InsightCard, SavingsRecommendation
 from .notification import (
     NotificationPreference,
@@ -128,6 +129,8 @@ __all__ = [
     "PositionCostBasis",
     "DismissedSuggestion",
     "GoalType",
+    "Holding",
+    "HoldingLot",
     "PositionClosure",
     "Receipt",
     "ReportAISummary",

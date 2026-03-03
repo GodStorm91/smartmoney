@@ -19,6 +19,7 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
   { path: '/', icon: Home, labelKey: 'nav.home' },
   { path: '/transactions', icon: Receipt, labelKey: 'nav.transactions' },
   { path: '/accounts', icon: Wallet, labelKey: 'nav.accounts' },
+  { path: '/investments', icon: TrendingUp, labelKey: 'holdings.title' },
   { path: '/budget', icon: TrendingUp, labelKey: 'nav.budget' },
   { path: '/analytics', icon: BarChart3, labelKey: 'nav.analytics' },
   { path: '/benchmark', icon: Scale, labelKey: 'nav.benchmark' },

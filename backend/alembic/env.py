@@ -20,6 +20,7 @@ from app.models.account import Account
 from app.models.tag import Tag
 from app.models.transaction_tag import TransactionTag
 from app.models.exchange_rate import ExchangeRate
+from app.models.holding import Holding, HoldingLot
 
 # this is the Alembic Config object
 config = context.config

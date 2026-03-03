@@ -32,6 +32,7 @@ from .routes.crypto import router as crypto_router
 from .routes.dashboard import router as dashboard_router
 from .routes.gamification import router as gamification_router
 from .routes.goals import router as goals_router
+from .routes.holdings import router as holdings_router
 from .routes.insights import router as insights_router
 from .routes.notifications import router as notifications_router
 from .routes.proxy import router as proxy_router
@@ -534,6 +535,7 @@ app.include_router(relocation_router)
 app.include_router(theme_router)
 app.include_router(export_router)
 app.include_router(health_score_router)
+app.include_router(holdings_router)
 
 
 # Root endpoints

@@ -21,6 +21,7 @@ import { Route as RecurringRouteImport } from './routes/recurring'
 import { Route as ProxyRouteImport } from './routes/proxy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LandingRouteImport } from './routes/landing'
+import { Route as InvestmentsRouteImport } from './routes/investments'
 import { Route as GoalsRouteImport } from './routes/goals'
 import { Route as BudgetRouteImport } from './routes/budget'
 import { Route as BenchmarkRouteImport } from './routes/benchmark'
@@ -91,6 +92,11 @@ const LandingRoute = LandingRouteImport.update({
   path: '/landing',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestmentsRoute = InvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() => import('./routes/investments.lazy').then((d) => d.Route))
 const GoalsRoute = GoalsRouteImport.update({
   id: '/goals',
   path: '/goals',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
+  '/investments': typeof InvestmentsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/proxy': typeof ProxyRoute
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
+  '/investments': typeof InvestmentsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/proxy': typeof ProxyRoute
@@ -170,6 +178,7 @@ export interface FileRoutesById {
   '/benchmark': typeof BenchmarkRoute
   '/budget': typeof BudgetRoute
   '/goals': typeof GoalsRoute
+  '/investments': typeof InvestmentsRoute
   '/landing': typeof LandingRoute
   '/login': typeof LoginRoute
   '/proxy': typeof ProxyRoute
@@ -192,6 +201,7 @@ export interface FileRouteTypes {
     | '/benchmark'
     | '/budget'
     | '/goals'
+    | '/investments'
     | '/landing'
     | '/login'
     | '/proxy'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/benchmark'
     | '/budget'
     | '/goals'
+    | '/investments'
     | '/landing'
     | '/login'
     | '/proxy'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/benchmark'
     | '/budget'
     | '/goals'
+    | '/investments'
     | '/landing'
     | '/login'
     | '/proxy'
@@ -253,6 +265,7 @@ export interface RootRouteChildren {
   BenchmarkRoute: typeof BenchmarkRoute
   BudgetRoute: typeof BudgetRoute
   GoalsRoute: typeof GoalsRoute
+  InvestmentsRoute: typeof InvestmentsRoute
   LandingRoute: typeof LandingRoute
   LoginRoute: typeof LoginRoute
   ProxyRoute: typeof ProxyRoute
@@ -353,6 +366,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/investments': {
+      id: '/investments'
+      path: '/investments'
+      fullPath: '/investments'
+      preLoaderRoute: typeof InvestmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/goals': {
       id: '/goals'
       path: '/goals'
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   BenchmarkRoute: BenchmarkRoute,
   BudgetRoute: BudgetRoute,
   GoalsRoute: GoalsRoute,
+  InvestmentsRoute: InvestmentsRoute,
   LandingRoute: LandingRoute,
   LoginRoute: LoginRoute,
   ProxyRoute: ProxyRoute,
