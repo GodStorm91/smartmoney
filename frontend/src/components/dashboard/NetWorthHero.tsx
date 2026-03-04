@@ -71,7 +71,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
 
       {expanded && (
         <div className="mt-5 pt-4 border-t border-gray-200/40 dark:border-gray-700/40">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-6">
             <div>
               <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-0.5">{t('dashboard.assets', 'Assets')}</p>
               <p className="text-lg font-bold font-numbers text-income-600 dark:text-income-300">

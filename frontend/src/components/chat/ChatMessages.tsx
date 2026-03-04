@@ -57,7 +57,7 @@ export function ChatMessages({
         >
           <ChatMessage role={message.role} content={message.content} />
           {message.action && (
-            <div className="ml-11">
+            <div className="ml-0 sm:ml-11">
               <ActionCard
                 action={message.action}
                 onApply={() => onApplyAction(index)}
@@ -67,7 +67,7 @@ export function ChatMessages({
             </div>
           )}
           {message.quickActions && message.quickActions.length > 0 && (
-            <div className="ml-11 mt-2 flex flex-wrap gap-2">
+            <div className="ml-0 sm:ml-11 mt-2 flex flex-wrap gap-2">
               {message.quickActions.map((quickAction, qaIndex) => (
                 <QuickActionButton
                   key={qaIndex}

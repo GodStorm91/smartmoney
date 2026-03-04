@@ -537,7 +537,7 @@ export function Transactions() {
             {searchInput && (
               <button
                 onClick={() => { setSearchInput(''); clearFilter('search') }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -548,7 +548,7 @@ export function Transactions() {
             <button
               onClick={() => setIsFilterExpanded(!isFilterExpanded)}
               className={cn(
-                'flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold transition-all',
+                'flex items-center gap-2 px-3.5 py-2.5 rounded-lg text-sm font-semibold transition-all',
                 isFilterExpanded || activeFilterCount > 0
                   ? 'bg-primary-600 text-white dark:bg-primary-500 shadow-sm'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -569,7 +569,7 @@ export function Transactions() {
 
             <button
               onClick={() => exportTransactionsCsv(sortedTransactions, filters.start_date, filters.end_date)}
-              className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              className="flex items-center gap-1 px-3 py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
               title={t('export.csv', 'Export CSV')}
             >
               <Download className="w-4 h-4" />
@@ -578,7 +578,7 @@ export function Transactions() {
             <button
               onClick={() => setIsDuplicateReviewOpen(true)}
               className={cn(
-                'relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap',
+                'relative flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap',
                 duplicateCount > 0
                   ? 'bg-warning-100 dark:bg-warning-900/30 text-warning-700 dark:text-warning-300 hover:bg-warning-200 dark:hover:bg-warning-800/40'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -605,7 +605,7 @@ export function Transactions() {
                   key={key}
                   onClick={() => handleDatePresetChange(key)}
                   className={cn(
-                    'px-3 py-2 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-colors',
+                    'px-3 py-2.5 sm:py-2 text-xs sm:text-sm font-medium rounded-lg whitespace-nowrap transition-colors',
                     datePreset === key
                       ? 'bg-primary-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -627,14 +627,14 @@ export function Transactions() {
                     placeholder={t('transactions.minAmount', 'Min')}
                     value={minAmount}
                     onChange={(e) => handleAmountChange('min', e.target.value)}
-                    className="h-10"
+                    className="h-11"
                   />
                   <Input
                     type="number"
                     placeholder={t('transactions.maxAmount', 'Max')}
                     value={maxAmount}
                     onChange={(e) => handleAmountChange('max', e.target.value)}
-                    className="h-10"
+                    className="h-11"
                   />
                 </div>
               </div>
@@ -759,7 +759,7 @@ export function Transactions() {
               <select
                 value={showCount}
                 onChange={(e) => setShowCount(e.target.value === 'all' ? 'all' : Number(e.target.value) as 50 | 100)}
-                className="md:hidden px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                className="md:hidden px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 h-10"
               >
                 <option value={50}>50</option>
                 <option value={100}>100</option>
@@ -773,7 +773,7 @@ export function Transactions() {
               <select
                 value={`${sortField}-${sortDirection}`}
                 onChange={(e) => handleMobileSort(e.target.value)}
-                className="px-3 py-1 text-sm rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                className="px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 h-10"
               >
                 <option value="date-desc">{t('transactions.sortDateDesc', 'Date ↓')}</option>
                 <option value="date-asc">{t('transactions.sortDateAsc', 'Date ↑')}</option>

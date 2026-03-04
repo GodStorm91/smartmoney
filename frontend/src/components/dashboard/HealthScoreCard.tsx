@@ -58,7 +58,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
   const offset = circumference - (score / 100) * circumference
 
   return (
-    <Card className="p-4 animate-fade-in">
+    <Card className="p-3 sm:p-4 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em]">
@@ -66,7 +66,7 @@ export function HealthScoreCard({ data }: HealthScoreCardProps) {
         </span>
         <button
           onClick={() => setExpanded(!expanded)}
-          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
         >
           {expanded
             ? <ChevronUp className="w-4 h-4 text-gray-400" />

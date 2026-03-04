@@ -16,8 +16,8 @@ export function DashboardGoalsSection({ goalsProgress, goalsCount, formatCurrenc
   // Goals with progress
   if (goalsProgress && goalsProgress.length > 0) {
     return (
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
+      <Card className="p-3 sm:p-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-xl bg-pink-100 dark:bg-pink-900/30">
               <Target className="w-4 h-4 text-pink-600 dark:text-pink-400" />

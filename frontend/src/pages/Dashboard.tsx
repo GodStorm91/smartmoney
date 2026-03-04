@@ -187,7 +187,7 @@ export function Dashboard() {
           <div className="flex items-center justify-between mb-2">
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() - 1); setCurrentDate(d) }}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               aria-label={t('dashboard.prevMonth', 'Previous month')}
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -197,7 +197,7 @@ export function Dashboard() {
             </h1>
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() + 1); setCurrentDate(d) }}
-              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               aria-label={t('dashboard.nextMonth', 'Next month')}
             >
               <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -215,7 +215,7 @@ export function Dashboard() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 py-5 space-y-4 sm:space-y-5">
         {/* 1. Onboarding (auto-hides after completion) */}
         <OnboardingChecklist />
 
@@ -269,7 +269,7 @@ export function Dashboard() {
 
         {/* 6. Monthly Summary — income/expenses + savings rate */}
         <div className="space-y-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
             <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
               <QuickStatCard
                 label={t('dashboard.income', 'Income')}
@@ -337,6 +337,7 @@ export function Dashboard() {
         <SubscriptionsWidget
           recurringTxns={recurringTxns}
           formatCurrency={formatCurrency}
+          rates={exchangeRates?.rates || {}}
         />
       </div>
 

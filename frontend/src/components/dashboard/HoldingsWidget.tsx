@@ -54,7 +54,7 @@ export function HoldingsWidget() {
     .slice(0, 4)
 
   return (
-    <Card className="p-4">
+    <Card className="p-3 sm:p-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
@@ -74,20 +74,20 @@ export function HoldingsWidget() {
       </div>
 
       {/* Portfolio Summary */}
-      <div className="grid grid-cols-2 gap-3 mb-3">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-3">
         {/* Total Value */}
-        <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+        <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
           <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
             {t('holdings.totalValue', 'Total Value')}
           </p>
-          <p className="text-[1.65rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
+          <p className="text-xl sm:text-[1.65rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
             {fmt(summary?.total_value ?? 0)}
           </p>
         </div>
 
         {/* P&L */}
         <div className={cn(
-          'p-3 rounded-lg',
+          'p-2.5 sm:p-3 rounded-lg',
           isPositive
             ? 'bg-income-50 dark:bg-income-900/20'
             : 'bg-expense-50 dark:bg-expense-900/20'
@@ -96,7 +96,7 @@ export function HoldingsWidget() {
             {t('holdings.pnl', 'P&L')}
           </p>
           <p className={cn(
-            'text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none',
+            'text-xl sm:text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none',
             isPositive
               ? 'text-income-600 dark:text-income-300'
               : 'text-expense-600 dark:text-expense-300'

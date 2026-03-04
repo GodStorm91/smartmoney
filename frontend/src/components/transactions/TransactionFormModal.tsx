@@ -325,7 +325,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
         className={cn(
           'w-full sm:max-w-md',
           'bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-2xl',
-          'max-h-[90vh] overflow-y-auto',
+          'max-h-[90dvh] overflow-y-auto',
           'animate-modal-in'
         )}
       >
@@ -336,7 +336,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
 
         {/* Header */}
         <div className="px-4 pb-4">
-          <h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100">
+          <h2 className="text-lg sm:text-xl font-semibold text-center text-gray-900 dark:text-gray-100">
             {t('transaction.addTransaction', 'Add Transaction')}
           </h2>
         </div>

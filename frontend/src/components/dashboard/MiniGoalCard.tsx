@@ -59,7 +59,7 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
           />
         </div>
       </div>
-      <ArrowRight className="w-4 h-4 text-gray-400" />
+      <ArrowRight className="w-5 h-5 text-gray-400 shrink-0" />
     </div>
   )
 }

@@ -211,7 +211,7 @@ export function TransactionEditModal({
         style={{ touchAction: 'pan-y' }}
       >
         <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
             {t('transaction.editTitle')}
           </h2>
 
@@ -269,7 +269,7 @@ export function TransactionEditModal({
                     required
                   />
                 </div>
-                <div className="w-28">
+                <div className="w-20 sm:w-28">
                   <Select
                     label={t('transaction.currency', 'Currency')}
                     value={currency}

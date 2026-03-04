@@ -39,13 +39,13 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
 
   return (
     <div className={cn(
-      'px-4 py-3 border-t border-gray-200 dark:border-gray-700',
-      'bg-white dark:bg-gray-800'
+      'px-3 sm:px-4 py-3 border-t border-gray-200 dark:border-gray-700',
+      'bg-white dark:bg-gray-800 safe-area-bottom'
     )}>
       <div className={cn(
         'flex items-end gap-2',
         'bg-gray-100 dark:bg-gray-700 rounded-2xl',
-        'px-4 py-2'
+        'px-3 sm:px-4 py-2'
       )}>
         <textarea
           ref={textareaRef}
@@ -57,7 +57,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           rows={1}
           className={cn(
             'flex-1 bg-transparent resize-none',
-            'text-sm text-gray-900 dark:text-white',
+            'text-base sm:text-sm text-gray-900 dark:text-white',
             'placeholder-gray-500 dark:placeholder-gray-400',
             'focus:outline-none',
             'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -68,7 +68,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
           onClick={handleSubmit}
           disabled={disabled || !value.trim()}
           className={cn(
-            'p-2 rounded-full',
+            'p-2.5 rounded-full',
             'bg-primary-500 text-white',
             'hover:bg-primary-600 active:bg-primary-700',
             'disabled:opacity-50 disabled:cursor-not-allowed',

@@ -13,9 +13,9 @@ interface QuickStatCardProps {
 
 export function QuickStatCard({ label, value, change, isPositive, formatCurrency, className }: QuickStatCardProps) {
   return (
-    <Card className={cn('p-4', className)}>
-      <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 mb-2 uppercase tracking-[0.12em]">{label}</p>
-      <p className="text-[1.65rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
+    <Card className={cn('p-3 sm:p-4', className)}>
+      <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 mb-1.5 sm:mb-2 uppercase tracking-[0.12em]">{label}</p>
+      <p className="text-xl sm:text-[1.65rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
         {formatCurrency(value)}
       </p>
       {change !== 0 && (

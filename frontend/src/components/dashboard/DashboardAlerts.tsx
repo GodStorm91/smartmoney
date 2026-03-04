@@ -88,10 +88,10 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
                     {onDismissBudgetAlert && (
                       <button
                         onClick={(e) => { e.preventDefault(); onDismissBudgetAlert(alert.id) }}
-                        className="p-0.5 rounded hover:bg-black/10 dark:hover:bg-white/10"
+                        className="p-1.5 -mr-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                         aria-label={t('alerts.dismiss', 'Dismiss alert')}
                       >
-                        <X className="w-3.5 h-3.5" />
+                        <X className="w-4 h-4" />
                       </button>
                     )}
                   </div>

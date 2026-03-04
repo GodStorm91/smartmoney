@@ -2,11 +2,13 @@ import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { CreditCard, ArrowRight } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { convertToJpy } from '@/utils/netWorthCalc'
 import type { RecurringTransaction, FrequencyType } from '@/services/recurring-service'
 
 interface SubscriptionsWidgetProps {
   recurringTxns: RecurringTransaction[] | undefined
   formatCurrency: (amount: number) => string
+  rates: Record<string, number>
 }
 
 function toMonthly(amount: number, freq: FrequencyType): number {
@@ -19,7 +21,11 @@ function toMonthly(amount: number, freq: FrequencyType): number {
   }
 }
 
-export function SubscriptionsWidget({ recurringTxns, formatCurrency }: SubscriptionsWidgetProps) {
+function toMonthlyConverted(r: RecurringTransaction, rates: Record<string, number>): number {
+  return toMonthly(convertToJpy(r.amount, r.currency || 'JPY', rates), r.frequency)
+}
+
+export function SubscriptionsWidget({ recurringTxns, formatCurrency, rates }: SubscriptionsWidgetProps) {
   const { t } = useTranslation('common')
 
   const subs = (recurringTxns || []).filter(
@@ -27,10 +33,10 @@ export function SubscriptionsWidget({ recurringTxns, formatCurrency }: Subscript
   )
   if (subs.length === 0) return null
 
-  const monthlyTotal = subs.reduce((s, r) => s + toMonthly(r.amount, r.frequency), 0)
+  const monthlyTotal = subs.reduce((s, r) => s + toMonthlyConverted(r, rates), 0)
 
   return (
-    <Card className="p-4">
+    <Card className="p-3 sm:p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
@@ -55,7 +61,7 @@ export function SubscriptionsWidget({ recurringTxns, formatCurrency }: Subscript
               {sub.description}
             </p>
             <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
-              {formatCurrency(toMonthly(sub.amount, sub.frequency))}/{t('subscriptions.mo', 'mo')}
+              {formatCurrency(toMonthlyConverted(sub, rates))}/{t('subscriptions.mo', 'mo')}
             </span>
           </div>
         ))}

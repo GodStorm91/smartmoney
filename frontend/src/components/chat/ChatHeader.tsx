@@ -30,9 +30,9 @@ export function ChatHeader({ onClose, credits, onClearHistory }: ChatHeaderProps
         </h2>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         {credits !== null && (
-          <span className="text-sm text-gray-500 dark:text-gray-400">
+          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             {t('chat.credits', { count: credits })}
           </span>
         )}
@@ -40,7 +40,7 @@ export function ChatHeader({ onClose, credits, onClearHistory }: ChatHeaderProps
           <button
             onClick={handleClearHistory}
             className={cn(
-              'p-1.5 rounded-lg',
+              'p-2 rounded-lg',
               'text-gray-500 hover:text-gray-700',
               'dark:text-gray-400 dark:hover:text-gray-200',
               'hover:bg-gray-100 dark:hover:bg-gray-700',
@@ -54,7 +54,7 @@ export function ChatHeader({ onClose, credits, onClearHistory }: ChatHeaderProps
         <button
           onClick={onClose}
           className={cn(
-            'p-1.5 rounded-lg',
+            'p-2 rounded-lg',
             'text-gray-500 hover:text-gray-700',
             'dark:text-gray-400 dark:hover:text-gray-200',
             'hover:bg-gray-100 dark:hover:bg-gray-700',

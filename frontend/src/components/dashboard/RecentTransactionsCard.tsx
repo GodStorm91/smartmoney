@@ -16,8 +16,8 @@ export function RecentTransactionsCard({ transactions, formatCurrency }: RecentT
   const { t } = useTranslation('common')
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
             <Receipt className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -43,7 +43,7 @@ export function RecentTransactionsCard({ transactions, formatCurrency }: RecentT
             >
               <div className="flex items-center gap-3">
                 <div className={cn(
-                  'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold',
+                  'w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold',
                   tx.type === 'income'
                     ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
                     : 'bg-expense-100 text-expense-600 dark:bg-expense-900/20 dark:text-expense-300'

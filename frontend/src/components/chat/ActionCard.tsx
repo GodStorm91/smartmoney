@@ -113,7 +113,7 @@ export function ActionCard({ action, onApply, onSkip, isApplying = false }: Acti
           onClick={onApply}
           disabled={isApplying}
           className={cn(
-            'flex-1 px-3 py-1.5 text-sm font-medium rounded-md',
+            'flex-1 px-3 py-2.5 sm:py-2 text-sm font-medium rounded-lg sm:rounded-md',
             'bg-primary-500 text-white',
             'hover:bg-primary-600 active:bg-primary-700',
             'disabled:opacity-50 disabled:cursor-not-allowed',
@@ -135,7 +135,7 @@ export function ActionCard({ action, onApply, onSkip, isApplying = false }: Acti
           onClick={onSkip}
           disabled={isApplying}
           className={cn(
-            'px-3 py-1.5 text-sm font-medium rounded-md',
+            'px-3 py-2.5 sm:py-2 text-sm font-medium rounded-lg sm:rounded-md',
             'border border-gray-300 dark:border-gray-600',
             'text-gray-700 dark:text-gray-300',
             'hover:bg-gray-100 dark:hover:bg-gray-700',

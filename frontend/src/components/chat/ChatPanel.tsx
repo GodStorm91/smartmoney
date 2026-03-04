@@ -196,7 +196,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
       <div
         className={cn(
           'fixed right-0 top-0 h-full z-[100]',
-          'w-full sm:w-[448px] lg:w-96',
+          'w-full sm:w-96 lg:w-[448px]',
           'bg-white dark:bg-gray-800',
           'shadow-2xl',
           'flex flex-col',

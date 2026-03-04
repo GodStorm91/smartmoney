@@ -154,9 +154,9 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
   const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
 
   return (
-    <Card className={cn('p-4', className)}>
+    <Card className={cn('p-3 sm:p-4', className)}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2">
           <CalendarIcon className="w-5 h-5 text-primary-500" />
           <h3 className="font-semibold text-gray-900 dark:text-gray-100">
@@ -166,7 +166,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrevMonth}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -175,7 +175,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
           </span>
           <button
             onClick={handleNextMonth}
-            className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
             <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
           </button>
@@ -183,8 +183,8 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-expense-50 dark:bg-expense-900/20 rounded-lg p-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+        <div className="bg-expense-50 dark:bg-expense-900/20 rounded-lg p-2.5 sm:p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <TrendingDown className="w-3.5 h-3.5 text-expense-600 dark:text-expense-300" />
             <span className="text-xs text-expense-600 dark:text-expense-300">
@@ -195,7 +195,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
             {formatCurrency(monthlyTotal)}
           </p>
         </div>
-        <div className="bg-net-50 dark:bg-net-900/20 rounded-lg p-3">
+        <div className="bg-net-50 dark:bg-net-900/20 rounded-lg p-2.5 sm:p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <DollarSign className="w-3.5 h-3.5 text-net-600 dark:text-net-300" />
             <span className="text-xs text-net-600 dark:text-net-300">
@@ -206,7 +206,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
             {formatCurrency(monthlyAverage)}
           </p>
         </div>
-        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
+        <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2.5 sm:p-3">
           <div className="flex items-center gap-1.5 mb-1">
             <CalendarIcon className="w-3.5 h-3.5 text-purple-500" />
             <span className="text-xs text-purple-600 dark:text-purple-400">
@@ -281,7 +281,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
 
                   {/* Hover Tooltip */}
                   {hoveredDay && isSameDay(day, hoveredDay) && spendingData && (
-                    <div className="absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg whitespace-nowrap">
+                    <div className="absolute z-10 bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg shadow-lg whitespace-normal sm:whitespace-nowrap min-w-[140px]">
                       <div className="font-medium mb-1">
                         {format(day, 'PPP', { locale })}
                       </div>
@@ -300,7 +300,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
           </div>
 
           {/* Legend */}
-          <div className="flex items-center justify-center gap-3 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-center flex-wrap gap-2 sm:gap-3 mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
             <span className="text-xs text-gray-500">{t('spendingCalendar.legend', 'Less')}</span>
             {SPENDING_LEVELS.slice(0, 5).map((level, idx) => (
               <div

@@ -31,7 +31,7 @@ export function ChatMessage({ role, content }: ChatMessageProps) {
 
       {/* Message bubble */}
       <div className={cn(
-        'max-w-[80%] px-4 py-2.5 rounded-2xl',
+        'max-w-[85%] sm:max-w-[80%] px-3.5 sm:px-4 py-2.5 rounded-2xl',
         'text-sm leading-relaxed',
         isUser
           ? 'bg-primary-500 text-white rounded-br-md'

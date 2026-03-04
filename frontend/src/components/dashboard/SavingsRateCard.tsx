@@ -33,8 +33,8 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
   const status = getStatus()
 
   return (
-    <Card className="p-4">
-      <div className="flex items-center justify-between mb-3">
+    <Card className="p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-2.5 sm:mb-3">
         <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em]">
           {t('dashboard.savingsRate', 'Savings Rate')}
         </span>
@@ -43,7 +43,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
         </span>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-[2rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-[-0.02em] leading-none">
+        <span className="text-[1.75rem] sm:text-[2rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-[-0.02em] leading-none">
           {Math.round(rate)}%
         </span>
         <span className="text-xs font-medium text-gray-400 dark:text-gray-400">
