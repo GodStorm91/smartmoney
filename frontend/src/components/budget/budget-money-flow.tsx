@@ -24,7 +24,7 @@ export function BudgetMoneyFlow({
   const unallocatedPct = Math.max(0, 100 - allocatedPct - savingsPct)
 
   return (
-    <div className={cn('rounded-xl bg-gray-50 dark:bg-gray-800/50 p-4', className)}>
+    <div className={cn('rounded-xl bg-gray-50 dark:bg-gray-800/50 p-3 sm:p-4', className)}>
       {/* Flow labels */}
       <div className="flex items-center justify-between mb-3">
         <FlowNode
@@ -71,7 +71,7 @@ export function BudgetMoneyFlow({
       </div>
 
       {/* Legend chips */}
-      <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-500 dark:text-gray-400">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-[10px] text-gray-500 dark:text-gray-400">
         <span className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-blue-500" />
           {Math.round(allocatedPct)}% {t('budget.flow.allocated').toLowerCase()}

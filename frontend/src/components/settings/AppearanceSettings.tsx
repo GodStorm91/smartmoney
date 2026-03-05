@@ -127,7 +127,7 @@ export function AppearanceSettings() {
                 title={accentLabelMap[color.id] || color.label}
               >
                 <div className={cn(
-                  'w-10 h-10 rounded-full transition-all ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
+                  'w-12 h-12 sm:w-10 sm:h-10 rounded-full transition-all ring-offset-2 ring-offset-white dark:ring-offset-gray-900',
                   accentColor === color.id
                     ? 'ring-2 ring-gray-900 dark:ring-white scale-110'
                     : 'ring-1 ring-gray-200 dark:ring-gray-700 group-hover:scale-105'

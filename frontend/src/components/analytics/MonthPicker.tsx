@@ -30,7 +30,7 @@ export function MonthPicker({ selectedMonth, onChange, className }: MonthPickerP
       <button
         onClick={handlePrev}
         className={cn(
-          'p-2 rounded-lg text-gray-600 dark:text-gray-400',
+          'p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400',
           'hover:bg-gray-100 dark:hover:bg-gray-700',
           'transition-colors'
         )}
@@ -38,14 +38,14 @@ export function MonthPicker({ selectedMonth, onChange, className }: MonthPickerP
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
-      <span className="min-w-[140px] text-center font-semibold text-gray-900 dark:text-gray-100">
+      <span className="min-w-[140px] text-center font-semibold text-primary-700 dark:text-primary-300">
         {formatMonth(selectedMonth)}
       </span>
       <button
         onClick={handleNext}
         disabled={isNextDisabled}
         className={cn(
-          'p-2 rounded-lg text-gray-600 dark:text-gray-400',
+          'p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-600 dark:text-gray-400',
           'hover:bg-gray-100 dark:hover:bg-gray-700',
           'transition-colors',
           isNextDisabled && 'opacity-50 cursor-not-allowed'

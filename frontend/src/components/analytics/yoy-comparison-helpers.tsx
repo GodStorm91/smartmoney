@@ -68,7 +68,7 @@ export function YoYViewToggle({
       <button
         onClick={() => setViewMode('expenses')}
         className={cn(
-          'px-4 py-1.5 text-xs font-semibold rounded-full transition-colors',
+          'px-4 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded-full transition-colors',
           viewMode === 'expenses'
             ? 'bg-expense-600 text-white shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -79,7 +79,7 @@ export function YoYViewToggle({
       <button
         onClick={() => setViewMode('income')}
         className={cn(
-          'px-4 py-1.5 text-xs font-semibold rounded-full transition-colors',
+          'px-4 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 text-xs font-semibold rounded-full transition-colors',
           viewMode === 'income'
             ? 'bg-income-600 text-white shadow-sm'
             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'

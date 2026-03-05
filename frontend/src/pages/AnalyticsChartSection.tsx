@@ -32,12 +32,12 @@ export const AnalyticsChartSection = forwardRef<HTMLDivElement, Props>(
     return (
       <div ref={ref} className="space-y-6">
         {/* Income vs Expense */}
-        <Card className="shadow-card">
+        <Card className="shadow-card border-t-2 border-t-primary-400 dark:border-t-primary-600">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+            <div className="p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
               <BarChart3 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
               {t('analytics.incomeVsExpense')}
             </h3>
           </div>
@@ -49,12 +49,12 @@ export const AnalyticsChartSection = forwardRef<HTMLDivElement, Props>(
         </Card>
 
         {/* Category Breakdown */}
-        <Card className="shadow-card">
+        <Card className="shadow-card border-t-2 border-t-purple-400 dark:border-t-purple-600">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/30">
+            <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/30">
               <PieChart className="w-4 h-4 text-purple-600 dark:text-purple-400" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
               {t('analytics.categoryBreakdown')}
             </h3>
           </div>
@@ -66,12 +66,12 @@ export const AnalyticsChartSection = forwardRef<HTMLDivElement, Props>(
         </Card>
 
         {/* Monthly Cash Flow */}
-        <Card className="shadow-card">
+        <Card className="shadow-card border-t-2 border-t-net-400 dark:border-t-net-600">
           <div className="flex items-center gap-2.5 mb-4">
-            <div className="p-1.5 rounded-lg bg-net-100 dark:bg-net-900/30">
+            <div className="p-2 rounded-xl bg-net-100 dark:bg-net-900/30">
               <TrendingUp className="w-4 h-4 text-net-600 dark:text-net-300" />
             </div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-gray-100">
               {t('analytics.monthlyCashFlow')}
             </h3>
           </div>

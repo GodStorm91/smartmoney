@@ -6,7 +6,8 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { X, Wallet, Calendar, DollarSign, AlertCircle } from 'lucide-react'
+import { X, Wallet, Calendar, DollarSign, AlertCircle, Check } from 'lucide-react'
+import { toast } from 'sonner'
 import { closePosition, ClosePositionRequest } from '@/services/position-closure-service'
 import { fetchAccounts } from '@/services/account-service'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
@@ -94,6 +95,9 @@ export function ClosePositionModal({
       queryClient.invalidateQueries({ queryKey: ['closed-positions'] })
       queryClient.invalidateQueries({ queryKey: ['defi-positions'] })
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
+      toast.success(t('crypto.positionClosed', 'Position closed successfully'), {
+        description: `${group.protocol} ${group.name}`,
+      })
       onSuccess()
       onClose()
     },
@@ -105,11 +109,11 @@ export function ClosePositionModal({
       style={{ touchAction: 'pan-y' }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 animate-backdrop" onClick={onClose} />
 
       {/* Modal */}
       <div
-        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        className="bg-white dark:bg-gray-900 rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -117,7 +121,7 @@ export function ClosePositionModal({
           <h2 className="text-lg font-bold text-gray-900 dark:text-white">
             {t('crypto.closePosition', 'Close Position')}
           </h2>
-          <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+          <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-150 hover:rotate-90 active:scale-90">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -142,7 +146,7 @@ export function ClosePositionModal({
               type="datetime-local"
               value={exitDate}
               onChange={(e) => setExitDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
 
@@ -157,7 +161,7 @@ export function ClosePositionModal({
               step="0.01"
               value={exitValueUsd}
               onChange={(e) => setExitValueUsd(parseFloat(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
 
@@ -170,7 +174,7 @@ export function ClosePositionModal({
               type="number"
               value={exitValueJpy}
               onChange={(e) => setExitValueJpy(parseInt(e.target.value) || 0)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
 
@@ -183,7 +187,7 @@ export function ClosePositionModal({
             <select
               value={destinationAccountId || ''}
               onChange={(e) => setDestinationAccountId(parseInt(e.target.value) || null)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             >
               <option value="">{t('select', 'Select...')}</option>
               {bankAccounts.map((acc) => (
@@ -201,7 +205,7 @@ export function ClosePositionModal({
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
             />
           </div>
 
@@ -215,33 +219,39 @@ export function ClosePositionModal({
               value={txHash}
               onChange={(e) => setTxHash(e.target.value)}
               placeholder="0x..."
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow font-mono text-sm"
             />
           </div>
 
           {/* P&L Preview */}
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+          <div className={`rounded-lg p-4 space-y-2 border ${
+            realizedPnlUsd !== null && realizedPnlUsd >= 0
+              ? 'bg-green-50/50 dark:bg-green-900/10 border-green-200 dark:border-green-800/50'
+              : realizedPnlUsd !== null
+                ? 'bg-red-50/50 dark:bg-red-900/10 border-red-200 dark:border-red-800/50'
+                : 'bg-gray-50 dark:bg-gray-800 border-transparent'
+          }`}>
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
               {t('crypto.pnlPreview', 'P&L Preview')}
             </h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
-                <p className="text-gray-500">{t('crypto.costBasis', 'Cost Basis')}</p>
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p className="text-gray-500 dark:text-gray-400">{t('crypto.costBasis', 'Cost Basis')}</p>
+                <p className="font-medium text-gray-900 dark:text-white tabular-nums">
                   {costBasisUsd !== null ? `$${costBasisUsd.toFixed(2)}` : 'N/A'}
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">{t('crypto.totalRewards', 'Total Rewards')}</p>
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p className="text-gray-500 dark:text-gray-400">{t('crypto.totalRewards', 'Total Rewards')}</p>
+                <p className="font-medium text-gray-900 dark:text-white tabular-nums">
                   {totalRewardsUsd ? `$${totalRewardsUsd.toFixed(2)}` : '$0.00'}
                 </p>
               </div>
               <div className="col-span-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-gray-500">{t('crypto.realizedPnl', 'Realized P&L')}</p>
-                <p className={`text-lg font-bold ${
+                <p className="text-gray-500 dark:text-gray-400">{t('crypto.realizedPnl', 'Realized P&L')}</p>
+                <p className={`text-lg font-bold tabular-nums ${
                   realizedPnlUsd !== null
-                    ? realizedPnlUsd >= 0 ? 'text-green-600' : 'text-red-600'
+                    ? realizedPnlUsd >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                     : 'text-gray-400'
                 }`}>
                   {realizedPnlUsd !== null
@@ -255,8 +265,8 @@ export function ClosePositionModal({
 
           {/* Error */}
           {closeMutation.error && (
-            <div className="flex items-center gap-2 text-red-600 text-sm">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 text-sm animate-scale-in">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
               {(closeMutation.error as Error).message}
             </div>
           )}
@@ -266,16 +276,21 @@ export function ClosePositionModal({
         <div className="flex gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+            className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.98] transition-all duration-150"
           >
             {t('cancel', 'Cancel')}
           </button>
           <button
             onClick={() => closeMutation.mutate()}
             disabled={!destinationAccountId || closeMutation.isPending}
-            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition-all duration-150"
           >
-            {closeMutation.isPending ? t('loading', 'Loading...') : t('crypto.confirmClose', 'Confirm Close')}
+            {closeMutation.isPending ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                {t('loading', 'Loading...')}
+              </span>
+            ) : t('crypto.confirmClose', 'Confirm Close')}
           </button>
         </div>
       </div>

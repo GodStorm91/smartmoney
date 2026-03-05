@@ -91,7 +91,7 @@ export function InsightCard({
           )}
           <Button
             variant="ghost"
-            className="mt-2 p-0 h-auto text-sm font-semibold text-primary-600 hover:text-primary-700"
+            className="mt-2 px-2 py-1.5 min-h-[44px] sm:min-h-0 h-auto text-sm font-semibold text-primary-600 hover:text-primary-700"
             onClick={handleCTAClick}
           >
             {getCTAText()} →

@@ -90,7 +90,7 @@ export function BudgetGenerateForm({ onGenerate, isLoading, error, suggestions }
     <div className="space-y-4">
       {/* Clone previous month option */}
       {suggestions?.has_previous && suggestions.previous_month && (
-        <Card className="p-6 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20">
+        <Card className="p-4 sm:p-6 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/20">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0 p-2 bg-blue-100 dark:bg-blue-800 rounded-lg">
               <svg className="w-5 h-5 text-blue-600 dark:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,9 +131,9 @@ export function BudgetGenerateForm({ onGenerate, isLoading, error, suggestions }
       )}
 
       {/* Original form */}
-      <Card className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">{t('budget.generateTitle')}</h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-6">{t('budget.generateDescription')}</p>
+      <Card className="p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">{t('budget.generateTitle')}</h3>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 sm:mb-6">{t('budget.generateDescription')}</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

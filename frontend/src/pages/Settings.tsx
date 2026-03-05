@@ -267,7 +267,7 @@ export function Settings() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2.5 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2.5 tracking-tight">
             <SettingsIcon className="w-5 h-5 text-primary-600" />
             {t('settings.title')}
           </h1>
@@ -289,7 +289,7 @@ export function Settings() {
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors',
+                      'flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-full text-xs font-semibold whitespace-nowrap transition-colors',
                       isActive
                         ? cn(colors?.activeBg, colors?.activeText)
                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -407,7 +407,7 @@ export function Settings() {
               {settings?.sources?.map((source, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/20 rounded-xl">
                   <span className="font-medium text-gray-900 dark:text-gray-100">{source}</span>
-                  <button className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 text-xs font-semibold">
+                  <button className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 text-sm font-semibold min-w-[44px] min-h-[44px] flex items-center justify-center">
                     {t('settings.delete')}
                   </button>
                 </div>
@@ -446,7 +446,7 @@ export function Settings() {
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {t('settings.export.instructions')}
               </p>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   onClick={handleExportIOS}
                   disabled={isExporting}
@@ -497,7 +497,7 @@ export function Settings() {
                 <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
                   {t('export.csv', 'Export CSV')}
                 </h4>
-                <div className="flex gap-2 mb-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
                   <Input
                     type="date"
                     value={csvStartDate}
@@ -552,7 +552,7 @@ export function Settings() {
                       type="text"
                       readOnly
                       value={generatedLink}
-                      className="flex-1 px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 select-all"
+                      className="flex-1 px-3 py-2.5 sm:py-2 h-11 sm:h-10 text-base sm:text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-gray-100 select-all"
                       onClick={(e) => (e.target as HTMLInputElement).select()}
                     />
                     <Button
@@ -677,7 +677,7 @@ interface ToggleSettingProps {
 
 function ToggleSetting({ label, description, checked, onChange }: ToggleSettingProps) {
   return (
-    <div className="flex items-start justify-between py-2">
+    <div className="flex items-start justify-between py-3 sm:py-2">
       <div className="flex-1 pr-4">
         <label className="font-semibold text-gray-900 dark:text-white block">{label}</label>
         {description && (
@@ -687,14 +687,14 @@ function ToggleSetting({ label, description, checked, onChange }: ToggleSettingP
       <button
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative inline-flex h-7 w-12 items-center rounded-full transition-colors flex-shrink-0',
+          'relative inline-flex h-8 w-14 sm:h-7 sm:w-12 items-center rounded-full transition-colors flex-shrink-0',
           checked ? 'bg-emerald-500 dark:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-600'
         )}
       >
         <span
           className={cn(
-            'inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-md',
-            checked ? 'translate-x-6' : 'translate-x-1'
+            'inline-block h-6 w-6 sm:h-5 sm:w-5 transform rounded-full bg-white transition-transform shadow-md',
+            checked ? 'translate-x-7 sm:translate-x-6' : 'translate-x-1'
           )}
         />
       </button>

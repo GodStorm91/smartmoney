@@ -192,7 +192,7 @@ export function CryptoWalletSettings() {
                     key={chain}
                     type="button"
                     onClick={() => toggleChain(chain)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-full text-sm font-medium transition-colors ${
                       selectedChains.includes(chain)
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
@@ -257,7 +257,7 @@ export function CryptoWalletSettings() {
                         deleteWalletMutation.mutate(wallet.id)
                       }
                     }}
-                    className="text-red-600 hover:text-red-700 text-sm"
+                    className="text-red-600 hover:text-red-700 text-sm min-w-[44px] min-h-[44px] flex items-center justify-center"
                   >
                     {t('delete')}
                   </button>
@@ -305,7 +305,7 @@ export function CryptoWalletSettings() {
                     key={chain}
                     type="button"
                     onClick={() => setContractChain(chain)}
-                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-full text-sm font-medium transition-colors ${
                       contractChain === chain
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'

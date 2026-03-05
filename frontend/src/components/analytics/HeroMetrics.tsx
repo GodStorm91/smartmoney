@@ -72,7 +72,7 @@ export function HeroMetrics({ analytics, displayCurrency = 'JPY' }: HeroMetricsP
             ? `${formatCurrency(top_category.amount, displayCurrency)} (${top_category.percentage}%)`
             : undefined
         }
-        className="col-span-2"
+        className="col-span-2 bg-purple-50/50 dark:bg-purple-900/10 border-purple-100 dark:border-purple-900/20"
       />
     </div>
   )

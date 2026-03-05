@@ -175,7 +175,7 @@ export function CategoryRulesList() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               className={cn(
-                'h-10 px-3 border rounded-lg text-sm',
+                'h-11 sm:h-10 px-3 border rounded-lg text-base sm:text-sm',
                 'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
                 'border-gray-300'
               )}
@@ -184,7 +184,7 @@ export function CategoryRulesList() {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className={cn(
-                'h-10 px-3 border rounded-lg text-sm',
+                'h-11 sm:h-10 px-3 border rounded-lg text-base sm:text-sm',
                 'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
                 'border-gray-300'
               )}
@@ -197,7 +197,7 @@ export function CategoryRulesList() {
               value={matchType}
               onChange={(e) => setMatchType(e.target.value as MatchType)}
               className={cn(
-                'h-10 px-3 border rounded-lg text-sm',
+                'h-11 sm:h-10 px-3 border rounded-lg text-base sm:text-sm',
                 'bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100',
                 'border-gray-300'
               )}
@@ -251,7 +251,7 @@ export function CategoryRulesList() {
                 <button
                   onClick={() => handleDelete(rule.id)}
                   disabled={deletingId === rule.id}
-                  className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 transition-colors"
+                  className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 transition-colors"
                 >
                   {deletingId === rule.id ? (
                     <LoadingSpinner size="sm" />

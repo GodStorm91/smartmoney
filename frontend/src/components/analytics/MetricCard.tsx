@@ -43,12 +43,18 @@ export function MetricCard({
         className
       )}
     >
-      <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">
+      <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+        {trend !== 'neutral' && (
+          <span className={cn(
+            'w-1.5 h-1.5 rounded-full flex-shrink-0',
+            trend === 'positive' ? 'bg-income-500' : 'bg-expense-500'
+          )} />
+        )}
         {label}
       </p>
       <p className={cn(
         'font-extrabold tracking-tight text-gray-900 dark:text-gray-100 font-numbers truncate',
-        hero ? 'text-3xl sm:text-4xl tracking-tighter' : 'text-2xl'
+        hero ? 'text-2xl sm:text-4xl tracking-tighter' : 'text-xl sm:text-2xl'
       )}>
         {value}
       </p>
@@ -57,7 +63,7 @@ export function MetricCard({
           <span className="text-sm font-semibold">
             {getTrendIcon()} {Math.abs(change).toFixed(1)}%
           </span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 dark:text-gray-500">
             {t('analytics.vsLastPeriod')}
           </span>
         </div>

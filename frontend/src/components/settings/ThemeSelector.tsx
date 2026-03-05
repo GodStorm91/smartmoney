@@ -38,7 +38,7 @@ export function ThemeSelector() {
             key={theme.id}
             onClick={() => setColorTheme(theme.id)}
             className={cn(
-              'relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all',
+              'relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all min-h-[44px]',
               isActive
                 ? 'border-primary-500 ring-2 ring-primary-500/20'
                 : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'

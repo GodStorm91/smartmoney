@@ -171,14 +171,14 @@ function CategoryRow({
         <div className="flex gap-2">
           <button
             onClick={onCancelDelete}
-            className="px-3 py-1 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            className="px-4 py-2 min-h-[44px] text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
           >
             {t('cancel')}
           </button>
           <button
             onClick={onConfirmDelete}
             disabled={isDeleting}
-            className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+            className="px-4 py-2 min-h-[44px] text-sm bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
           >
             {isDeleting ? '...' : t('delete')}
           </button>
@@ -196,14 +196,14 @@ function CategoryRow({
       <div className="flex items-center gap-1">
         <button
           onClick={onEdit}
-          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
           title={t('edit')}
         >
           <Pencil size={16} />
         </button>
         <button
           onClick={onDelete}
-          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
+          className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
           title={t('delete')}
         >
           <Trash2 size={16} />

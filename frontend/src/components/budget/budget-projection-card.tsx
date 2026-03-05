@@ -133,7 +133,7 @@ export function BudgetProjectionCard({
         </div>
 
         {/* Daily Pace Comparison */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
           {/* Current Daily Rate */}
           <div className={cn(
             'p-3 rounded-lg',
@@ -145,7 +145,7 @@ export function BudgetProjectionCard({
               {t('budget.projection.currentPace')}
             </p>
             <p className={cn(
-              'text-xl font-bold',
+              'text-lg sm:text-xl font-bold',
               dailyRate > safeDaily && safeDaily > 0
                 ? 'text-amber-700 dark:text-amber-400'
                 : 'text-gray-900 dark:text-gray-100'
@@ -160,7 +160,7 @@ export function BudgetProjectionCard({
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
               {t('budget.projection.safePace')}
             </p>
-            <p className="text-xl font-bold text-income-600 dark:text-income-300">
+            <p className="text-lg sm:text-xl font-bold text-income-600 dark:text-income-300">
               {safeDaily > 0 ? formatCurrency(safeDaily) : '—'}
               {safeDaily > 0 && <span className="text-xs font-normal text-gray-500">/{t('day')}</span>}
             </p>

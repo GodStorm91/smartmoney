@@ -2,7 +2,7 @@
  * PositionDetailModal - Display detailed DeFi position analytics
  * Focused on Gain/Loss and easy to use
  */
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { X, TrendingUp, DollarSign, Percent, Clock, Gift, ArrowUpRight, ArrowDownRight } from 'lucide-react'
@@ -30,6 +30,16 @@ interface PositionDetailModalProps {
 
 export function PositionDetailModal({ group, onClose }: PositionDetailModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('overview')
+
+  // Close on Escape key
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+  }, [onClose])
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
   const [showCloseModal, setShowCloseModal] = useState(false)
 
   const primaryToken = group.tokens[0]
@@ -156,9 +166,9 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
   const modalContent = (
     <div className="fixed inset-0 z-[100001]">
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 animate-backdrop" onClick={onClose} />
       <div className="fixed inset-0 z-[100002] flex items-center justify-center p-4 overflow-y-auto">
-        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90dvh] my-auto overflow-hidden">
+        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90dvh] my-auto overflow-hidden animate-modal-in">
           {/* Header */}
           <div className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 p-6 text-white">
             <div className="flex items-center justify-between mb-4">
@@ -170,37 +180,37 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                         key={token.id}
                         src={token.logo_url}
                         alt={token.symbol}
-                        className="w-10 h-10 rounded-full border-2 border-white/20"
-                        style={{ zIndex: group.tokens.length - i }}
+                        className="w-10 h-10 rounded-full border-2 border-white/20 animate-stagger-in"
+                        style={{ zIndex: group.tokens.length - i, '--stagger-index': i } as React.CSSProperties}
                       />
                     ) : (
                       <div
                         key={token.id}
-                        className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm border-2 border-white/20"
-                        style={{ zIndex: group.tokens.length - i }}
+                        className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm border-2 border-white/20 animate-stagger-in"
+                        style={{ zIndex: group.tokens.length - i, '--stagger-index': i } as React.CSSProperties}
                       >
                         {token.symbol.slice(0, 2)}
                       </div>
                     )
                   )}
                 </div>
-                <div>
+                <div className="animate-fade-in">
                   <h2 className="text-xl font-bold">{group.protocol}</h2>
                   <p className="text-gray-400 text-sm">{group.name}</p>
                 </div>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-150 hover:rotate-90 active:scale-90"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Current Value - Main Focus */}
-            <div className="text-center py-4">
+            <div className="text-center py-4 animate-fade-in">
               <p className="text-gray-400 text-sm mb-1">Current Value</p>
-              <p className="text-4xl font-bold">${group.total_usd.toFixed(2)}</p>
+              <p className="text-4xl font-bold tabular-nums">${group.total_usd.toFixed(2)}</p>
               <div className="flex items-center justify-center gap-2 mt-2 text-sm">
                 <span className="text-gray-400">
                   {group.tokens.map((token, i) => (
@@ -214,15 +224,23 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex border-b border-gray-200 dark:border-gray-700">
+          {/* Tabs — sliding indicator */}
+          <div className="relative flex border-b border-gray-200 dark:border-gray-700">
+            {/* Sliding indicator */}
+            <div
+              className="absolute bottom-0 h-0.5 bg-indigo-600 dark:bg-indigo-400 transition-all duration-300 ease-out"
+              style={{
+                width: '50%',
+                left: activeTab === 'overview' ? '0%' : '50%',
+              }}
+            />
             <button
               onClick={() => setActiveTab('overview')}
               className={cn(
                 'flex-1 px-4 py-3 text-sm font-medium transition-colors',
                 activeTab === 'overview'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-indigo-600 dark:text-indigo-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               )}
             >
               Gain/Loss
@@ -232,11 +250,11 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
               className={cn(
                 'flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2',
                 activeTab === 'rewards'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-indigo-600 dark:text-indigo-400'
+                  : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'
               )}
             >
-              <Gift className="w-4 h-4" />
+              <Gift className={cn('w-4 h-4 transition-transform duration-300', activeTab === 'rewards' && 'scale-110')} />
               Rewards
             </button>
           </div>
@@ -252,75 +270,87 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                 {activeTab === 'overview' && (
                   <>
                     {/* Gain/Loss Summary Card */}
-                    {performance && (
-                      <Card className="overflow-hidden">
-                        <div className={cn(
-                          'p-4 text-center',
-                          Number(performance.total_return_pct) >= 0
-                            ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
-                            : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20'
-                        )}>
-                          <div className="flex items-center justify-center gap-2 mb-2">
-                            {Number(performance.total_return_pct) >= 0 ? (
-                              <ArrowUpRight className="w-5 h-5 text-green-600" />
-                            ) : (
-                              <ArrowDownRight className="w-5 h-5 text-red-600" />
-                            )}
-                            <span className={cn(
-                              'text-sm font-medium',
-                              Number(performance.total_return_pct) >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
-                            )}>
-                              Total Return
-                            </span>
+                    {performance && (() => {
+                      const isPositive = Number(performance.total_return_pct) >= 0
+                      return (
+                        <Card className="overflow-hidden animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+                          <div className={cn(
+                            'p-4 text-center relative overflow-hidden',
+                            isPositive
+                              ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20'
+                              : 'bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20'
+                          )}>
+                            {/* Subtle radial glow behind the number */}
+                            <div className={cn(
+                              'absolute inset-0 opacity-20 pointer-events-none',
+                              isPositive
+                                ? 'bg-[radial-gradient(circle_at_50%_60%,rgba(16,185,129,0.4),transparent_70%)]'
+                                : 'bg-[radial-gradient(circle_at_50%_60%,rgba(239,68,68,0.3),transparent_70%)]'
+                            )} />
+                            <div className="relative">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                {isPositive ? (
+                                  <ArrowUpRight className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                ) : (
+                                  <ArrowDownRight className="w-5 h-5 text-red-600 dark:text-red-400" />
+                                )}
+                                <span className={cn(
+                                  'text-sm font-medium',
+                                  isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                                )}>
+                                  Total Return
+                                </span>
+                              </div>
+                              <p className={cn(
+                                'text-3xl font-bold tabular-nums',
+                                isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                              )}>
+                                {isPositive ? '+' : ''}{performance.total_return_pct.toFixed(2)}%
+                              </p>
+                              <p className={cn(
+                                'text-lg font-semibold mt-1 tabular-nums',
+                                isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                              )}>
+                                {Number(performance.total_return_usd) >= 0 ? '+' : ''}${Math.abs(Number(performance.total_return_usd)).toFixed(2)}
+                              </p>
+                            </div>
                           </div>
-                          <p className={cn(
-                            'text-3xl font-bold',
-                            Number(performance.total_return_pct) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                          )}>
-                            {Number(performance.total_return_pct) >= 0 ? '+' : ''}{performance.total_return_pct.toFixed(2)}%
-                          </p>
-                          <p className={cn(
-                            'text-lg font-semibold mt-1',
-                            Number(performance.total_return_usd) >= 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
-                          )}>
-                            {Number(performance.total_return_usd) >= 0 ? '+' : ''}${Math.abs(Number(performance.total_return_usd)).toFixed(2)}
-                          </p>
-                        </div>
 
-                        <div className="p-4 grid grid-cols-2 gap-4">
-                          <div>
-                            <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs mb-1">
-                              <DollarSign className="w-3.5 h-3.5" />
-                              Invested
+                          <div className="p-4 grid grid-cols-2 gap-4">
+                            <div>
+                              <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs mb-1">
+                                <DollarSign className="w-3.5 h-3.5" />
+                                Invested
+                              </div>
+                              <p className="font-semibold text-gray-900 dark:text-white tabular-nums">
+                                ${Number(performance.start_value_usd).toFixed(2)}
+                              </p>
                             </div>
-                            <p className="font-semibold text-gray-900 dark:text-white">
-                              ${Number(performance.start_value_usd).toFixed(2)}
-                            </p>
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs mb-1">
-                              <Clock className="w-3.5 h-3.5" />
-                              Duration
+                            <div>
+                              <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-xs mb-1">
+                                <Clock className="w-3.5 h-3.5" />
+                                Duration
+                              </div>
+                              <p className="font-semibold text-gray-900 dark:text-white tabular-nums">
+                                {performance.days_held} days
+                              </p>
                             </div>
-                            <p className="font-semibold text-gray-900 dark:text-white">
-                              {performance.days_held} days
-                            </p>
                           </div>
-                        </div>
-                      </Card>
-                    )}
+                        </Card>
+                      )
+                    })()}
 
                     {/* Annualized Return */}
                     {performance && performance.annualized_return_pct !== null && (
-                      <Card>
+                      <Card className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Percent className="w-4 h-4 text-indigo-500" />
                             <span className="text-sm text-gray-600 dark:text-gray-400">Annualized Return</span>
                           </div>
                           <span className={cn(
-                            'font-bold text-lg',
-                            Number(performance.annualized_return_pct) >= 0 ? 'text-green-600' : 'text-red-600'
+                            'font-bold text-lg tabular-nums',
+                            Number(performance.annualized_return_pct) >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                           )}>
                             {Number(performance.annualized_return_pct) >= 0 ? '+' : ''}{performance.annualized_return_pct.toFixed(2)}%
                           </span>
@@ -330,13 +360,13 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
                     {/* APY */}
                     {performance && performance.current_apy != null && (
-                      <Card>
+                      <Card className="animate-stagger-in" style={{ '--stagger-index': 2 } as React.CSSProperties}>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-purple-500" />
                             <span className="text-sm text-gray-600 dark:text-gray-400">Current APY</span>
                           </div>
-                          <span className="font-bold text-lg text-purple-600 dark:text-purple-400">
+                          <span className="font-bold text-lg tabular-nums text-purple-600 dark:text-purple-400">
                             {Number(performance.current_apy).toFixed(2)}%
                           </span>
                         </div>
@@ -345,7 +375,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
                     {/* Performance Chart */}
                     {combinedHistory && combinedHistory.snapshots.length > 0 && (
-                      <Card>
+                      <Card className="animate-stagger-in" style={{ '--stagger-index': 3 } as React.CSSProperties}>
                         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
                           30-Day Performance
                         </h3>
@@ -358,7 +388,8 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                     {/* Close Position Button */}
                     <button
                       onClick={() => setShowCloseModal(true)}
-                      className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors"
+                      className="w-full py-3 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-medium rounded-lg transition-all duration-150 animate-stagger-in"
+                      style={{ '--stagger-index': 4 } as React.CSSProperties}
                     >
                       Close Position
                     </button>

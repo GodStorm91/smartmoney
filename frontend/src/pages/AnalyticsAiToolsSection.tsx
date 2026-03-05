@@ -14,17 +14,17 @@ export function AnalyticsAiToolsSection() {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-card">
+    <div className="border border-amber-200 dark:border-amber-800/40 rounded-xl overflow-hidden shadow-card">
       <button
         onClick={() => setExpanded(!expanded)}
         className={cn(
           'w-full px-4 py-3.5 flex items-center justify-between',
-          'bg-gray-50/80 dark:bg-gray-800/80',
+          'bg-amber-50/60 dark:bg-amber-900/10',
           'text-left font-semibold text-gray-900 dark:text-gray-100'
         )}
       >
         <span className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/30">
+          <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/30">
             <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           {t('analytics.aiTools')}
