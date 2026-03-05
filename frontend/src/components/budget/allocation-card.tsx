@@ -37,7 +37,7 @@ export function AllocationCard({
   const { data: exchangeRates } = useExchangeRates()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const spent = trackingItem?.spent || 0
   const budgeted = trackingItem?.budgeted || allocation.amount

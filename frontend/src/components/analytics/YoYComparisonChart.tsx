@@ -57,7 +57,7 @@ export function YoYComparisonChart() {
   const currColor = viewMode === 'expenses' ? EXPENSE_CURR_COLOR : INCOME_CURR_COLOR
 
   // null values = future months; Recharts renders them as gaps (no bar)
-  const chartData = data?.months.map((m) => ({
+  const chartData = (Array.isArray(data?.months) ? data.months : []).map((m) => ({
     label:     m.label,
     previous:  viewMode === 'expenses' ? m.previous_expense : m.previous_income,
     current:   viewMode === 'expenses' ? m.current_expense  : m.current_income,
@@ -69,11 +69,11 @@ export function YoYComparisonChart() {
     chartData.some((d) => (d.current  ?? 0) > 0)
 
   return (
-    <Card>
+    <Card className="border-t-2 border-t-net-400 dark:border-t-net-600">
       {/* Header + toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 rounded-xl bg-net-100 dark:bg-net-900/30">
+          <div className="p-2 rounded-xl bg-net-100 dark:bg-net-900/30">
             <CalendarRange className="w-4 h-4 text-net-600 dark:text-net-400" />
           </div>
           <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">

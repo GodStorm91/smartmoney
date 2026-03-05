@@ -96,7 +96,7 @@ export function SpendingHeatmap({ startDate, endDate }: Props) {
 
   // ---- Populated state ----
   return (
-    <Card>
+    <Card className="border-t-2 border-t-expense-300 dark:border-t-expense-700">
       <CardHeader t={t} />
 
       <HeatmapGrid
@@ -125,7 +125,7 @@ export function SpendingHeatmap({ startDate, endDate }: Props) {
         >
           <p className="font-semibold text-gray-800 dark:text-gray-100">{tooltip.date}</p>
           <p className="text-expense-600 dark:text-expense-400">
-            {formatCurrencyPrivacy(tooltip.amount, currency, rates, true, false)}
+            {formatCurrencyPrivacy(tooltip.amount, currency, rates, false, false)}
           </p>
         </div>
       )}
@@ -140,7 +140,7 @@ export function SpendingHeatmap({ startDate, endDate }: Props) {
 function CardHeader({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
   return (
     <div className="flex items-center gap-2.5 mb-4">
-      <div className="p-1.5 rounded-xl bg-expense-100 dark:bg-expense-900/30">
+      <div className="p-2 rounded-xl bg-expense-100 dark:bg-expense-900/30">
         <LayoutGrid className="w-4 h-4 text-expense-600 dark:text-expense-400" />
       </div>
       <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">

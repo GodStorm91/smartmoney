@@ -4,6 +4,8 @@ import { AlertTriangle, TrendingUp, Target, Wallet, Bell } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/utils/cn'
 import { formatCurrency } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 
 interface Alert {
   id: string
@@ -31,8 +33,12 @@ export function SmartAlertsCard({
   goals = [],
 }: SmartAlertsCardProps) {
   const { t } = useTranslation('common')
+  const { currency } = useSettings()
+  const { data: exchangeRates } = useExchangeRates()
+  const rates = exchangeRates?.rates || {}
 
   const alerts = useMemo(() => {
+    const fmt = (amount: number) => formatCurrency(amount, currency, rates, false)
     const result: Alert[] = []
 
     // 1. Overspending alert
@@ -43,7 +49,7 @@ export function SmartAlertsCard({
         icon: <AlertTriangle size={16} />,
         title: t('alerts.overspending', 'Overspending Alert'),
         description: t('alerts.overspendingDesc', 'Expenses exceed income by {{amount}}', {
-          amount: formatCurrency(expense - income),
+          amount: fmt(expense - income),
         }),
       })
     }
@@ -74,7 +80,7 @@ export function SmartAlertsCard({
         title: t('alerts.budgetExceeded', 'Budget Exceeded'),
         description: t('alerts.budgetExceededDesc', '{{category}} is {{amount}} over budget', {
           category: t(`category.${worstCategory.category}`, worstCategory.category),
-          amount: formatCurrency(worstCategory.spent - worstCategory.allocated),
+          amount: fmt(worstCategory.spent - worstCategory.allocated),
         }),
       })
     }
@@ -104,7 +110,7 @@ export function SmartAlertsCard({
     })
 
     return result.slice(0, 3) // Max 3 alerts
-  }, [income, expense, savingsRate, budgetCategories, goals, t])
+  }, [income, expense, savingsRate, budgetCategories, goals, t, currency, rates])
 
   if (alerts.length === 0) {
     return null

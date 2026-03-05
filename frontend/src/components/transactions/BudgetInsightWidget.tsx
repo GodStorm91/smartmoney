@@ -51,7 +51,7 @@ export function BudgetInsightWidget({
   })
 
   const fmt = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   // Don't show for income transactions
   if (!isExpense) return null

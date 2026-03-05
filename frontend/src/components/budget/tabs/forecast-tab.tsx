@@ -32,7 +32,7 @@ export function ForecastTab({
   const { data: exchangeRates } = useExchangeRates()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const predictions = useMemo(() => {
     if (!tracking) return []
@@ -59,23 +59,23 @@ export function ForecastTab({
       {/* Overall Forecast Summary */}
       {forecast && (
         <Card className={cn(
-          'p-6 border-2',
+          'p-4 sm:p-6 border-2',
           forecast.overallStatus === 'danger' ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' :
           forecast.overallStatus === 'warning' ? 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20' :
           'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20'
         )}>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className={cn(
-              'w-14 h-14 rounded-full flex items-center justify-center',
+              'w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center flex-shrink-0',
               forecast.overallStatus === 'danger' ? 'bg-red-500' :
               forecast.overallStatus === 'warning' ? 'bg-amber-500' : 'bg-green-500'
             )}>
               {forecast.overallStatus === 'danger' ? (
-                <AlertTriangle className="w-7 h-7 text-white" />
+                <AlertTriangle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               ) : forecast.overallStatus === 'warning' ? (
-                <TrendingUp className="w-7 h-7 text-white" />
+                <TrendingUp className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               ) : (
-                <CheckCircle className="w-7 h-7 text-white" />
+                <CheckCircle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               )}
             </div>
             <div className="flex-1">
@@ -103,7 +103,7 @@ export function ForecastTab({
             </div>
             <div className="text-right">
               <p className={cn(
-                'text-3xl font-bold',
+                'text-2xl sm:text-3xl font-bold',
                 forecast.overallStatus === 'danger' ? 'text-red-600 dark:text-red-400' :
                 forecast.overallStatus === 'warning' ? 'text-amber-600 dark:text-amber-400' :
                 'text-green-600 dark:text-green-400'

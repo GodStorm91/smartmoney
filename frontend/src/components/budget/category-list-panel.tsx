@@ -58,7 +58,7 @@ export function CategoryListPanel({
   }, [focusedIndex])
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const getTrackingItem = (category: string) =>
     trackingItems?.find(item => item.category === category)

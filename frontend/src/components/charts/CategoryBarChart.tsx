@@ -76,6 +76,9 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
   const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
   const textColor = isDark ? '#cdd6f4' : '#374151'
 
+  // Guard against non-array data
+  if (!Array.isArray(data) || data.length === 0) return null
+
   // Calculate total for percentage calculation
   const total = data.reduce((sum, item) => sum + item.amount, 0)
 

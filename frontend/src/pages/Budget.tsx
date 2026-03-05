@@ -62,7 +62,7 @@ export function BudgetPage() {
   const { showBudgetCreatedXP } = useXPGain()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const formatMonth = (month: string) => {
     const [year, monthNum] = month.split('-')

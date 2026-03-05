@@ -45,7 +45,7 @@ export function BudgetAllocationList({
   const { data: exchangeRates } = useExchangeRates()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const parentToChildrenMap = useMemo(() => {
     const map = new Map<string, string[]>()

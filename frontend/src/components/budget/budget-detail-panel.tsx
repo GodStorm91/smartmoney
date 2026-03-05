@@ -64,7 +64,7 @@ export function BudgetDetailPanel({
   const [previousMonthSpent, setPreviousMonthSpent] = useState<number | null>(null)
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const formatTxCurrency = (amount: number, txCurrency: string) =>
     formatCurrencyPrivacy(amount, txCurrency || currency, exchangeRates?.rates || {}, true, isPrivacyMode)
@@ -352,7 +352,7 @@ export function BudgetDetailPanel({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0 ml-2"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors flex-shrink-0 ml-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>

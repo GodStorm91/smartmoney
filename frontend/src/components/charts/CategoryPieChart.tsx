@@ -33,6 +33,9 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
   const legendColor = isDark ? '#cdd6f4' : '#374151'
   const labelColor = isDark ? '#cdd6f4' : '#374151'
 
+  // Guard against non-array data
+  if (!Array.isArray(data) || data.length === 0) return null
+
   // Calculate total for percentage calculation
   const total = data.reduce((sum, item) => sum + item.amount, 0)
 

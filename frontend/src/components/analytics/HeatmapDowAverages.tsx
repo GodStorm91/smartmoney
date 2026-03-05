@@ -26,7 +26,10 @@ function DowBar({ label, avg, maxAvg }: { label: string; avg: number; maxAvg: nu
 
 export function HeatmapDowAverages({ dowAvg }: Props) {
   const { t } = useTranslation('common')
-  const weekdays: string[] = t('heatmap.weekdays', { returnObjects: true }) as string[]
+  const rawWeekdays = t('heatmap.weekdays', { returnObjects: true })
+  const weekdays: string[] = Array.isArray(rawWeekdays)
+    ? rawWeekdays
+    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const maxAvg = Math.max(...Object.values(dowAvg), 0)
 
   return (

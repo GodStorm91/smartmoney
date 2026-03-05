@@ -33,9 +33,9 @@ export function BudgetSummaryCard({
   const { isPrivacyMode } = usePrivacy()
   const { data: exchangeRates } = useExchangeRates()
 
-  // Budget amounts are in user's display currency (native)
+  // Budget amounts are in JPY base from backend — convert to display currency
   const formatBudgetCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const budgetLang = budget.language || 'ja'
   const currentLang = i18n.language
@@ -49,8 +49,8 @@ export function BudgetSummaryCard({
     : 0
 
   return (
-    <Card className="p-6">
-      <div className="flex justify-between items-start mb-6">
+    <Card className="p-4 sm:p-6">
+      <div className="flex flex-wrap justify-between items-start gap-3 mb-4 sm:mb-6">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-xl font-semibold">{t('budget.currentBudget')}</h3>
@@ -74,10 +74,10 @@ export function BudgetSummaryCard({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.monthlyIncome')}</p>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 sm:p-4 rounded-lg">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.monthlyIncome')}</p>
+          <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
             {formatBudgetCurrency(budget.monthly_income)}
           </p>
           {previousMonth && incomeDiff !== 0 && (
@@ -92,26 +92,26 @@ export function BudgetSummaryCard({
         </div>
 
         {budget.savings_target !== undefined && budget.savings_target > 0 && (
-          <div className="bg-income-50 dark:bg-income-900/20 p-4 rounded-lg">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.savingsTarget')}</p>
-            <p className="text-2xl font-bold text-income-600 dark:text-income-300">
+          <div className="bg-income-50 dark:bg-income-900/20 p-3 sm:p-4 rounded-lg">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.savingsTarget')}</p>
+            <p className="text-xl sm:text-2xl font-bold text-income-600 dark:text-income-300">
               {formatBudgetCurrency(budget.savings_target)}
             </p>
           </div>
         )}
 
         {budget.carry_over !== undefined && budget.carry_over !== 0 && (
-          <div className={`p-4 rounded-lg ${budget.carry_over > 0 ? 'bg-teal-50 dark:bg-teal-900/30' : 'bg-orange-50 dark:bg-orange-900/30'}`}>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.carryOver')}</p>
-            <p className={`text-2xl font-bold ${budget.carry_over > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-orange-600 dark:text-orange-400'}`}>
+          <div className={`p-3 sm:p-4 rounded-lg ${budget.carry_over > 0 ? 'bg-teal-50 dark:bg-teal-900/30' : 'bg-orange-50 dark:bg-orange-900/30'}`}>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.carryOver')}</p>
+            <p className={`text-xl sm:text-2xl font-bold ${budget.carry_over > 0 ? 'text-teal-600 dark:text-teal-400' : 'text-orange-600 dark:text-orange-400'}`}>
               {budget.carry_over > 0 ? '+' : ''}{formatBudgetCurrency(budget.carry_over)}
             </p>
           </div>
         )}
 
-        <div className="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.totalAllocated')}</p>
-          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+        <div className="bg-purple-50 dark:bg-purple-900/30 p-3 sm:p-4 rounded-lg">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('budget.totalAllocated')}</p>
+          <p className="text-xl sm:text-2xl font-bold text-purple-600 dark:text-purple-400">
             {formatBudgetCurrency(totalAllocated)}
           </p>
           {previousMonth && allocatedDiff !== 0 && (
@@ -127,7 +127,7 @@ export function BudgetSummaryCard({
       </div>
 
       {budget.advice && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-4 rounded-lg">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 sm:p-4 rounded-lg">
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">{t('budget.aiAdvice')}</p>
           <p className="text-amber-700 dark:text-amber-400">{budget.advice}</p>
           {isLanguageMismatch && (

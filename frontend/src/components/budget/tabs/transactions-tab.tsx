@@ -35,7 +35,7 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
   const [currentPage, setCurrentPage] = useState(1)
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
   const fmtShort = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
   const formatTxCurrency = (amount: number, txCurrency: string) =>
@@ -114,14 +114,14 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row gap-3">
-        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm">
+        <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="px-3 py-2.5 sm:py-2 h-11 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-base sm:text-sm">
           {categories.map(cat => <option key={cat} value={cat}>{cat === 'all' ? t('transactions.allCategories') : cat}</option>)}
         </select>
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('transactions.search')} className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm" />
+          <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={t('transactions.search')} className="w-full pl-10 pr-4 py-2.5 sm:py-2 h-11 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-base sm:text-sm" />
         </div>
-        <select value={`${sortBy}-${sortOrder}`} onChange={(e) => { const [b, o] = e.target.value.split('-'); setSortBy(b as 'date'|'amount'); setSortOrder(o as 'asc'|'desc') }} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm">
+        <select value={`${sortBy}-${sortOrder}`} onChange={(e) => { const [b, o] = e.target.value.split('-'); setSortBy(b as 'date'|'amount'); setSortOrder(o as 'asc'|'desc') }} className="px-3 py-2.5 sm:py-2 h-11 sm:h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-base sm:text-sm">
           <option value="date-desc">{t('transactions.sortDateDesc')}</option>
           <option value="date-asc">{t('transactions.sortDateAsc')}</option>
           <option value="amount-desc">{t('transactions.sortAmountDesc')}</option>
@@ -182,9 +182,9 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
         <div className="flex items-center justify-between">
           <p className="text-sm text-gray-500">{t('transactions.showingCount', { shown: paginatedTx.length, total: filteredTransactions.length })}</p>
           <div className="flex items-center gap-2">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"><ChevronLeft className="w-5 h-5" /></button>
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronLeft className="w-5 h-5" /></button>
             <span className="text-sm">{currentPage} / {totalPages}</span>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"><ChevronRight className="w-5 h-5" /></button>
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 min-w-[44px] min-h-[44px] flex items-center justify-center"><ChevronRight className="w-5 h-5" /></button>
           </div>
         </div>
       )}

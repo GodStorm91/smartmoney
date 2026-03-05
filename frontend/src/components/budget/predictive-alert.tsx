@@ -32,7 +32,7 @@ export function PredictiveAlert({
   const { data: exchangeRates } = useExchangeRates()
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   // Limit to maxAlerts
   const displayPredictions = predictions.slice(0, maxAlerts)

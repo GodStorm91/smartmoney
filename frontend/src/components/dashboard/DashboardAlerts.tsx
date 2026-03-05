@@ -3,6 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { Bell, X } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/utils/cn'
+import { formatCurrency } from '@/utils/formatCurrency'
+import { useSettings } from '@/contexts/SettingsContext'
+import { useExchangeRates } from '@/hooks/useExchangeRates'
 
 // Semantic color mapping for alert severity
 const DANGER_BG = 'bg-expense-100 text-expense-700 dark:bg-expense-900/30 dark:text-expense-400'
@@ -33,6 +36,8 @@ interface DashboardAlertsProps {
 
 export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [], onDismissBudgetAlert }: DashboardAlertsProps) {
   const { t } = useTranslation('common')
+  const { currency } = useSettings()
+  const { data: exchangeRates } = useExchangeRates()
 
   const hasAlerts = alerts.length > 0
   const hasAnomalies = unreadAnomalyCount && unreadAnomalyCount > 0
@@ -108,7 +113,7 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
                     'text-[10px] mt-1',
                     over ? 'text-expense-500 dark:text-expense-400' : 'text-amber-500 dark:text-amber-400'
                   )}>
-                    {t('alerts.budgetRemaining', '{{amount}} remaining', { amount: alert.amount_remaining.toFixed(0) })}
+                    {t('alerts.budgetRemaining', '{{amount}} remaining', { amount: formatCurrency(alert.amount_remaining, currency, exchangeRates?.rates || {}, false) })}
                   </p>
                 </div>
               </Link>

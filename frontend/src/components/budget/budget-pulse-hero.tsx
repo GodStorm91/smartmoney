@@ -28,7 +28,7 @@ export function BudgetPulseHero({
   const { data: exchangeRates } = useExchangeRates()
 
   const fmt = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
   const fmtCompact = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
@@ -104,7 +104,7 @@ export function BudgetPulseHero({
         </div>
 
         <p className={cn(
-          'text-4xl font-extrabold tracking-tight',
+          'text-3xl sm:text-4xl font-extrabold tracking-tight',
           availableToSpend < 0 ? 'text-expense-600 dark:text-expense-300' : health.color
         )}>
           {availableToSpend < 0 && '−'}{fmt(Math.abs(availableToSpend))}
@@ -129,14 +129,14 @@ export function BudgetPulseHero({
       </div>
 
       {/* Bottom: Pace + Days remaining — compact row */}
-      <div className="px-4 py-3 bg-black/5 dark:bg-white/5 grid grid-cols-3 gap-3">
+      <div className="px-3 sm:px-4 py-3 bg-black/5 dark:bg-white/5 grid grid-cols-3 gap-2 sm:gap-3">
         {/* Current pace */}
         <div className="min-w-0">
           <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.projection.currentPace')}
           </p>
           <p className={cn(
-            'text-lg font-bold leading-tight',
+            'text-base sm:text-lg font-bold leading-tight',
             paceWarning ? 'text-amber-600 dark:text-amber-400' : ''
           )}>
             {fmtCompact(dailyRate)}
@@ -149,7 +149,7 @@ export function BudgetPulseHero({
           <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.projection.safePace')}
           </p>
-          <p className="text-lg font-bold leading-tight text-income-600 dark:text-income-300">
+          <p className="text-base sm:text-lg font-bold leading-tight text-income-600 dark:text-income-300">
             {safeDaily > 0 ? fmtCompact(safeDaily) : '—'}
             {safeDaily > 0 && (
               <span className="text-[10px] font-normal opacity-50">{t('budget.pulse.perDay')}</span>
@@ -164,7 +164,7 @@ export function BudgetPulseHero({
           </p>
           <div className="flex items-center justify-end gap-1">
             <Calendar className="w-3.5 h-3.5 opacity-50" />
-            <p className="text-lg font-bold leading-tight">{daysRemaining}</p>
+            <p className="text-base sm:text-lg font-bold leading-tight">{daysRemaining}</p>
           </div>
         </div>
       </div>

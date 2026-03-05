@@ -65,6 +65,9 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
   const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
   const legendColor = isDark ? '#cdd6f4' : '#374151'
 
+  // Guard against non-array data
+  if (!Array.isArray(data) || data.length === 0) return null
+
   // Check if all expenses are zero (backend returns 'expenses' field)
   const hasNoExpenses = data.every(d => d.expenses === 0)
 

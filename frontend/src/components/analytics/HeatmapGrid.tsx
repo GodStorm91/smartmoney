@@ -17,7 +17,10 @@ interface Props {
 
 export function HeatmapGrid({ weeks, maxAmount, onCellEnter, onCellLeave }: Props) {
   const { t } = useTranslation('common')
-  const weekdays: string[] = t('heatmap.weekdays', { returnObjects: true }) as string[]
+  const rawWeekdays = t('heatmap.weekdays', { returnObjects: true })
+  const weekdays: string[] = Array.isArray(rawWeekdays)
+    ? rawWeekdays
+    : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
   return (
     <div className="overflow-x-auto -mx-1 px-1 pb-2">

@@ -44,7 +44,7 @@ export function TransactionSection({
   const [error, setError] = useState<string | null>(null)
 
   const formatCurrency = (amount: number) =>
-    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, true, isPrivacyMode)
+    formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
   const formatTxCurrency = (amount: number, txCurrency: string) =>
     formatCurrencyPrivacy(amount, txCurrency || currency, exchangeRates?.rates || {}, true, isPrivacyMode)
