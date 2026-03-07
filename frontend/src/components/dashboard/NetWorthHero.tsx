@@ -23,7 +23,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
   const [expanded, setExpanded] = useState(false)
 
   const { assets, liabilities, netWorth } = calculateNetWorth(accounts, exchangeRates?.rates || {})
-  const monthlyNet = summary?.net_change || 0
+  const monthlyNet = summary?.net || 0
 
   const formatCurrency = (amount: number) =>
     formatCurrencyPrivacy(amount, currency, exchangeRates?.rates || {}, false, isPrivacyMode)

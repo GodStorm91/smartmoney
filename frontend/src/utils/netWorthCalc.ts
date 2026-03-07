@@ -1,6 +1,6 @@
 import type { AccountWithBalance } from '@/types/account'
 
-export const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
+export const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto', 'savings']
 
 export function convertToJpy(amount: number, currency: string, rates: Record<string, number>): number {
   if (currency === 'JPY' || !rates[currency]) return amount

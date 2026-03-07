@@ -12,7 +12,7 @@ import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 import { fetchWallets, fetchWallet, fetchDefiPositions } from '@/services/crypto-service'
 
-const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto']
+const ASSET_TYPES = ['bank', 'cash', 'investment', 'receivable', 'crypto', 'savings']
 
 interface NetWorthCardProps {
   monthlyNet?: number

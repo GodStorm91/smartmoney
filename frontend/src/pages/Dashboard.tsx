@@ -92,7 +92,7 @@ export function Dashboard() {
     },
   })
 
-  const { data: accounts } = useAccounts()
+  const { data: accounts, isLoading: accountsLoading } = useAccounts()
 
   const { data: unreadAnomalies } = useQuery({
     queryKey: ['unreadAnomalyCount'],
@@ -144,7 +144,7 @@ export function Dashboard() {
     setSelectedDayDate(null)
   }
 
-  const isLoading = summaryLoading || trendsLoading || goalsLoading
+  const isLoading = summaryLoading || trendsLoading || goalsLoading || accountsLoading
 
   // useCallback hooks must be declared before any early returns (Rules of Hooks)
   const formatCurrency = useCallback((amount: number) =>
