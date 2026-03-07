@@ -60,7 +60,7 @@ export function SubscriptionsWidget({ recurringTxns, formatCurrency, rates }: Su
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
               {sub.description}
             </p>
-            <span className="text-sm font-bold text-gray-900 dark:text-gray-100 font-numbers shrink-0 ml-3">
+            <span className="text-sm font-bold text-expense-600 dark:text-expense-300 font-numbers shrink-0 ml-3">
               {formatCurrency(toMonthlyConverted(sub, rates))}/{t('subscriptions.mo', 'mo')}
             </span>
           </div>

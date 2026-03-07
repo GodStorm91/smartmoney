@@ -140,20 +140,30 @@ export function CashFlowForecastCard() {
           </div>
 
           {/* Average Monthly Net */}
-          <div className="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+          <div className={cn(
+            "p-3 rounded-lg",
+            summary.avg_monthly_net >= 0
+              ? "bg-net-50 dark:bg-net-900/20"
+              : "bg-expense-50 dark:bg-expense-900/20"
+          )}>
             <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
               {t('forecast.avgMonthlySavings')}
             </p>
             <p className={cn(
               "text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none",
               summary.avg_monthly_net >= 0
-                ? "text-gray-900 dark:text-gray-100"
+                ? "text-net-600 dark:text-net-300"
                 : "text-expense-600 dark:text-expense-300"
             )}>
               {summary.avg_monthly_net >= 0 ? '+' : ''}
               {fmt(summary.avg_monthly_net)}
             </p>
-            <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5 font-medium">
+            <p className={cn(
+              "text-[11px] mt-1.5 font-medium",
+              summary.avg_monthly_net >= 0
+                ? "text-net-600/60 dark:text-net-300/60"
+                : "text-expense-600/60 dark:text-expense-300/60"
+            )}>
               {t('forecast.perMonth')}
             </p>
           </div>

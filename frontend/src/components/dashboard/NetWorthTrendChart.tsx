@@ -35,6 +35,12 @@ export function NetWorthTrendChart({ data }: NetWorthTrendChartProps) {
   const tooltipBorder = isDark ? '#45475a' : '#E5E7EB'
   const tooltipText = isDark ? '#cdd6f4' : '#374151'
 
+  // Read CSS custom property for theme-aware chart color
+  const primaryColor = typeof window !== 'undefined'
+    ? getComputedStyle(document.documentElement).getPropertyValue('--primary-600').trim()
+    : '142 30% 51%'
+  const chartColor = primaryColor ? `hsl(${primaryColor})` : '#3B82F6'
+
   const fmt = (value: number) =>
     formatCurrencyPrivacy(value, currency, exchangeRates?.rates || {}, false, isPrivacyMode)
 
@@ -62,8 +68,8 @@ export function NetWorthTrendChart({ data }: NetWorthTrendChartProps) {
           <AreaChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="netWorthGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+                <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
@@ -95,7 +101,7 @@ export function NetWorthTrendChart({ data }: NetWorthTrendChartProps) {
             <Area
               type="monotone"
               dataKey="netWorth"
-              stroke="#3B82F6"
+              stroke={chartColor}
               strokeWidth={2}
               fill="url(#netWorthGrad)"
               animationDuration={1200}

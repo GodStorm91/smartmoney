@@ -63,7 +63,7 @@ export function RecentTransactionsCard({ transactions, formatCurrency }: RecentT
                 'text-base font-bold font-numbers tracking-tight',
                 tx.type === 'income'
                   ? 'text-income-600 dark:text-income-300'
-                  : 'text-gray-900 dark:text-gray-100'
+                  : 'text-expense-600 dark:text-expense-300'
               )}>
                 {tx.type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(tx.amount), tx.currency || 'JPY')}
               </span>
