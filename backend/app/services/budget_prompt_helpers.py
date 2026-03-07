@@ -55,6 +55,7 @@ def fetch_category_spending(db: Session, user_id: int) -> dict[str, dict]:
             Transaction.is_income == False,
             Transaction.is_transfer == False,
             Transaction.is_adjustment == False,
+            Transaction.exclude_from_budget == False,
             Transaction.date >= three_months_ago
         )
         .all()

@@ -723,6 +723,9 @@
     "autoSuggested": "Auto-suggested",
     "balanceAdjustment": "Balance adjustment",
     "balanceAdjustmentHint": "Won't count toward budget",
+    "excludeFromBudget": "Exclude from budget",
+    "excludeFromBudgetHint": "Won't count in budget tracking (still shows in analytics)",
+    "budgetExcluded": "Budget excluded",
     "currency": "Currency",
     "errors": {
       "amountRequired": "Amount is required",
@@ -1403,6 +1406,11 @@
     },
     "coverage": {
       "label": "Budget coverage of total spending"
+    },
+    "excluded": {
+      "title": "Excluded from budget",
+      "total": "Total excluded",
+      "noTransactions": "No excluded transactions"
     },
     "aiCategorize": {
       "title": "AI Auto-Categorize",

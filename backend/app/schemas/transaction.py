@@ -19,6 +19,7 @@ class TransactionBase(BaseModel):
     is_income: bool = False
     is_transfer: bool = False
     is_adjustment: bool = False
+    exclude_from_budget: bool = False
 
 
 class TransactionCreate(TransactionBase):
@@ -43,6 +44,7 @@ class TransactionUpdate(BaseModel):
     is_income: Optional[bool] = None
     is_transfer: Optional[bool] = None
     is_adjustment: Optional[bool] = None
+    exclude_from_budget: Optional[bool] = None
     account_id: Optional[int] = None
     receipt_url: Optional[str] = Field(None, max_length=500)
 
@@ -56,6 +58,7 @@ class TransactionResponse(TransactionBase):
     currency: str = "JPY"
     account_id: Optional[int] = None
     is_adjustment: bool = False
+    exclude_from_budget: bool = False
     receipt_url: Optional[str] = None
     transfer_type: Optional[str] = None  # outgoing, incoming, fee, proxy_*
 

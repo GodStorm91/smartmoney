@@ -112,6 +112,11 @@ export function TransactionDetailModal({
               )}>
                 {transaction.type === 'income' ? t('transactions.income') : t('transactions.expense')}
               </p>
+              {transaction.exclude_from_budget && (
+                <span className="inline-flex items-center px-2.5 py-1 mt-2 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                  {t('transaction.budgetExcluded')}
+                </span>
+              )}
             </div>
 
             {/* Details List */}

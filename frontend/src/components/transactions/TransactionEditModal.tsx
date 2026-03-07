@@ -41,6 +41,7 @@ export function TransactionEditModal({
   const [type, setType] = useState<'income' | 'expense'>('expense')
   const [parentCategory, setParentCategory] = useState('')
   const [isAdjustment, setIsAdjustment] = useState(false)
+  const [excludeFromBudget, setExcludeFromBudget] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [receiptUrl, setReceiptUrl] = useState<string | null>(null)
   const [newReceiptFile, setNewReceiptFile] = useState<File | null>(null)
@@ -108,6 +109,7 @@ export function TransactionEditModal({
       setAccountId(transaction.account_id ?? null)
       setType(transaction.type)
       setIsAdjustment(transaction.is_adjustment || false)
+      setExcludeFromBudget(transaction.exclude_from_budget || false)
       setShowDeleteConfirm(false)
       setReceiptUrl(transaction.receipt_url || null)
       setNewReceiptFile(null)
@@ -178,6 +180,7 @@ export function TransactionEditModal({
       account_id: accountId,
       receipt_url: finalReceiptUrl,
       is_adjustment: isAdjustment,
+      exclude_from_budget: excludeFromBudget,
     })
   }
 
@@ -308,7 +311,7 @@ export function TransactionEditModal({
               </div>
 
               {/* Budget Insight */}
-              {category && !isAdjustment && (
+              {category && !isAdjustment && !excludeFromBudget && (
                 <BudgetInsightWidget
                   parentCategory={parentCategory || category}
                   transactionAmount={parseInt(amount) || 0}
@@ -344,6 +347,24 @@ export function TransactionEditModal({
                   </span>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
                     {t('transaction.balanceAdjustmentHint', "Won't count toward budget")}
+                  </p>
+                </div>
+              </label>
+
+              {/* Exclude from Budget Checkbox */}
+              <label className="flex items-center gap-3 cursor-pointer py-2">
+                <input
+                  type="checkbox"
+                  checked={excludeFromBudget}
+                  onChange={(e) => setExcludeFromBudget(e.target.checked)}
+                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {t('transaction.excludeFromBudget', 'Exclude from budget')}
+                  </span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('transaction.excludeFromBudgetHint', "Won't count in budget tracking (still shows in analytics)")}
                   </p>
                 </div>
               </label>

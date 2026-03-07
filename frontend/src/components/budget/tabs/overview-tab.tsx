@@ -17,6 +17,7 @@ import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { cn } from '@/utils/cn'
+import { ExcludedTransactionsSection } from '../excluded-transactions-section'
 import type { Budget, BudgetTracking } from '@/types'
 
 interface OverviewTabProps {
@@ -186,6 +187,9 @@ export function OverviewTab({
           />
         </Card>
       )}
+
+      {/* 6. Excluded from Budget */}
+      <ExcludedTransactionsSection month={selectedMonth} />
     </div>
   )
 }

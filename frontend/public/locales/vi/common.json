@@ -599,6 +599,9 @@
     "autoSuggested": "Tự động gợi ý",
     "balanceAdjustment": "Điều chỉnh số dư",
     "balanceAdjustmentHint": "Không tính vào ngân sách",
+    "excludeFromBudget": "Loại khỏi ngân sách",
+    "excludeFromBudgetHint": "Không tính vào ngân sách (vẫn hiển thị trong phân tích)",
+    "budgetExcluded": "Đã loại ngân sách",
     "currency": "Tiền tệ",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
@@ -1276,6 +1279,11 @@
     },
     "coverage": {
       "label": "Độ phủ ngân sách trên tổng chi tiêu"
+    },
+    "excluded": {
+      "title": "Loại khỏi ngân sách",
+      "total": "Tổng đã loại",
+      "noTransactions": "Không có giao dịch bị loại"
     },
     "aiCategorize": {
       "title": "Phân loại tự động bằng AI",

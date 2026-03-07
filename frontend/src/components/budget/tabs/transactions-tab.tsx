@@ -157,15 +157,23 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
           return (
             <button key={tx.id} onClick={() => onEditTransaction?.(tx)} className={cn(
               'w-full flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-800 text-left',
-              overBudgetCat && 'border-l-3 border-l-red-400 dark:border-l-red-500'
+              overBudgetCat && !tx.exclude_from_budget && 'border-l-3 border-l-red-400 dark:border-l-red-500',
+              tx.exclude_from_budget && 'opacity-60'
             )}>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description}</p>
-                <p className="text-sm text-gray-500">{formatDate(tx.date, 'MMM d')} • {tx.category || t('category.other')}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description}</p>
+                  {tx.exclude_from_budget && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 flex-shrink-0">
+                      {t('transaction.budgetExcluded')}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">{formatDate(tx.date, 'MMM d')} &middot; {tx.category || t('category.other')}</p>
               </div>
               <div className="text-right ml-4 flex-shrink-0">
                 <span className="font-semibold text-gray-900 dark:text-white">{formatTxCurrency(tx.amount, tx.currency)}</span>
-                {impactPercent > 10 && (
+                {!tx.exclude_from_budget && impactPercent > 10 && (
                   <p className={cn(
                     'text-[10px] font-medium mt-0.5',
                     impactPercent > 30 ? 'text-red-500' : impactPercent > 20 ? 'text-amber-500' : 'text-gray-400'

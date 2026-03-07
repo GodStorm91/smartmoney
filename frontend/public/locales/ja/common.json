@@ -303,6 +303,9 @@
     "autoSuggested": "自動提案",
     "balanceAdjustment": "残高調整",
     "balanceAdjustmentHint": "予算に含めません",
+    "excludeFromBudget": "予算から除外",
+    "excludeFromBudgetHint": "予算には含まれません（分析には表示されます）",
+    "budgetExcluded": "予算除外",
     "currency": "通貨",
     "today": "今日",
     "cancel": "キャンセル",
@@ -1283,6 +1286,11 @@
     },
     "coverage": {
       "label": "総支出に対する予算カバー率"
+    },
+    "excluded": {
+      "title": "予算から除外",
+      "total": "除外合計",
+      "noTransactions": "除外された取引はありません"
     },
     "aiCategorize": {
       "title": "AI自動カテゴリ分類",

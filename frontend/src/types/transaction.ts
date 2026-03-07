@@ -12,6 +12,7 @@ export interface Transaction {
   account_id?: number | null
   is_transfer?: boolean  // True for transfer transactions between accounts
   is_adjustment?: boolean  // True for balance adjustments (excluded from budget)
+  exclude_from_budget?: boolean  // True to exclude from budget tracking (still shows in analytics)
   receipt_url?: string | null  // Receipt image URL
   transfer_type?: string | null  // outgoing, incoming, fee, proxy_expense, proxy_settled, etc.
 }

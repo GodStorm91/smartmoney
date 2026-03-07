@@ -227,6 +227,7 @@ class BudgetTrackingService:
                 Transaction.is_income == False,
                 Transaction.is_transfer == False,
                 Transaction.is_adjustment == False,
+                Transaction.exclude_from_budget == False,
                 Transaction.date >= month_start,
                 Transaction.date <= month_end
             )
@@ -423,6 +424,7 @@ class BudgetTrackingService:
                 Transaction.is_income == False,
                 Transaction.is_transfer == False,
                 Transaction.is_adjustment == False,
+                Transaction.exclude_from_budget == False,
                 Transaction.date >= start_date,
                 Transaction.date <= today
             )

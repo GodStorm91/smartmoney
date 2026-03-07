@@ -292,6 +292,9 @@ export function SwipeableTransactionCard({
           </div>
           <div className="flex gap-2 text-xs">
             <Badge variant={transaction.is_transfer ? 'info' : transaction.type === 'income' ? 'success' : 'error'}>{transaction.category}</Badge>
+            {transaction.exclude_from_budget && (
+              <Badge variant="default">{t('transaction.budgetExcluded')}</Badge>
+            )}
             <span className="text-gray-600 dark:text-gray-400">{transaction.source}</span>
           </div>
         </Card>

@@ -49,6 +49,7 @@ class BudgetAlertService:
             Transaction.is_income == False,
             Transaction.is_transfer == False,
             Transaction.is_adjustment == False,
+            Transaction.exclude_from_budget == False,
             Transaction.date >= month_start.date(),
             Transaction.date < month_end.date(),
         )
@@ -246,6 +247,7 @@ class BudgetAlertService:
                 Transaction.is_income == False,
                 Transaction.is_transfer == False,
                 Transaction.is_adjustment == False,
+                Transaction.exclude_from_budget == False,
                 Transaction.date >= month_start.date(),
                 Transaction.date < month_end.date(),
             )
