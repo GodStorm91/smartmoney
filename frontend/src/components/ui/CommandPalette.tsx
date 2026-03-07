@@ -182,8 +182,8 @@ export function CommandPalette({
                     <span
                       className={`text-sm font-medium ${
                         tx.type === 'income'
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
+                          ? 'text-income-600 dark:text-income-300'
+                          : 'text-expense-600 dark:text-expense-300'
                       }`}
                     >
                       {isPrivacyMode

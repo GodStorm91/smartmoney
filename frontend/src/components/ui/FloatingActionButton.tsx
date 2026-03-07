@@ -43,7 +43,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
           navigate({ to: '/transactions', search: { action: 'add-transaction' } })
         }
       },
-      color: 'bg-green-500 hover:bg-green-600',
+      color: 'bg-income-600 hover:bg-income-600/90',
     },
     {
       icon: <Receipt size={20} />,
@@ -61,7 +61,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
         setIsOpen(false)
         navigate({ to: '/upload' })
       },
-      color: 'bg-blue-500 hover:bg-blue-600',
+      color: 'bg-primary-600 hover:bg-primary-600/90',
     },
     {
       icon: <ShoppingCart size={20} />,

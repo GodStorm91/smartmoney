@@ -38,14 +38,14 @@ export function SwipeActions({
   const defaultLeftActions: SwipeAction[] = leftActions || (onEdit ? [{
     icon: <Edit2 size={20} />,
     label: 'Edit',
-    color: 'bg-blue-500',
+    color: 'bg-primary-500',
     onClick: onEdit,
   }] : [])
 
   const defaultRightActions: SwipeAction[] = rightActions || (onDelete ? [{
     icon: <Trash2 size={20} />,
     label: 'Delete',
-    color: 'bg-red-500',
+    color: 'bg-expense-600',
     onClick: onDelete,
   }] : [])
 

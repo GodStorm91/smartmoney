@@ -17,7 +17,7 @@ export function SuccessCheckmark({ size = 'md', className }: SuccessCheckmarkPro
   return (
     <div className={cn('relative', config.wrapper, className)}>
       {/* Circle background */}
-      <div className="absolute inset-0 rounded-full bg-green-100 dark:bg-green-900/30 animate-checkmark-circle" />
+      <div className="absolute inset-0 rounded-full bg-income-100 dark:bg-income-900/30 animate-checkmark-circle" />
 
       {/* SVG Checkmark */}
       <svg
@@ -31,7 +31,7 @@ export function SuccessCheckmark({ size = 'md', className }: SuccessCheckmarkPro
           r="20"
           stroke="currentColor"
           strokeWidth={config.stroke}
-          className="text-green-500 animate-checkmark-circle"
+          className="text-income-600 animate-checkmark-circle"
           style={{ animationDelay: '0.1s' }}
         />
         <path
@@ -40,7 +40,7 @@ export function SuccessCheckmark({ size = 'md', className }: SuccessCheckmarkPro
           strokeWidth={config.stroke}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-green-500 animate-checkmark"
+          className="text-income-600 animate-checkmark"
           style={{
             strokeDasharray: 50,
             strokeDashoffset: 50,

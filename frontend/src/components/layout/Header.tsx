@@ -89,7 +89,7 @@ export function Header() {
 
             <button
               onClick={logout}
-              className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus-ring"
+              className="hidden md:block text-gray-600 dark:text-gray-300 hover:text-expense-600 dark:hover:text-expense-300 transition-colors p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus-ring"
               title={t('auth.logout')}
             >
               <LogOut className="w-5 h-5" />
@@ -138,7 +138,7 @@ export function Header() {
                   }}
                   className={cn(
                     'flex items-center gap-2 px-3 py-2 rounded-lg transition-colors',
-                    'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20'
+                    'text-expense-600 dark:text-expense-300 hover:bg-expense-50 dark:hover:bg-expense-900/20'
                   )}
                 >
                   <LogOut className="w-5 h-5" />

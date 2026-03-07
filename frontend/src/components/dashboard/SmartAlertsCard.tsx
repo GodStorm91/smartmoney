@@ -134,17 +134,17 @@ export function SmartAlertsCard({
             key={alert.id}
             className={cn(
               'flex items-start gap-3 p-3 rounded-lg',
-              alert.type === 'danger' && 'bg-red-50 dark:bg-red-900/20',
+              alert.type === 'danger' && 'bg-expense-50 dark:bg-expense-900/20',
               alert.type === 'warning' && 'bg-amber-50 dark:bg-amber-900/20',
-              alert.type === 'info' && 'bg-blue-50 dark:bg-blue-900/20'
+              alert.type === 'info' && 'bg-primary-50 dark:bg-primary-900/20'
             )}
           >
             <div
               className={cn(
                 'p-1.5 rounded-full flex-shrink-0',
-                alert.type === 'danger' && 'bg-red-100 text-red-600 dark:bg-red-800 dark:text-red-400',
+                alert.type === 'danger' && 'bg-expense-100 text-expense-600 dark:bg-expense-900 dark:text-expense-300',
                 alert.type === 'warning' && 'bg-amber-100 text-amber-600 dark:bg-amber-800 dark:text-amber-400',
-                alert.type === 'info' && 'bg-blue-100 text-blue-600 dark:bg-blue-800 dark:text-blue-400'
+                alert.type === 'info' && 'bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300'
               )}
             >
               {alert.icon}
@@ -154,9 +154,9 @@ export function SmartAlertsCard({
               <span
                 className={cn(
                   'font-medium text-sm',
-                  alert.type === 'danger' && 'text-red-800 dark:text-red-300',
+                  alert.type === 'danger' && 'text-expense-600 dark:text-expense-300',
                   alert.type === 'warning' && 'text-amber-800 dark:text-amber-300',
-                  alert.type === 'info' && 'text-blue-800 dark:text-blue-300'
+                  alert.type === 'info' && 'text-primary-600 dark:text-primary-300'
                 )}
               >
                 {alert.title}
@@ -164,9 +164,9 @@ export function SmartAlertsCard({
               <p
                 className={cn(
                   'text-xs mt-0.5',
-                  alert.type === 'danger' && 'text-red-600 dark:text-red-400',
+                  alert.type === 'danger' && 'text-expense-600 dark:text-expense-300',
                   alert.type === 'warning' && 'text-amber-600 dark:text-amber-400',
-                  alert.type === 'info' && 'text-blue-600 dark:text-blue-400'
+                  alert.type === 'info' && 'text-primary-600 dark:text-primary-300'
                 )}
               >
                 {alert.description}

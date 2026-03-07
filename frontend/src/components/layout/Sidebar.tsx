@@ -87,7 +87,7 @@ export function Sidebar() {
           onClick={logout}
           title={!expanded ? t('auth.logout') : undefined}
           className={cn(
-            'flex items-center gap-3 rounded-lg transition-colors h-10 w-full text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20',
+            'flex items-center gap-3 rounded-lg transition-colors h-10 w-full text-expense-600 dark:text-expense-300 hover:bg-expense-50 dark:hover:bg-expense-900/20',
             expanded ? 'px-3' : 'justify-center px-0'
           )}
         >

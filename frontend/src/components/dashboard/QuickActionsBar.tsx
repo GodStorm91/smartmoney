@@ -45,13 +45,13 @@ export function QuickActionsBar({
       icon: <Upload size={22} />,
       label: t('quickActions.upload', 'Upload'),
       to: '/upload',
-      color: 'bg-blue-500 text-white',
+      color: 'bg-primary-600 text-white',
     },
     {
       icon: <TrendingUp size={22} />,
       label: t('quickActions.analytics', 'Analytics'),
       to: '/analytics',
-      color: 'bg-green-500 text-white',
+      color: 'bg-income-600 text-white',
     },
     {
       icon: <Wallet size={22} />,

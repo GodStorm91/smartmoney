@@ -28,11 +28,11 @@ interface DailySpending {
 
 const SPENDING_LEVELS = [
   { threshold: 0, color: 'bg-gray-50 dark:bg-gray-800', border: 'border-gray-100 dark:border-gray-700', text: 'text-gray-400' },
-  { threshold: 1000, color: 'bg-green-50 dark:bg-green-900/20', border: 'border-green-200 dark:border-green-800', text: 'text-green-600 dark:text-green-400' },
+  { threshold: 1000, color: 'bg-income-50 dark:bg-income-900/20', border: 'border-income-300 dark:border-income-900', text: 'text-income-600 dark:text-income-300' },
   { threshold: 5000, color: 'bg-yellow-50 dark:bg-yellow-900/20', border: 'border-yellow-200 dark:border-yellow-800', text: 'text-yellow-600 dark:text-yellow-400' },
   { threshold: 10000, color: 'bg-orange-50 dark:bg-orange-900/20', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-600 dark:text-orange-400' },
-  { threshold: 20000, color: 'bg-red-50 dark:bg-red-900/20', border: 'border-red-200 dark:border-red-800', text: 'text-red-600 dark:text-red-400' },
-  { threshold: 50000, color: 'bg-red-100 dark:bg-red-900/30', border: 'border-red-300 dark:border-red-700', text: 'text-red-700 dark:text-red-300' },
+  { threshold: 20000, color: 'bg-expense-50 dark:bg-expense-900/20', border: 'border-expense-300 dark:border-expense-900', text: 'text-expense-600 dark:text-expense-300' },
+  { threshold: 50000, color: 'bg-expense-100 dark:bg-expense-900/30', border: 'border-expense-300 dark:border-expense-900', text: 'text-expense-600 dark:text-expense-300' },
 ]
 
 function getSpendingLevel(amount: number) {

@@ -186,9 +186,9 @@ export function BottomNavigation() {
                 setIsMoreOpen(false)
                 logout()
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-expense-600 dark:text-expense-300 hover:bg-expense-50 dark:hover:bg-expense-900/20 transition-colors"
             >
-              <div className="w-10 h-10 flex items-center justify-center bg-red-100 dark:bg-red-900/30 rounded-lg">
+              <div className="w-10 h-10 flex items-center justify-center bg-expense-100 dark:bg-expense-900/30 rounded-lg">
                 <LogOut className="w-5 h-5" strokeWidth={1.5} />
               </div>
               <span className="font-medium">{t('auth.logout')}</span>
