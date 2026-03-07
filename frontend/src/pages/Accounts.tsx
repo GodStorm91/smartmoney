@@ -139,14 +139,14 @@ export default function Accounts() {
           <div className="flex gap-2">
             <button
               onClick={() => setIsTransferModalOpen(true)}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-[0.97] transition-all duration-150"
             >
               <ArrowRightLeft className="w-4 h-4" />
               <span className="hidden sm:inline">{t('transfer.title')}</span>
             </button>
             <button
               onClick={handleCreateAccount}
-              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all duration-150"
             >
               <Plus className="w-4 h-4" />
               {t('account.createAccount')}
@@ -232,14 +232,14 @@ export default function Accounts() {
       {/* Total Balance Summary */}
       {hasAccounts && hasFilteredResults && (
         <div className="mb-6">
-          <Card variant="glass" className="!p-5 bg-hero-gradient">
+          <Card variant="glass" className="!p-5 bg-hero-gradient animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
                   {isSearching ? t('account.filteredBalance', 'Filtered Balance') : t('account.totalBalance', 'Total Balance')}
                 </p>
                 <p className={cn(
-                  'text-3xl sm:text-4xl font-extrabold font-numbers mt-1.5 tracking-tighter',
+                  'text-3xl sm:text-4xl font-extrabold font-numbers tabular-nums mt-1.5 tracking-tighter',
                   totalBalance >= 0 ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                 )}>
                   {formatCurrencyPrivacy(totalBalance, 'JPY', exchangeRates?.rates || {}, true, isPrivacyMode)}
@@ -280,7 +280,7 @@ export default function Accounts() {
           action={
             <button
               onClick={handleCreateAccount}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 active:scale-[0.97] transition-all duration-150 text-sm"
             >
               <Plus className="w-4 h-4" />
               {t('emptyState.accounts.cta')}

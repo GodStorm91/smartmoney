@@ -19,7 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.add_column('transactions', sa.Column('exclude_from_budget', sa.Boolean(), nullable=False, server_default=sa.text('0')))
+    op.add_column('transactions', sa.Column('exclude_from_budget', sa.Boolean(), nullable=False, server_default=sa.text('false')))
 
 
 def downgrade() -> None:

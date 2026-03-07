@@ -177,13 +177,14 @@ export function AccountFormModal({
   // Use createPortal to render modal outside the DOM hierarchy
   // This prevents z-index conflicts with sidebar drawers and other fixed elements
   const modalContent = (
-    <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[100001] flex items-center justify-center p-4 overflow-hidden" style={{ touchAction: 'pan-y' }}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 animate-backdrop" onClick={onClose} />
 
       {/* Modal - allows vertical scroll */}
       <div
-        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto overflow-x-hidden"
+        className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto overflow-x-hidden animate-modal-in"
+        onClick={(e) => e.stopPropagation()}
         style={{ touchAction: 'pan-y' }}
       >
         {/* Header */}
@@ -193,7 +194,7 @@ export function AccountFormModal({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 hover:rotate-90 active:scale-90"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -480,7 +481,7 @@ export function AccountFormModal({
 
           {/* Error message */}
           {errors.submit && (
-            <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg p-3">
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 animate-scale-in">
               <p className="text-red-700 dark:text-red-300 text-sm">{errors.submit}</p>
             </div>
           )}
@@ -494,7 +495,7 @@ export function AccountFormModal({
                   setShowConfirmation(false)
                   setDesiredCurrentBalance('')
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all duration-150"
               >
                 {t('account.cancelAdjustment')}
               </button>
@@ -503,7 +504,7 @@ export function AccountFormModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98] transition-all duration-150"
               >
                 {t('cancel')}
               </button>
@@ -512,13 +513,16 @@ export function AccountFormModal({
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
               className={cn(
-                'flex-1 px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
-                showConfirmation ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-blue-600 hover:bg-blue-700'
+                'flex-1 px-4 py-2.5 text-white rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] disabled:active:scale-100',
+                showConfirmation ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-primary-600 hover:bg-primary-700'
               )}
             >
-              {createMutation.isPending || updateMutation.isPending
-                ? t('saving')
-                : showConfirmation
+              {createMutation.isPending || updateMutation.isPending ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  {t('saving')}
+                </span>
+              ) : showConfirmation
                 ? t('account.confirmAdjustment')
                 : editingAccountId
                 ? t('update')

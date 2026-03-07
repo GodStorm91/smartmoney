@@ -56,7 +56,7 @@ export function AccountCard({ account, onEdit, onAddTransaction }: AccountCardPr
 
   return (
     <Card
-      className="relative hover:shadow-md transition-shadow cursor-pointer"
+      className="relative hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm transition-all duration-200 cursor-pointer"
       onClick={handleCardClick}
     >
       {/* Header */}
@@ -78,7 +78,7 @@ export function AccountCard({ account, onEdit, onAddTransaction }: AccountCardPr
           {onAddTransaction && (
             <button
               onClick={handleAddTransactionClick}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 active:scale-90"
               aria-label={t('transaction.addTransaction')}
             >
               <svg
@@ -96,7 +96,7 @@ export function AccountCard({ account, onEdit, onAddTransaction }: AccountCardPr
           {onEdit && (
             <button
               onClick={(e) => { e.stopPropagation(); onEdit(account.id) }}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-150 active:scale-90"
               aria-label={t('account.edit')}
             >
               <svg
@@ -128,8 +128,8 @@ export function AccountCard({ account, onEdit, onAddTransaction }: AccountCardPr
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">{t('account.currentBalance')}</p>
         <p
           className={cn(
-            'text-3xl font-bold font-mono',
-            balancePositive ? 'text-green-600' : 'text-red-600'
+            'text-3xl font-bold font-numbers tabular-nums tracking-tight',
+            balancePositive ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
           )}
         >
           {formatCurrencyPrivacy(account.current_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
@@ -140,7 +140,7 @@ export function AccountCard({ account, onEdit, onAddTransaction }: AccountCardPr
       <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
         <div>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t('account.initialBalance')}</p>
-          <p className="text-sm font-mono text-gray-700 dark:text-gray-300">
+          <p className="text-sm font-numbers tabular-nums text-gray-700 dark:text-gray-300">
             {formatCurrencyPrivacy(account.initial_balance, account.currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
           </p>
         </div>
