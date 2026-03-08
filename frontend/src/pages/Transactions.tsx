@@ -505,7 +505,7 @@ export function Transactions() {
   }, [displayedTransactions])
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 pb-28">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 pb-28 animate-fade-in">
       {fromAccounts && (
         <Button
           variant="ghost"
@@ -522,7 +522,10 @@ export function Transactions() {
         <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-50 mb-1 tracking-tight">
           {t('transactions.title')}
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{t('transactions.subtitle')}</p>
+        <div className="flex items-center gap-3 mt-1">
+          <div className="h-1 w-10 rounded-full bg-gradient-to-r from-primary-500 to-primary-300" />
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t('transactions.subtitle')}</p>
+        </div>
       </div>
 
       <Card className="mb-4">
@@ -686,48 +689,57 @@ export function Transactions() {
           <Card
             onClick={() => handleTypeFilter('income')}
             className={cn(
-              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-income-600 dark:border-l-income-300 overflow-hidden !p-3 sm:!p-4',
+              'cursor-pointer transition-all hover:shadow-lg hover:scale-[1.03] overflow-hidden !p-0',
               typeParam === 'income'
-                ? 'ring-2 ring-income-600 dark:ring-income-300 bg-income-50 dark:bg-income-900/20'
+                ? 'ring-2 ring-income-600 dark:ring-income-300 shadow-md'
                 : ''
             )}
           >
-            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.income')}</p>
-            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-income-600 dark:text-income-300 tracking-tight leading-none truncate">
-              {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
-            </p>
+            <div className="h-1.5 bg-gradient-to-r from-income-500 to-income-300" />
+            <div className="p-3 sm:p-4">
+              <p className="text-[10px] sm:text-[11px] font-bold text-income-600/70 dark:text-income-400/80 mb-1.5 uppercase tracking-[0.12em]">{t('transactions.income')}</p>
+              <p className="text-base sm:text-xl lg:text-2xl font-extrabold font-numbers text-income-600 dark:text-income-300 tracking-tight leading-none truncate">
+                {formatCurrencyPrivacy(income, summaryCurrency, rates, true, isPrivacyMode)}
+              </p>
+            </div>
           </Card>
         </div>
         <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
           <Card
             onClick={() => handleTypeFilter('expense')}
             className={cn(
-              'cursor-pointer transition-all hover:shadow-md hover:scale-[1.02] border-l-4 border-l-expense-600 dark:border-l-expense-300 overflow-hidden !p-3 sm:!p-4',
+              'cursor-pointer transition-all hover:shadow-lg hover:scale-[1.03] overflow-hidden !p-0',
               typeParam === 'expense'
-                ? 'ring-2 ring-expense-600 dark:ring-expense-300 bg-expense-50 dark:bg-expense-900/20'
+                ? 'ring-2 ring-expense-600 dark:ring-expense-300 shadow-md'
                 : ''
             )}
           >
-            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.expense')}</p>
-            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none truncate">
-              {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
-            </p>
+            <div className="h-1.5 bg-gradient-to-r from-expense-500 to-expense-300" />
+            <div className="p-3 sm:p-4">
+              <p className="text-[10px] sm:text-[11px] font-bold text-expense-600/70 dark:text-expense-400/80 mb-1.5 uppercase tracking-[0.12em]">{t('transactions.expense')}</p>
+              <p className="text-base sm:text-xl lg:text-2xl font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none truncate">
+                {formatCurrencyPrivacy(expense, summaryCurrency, rates, true, isPrivacyMode)}
+              </p>
+            </div>
           </Card>
         </div>
         <div className="animate-stagger-in" style={{ '--stagger-index': 2 } as React.CSSProperties}>
           <Card
             onClick={() => typeParam ? navigate({ to: '/transactions', search: (prev) => ({ ...prev, type: undefined }) }) : undefined}
             className={cn(
-              'transition-all border-l-4 border-l-net-600 dark:border-l-net-300 overflow-hidden !p-3 sm:!p-4',
+              'transition-all overflow-hidden !p-0',
               typeParam
-                ? 'cursor-pointer hover:shadow-md hover:scale-[1.02]'
+                ? 'cursor-pointer hover:shadow-lg hover:scale-[1.03]'
                 : 'bg-net-50/40 dark:bg-net-900/10'
             )}
           >
-            <p className="text-[10px] sm:text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-[0.12em]">{t('transactions.difference')}</p>
-            <p className="text-sm sm:text-xl lg:text-2xl font-extrabold font-numbers text-net-600 dark:text-net-300 tracking-tight leading-none truncate">
-              {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
-            </p>
+            <div className="h-1.5 bg-gradient-to-r from-net-500 to-net-300" />
+            <div className="p-3 sm:p-4">
+              <p className="text-[10px] sm:text-[11px] font-bold text-net-600/70 dark:text-net-400/80 mb-1.5 uppercase tracking-[0.12em]">{t('transactions.difference')}</p>
+              <p className="text-base sm:text-xl lg:text-2xl font-extrabold font-numbers text-net-600 dark:text-net-300 tracking-tight leading-none truncate">
+                {formatCurrencyPrivacy(net, summaryCurrency, rates, true, isPrivacyMode)}
+              </p>
+            </div>
           </Card>
         </div>
       </div>
@@ -827,7 +839,7 @@ export function Transactions() {
           {/* Desktop Table */}
           <Card className="hidden md:block overflow-hidden shadow-sm">
             <table className="w-full">
-              <thead className="bg-gray-100/80 dark:bg-gray-700/70 border-b-2 border-gray-200 dark:border-gray-600">
+              <thead className="bg-gradient-to-r from-gray-100 to-gray-50 dark:from-gray-700/80 dark:to-gray-700/50 border-b-2 border-primary-200 dark:border-primary-800">
                 <tr>
                   <th className="px-4 py-3.5 w-12">
                     <input
@@ -868,12 +880,12 @@ export function Transactions() {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
                 {displayedTransactions.map((tx) => (
-                  <tr key={tx.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${
+                  <tr key={tx.id} className={`hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors ${
                     tx.is_transfer
-                      ? 'border-l-[3px] border-l-blue-400 dark:border-l-blue-500'
+                      ? 'border-l-4 border-l-net-400 dark:border-l-net-500'
                       : tx.type === 'income'
-                        ? 'border-l-[3px] border-l-income-300 dark:border-l-income-600'
-                        : 'border-l-[3px] border-l-expense-300 dark:border-l-expense-600'
+                        ? 'border-l-4 border-l-income-400 dark:border-l-income-500'
+                        : 'border-l-4 border-l-expense-400 dark:border-l-expense-500'
                   }`}>
                     <td className="px-4 py-4">
                       <input
@@ -892,7 +904,7 @@ export function Transactions() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{tx.source}</td>
-                    <td className={`px-6 py-4 text-sm font-semibold font-numbers text-right ${tx.is_transfer ? 'text-net-600 dark:text-net-300' : tx.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'}`}>
+                    <td className={`px-6 py-4 text-sm font-extrabold font-numbers text-right ${tx.is_transfer ? 'text-net-600 dark:text-net-300' : tx.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'}`}>
                       {formatCurrencySignedPrivacy(tx.amount, tx.type, tx.currency || 'JPY', rates, true, isPrivacyMode)}
                     </td>
                     <td className="px-6 py-4">
@@ -927,10 +939,10 @@ export function Transactions() {
                 groupedTransactions.map((group) => (
                   <div key={group.date}>
                     <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-[11px] font-extrabold uppercase tracking-[0.12em] text-primary-700 dark:text-primary-300 bg-primary-100/80 dark:bg-primary-900/20 px-3.5 py-1.5 rounded-full">
+                      <h3 className="text-[11px] font-black uppercase tracking-[0.14em] text-white bg-gradient-to-r from-primary-600 to-primary-400 dark:from-primary-500 dark:to-primary-400 px-4 py-1.5 rounded-full shadow-sm">
                         {formatDateHeader(group.date)}
                       </h3>
-                      <div className="flex-1 h-px bg-primary-200/60 dark:bg-primary-800/30" />
+                      <div className="flex-1 h-px bg-gradient-to-r from-primary-200 to-transparent dark:from-primary-800 dark:to-transparent" />
                     </div>
                     <div className="space-y-3">
                       {group.transactions.map((tx) => (
@@ -983,10 +995,10 @@ export function Transactions() {
 
       {/* Bulk Action Toolbar */}
       {selectedIds.size > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-900 dark:bg-gray-950 border-t-2 border-primary-500 shadow-2xl p-4 z-40 animate-fade-in">
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-950 dark:to-gray-900 border-t-2 border-primary-400 shadow-2xl p-4 z-40 animate-fade-in backdrop-blur-sm">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <span className="text-sm font-bold text-white">
-              <span className="inline-flex items-center justify-center bg-primary-500 text-white text-xs font-black rounded-full w-6 h-6 mr-2">{selectedIds.size}</span>
+              <span className="inline-flex items-center justify-center bg-gradient-to-r from-primary-500 to-primary-400 text-white text-xs font-black rounded-full w-7 h-7 mr-2 shadow-sm">{selectedIds.size}</span>
               {t('transactions.selectedCount', '{{count}} selected', { count: selectedIds.size })}
             </span>
             <div className="flex gap-3">

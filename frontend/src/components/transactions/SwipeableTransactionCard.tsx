@@ -181,7 +181,7 @@ export function SwipeableTransactionCard({
                 }}
                 className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-blue-600 dark:text-blue-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 text-primary-600 dark:text-primary-400">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                 </svg>
                 <span className="text-gray-900 dark:text-gray-100">{t('button.edit', 'Edit')}</span>
@@ -259,20 +259,20 @@ export function SwipeableTransactionCard({
         onClick={handleCardClick}
         onContextMenu={handleContextMenu}
       >
-        <Card className={`cursor-pointer active:scale-[0.98] transition-transform border-l-[3px] ${
+        <Card className={`cursor-pointer active:scale-[0.98] transition-transform border-l-4 ${
           transaction.is_transfer
-            ? 'border-l-blue-400 dark:border-l-blue-500'
+            ? 'border-l-net-400 dark:border-l-net-500'
             : transaction.type === 'income'
-              ? 'border-l-income-300 dark:border-l-income-600'
-              : 'border-l-expense-300 dark:border-l-expense-600'
+              ? 'border-l-income-400 dark:border-l-income-500'
+              : 'border-l-expense-400 dark:border-l-expense-500'
         }`}>
           <div className="flex justify-between items-start mb-2 gap-2">
             <div className="min-w-0">
-              <p className="font-medium text-gray-900 dark:text-gray-50 truncate">{transaction.description}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{formatDate(transaction.date)}</p>
+              <p className="font-semibold text-gray-900 dark:text-gray-50 truncate">{transaction.description}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(transaction.date)}</p>
             </div>
             <p
-              className={`text-base sm:text-lg font-bold font-numbers shrink-0 ml-2 ${
+              className={`text-lg sm:text-xl font-extrabold font-numbers shrink-0 ml-2 ${
                 transaction.is_transfer
                   ? 'text-net-600 dark:text-net-300'
                   : transaction.type === 'income'
