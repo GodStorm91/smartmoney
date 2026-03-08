@@ -51,7 +51,7 @@ export function DeleteConfirmDialog({
             <span className="text-gray-600 dark:text-gray-400">{formatDate(transaction.date)}</span>
             <span
               className={`font-bold font-numbers ${
-                transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                transaction.type === 'income' ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
               }`}
             >
               {formatCurrencySignedPrivacy(

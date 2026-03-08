@@ -38,7 +38,7 @@ export function FinancialHealthCard({
           <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
             {t('health.title', 'Financial Health')}
           </h3>
-          <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+          <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
             {showDetails ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>

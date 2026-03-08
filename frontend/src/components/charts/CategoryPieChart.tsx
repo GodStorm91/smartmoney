@@ -46,6 +46,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
   }
 
   return (
+    <div className="w-full h-full animate-fade-in">
     <ResponsiveContainer width="100%" height="100%">
       <PieChart>
         <Pie
@@ -83,5 +84,6 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
         />
       </PieChart>
     </ResponsiveContainer>
+    </div>
   )
 }

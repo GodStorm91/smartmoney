@@ -362,7 +362,7 @@ export function QuickEntryFAB() {
             </button>
             <button
               onClick={() => handleMenuAction('transaction')}
-              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-lg"
+              className="flex items-center gap-3 pl-4 pr-5 py-3 rounded-full bg-income-600 hover:bg-income-600/90 text-white shadow-lg transition-colors"
             >
               <CreditCard size={20} />
               <span className="text-sm font-medium">{t('transaction.addTransaction', 'Add Transaction')}</span>
@@ -379,7 +379,7 @@ export function QuickEntryFAB() {
           className={cn(
             'fixed bottom-28 right-4 sm:bottom-6 sm:right-6 z-50',
             'w-14 h-14 rounded-full',
-            'bg-gradient-to-r from-blue-500 to-purple-500',
+            'bg-gradient-to-r from-primary-500 to-purple-500',
             'text-white shadow-lg',
             'flex items-center justify-center',
             'transition-transform duration-75',
@@ -434,7 +434,7 @@ export function QuickEntryFAB() {
                   className={cn(
                     'px-4 py-2 rounded-full text-sm font-medium transition-all',
                     inputCurrency === currency
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-primary-500 text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   )}
                 >
@@ -450,7 +450,7 @@ export function QuickEntryFAB() {
               </div>
               {/* Conversion Preview */}
               {convertedAmount && (
-                <div className="text-lg text-blue-500 dark:text-blue-400 mt-2 font-numbers">
+                <div className="text-lg text-primary-500 dark:text-primary-400 mt-2 font-numbers">
                   ≈ {convertedAmount.symbol}{convertedAmount.formatted}
                 </div>
               )}
@@ -507,7 +507,7 @@ export function QuickEntryFAB() {
                 className={cn(
                   'flex-1 h-14 rounded-xl font-medium text-white transition-all',
                   amount
-                    ? 'bg-blue-500 hover:bg-blue-600'
+                    ? 'bg-primary-500 hover:bg-primary-600'
                     : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
                 )}
               >
@@ -535,7 +535,7 @@ export function QuickEntryFAB() {
                 {currencySymbol}{formattedAmount}
               </span>
               {convertedAmount && (
-                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                <span className="text-lg text-primary-500 dark:text-primary-400 ml-2 font-numbers">
                   → {convertedAmount.symbol}{convertedAmount.formatted}
                 </span>
               )}
@@ -572,7 +572,7 @@ export function QuickEntryFAB() {
                 {currencySymbol}{formattedAmount}
               </span>
               {convertedAmount && (
-                <span className="text-lg text-blue-500 dark:text-blue-400 ml-2 font-numbers">
+                <span className="text-lg text-primary-500 dark:text-primary-400 ml-2 font-numbers">
                   → {convertedAmount.symbol}{convertedAmount.formatted}
                 </span>
               )}

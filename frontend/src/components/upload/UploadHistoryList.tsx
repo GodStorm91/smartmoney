@@ -24,8 +24,8 @@ export function UploadHistoryList({ history, isLoading }: UploadHistoryListProps
         <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('upload.noHistory')}</h3>
-        <p className="text-gray-600">{t('upload.uploadFirst')}</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t('upload.noHistory')}</h3>
+        <p className="text-gray-600 dark:text-gray-400">{t('upload.uploadFirst')}</p>
       </div>
     )
   }
@@ -41,9 +41,9 @@ export function UploadHistoryList({ history, isLoading }: UploadHistoryListProps
 
 function UploadResultCard({ result }: { result: UploadResult }) {
   const { t } = useTranslation('common')
-  const bgColor = result.status === 'success' ? 'bg-green-50 border-green-200' : result.status === 'warning' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'
-  const iconColor = result.status === 'success' ? 'bg-green-100 text-green-600' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-600' : 'bg-gray-200 text-gray-600'
-  const badgeColor = result.status === 'success' ? 'bg-green-100 text-green-800' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-200 text-gray-700'
+  const bgColor = result.status === 'success' ? 'bg-income-50 border-income-200 dark:bg-income-900/20 dark:border-income-800' : result.status === 'warning' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700'
+  const iconColor = result.status === 'success' ? 'bg-income-100 text-income-600 dark:bg-income-900/30 dark:text-income-300' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+  const badgeColor = result.status === 'success' ? 'bg-income-100 text-income-800 dark:bg-income-900/30 dark:text-income-300' : result.status === 'warning' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
   const badgeLabel = result.status === 'success' ? t('upload.success') : result.status === 'warning' ? t('upload.warning') : t('upload.completed')
 
   return (
@@ -60,23 +60,23 @@ function UploadResultCard({ result }: { result: UploadResult }) {
       <div className="flex-1">
         <div className="flex items-start justify-between mb-2">
           <div>
-            <h4 className="font-semibold text-gray-900">{result.filename}</h4>
-            <p className="text-sm text-gray-600">{formatDateTime(result.uploaded_at)}</p>
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100">{result.filename}</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{formatDateTime(result.uploaded_at)}</p>
           </div>
           <span className={`px-3 py-1 text-xs font-medium rounded-full ${badgeColor}`}>{badgeLabel}</span>
         </div>
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
             <p className="text-gray-600">{t('upload.imported')}</p>
-            <p className="font-semibold font-numbers text-gray-900">{result.imported_count}{t('upload.count')}</p>
+            <p className="font-semibold font-numbers text-gray-900 dark:text-gray-100">{result.imported_count}{t('upload.count')}</p>
           </div>
           <div>
-            <p className="text-gray-600">{t('upload.duplicates')}</p>
-            <p className="font-semibold font-numbers text-gray-900">{result.duplicate_count}{t('upload.count')}</p>
+            <p className="text-gray-600 dark:text-gray-400">{t('upload.duplicates')}</p>
+            <p className="font-semibold font-numbers text-gray-900 dark:text-gray-100">{result.duplicate_count}{t('upload.count')}</p>
           </div>
           <div>
             <p className="text-gray-600">{t('upload.errors')}</p>
-            <p className={`font-semibold font-numbers ${result.error_count > 0 ? 'text-yellow-700' : 'text-gray-900'}`}>{result.error_count}{t('upload.count')}</p>
+            <p className={`font-semibold font-numbers ${result.error_count > 0 ? 'text-yellow-700 dark:text-yellow-300' : 'text-gray-900 dark:text-gray-100'}`}>{result.error_count}{t('upload.count')}</p>
           </div>
         </div>
         {result.errors && result.errors.length > 0 && (

@@ -117,7 +117,7 @@ export function SmartAlertsCard({
   }
 
   return (
-    <Card className="overflow-hidden border-l-4 border-l-amber-500">
+    <Card className="overflow-hidden border-l-4 border-l-amber-500 animate-fade-in">
       <div className="flex items-center gap-2 mb-4">
         <Bell size={16} className="text-amber-500" />
         <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -129,11 +129,12 @@ export function SmartAlertsCard({
       </div>
 
       <div className="space-y-3">
-        {alerts.map((alert) => (
+        {alerts.map((alert, index) => (
           <div
             key={alert.id}
+            style={{ '--stagger-index': index } as React.CSSProperties}
             className={cn(
-              'flex items-start gap-3 p-3 rounded-lg',
+              'flex items-start gap-3 p-3 rounded-lg animate-stagger-in',
               alert.type === 'danger' && 'bg-expense-50 dark:bg-expense-900/20',
               alert.type === 'warning' && 'bg-amber-50 dark:bg-amber-900/20',
               alert.type === 'info' && 'bg-primary-50 dark:bg-primary-900/20'

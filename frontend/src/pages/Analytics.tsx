@@ -63,14 +63,14 @@ export function Analytics() {
 
   const tabButtonClass = (tab: AnalyticsTab) =>
     cn(
-      'px-5 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 text-sm font-semibold rounded-full transition-colors',
+      'px-5 py-2.5 sm:py-2 min-h-[44px] sm:min-h-0 text-sm font-semibold rounded-full transition-all duration-200',
       activeTab === tab
         ? 'bg-primary-600 text-white shadow-md'
         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
     )
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8">
+    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8 animate-fade-in">
       {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">

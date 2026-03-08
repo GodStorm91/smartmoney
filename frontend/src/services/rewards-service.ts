@@ -81,17 +81,14 @@ class RewardsService {
   }
 
   async uploadCustomAvatar(file: File): Promise<{ message: string; avatar: Avatar }> {
-    console.log('[uploadCustomAvatar] Starting upload:', file.name, file.type, file.size);
     const formData = new FormData();
     formData.append('avatar', file);
-    console.log('[uploadCustomAvatar] FormData created, token exists:', !!localStorage.getItem('smartmoney_access_token'));
     // Must override Content-Type to let axios set multipart/form-data with boundary
     const response = await apiClient.post('/api/rewards/avatars/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log('[uploadCustomAvatar] Upload response:', response.data);
     return response.data;
   }
 
@@ -187,18 +184,13 @@ export const useActivateAvatar = () => {
 export const useUploadCustomAvatar = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (file: File) => {
-      console.log('[useUploadCustomAvatar] Starting upload:', file.name, file.type, file.size);
-      return rewardsService.uploadCustomAvatar(file);
-    },
+    mutationFn: (file: File) => rewardsService.uploadCustomAvatar(file),
     onSuccess: (data) => {
-      console.log('[useUploadCustomAvatar] Upload success:', data);
       queryClient.invalidateQueries({ queryKey: ['avatars'] });
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       toast.success('Custom avatar uploaded!');
       // Auto-select the new custom avatar
       if (data.avatar?.id) {
-        console.log('[useUploadCustomAvatar] Auto-selecting new avatar:', data.avatar.id);
         rewardsService.activateAvatar(data.avatar.id);
       }
     },

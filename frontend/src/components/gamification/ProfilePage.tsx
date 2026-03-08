@@ -68,8 +68,6 @@ export const ProfilePage: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    console.log('[Avatar Upload] File selected:', file.name, file.type, file.size);
-
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -79,30 +77,25 @@ export const ProfilePage: React.FC = () => {
       // Check if file is HEIC and convert if needed
       let fileToUpload = file;
       if (isHeicFile(file)) {
-        console.log('[Avatar Upload] Detected HEIC file, starting conversion...');
         setIsConverting(true);
         toast.info('Converting HEIC image...');
         fileToUpload = await convertHeicToJpeg(file);
         setIsConverting(false);
-        console.log('[Avatar Upload] HEIC conversion complete:', fileToUpload.name, fileToUpload.type, fileToUpload.size);
         toast.success('HEIC image converted successfully!');
       }
 
       // Validate file type after conversion
-      console.log('[Avatar Upload] Validating file type:', fileToUpload.type);
       if (!fileToUpload.type.startsWith('image/')) {
         toast.error('Please select a valid image file');
         return;
       }
 
       // Validate file size (max 5MB)
-      console.log('[Avatar Upload] Validating file size:', fileToUpload.size);
       if (fileToUpload.size > 5 * 1024 * 1024) {
         toast.error('Image must be less than 5MB');
         return;
       }
 
-      console.log('[Avatar Upload] Starting upload...');
       uploadCustomAvatar(fileToUpload);
     } catch (error) {
       setIsConverting(false);

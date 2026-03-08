@@ -108,7 +108,7 @@ export function CashFlowSummary({ data, savingsGoal }: CashFlowSummaryProps) {
 
   // 2+ data points - show comparison bars
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col animate-fade-in">
       {/* Comparison Bar Chart */}
       <div className="flex-1 min-h-[150px]">
         <ResponsiveContainer width="100%" height="100%">

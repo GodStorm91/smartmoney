@@ -289,7 +289,7 @@ export function Settings() {
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
                     className={cn(
-                      'flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-full text-xs font-semibold whitespace-nowrap transition-colors',
+                      'flex items-center gap-1.5 px-3 py-2.5 sm:py-1.5 min-h-[44px] sm:min-h-0 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200',
                       isActive
                         ? cn(colors?.activeBg, colors?.activeText)
                         : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -306,7 +306,7 @@ export function Settings() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-2xl mx-auto px-4 py-4 space-y-4 animate-fade-in">
         {/* Appearance */}
         <div className={cn('space-y-4', activeSection !== 'appearance' && 'hidden')}>
           <SectionCard sectionId="appearance" icon={Palette} title={t('appearance.title', 'Appearance')} description={t('appearance.subtitle', 'Theme, colors, and display preferences')}>
@@ -576,7 +576,7 @@ export function Settings() {
 
                   {/* QR Code */}
                   <div className="flex flex-col items-center gap-2">
-                    <div className="p-3 bg-white rounded-lg">
+                    <div className="p-3 bg-white dark:bg-gray-100 rounded-lg">
                       <QRCodeSVG value={generatedLink} size={180} />
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -687,7 +687,7 @@ function ToggleSetting({ label, description, checked, onChange }: ToggleSettingP
       <button
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative inline-flex h-8 w-14 sm:h-7 sm:w-12 items-center rounded-full transition-colors flex-shrink-0',
+          'relative inline-flex h-8 w-14 sm:h-7 sm:w-12 items-center rounded-full transition-colors flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900',
           checked ? 'bg-emerald-500 dark:bg-emerald-600' : 'bg-gray-300 dark:bg-gray-600'
         )}
       >

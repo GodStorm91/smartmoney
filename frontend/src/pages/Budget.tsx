@@ -211,7 +211,7 @@ export function BudgetPage() {
           <div className="flex items-center justify-between mb-3">
             <button
               onClick={() => navigateMonth('prev')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
@@ -227,7 +227,7 @@ export function BudgetPage() {
               {!isCurrentMonth && (
                 <button
                   onClick={goToCurrentMonth}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-income-600 dark:text-income-300"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-income-600 dark:text-income-300 transition-colors"
                   title={t('common.today')}
                 >
                   <CalendarDays className="w-5 h-5" />
@@ -235,7 +235,7 @@ export function BudgetPage() {
               )}
               <button
                 onClick={() => navigateMonth('next')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
                 disabled={selectedMonth >= new Date().toISOString().slice(0, 7)}
               >
                 <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
@@ -278,7 +278,7 @@ export function BudgetPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4">
+      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4 animate-fade-in">
         {/* Empty State — Creation Wizard */}
         {!displayBudget && !error && (
           <BudgetCreationWizard

@@ -50,7 +50,7 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
         className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-in zoom-in-95 duration-200"
         onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       >
-        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl w-full max-w-md max-h-[85dvh] overflow-hidden flex flex-col">
+        <div className="relative bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md max-h-[85dvh] overflow-hidden flex flex-col">
           {/* Header */}
           <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between z-10 shrink-0">
             <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export function DayTransactionsModal({ isOpen, onClose, date, transactions }: Da
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>

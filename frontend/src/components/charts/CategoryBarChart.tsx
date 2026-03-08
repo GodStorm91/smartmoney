@@ -145,7 +145,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
   const chartHeight = Math.max(200, displayData.length * 32)
 
   return (
-    <div className="w-full">
+    <div className="w-full animate-fade-in">
       <ResponsiveContainer width="100%" height={chartHeight}>
         <BarChart
           data={displayData}

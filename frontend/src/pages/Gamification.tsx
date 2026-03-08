@@ -7,10 +7,10 @@ const GamificationPage: React.FC = () => {
   const { t } = useTranslation('common');
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 animate-fade-in">
       <div className="mb-6">
         <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Trophy className="h-8 w-8 text-yellow-500" />
+          <Trophy className="h-8 w-8 text-yellow-500 animate-bounce-in" />
           {t('gamification.title')}
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">

@@ -78,6 +78,7 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
   }))
 
   return (
+    <div className="w-full h-full animate-fade-in">
     <ResponsiveContainer width="100%" height="100%">
       <ComposedChart data={enhancedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
@@ -167,5 +168,6 @@ export function IncomeExpenseBarChart({ data }: IncomeExpenseBarChartProps) {
         />
       </ComposedChart>
     </ResponsiveContainer>
+    </div>
   )
 }

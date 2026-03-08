@@ -83,7 +83,7 @@ export function CreateCategoryModal({
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {t('category.createTitle', 'Create Category')}
           </h3>
-          <button onClick={handleClose} className="p-2.5 -mr-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+          <button onClick={handleClose} className="p-2.5 -mr-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
             <X size={20} className="text-gray-500 dark:text-gray-400" />
           </button>
         </div>
@@ -173,7 +173,7 @@ export function CreateCategoryModal({
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="flex-1 h-10 bg-blue-500 text-white rounded-lg font-medium disabled:opacity-50"
+              className="flex-1 h-10 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium disabled:opacity-50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
             >
               {createMutation.isPending ? '...' : t('create', 'Create')}
             </button>

@@ -104,15 +104,15 @@ export function UploadDropZone({
       </div>
 
       {/* File Requirements */}
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="mt-6 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-4">
         <div className="flex gap-3">
-          <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <div>
-            <h4 className="text-sm font-semibold text-blue-900 mb-1">{t('upload.requirements')}</h4>
+            <h4 className="text-sm font-semibold text-primary-900 dark:text-primary-200 mb-1">{t('upload.requirements')}</h4>
             {uploadMode === 'csv' ? (
-              <ul className="text-sm text-blue-800 space-y-1">
+              <ul className="text-sm text-primary-800 dark:text-primary-300 space-y-1">
                 <li>• {t('upload.requiredColumns')}</li>
                 <li>• {t('upload.supportedApps')}</li>
                 <li>• {t('upload.encoding')}</li>

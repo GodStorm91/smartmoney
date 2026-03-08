@@ -100,8 +100,8 @@ export function AllocationCard({
             <div
               className={cn(
                 'h-full rounded-full transition-[width] duration-500',
-                percentOfTotal > 100 ? 'bg-red-500' :
-                percentOfTotal > 90 ? 'bg-amber-500' : 'bg-blue-500'
+                percentOfTotal > 100 ? 'bg-expense-500' :
+                percentOfTotal > 90 ? 'bg-amber-500' : 'bg-primary-500'
               )}
               style={{ width: `${Math.min(100, percentOfTotal)}%` }}
             />
@@ -121,7 +121,7 @@ export function AllocationCard({
             </span>
             <span className={cn(
               'font-semibold',
-              remaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+              remaining >= 0 ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
             )}>
               {remaining >= 0
                 ? t('budget.remaining', { amount: formatCurrency(remaining) })
@@ -155,7 +155,7 @@ export function AllocationCard({
       <div className="hidden lg:flex px-4 pb-3">
         <button
           onClick={() => onOpenDetail(allocation.category)}
-          className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+          className="flex items-center gap-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors"
         >
           <Info className="w-4 h-4" />
           <span>{t('viewDetails')}</span>

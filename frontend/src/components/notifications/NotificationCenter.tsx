@@ -181,9 +181,8 @@ export function NotificationCenter({ onClose, onViewAll }: NotificationCenterPro
                 key={notification.id}
                 notification={notification}
                 onAction={handleNotificationAction}
-                onDismiss={(id) => {
-                  // Handle dismiss - could call delete API
-                  console.log('Dismiss notification:', id)
+                onDismiss={(_id) => {
+                  // TODO: call delete API when backend supports it
                 }}
               />
             ))}

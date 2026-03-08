@@ -105,7 +105,7 @@ function XPToastItem({ toast, onDismiss }: { toast: XPGainData; onDismiss: (time
 export function triggerXPGain(amount: number, source: string) {
   // This would typically be called through the context
   // For now, components can use the useXPToast hook
-  console.log(`[XP Gain] +${amount} XP from ${source}`)
+  // XP gain trigger — components should use useXPToast hook
 }
 
 export default XPToastProvider

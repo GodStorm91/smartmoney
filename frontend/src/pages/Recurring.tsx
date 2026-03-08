@@ -52,7 +52,7 @@ export default function Recurring() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function Recurring() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={cn(
-              'px-4 py-1.5 text-sm font-medium rounded-md transition-colors',
+              'px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200',
               activeTab === tab
                 ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
