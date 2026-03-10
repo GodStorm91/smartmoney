@@ -27,7 +27,10 @@
     "collapse": "Thu gọn",
     "expand": "Mở rộng",
     "relocation": "Chuyển chỗ ở",
-    "benchmark": "Chuẩn"
+    "benchmark": "Chuẩn",
+    "finance": "Tài chính",
+    "tools": "Công cụ",
+    "other": "Khác"
   },
   "button": {
     "save": "Lưu",
@@ -219,6 +222,7 @@
     "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước",
     "viewAll": "Xem tất cả",
     "showLess": "Thu gọn",
+    "showMore": "Xem chi tiết",
     "spendingSpike": "Chi tiêu tăng đột biến",
     "savingsWin": "Tiết kiệm thành công",
     "budgetPace": "Tiến độ ngân sách",
@@ -383,7 +387,26 @@
     "thisMonth": "Tháng này",
     "average": "TB 3 tháng",
     "vsAverage": "so với TB",
-    "goal": "Mục tiêu"
+    "goal": "Mục tiêu",
+    "yoy": {
+      "title": "So sánh năm trước",
+      "thisYear": "Năm nay",
+      "lastYear": "Năm ngoái",
+      "expenses": "Chi tiêu",
+      "income": "Thu nhập",
+      "change": "{{percent}}% so với năm ngoái",
+      "increase": "tăng",
+      "decrease": "giảm",
+      "noData": "Không đủ dữ liệu để so sánh"
+    },
+    "heatmap": {
+      "title": "Bản đồ nhiệt chi tiêu",
+      "noData": "Không có dữ liệu chi tiêu trong khoảng thời gian này",
+      "dailyAvg": "Trung bình theo ngày",
+      "less": "Ít",
+      "more": "Nhiều",
+      "weekdays": ["T2", "T3", "T4", "T5", "T6", "T7", "CN"]
+    }
   },
   "goals": {
     "title": "Mục tiêu dài hạn",
@@ -575,8 +598,14 @@
     "deleteWarning": "Hành động này không thể hoàn tác. Bạn có chắc không?",
     "saved": "Đã lưu giao dịch!",
     "moreOptions": "Tùy chọn khác",
+    "aiCategorizing": "AI đang phân loại...",
+    "aiSuggested": "AI gợi ý",
+    "autoSuggested": "Tự động gợi ý",
     "balanceAdjustment": "Điều chỉnh số dư",
     "balanceAdjustmentHint": "Không tính vào ngân sách",
+    "excludeFromBudget": "Loại khỏi ngân sách",
+    "excludeFromBudgetHint": "Không tính vào ngân sách (vẫn hiển thị trong phân tích)",
+    "budgetExcluded": "Đã loại ngân sách",
     "currency": "Tiền tệ",
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
@@ -1255,6 +1284,11 @@
     "coverage": {
       "label": "Độ phủ ngân sách trên tổng chi tiêu"
     },
+    "excluded": {
+      "title": "Loại khỏi ngân sách",
+      "total": "Tổng đã loại",
+      "noTransactions": "Không có giao dịch bị loại"
+    },
     "aiCategorize": {
       "title": "Phân loại tự động bằng AI",
       "description": "AI sẽ đề xuất danh mục cho các giao dịch chưa phân loại",
@@ -1874,52 +1908,52 @@
   },
   "emptyState": {
     "transactions": {
-      "title": "Chưa có giao dịch nào",
-      "description": "Tải lên CSV hoặc thêm giao dịch đầu tiên để bắt đầu theo dõi",
+      "title": "Câu chuyện tài chính bắt đầu từ đây",
+      "description": "Tải lên CSV hoặc thêm giao dịch đầu tiên — mọi hành trình đều bắt đầu từ bước đầu tiên",
       "cta": "Thêm giao dịch"
     },
     "goals": {
-      "title": "Đặt mục tiêu tiết kiệm đầu tiên",
-      "description": "Xác định mục tiêu 1, 3, 5 hoặc 10 năm và theo dõi tiến trình",
+      "title": "Ước mơ lớn, bắt đầu nhỏ",
+      "description": "Đặt mục tiêu tiết kiệm 1, 3, 5 hoặc 10 năm và theo dõi sự phát triển",
       "cta": "Tạo mục tiêu"
     },
     "budget": {
-      "title": "Chưa có ngân sách cho tháng này",
-      "description": "Tạo ngân sách để theo dõi chi tiêu theo kế hoạch",
+      "title": "Kiểm soát tháng này",
+      "description": "Một ngân sách đơn giản giúp bạn chi tiêu tự tin hơn",
       "cta": "Tạo ngân sách"
     },
     "accounts": {
-      "title": "Chưa có tài khoản nào",
-      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để bắt đầu theo dõi số dư",
+      "title": "Hãy bắt đầu sắp xếp",
+      "description": "Thêm tài khoản ngân hàng, thẻ tín dụng hoặc tiền mặt để thấy bức tranh toàn cảnh",
       "cta": "Thêm tài khoản đầu tiên"
     },
     "categories": {
-      "title": "Chưa có dữ liệu chi tiêu",
-      "description": "Thêm giao dịch để xem phân tích chi tiêu theo danh mục",
+      "title": "Khám phá chi tiêu của bạn",
+      "description": "Thêm giao dịch để tìm hiểu tiền của bạn đi đâu",
       "cta": "Thêm giao dịch"
     },
     "analytics": {
-      "title": "Không đủ dữ liệu để phân tích",
-      "description": "Thêm ít nhất một tháng giao dịch để xem xu hướng",
+      "title": "Phân tích sắp sẵn sàng",
+      "description": "Thêm ít nhất một tháng giao dịch để khám phá xu hướng và mẫu hình",
       "cta": "Tải lên CSV"
     },
     "bills": {
-      "title": "Chưa có hóa đơn nào",
-      "description": "Thêm hóa đơn định kỳ để nhận nhắc nhở trước hạn thanh toán",
+      "title": "Không bao giờ quên thanh toán",
+      "description": "Theo dõi hóa đơn định kỳ và nhận nhắc nhở nhẹ nhàng trước hạn",
       "cta": "Thêm hóa đơn"
     },
     "recurring": {
-      "title": "Chưa có giao dịch định kỳ",
-      "description": "Thiết lập theo dõi tự động cho các chi phí thường xuyên",
+      "title": "Tự động hóa thói quen",
+      "description": "Thiết lập theo dõi chi phí thường xuyên để không bỏ sót",
       "cta": "Thêm giao dịch định kỳ"
     },
     "dashboardRecent": {
-      "title": "Chưa có hoạt động gần đây",
+      "title": "Đã cập nhật đầy đủ",
       "description": "Các giao dịch mới nhất sẽ hiển thị tại đây"
     },
     "welcome": {
       "title": "Chào mừng đến SmartMoney",
-      "description": "Bắt đầu bằng cách thêm tài khoản và nhập giao dịch",
+      "description": "Người bạn đồng hành tài chính — hãy cùng bắt đầu",
       "cta": "Bắt đầu"
     }
   },
@@ -2050,5 +2084,92 @@
       "subscriptions": "Đăng ký"
     },
     "noSubscriptions": "Không có đăng ký hoạt động"
+  },
+  "healthScore": {
+    "title": "Sức khỏe tài chính",
+    "score": "Điểm",
+    "grade": "Xếp hạng",
+    "savingsRate": "Tỷ lệ tiết kiệm",
+    "budgetAdherence": "Tuân thủ ngân sách",
+    "debtRatio": "Tỷ lệ nợ",
+    "emergencyFund": "Quỹ khẩn cấp",
+    "goalProgress": "Tiến độ mục tiêu",
+    "consistency": "Tính nhất quán theo dõi",
+    "tips": "Mẹo cải thiện",
+    "excellent": "Xuất sắc",
+    "good": "Tốt",
+    "fair": "Trung bình",
+    "needsWork": "Cần cải thiện"
+  },
+  "duplicates": {
+    "title": "Giao dịch trùng lặp",
+    "found": "Tìm thấy {{count}} cặp có thể trùng lặp",
+    "none": "Không tìm thấy giao dịch trùng lặp",
+    "similarity": "Khớp {{percent}}%",
+    "daysApart": "Cách {{days}} ngày",
+    "keepLeft": "Giữ bên trái",
+    "keepRight": "Giữ bên phải",
+    "keepBoth": "Giữ cả hai",
+    "merged": "Đã xóa giao dịch trùng lặp",
+    "dismissed": "Đã đánh dấu là không trùng lặp",
+    "source": "Nguồn",
+    "review": "Xem xét trùng lặp"
+  },
+  "velocity": {
+    "title": "Tốc độ chi tiêu",
+    "perDay": "/ngày",
+    "projected": "Dự kiến tháng này",
+    "dayProgress": "Ngày {{current}}/{{total}}",
+    "vsLastMonth": "so với tháng trước",
+    "noData": "Không có dữ liệu chi tiêu tháng này"
+  },
+  "holdings": {
+    "title": "Đầu tư",
+    "subtitle": "Theo dõi danh mục đầu tư",
+    "add": "Thêm tài sản",
+    "edit": "Sửa tài sản",
+    "assetName": "Tên tài sản",
+    "assetType": "Loại tài sản",
+    "ticker": "Mã chứng khoán",
+    "unitLabel": "Đơn vị",
+    "units": "Số lượng",
+    "avgCost": "Giá TB",
+    "currentPrice": "Giá hiện tại",
+    "updatePrice": "Cập nhật giá",
+    "priceAsOf": "Giá ngày {{date}}",
+    "stalePrice": "Giá đã cũ",
+    "pnl": "Lãi/Lỗ",
+    "totalValue": "Tổng giá trị",
+    "costBasis": "Giá vốn",
+    "currentValue": "Giá trị hiện tại",
+    "addPurchase": "Thêm mua",
+    "addSale": "Ghi nhận bán",
+    "lotHistory": "Lịch sử giao dịch",
+    "noHoldings": "Chưa có tài sản",
+    "noHoldingsDesc": "Bắt đầu theo dõi đầu tư của bạn",
+    "commodity": "Hàng hóa",
+    "stock": "Cổ phiếu",
+    "etf": "ETF",
+    "bond": "Trái phiếu",
+    "crypto": "Tiền điện tử",
+    "other": "Khác",
+    "buy": "Mua",
+    "sell": "Bán",
+    "dividend": "Cổ tức",
+    "pricePerUnit": "Giá mỗi {{unit}}",
+    "totalAmount": "Tổng tiền",
+    "fee": "Phí (tùy chọn)",
+    "date": "Ngày",
+    "notes": "Ghi chú (tùy chọn)",
+    "portfolioTotal": "Tổng danh mục",
+    "deleteConfirm": "Bạn có chắc muốn xóa tài sản này?",
+    "deleteLotConfirm": "Xóa giao dịch này?",
+    "created": "Đã thêm tài sản",
+    "updated": "Đã cập nhật tài sản",
+    "deleted": "Đã xóa tài sản",
+    "lotAdded": "Đã ghi nhận giao dịch",
+    "lotDeleted": "Đã xóa giao dịch",
+    "priceUpdated": "Đã cập nhật giá",
+    "noPriceSet": "Chưa cập nhật giá"
   }
 }

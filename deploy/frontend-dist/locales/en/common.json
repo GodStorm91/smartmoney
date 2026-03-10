@@ -30,7 +30,10 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "relocation": "Relocation",
-    "benchmark": "Benchmark"
+    "benchmark": "Benchmark",
+    "finance": "Finance",
+    "tools": "Tools",
+    "other": "Other"
   },
   "button": {
     "save": "Save",
@@ -240,6 +243,7 @@
     "insightsHint": "Keep tracking to see personalized insights",
     "viewAll": "View all",
     "showLess": "Show less",
+    "showMore": "Show details",
     "viewTransactions": "View Transactions",
     "viewBreakdown": "View Breakdown",
     "learnMore": "Learn More",
@@ -501,7 +505,26 @@
     "thisMonth": "This Month",
     "average": "3-Month Avg",
     "vsAverage": "vs average",
-    "goal": "Goal"
+    "goal": "Goal",
+    "yoy": {
+      "title": "Year-over-Year",
+      "thisYear": "This Year",
+      "lastYear": "Last Year",
+      "expenses": "Expenses",
+      "income": "Income",
+      "change": "{{percent}}% vs last year",
+      "increase": "increase",
+      "decrease": "decrease",
+      "noData": "Not enough data for comparison"
+    },
+    "heatmap": {
+      "title": "Spending Heatmap",
+      "noData": "No spending data for this period",
+      "dailyAvg": "Daily Average",
+      "less": "Less",
+      "more": "More",
+      "weekdays": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    }
   },
   "goals": {
     "title": "Long-term Goals",
@@ -699,8 +722,14 @@
     "deleteWarning": "This action cannot be undone. Are you sure?",
     "saved": "Transaction saved!",
     "moreOptions": "More Options",
+    "aiCategorizing": "AI categorizing...",
+    "aiSuggested": "AI-suggested",
+    "autoSuggested": "Auto-suggested",
     "balanceAdjustment": "Balance adjustment",
     "balanceAdjustmentHint": "Won't count toward budget",
+    "excludeFromBudget": "Exclude from budget",
+    "excludeFromBudgetHint": "Won't count in budget tracking (still shows in analytics)",
+    "budgetExcluded": "Budget excluded",
     "currency": "Currency",
     "errors": {
       "amountRequired": "Amount is required",
@@ -1382,6 +1411,11 @@
     "coverage": {
       "label": "Budget coverage of total spending"
     },
+    "excluded": {
+      "title": "Excluded from budget",
+      "total": "Total excluded",
+      "noTransactions": "No excluded transactions"
+    },
     "aiCategorize": {
       "title": "AI Auto-Categorize",
       "description": "AI will suggest categories for uncategorized transactions",
@@ -2023,52 +2057,52 @@
   },
   "emptyState": {
     "transactions": {
-      "title": "No transactions yet",
-      "description": "Upload a CSV or add your first transaction to start tracking",
+      "title": "Your financial story starts here",
+      "description": "Upload a CSV or add your first transaction — every journey begins with a single step",
       "cta": "Add Transaction"
     },
     "goals": {
-      "title": "Set your first savings goal",
-      "description": "Define targets for 1, 3, 5, or 10 years and track your progress",
+      "title": "Dream big, start small",
+      "description": "Set a savings goal for 1, 3, 5, or 10 years and watch your progress grow",
       "cta": "Create Goal"
     },
     "budget": {
-      "title": "No budget set for this month",
-      "description": "Create a budget to track spending against your plan",
+      "title": "Take control of this month",
+      "description": "A simple budget helps you spend with confidence",
       "cta": "Create Budget"
     },
     "accounts": {
-      "title": "No accounts yet",
-      "description": "Add your bank, credit card, or cash accounts to start tracking balances",
+      "title": "Let's get organized",
+      "description": "Add your bank, credit card, or cash accounts to see the full picture",
       "cta": "Add Your First Account"
     },
     "categories": {
-      "title": "No spending data yet",
-      "description": "Add transactions to see your spending breakdown by category",
+      "title": "Your spending story awaits",
+      "description": "Add transactions to uncover where your money goes",
       "cta": "Add Transaction"
     },
     "analytics": {
-      "title": "Not enough data for analytics",
-      "description": "Add at least one month of transactions to see trends and insights",
+      "title": "Insights are on the way",
+      "description": "Add at least one month of transactions to unlock trends and patterns",
       "cta": "Upload CSV"
     },
     "bills": {
-      "title": "No bills to track",
-      "description": "Add recurring bills to get reminders before due dates",
+      "title": "Never miss a payment",
+      "description": "Track recurring bills and get gentle reminders before due dates",
       "cta": "Add Bill"
     },
     "recurring": {
-      "title": "No recurring transactions",
-      "description": "Set up automated tracking for regular expenses",
+      "title": "Automate the routine",
+      "description": "Set up tracking for regular expenses so nothing slips through",
       "cta": "Add Recurring"
     },
     "dashboardRecent": {
-      "title": "No recent activity",
-      "description": "Your latest transactions will appear here"
+      "title": "All caught up",
+      "description": "Your latest transactions will appear here as you go"
     },
     "welcome": {
       "title": "Welcome to SmartMoney",
-      "description": "Start by adding an account and importing your transactions",
+      "description": "Your personal finance companion — let's get started together",
       "cta": "Get Started"
     }
   },
@@ -2203,5 +2237,76 @@
     "good": "Good",
     "fair": "Fair",
     "needsWork": "Needs Work"
+  },
+  "duplicates": {
+    "title": "Duplicate Transactions",
+    "found": "{{count}} potential duplicates found",
+    "none": "No duplicates found",
+    "similarity": "{{percent}}% match",
+    "daysApart": "{{days}} day(s) apart",
+    "keepLeft": "Keep Left",
+    "keepRight": "Keep Right",
+    "keepBoth": "Keep Both",
+    "merged": "Duplicate removed",
+    "dismissed": "Marked as not duplicate",
+    "source": "Source",
+    "review": "Review Duplicates"
+  },
+  "velocity": {
+    "title": "Spending Velocity",
+    "perDay": "/day",
+    "projected": "Projected this month",
+    "dayProgress": "Day {{current}}/{{total}}",
+    "vsLastMonth": "vs last month",
+    "noData": "No spending data this month"
+  },
+  "holdings": {
+    "title": "Investments",
+    "subtitle": "Track your investment portfolio",
+    "add": "Add Holding",
+    "edit": "Edit Holding",
+    "assetName": "Asset Name",
+    "assetType": "Asset Type",
+    "ticker": "Ticker Symbol",
+    "unitLabel": "Unit Label",
+    "units": "Units",
+    "avgCost": "Avg Cost",
+    "currentPrice": "Current Price",
+    "updatePrice": "Update Price",
+    "priceAsOf": "Price as of {{date}}",
+    "stalePrice": "Price outdated",
+    "pnl": "P&L",
+    "totalValue": "Total Value",
+    "costBasis": "Cost Basis",
+    "currentValue": "Current Value",
+    "addPurchase": "Add Purchase",
+    "addSale": "Record Sale",
+    "lotHistory": "Transaction History",
+    "noHoldings": "No holdings yet",
+    "noHoldingsDesc": "Start tracking your investments",
+    "commodity": "Commodity",
+    "stock": "Stock",
+    "etf": "ETF",
+    "bond": "Bond",
+    "crypto": "Crypto",
+    "other": "Other",
+    "buy": "Buy",
+    "sell": "Sell",
+    "dividend": "Dividend",
+    "pricePerUnit": "Price per {{unit}}",
+    "totalAmount": "Total Amount",
+    "fee": "Fee (optional)",
+    "date": "Date",
+    "notes": "Notes (optional)",
+    "portfolioTotal": "Portfolio Total",
+    "deleteConfirm": "Are you sure you want to delete this holding?",
+    "deleteLotConfirm": "Delete this transaction?",
+    "created": "Holding created",
+    "updated": "Holding updated",
+    "deleted": "Holding deleted",
+    "lotAdded": "Transaction recorded",
+    "lotDeleted": "Transaction removed",
+    "priceUpdated": "Price updated",
+    "noPriceSet": "No price set"
   }
 }

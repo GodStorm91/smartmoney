@@ -1,54 +1,52 @@
 {
   "hero": {
-    "headline": "あなたのお金、あなたのデータ",
-    "subheadline": "プライバシー重視の家計簿アプリ。AI予算機能付き。クラウド不要、サブスク不要。",
+    "category": "海外生活者のための家計管理",
+    "headline": "あなたのお金。あなたの言語。あなたのサーバー。",
+    "subheadline": "多通貨対応の支出管理を自分のサーバーで。クラウド不要、サブスク不要、データ共有なし。",
     "cta": "無料で始める",
-    "seeLiveDemo": "デモを見る",
-    "valueProp1": "セルフホスト対応",
-    "valueProp2": "AI予算生成",
-    "valueProp3": "多通貨対応"
+    "seeLiveDemo": "デモを見る"
   },
   "features": {
-    "title": "必要な機能がすべて揃う",
-    "subtitle": "お金を効果的に管理するシンプルなツール",
+    "title": "海外生活に最適",
+    "subtitle": "円・ドン・ドルをまとめて管理",
     "dashboard": {
-      "title": "美しいダッシュボード",
-      "description": "総資産、収入、支出をインタラクティブなチャートで一目で確認"
+      "title": "資産を一目で把握",
+      "description": "複数通貨・口座の残高をひとつの画面で確認"
     },
     "transactions": {
-      "title": "簡単な取引入力",
-      "description": "クイック入力、レシートスキャン、MoneyForward・Zaimからのインポート"
+      "title": "どの銀行からもインポート",
+      "description": "MoneyForward・Zaim・銀行のCSVをそのまま取り込み"
     },
     "budget": {
       "title": "AI予算生成",
-      "description": "Claude AIがあなたの支出パターンを分析し、最適な予算を提案"
+      "description": "Claude AIが支出パターンを分析し、最適な予算を提案"
     },
     "analytics": {
-      "title": "詳細な分析",
-      "description": "月次トレンド、カテゴリ別内訳、支出インサイト"
+      "title": "お金の流れを可視化",
+      "description": "月次トレンドとカテゴリ別内訳を全通貨で分析"
     }
   },
   "howItWorks": {
     "title": "使い方",
-    "subtitle": "3つのステップで簡単スタート",
+    "subtitle": "3ステップで簡単スタート",
     "step1": {
       "title": "データをインポート",
       "description": "銀行や家計簿アプリからCSVをアップロード"
     },
     "step2": {
-      "title": "支出を分析",
-      "description": "毎月のお金の流れを把握"
+      "title": "全体像を把握",
+      "description": "ダッシュボードで毎月のお金の流れを確認"
     },
     "step3": {
-      "title": "予算を生成",
-      "description": "AIがあなた専用の予算を作成"
+      "title": "AIで賢く管理",
+      "description": "AIが自動で予算作成とインサイトを提供"
     }
   },
   "cta": {
-    "title": "今日からお金の管理を始めよう",
-    "subtitle": "無料で使える。セルフホスト。オープンソース。",
+    "title": "家計管理を始めよう",
+    "subtitle": "セルフホスト。オープンソース。データはあなたのもの。",
     "button": "無料で始める",
-    "openSource": "GitHubでオープンソース公開中",
+    "openSource": "GitHubで見る",
     "noAccount": "クレジットカード不要"
   },
   "footer": {

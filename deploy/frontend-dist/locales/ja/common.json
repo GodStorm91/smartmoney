@@ -27,7 +27,10 @@
     "collapse": "折りたたむ",
     "expand": "展開",
     "relocation": "引越し",
-    "benchmark": "ベンチマーク"
+    "benchmark": "ベンチマーク",
+    "finance": "ファイナンス",
+    "tools": "ツール",
+    "other": "その他"
   },
   "button": {
     "save": "保存",
@@ -209,6 +212,7 @@
     "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
     "viewAll": "すべて表示",
     "showLess": "折りたたむ",
+    "showMore": "詳細を表示",
     "viewTransactions": "取引を見る",
     "viewBreakdown": "内訳を見る",
     "learnMore": "詳細を見る",
@@ -298,8 +302,14 @@
     "deleteWarning": "この操作は取り消せません。本当に削除しますか？",
     "saved": "取引を保存しました！",
     "moreOptions": "詳細オプション",
+    "aiCategorizing": "AIが分類中...",
+    "aiSuggested": "AI提案",
+    "autoSuggested": "自動提案",
     "balanceAdjustment": "残高調整",
     "balanceAdjustmentHint": "予算に含めません",
+    "excludeFromBudget": "予算から除外",
+    "excludeFromBudgetHint": "予算には含まれません（分析には表示されます）",
+    "budgetExcluded": "予算除外",
     "currency": "通貨",
     "today": "今日",
     "cancel": "キャンセル",
@@ -419,7 +429,26 @@
     "thisMonth": "今月",
     "average": "3ヶ月平均",
     "vsAverage": "平均比",
-    "goal": "目標"
+    "goal": "目標",
+    "yoy": {
+      "title": "前年比較",
+      "thisYear": "今年",
+      "lastYear": "昨年",
+      "expenses": "支出",
+      "income": "収入",
+      "change": "前年比{{percent}}%",
+      "increase": "増加",
+      "decrease": "減少",
+      "noData": "比較に十分なデータがありません"
+    },
+    "heatmap": {
+      "title": "支出ヒートマップ",
+      "noData": "この期間の支出データがありません",
+      "dailyAvg": "曜日別平均",
+      "less": "少",
+      "more": "多",
+      "weekdays": ["月", "火", "水", "木", "金", "土", "日"]
+    }
   },
   "goals": {
     "title": "長期目標",
@@ -1262,6 +1291,11 @@
     "coverage": {
       "label": "総支出に対する予算カバー率"
     },
+    "excluded": {
+      "title": "予算から除外",
+      "total": "除外合計",
+      "noTransactions": "除外された取引はありません"
+    },
     "aiCategorize": {
       "title": "AI自動カテゴリ分類",
       "description": "AIが未分類の取引にカテゴリを提案します",
@@ -1946,52 +1980,52 @@
   },
   "emptyState": {
     "transactions": {
-      "title": "取引がありません",
-      "description": "CSVをアップロードするか、最初の取引を追加して記録を開始しましょう",
+      "title": "あなたの家計物語はここから",
+      "description": "CSVをアップロードするか、最初の取引を追加しましょう — 千里の道も一歩から",
       "cta": "取引を追加"
     },
     "goals": {
-      "title": "最初の貯蓄目標を設定",
-      "description": "1年、3年、5年、10年の目標を設定して進捗を追跡しましょう",
+      "title": "大きな夢を、小さな一歩から",
+      "description": "1年、3年、5年、10年の貯蓄目標を設定して、成長を見守りましょう",
       "cta": "目標を作成"
     },
     "budget": {
-      "title": "今月の予算が未設定です",
-      "description": "予算を作成して支出を計画と比較しましょう",
+      "title": "今月をコントロールしよう",
+      "description": "シンプルな予算で、安心して使えるようになります",
       "cta": "予算を作成"
     },
     "accounts": {
-      "title": "口座がまだありません",
-      "description": "銀行、クレジットカード、現金の口座を追加して残高管理を始めましょう",
+      "title": "まずは整理から",
+      "description": "銀行、クレジットカード、現金の口座を追加して全体像を把握しましょう",
       "cta": "最初の口座を追加"
     },
     "categories": {
-      "title": "支出データがありません",
-      "description": "取引を追加してカテゴリ別の支出内訳を確認しましょう",
+      "title": "支出パターンを発見しよう",
+      "description": "取引を追加して、お金の流れを可視化しましょう",
       "cta": "取引を追加"
     },
     "analytics": {
-      "title": "分析に十分なデータがありません",
-      "description": "1ヶ月以上の取引を追加してトレンドを確認しましょう",
+      "title": "インサイトはもうすぐ",
+      "description": "1ヶ月以上の取引を追加すると、トレンドやパターンが見えてきます",
       "cta": "CSVをアップロード"
     },
     "bills": {
-      "title": "請求書がありません",
-      "description": "定期的な請求書を追加して支払期限前にリマインダーを受け取りましょう",
+      "title": "支払い忘れをゼロに",
+      "description": "定期的な請求書を登録して、期限前にやさしくリマインドします",
       "cta": "請求書を追加"
     },
     "recurring": {
-      "title": "定期取引がありません",
-      "description": "定期的な支出の自動追跡を設定しましょう",
+      "title": "ルーティンを自動化",
+      "description": "定期的な支出を設定して、見落としを防ぎましょう",
       "cta": "定期取引を追加"
     },
     "dashboardRecent": {
-      "title": "最近の取引がありません",
-      "description": "最新の取引がここに表示されます"
+      "title": "すべてキャッチアップ済み",
+      "description": "最新の取引はここに表示されます"
     },
     "welcome": {
       "title": "SmartMoneyへようこそ",
-      "description": "口座を追加し、取引をインポートして始めましょう",
+      "description": "あなたの家計パートナー — 一緒に始めましょう",
       "cta": "始める"
     }
   },
@@ -2118,5 +2152,76 @@
     "good": "良好",
     "fair": "普通",
     "needsWork": "要改善"
+  },
+  "duplicates": {
+    "title": "重複取引",
+    "found": "{{count}}件の重複候補が見つかりました",
+    "none": "重複は見つかりませんでした",
+    "similarity": "{{percent}}%一致",
+    "daysApart": "{{days}}日の差",
+    "keepLeft": "左を残す",
+    "keepRight": "右を残す",
+    "keepBoth": "両方を残す",
+    "merged": "重複を削除しました",
+    "dismissed": "重複ではないとしてマークしました",
+    "source": "ソース",
+    "review": "重複を確認"
+  },
+  "velocity": {
+    "title": "支出ペース",
+    "perDay": "/日",
+    "projected": "今月の予測合計",
+    "dayProgress": "{{current}}日目/{{total}}日",
+    "vsLastMonth": "先月比",
+    "noData": "今月の支出データがありません"
+  },
+  "holdings": {
+    "title": "投資",
+    "subtitle": "投資ポートフォリオを追跡",
+    "add": "保有追加",
+    "edit": "保有編集",
+    "assetName": "資産名",
+    "assetType": "資産タイプ",
+    "ticker": "ティッカー",
+    "unitLabel": "単位",
+    "units": "数量",
+    "avgCost": "平均取得単価",
+    "currentPrice": "現在価格",
+    "updatePrice": "価格更新",
+    "priceAsOf": "{{date}}時点",
+    "stalePrice": "価格が古い",
+    "pnl": "損益",
+    "totalValue": "評価額",
+    "costBasis": "取得原価",
+    "currentValue": "現在評価額",
+    "addPurchase": "購入追加",
+    "addSale": "売却記録",
+    "lotHistory": "取引履歴",
+    "noHoldings": "保有資産なし",
+    "noHoldingsDesc": "投資の追跡を始めましょう",
+    "commodity": "商品",
+    "stock": "株式",
+    "etf": "ETF",
+    "bond": "債券",
+    "crypto": "暗号資産",
+    "other": "その他",
+    "buy": "購入",
+    "sell": "売却",
+    "dividend": "配当",
+    "pricePerUnit": "{{unit}}単価",
+    "totalAmount": "合計金額",
+    "fee": "手数料（任意）",
+    "date": "日付",
+    "notes": "メモ（任意）",
+    "portfolioTotal": "ポートフォリオ合計",
+    "deleteConfirm": "この保有を削除しますか？",
+    "deleteLotConfirm": "この取引を削除しますか？",
+    "created": "保有を追加しました",
+    "updated": "保有を更新しました",
+    "deleted": "保有を削除しました",
+    "lotAdded": "取引を記録しました",
+    "lotDeleted": "取引を削除しました",
+    "priceUpdated": "価格を更新しました",
+    "noPriceSet": "価格未設定"
   }
 }
