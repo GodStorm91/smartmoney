@@ -30,7 +30,10 @@
     "collapse": "Collapse",
     "expand": "Expand",
     "relocation": "Relocation",
-    "benchmark": "Benchmark"
+    "benchmark": "Benchmark",
+    "finance": "Finance",
+    "tools": "Tools",
+    "other": "Other"
   },
   "button": {
     "save": "Save",
@@ -240,6 +243,7 @@
     "insightsHint": "Keep tracking to see personalized insights",
     "viewAll": "View all",
     "showLess": "Show less",
+    "showMore": "Show details",
     "viewTransactions": "View Transactions",
     "viewBreakdown": "View Breakdown",
     "learnMore": "Learn More",

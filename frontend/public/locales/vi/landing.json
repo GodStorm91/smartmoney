@@ -1,54 +1,52 @@
 {
   "hero": {
-    "headline": "Quản lý tiền, sở hữu dữ liệu",
-    "subheadline": "Ứng dụng quản lý tài chính cá nhân với AI. Tự lưu trữ dữ liệu—không cloud, không phí hàng tháng.",
+    "category": "Quản lý tài chính cho người sống ở nước ngoài",
+    "headline": "Tiền của bạn. Ngôn ngữ của bạn. Server của bạn.",
+    "subheadline": "Theo dõi chi tiêu đa tiền tệ trên server riêng. Không cloud, không phí hàng tháng, không chia sẻ dữ liệu.",
     "cta": "Bắt đầu miễn phí",
-    "seeLiveDemo": "Xem Demo",
-    "valueProp1": "Tự lưu trữ",
-    "valueProp2": "Ngân sách AI",
-    "valueProp3": "Đa tiền tệ"
+    "seeLiveDemo": "Xem Demo"
   },
   "features": {
-    "title": "Đầy đủ tính năng",
-    "subtitle": "Công cụ đơn giản để quản lý tiền hiệu quả",
+    "title": "Thiết kế cho cuộc sống ở nước ngoài",
+    "subtitle": "Theo dõi JPY, VND, USD—tất cả trong một nơi",
     "dashboard": {
-      "title": "Bảng điều khiển đẹp mắt",
-      "description": "Xem tổng tài sản, thu nhập và chi tiêu với biểu đồ tương tác"
+      "title": "Tổng quan tài sản",
+      "description": "Xem số dư nhiều tiền tệ và tài khoản trên một màn hình"
     },
     "transactions": {
-      "title": "Nhập giao dịch dễ dàng",
-      "description": "Nhập nhanh, quét hóa đơn, import CSV từ ngân hàng"
+      "title": "Import từ mọi ngân hàng",
+      "description": "Import CSV từ ngân hàng hoặc ứng dụng tài chính"
     },
     "budget": {
       "title": "AI tạo ngân sách",
-      "description": "Claude AI phân tích chi tiêu và tạo ngân sách phù hợp với bạn"
+      "description": "Claude AI phân tích chi tiêu và tạo ngân sách phù hợp"
     },
     "analytics": {
-      "title": "Phân tích chi tiết",
-      "description": "Xu hướng hàng tháng, phân loại chi tiêu, thông tin chi tiết"
+      "title": "Biết tiền đi đâu",
+      "description": "Xu hướng hàng tháng và phân loại chi tiêu cho tất cả tiền tệ"
     }
   },
   "howItWorks": {
     "title": "Cách hoạt động",
-    "subtitle": "Bắt đầu với 3 bước đơn giản",
+    "subtitle": "Bắt đầu với 3 bước",
     "step1": {
       "title": "Import dữ liệu",
       "description": "Tải CSV từ ngân hàng hoặc ứng dụng tài chính"
     },
     "step2": {
-      "title": "Phân tích chi tiêu",
-      "description": "Xem tiền của bạn đi đâu mỗi tháng"
+      "title": "Xem toàn cảnh",
+      "description": "Dashboard cho thấy tiền đi đâu mỗi tháng"
     },
     "step3": {
-      "title": "Tạo ngân sách",
-      "description": "Để AI tạo ngân sách cá nhân cho bạn"
+      "title": "AI hỗ trợ",
+      "description": "AI tự động tạo ngân sách và đưa ra gợi ý"
     }
   },
   "cta": {
-    "title": "Bắt đầu quản lý tiền ngay hôm nay",
-    "subtitle": "Miễn phí. Tự lưu trữ. Mã nguồn mở.",
+    "title": "Kiểm soát tài chính của bạn",
+    "subtitle": "Tự lưu trữ. Mã nguồn mở. Dữ liệu thuộc về bạn.",
     "button": "Bắt đầu miễn phí",
-    "openSource": "Mã nguồn mở trên GitHub",
+    "openSource": "Xem trên GitHub",
     "noAccount": "Không cần thẻ tín dụng"
   },
   "footer": {

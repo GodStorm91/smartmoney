@@ -35,15 +35,15 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
   return (
     <Card className="p-3 sm:p-4">
       <div className="flex items-center justify-between mb-2.5 sm:mb-3">
-        <span className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em]">
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {t('dashboard.savingsRate', 'Savings Rate')}
         </span>
-        <span className={cn('text-[11px] font-bold px-2.5 py-1 rounded-full', status.bg, status.color)}>
+        <span className={cn('text-[11px] font-medium px-2.5 py-1 rounded-full', status.bg, status.color)}>
           {status.label}
         </span>
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-[1.75rem] sm:text-[2rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-[-0.02em] leading-none">
+        <span className="text-[1.75rem] sm:text-[2rem] font-bold font-numbers text-gray-900 dark:text-gray-100 tracking-[-0.02em] leading-none">
           {Math.round(rate)}%
         </span>
         <span className="text-xs font-medium text-gray-400 dark:text-gray-400">
@@ -53,7 +53,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
       <div className="w-full h-3 bg-gray-100 dark:bg-gray-700/60 rounded-full mt-4 overflow-hidden">
         <div
           className={cn(
-            'h-full rounded-full animate-progress-fill progress-glow',
+            'h-full rounded-full animate-progress-fill',
             rate >= 20 ? 'bg-income-600' : rate >= 10 ? 'bg-amber-500' : 'bg-expense-600'
           )}
           style={{ width: `${Math.min(100, rate)}%` }}

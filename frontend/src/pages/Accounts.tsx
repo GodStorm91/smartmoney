@@ -235,11 +235,11 @@ export default function Accounts() {
           <Card variant="glass" className="!p-5 bg-hero-gradient animate-fade-in">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
+                <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
                   {isSearching ? t('account.filteredBalance', 'Filtered Balance') : t('account.totalBalance', 'Total Balance')}
                 </p>
                 <p className={cn(
-                  'text-3xl sm:text-4xl font-extrabold font-numbers tabular-nums mt-1.5 tracking-tighter',
+                  'text-3xl sm:text-4xl font-bold font-numbers tabular-nums mt-1.5 tracking-tight',
                   totalBalance >= 0 ? 'text-income-600 dark:text-income-300' : 'text-expense-600 dark:text-expense-300'
                 )}>
                   {formatCurrencyPrivacy(totalBalance, 'JPY', exchangeRates?.rates || {}, true, isPrivacyMode)}

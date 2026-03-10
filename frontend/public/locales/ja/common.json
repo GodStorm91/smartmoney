@@ -27,7 +27,10 @@
     "collapse": "折りたたむ",
     "expand": "展開",
     "relocation": "引越し",
-    "benchmark": "ベンチマーク"
+    "benchmark": "ベンチマーク",
+    "finance": "ファイナンス",
+    "tools": "ツール",
+    "other": "その他"
   },
   "button": {
     "save": "保存",
@@ -209,6 +212,7 @@
     "insightsHint": "個人化されたインサイトを表示するために記録を続けてください",
     "viewAll": "すべて表示",
     "showLess": "折りたたむ",
+    "showMore": "詳細を表示",
     "viewTransactions": "取引を見る",
     "viewBreakdown": "内訳を見る",
     "learnMore": "詳細を見る",

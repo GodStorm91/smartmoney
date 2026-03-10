@@ -8,7 +8,7 @@ export const TIER_STORAGE_KEY = 'smartmoney-tier'
 export type Theme = 'light' | 'dark' | 'system'
 export type AccentColor = 'green' | 'blue' | 'purple' | 'orange' | 'rose' | 'teal'
 export type AppTier = 'pro' | 'lite'
-export type ColorTheme = 'default' | 'catppuccin-latte' | 'catppuccin-frappe' | 'catppuccin-macchiato' | 'catppuccin-mocha' | 'dracula' | 'dracula-light'
+export type ColorTheme = 'default'
 
 export const ACCENT_COLORS: { id: AccentColor; label: string; preview: string }[] = [
   { id: 'green', label: 'Emerald', preview: '#4CAF50' },
@@ -21,12 +21,6 @@ export const ACCENT_COLORS: { id: AccentColor; label: string; preview: string }[
 
 export const COLOR_THEMES: { id: ColorTheme; mode: 'light' | 'dark'; preview: { base: string; surface: string; text: string; primary: string } }[] = [
   { id: 'default', mode: 'light', preview: { base: '#f9fafb', surface: '#ffffff', text: '#111827', primary: '#4CAF50' } },
-  { id: 'catppuccin-latte', mode: 'light', preview: { base: '#eff1f5', surface: '#ccd0da', text: '#4c4f69', primary: '#7c3aed' } },
-  { id: 'catppuccin-frappe', mode: 'dark', preview: { base: '#303446', surface: '#414559', text: '#c6d0f5', primary: '#babbf1' } },
-  { id: 'catppuccin-macchiato', mode: 'dark', preview: { base: '#24273a', surface: '#363a4f', text: '#cad3f5', primary: '#91d7e3' } },
-  { id: 'catppuccin-mocha', mode: 'dark', preview: { base: '#1e1e2e', surface: '#313244', text: '#cdd6f4', primary: '#cba6f7' } },
-  { id: 'dracula', mode: 'dark', preview: { base: '#282a36', surface: '#44475a', text: '#f8f8f2', primary: '#bd93f9' } },
-  { id: 'dracula-light', mode: 'light', preview: { base: '#fffbeb', surface: '#dedccf', text: '#1f1f1f', primary: '#644ac9' } },
 ]
 
 export const VALID_COLOR_THEMES: ColorTheme[] = COLOR_THEMES.map(t => t.id)

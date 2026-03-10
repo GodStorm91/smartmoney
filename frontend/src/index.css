@@ -111,157 +111,6 @@
 
   /* === Color Theme Variables (HSL format, matching --primary-* pattern) === */
 
-  /* === Catppuccin Latte (Light) — Peach/Coral accent === */
-  :root[data-theme="catppuccin-latte"] {
-    --primary-50: 20 65% 95%;
-    --primary-100: 20 60% 90%;
-    --primary-200: 20 58% 82%;
-    --primary-300: 20 60% 72%;
-    --primary-400: 20 62% 62%;
-    --primary-500: 20 65% 58%;
-    --primary-600: 20 68% 48%;
-    --primary-700: 20 72% 39%;
-    --primary-800: 20 75% 31%;
-    --primary-900: 20 78% 23%;
-    /* Surface: Latte palette — light theme, gray scale maps dark-to-light */
-    --gray-50: 220 23% 95%;    /* Base #eff1f5 */
-    --gray-100: 220 22% 92%;   /* Mantle #e6e9ef */
-    --gray-200: 223 16% 83%;   /* Surface0 #ccd0da */
-    --gray-300: 225 14% 77%;   /* Surface1 #bcc0cc */
-    --gray-400: 228 11% 65%;   /* Overlay0 #9ca0b0 */
-    --gray-500: 231 10% 59%;   /* Overlay1 #8c8fa1 */
-    --gray-600: 233 10% 47%;   /* Subtext0 #6c6f85 */
-    --gray-700: 233 13% 41%;   /* Subtext1 #5c5f77 */
-    --gray-800: 234 16% 35%;   /* Text #4c4f69 */
-    --gray-900: 234 16% 35%;   /* Text #4c4f69 */
-
-  }
-
-  /* === Catppuccin Frappe (Dark) — Teal accent === */
-  :root[data-theme="catppuccin-frappe"] {
-    --primary-50: 173 50% 95%;
-    --primary-100: 173 46% 88%;
-    --primary-200: 173 48% 78%;
-    --primary-300: 173 50% 68%;
-    --primary-400: 173 50% 58%;
-    --primary-500: 173 50% 50%;
-    --primary-600: 173 54% 42%;
-    --primary-700: 173 58% 34%;
-    --primary-800: 173 62% 26%;
-    --primary-900: 173 65% 19%;
-    /* Surface: Frappe palette — dark theme, gray scale maps light-to-dark */
-    --gray-50: 227 70% 87%;    /* Text #c6d0f5 */
-    --gray-100: 227 44% 80%;   /* Subtext1 #b5bfe2 */
-    --gray-200: 228 29% 73%;   /* Subtext0 #a5adce */
-    --gray-300: 227 17% 58%;   /* Overlay1 #838ba7 */
-    --gray-400: 229 13% 52%;   /* Overlay0 #737994 */
-    --gray-500: 228 13% 44%;   /* Surface2 #626880 */
-    --gray-600: 227 15% 37%;   /* Surface1 #51576d */
-    --gray-700: 230 16% 30%;   /* Surface0 #414559 */
-    --gray-800: 229 19% 23%;   /* Base #303446 */
-    --gray-900: 229 20% 17%;   /* Crust #232634 */
-  }
-
-  /* === Catppuccin Macchiato (Dark) — Mauve/Pink accent === */
-  :root[data-theme="catppuccin-macchiato"] {
-    --primary-50: 322 60% 95%;
-    --primary-100: 322 55% 88%;
-    --primary-200: 322 58% 78%;
-    --primary-300: 322 60% 68%;
-    --primary-400: 322 60% 60%;
-    --primary-500: 322 60% 54%;
-    --primary-600: 322 62% 45%;
-    --primary-700: 322 65% 37%;
-    --primary-800: 322 68% 29%;
-    --primary-900: 322 70% 21%;
-    /* Surface: Macchiato palette */
-    --gray-50: 227 68% 88%;    /* Text #cad3f5 */
-    --gray-100: 228 39% 80%;   /* Subtext1 #b8c0e0 */
-    --gray-200: 227 27% 72%;   /* Subtext0 #a5adcb */
-    --gray-300: 228 15% 57%;   /* Overlay1 #8087a2 */
-    --gray-400: 230 12% 49%;   /* Overlay0 #6e738d */
-    --gray-500: 230 14% 41%;   /* Surface2 #5b6078 */
-    --gray-600: 231 16% 34%;   /* Surface1 #494d64 */
-    --gray-700: 230 19% 26%;   /* Surface0 #363a4f */
-    --gray-800: 232 23% 18%;   /* Base #24273a */
-    --gray-900: 236 23% 12%;   /* Crust #181926 */
-  }
-
-  /* === Catppuccin Mocha (Dark) — Sky Blue accent === */
-  :root[data-theme="catppuccin-mocha"] {
-    --primary-50: 189 65% 95%;
-    --primary-100: 189 60% 88%;
-    --primary-200: 189 62% 78%;
-    --primary-300: 189 65% 68%;
-    --primary-400: 189 65% 58%;
-    --primary-500: 189 65% 52%;
-    --primary-600: 189 68% 43%;
-    --primary-700: 189 72% 35%;
-    --primary-800: 189 75% 27%;
-    --primary-900: 189 78% 20%;
-    /* Surface: Mocha palette */
-    --gray-50: 226 64% 88%;    /* Text #cdd6f4 */
-    --gray-100: 227 35% 80%;   /* Subtext1 #bac2de */
-    --gray-200: 228 24% 72%;   /* Subtext0 #a6adc8 */
-    --gray-300: 230 13% 55%;   /* Overlay1 #7f849c */
-    --gray-400: 231 11% 47%;   /* Overlay0 #6c7086 */
-    --gray-500: 232 12% 39%;   /* Surface2 #585b70 */
-    --gray-600: 234 13% 31%;   /* Surface1 #45475a */
-    --gray-700: 237 16% 23%;   /* Surface0 #313244 */
-    --gray-800: 240 21% 15%;   /* Base #1e1e2e */
-    --gray-900: 240 23% 9%;    /* Crust #11111b */
-  }
-
-  /* === Dracula (Dark) — Dracula Cyan accent === */
-  :root[data-theme="dracula"] {
-    --primary-50: 191 75% 95%;
-    --primary-100: 191 70% 88%;
-    --primary-200: 191 72% 78%;
-    --primary-300: 191 75% 68%;
-    --primary-400: 191 75% 60%;
-    --primary-500: 191 75% 54%;
-    --primary-600: 191 78% 44%;
-    --primary-700: 191 82% 36%;
-    --primary-800: 191 85% 28%;
-    --primary-900: 191 88% 20%;
-    /* Surface: Dracula palette */
-    --gray-50: 60 30% 96%;     /* Foreground #f8f8f2 */
-    --gray-100: 60 20% 88%;    /* Foreground dimmed */
-    --gray-200: 60 10% 75%;    /* Foreground muted */
-    --gray-300: 225 27% 60%;   /* Comment lighter */
-    --gray-400: 225 27% 51%;   /* Comment #6272a4 */
-    --gray-500: 231 10% 29%;   /* Bg lighter #424450 */
-    --gray-600: 230 15% 24%;   /* Bg light #343746 */
-    --gray-700: 232 14% 31%;   /* Current Line #44475a */
-    --gray-800: 231 15% 18%;   /* Background #282a36 */
-    --gray-900: 232 14% 11%;   /* Bg darker #191a21 */
-  }
-
-  /* === Dracula Light / Alucard (Light) — Dracula Pink accent === */
-  :root[data-theme="dracula-light"] {
-    --primary-50: 326 55% 96%;
-    --primary-100: 326 50% 90%;
-    --primary-200: 326 52% 82%;
-    --primary-300: 326 55% 72%;
-    --primary-400: 326 55% 62%;
-    --primary-500: 326 55% 56%;
-    --primary-600: 326 58% 46%;
-    --primary-700: 326 62% 38%;
-    --primary-800: 326 65% 30%;
-    --primary-900: 326 68% 22%;
-    /* Surface: Alucard palette — light theme */
-    --gray-50: 48 100% 96%;    /* Background #fffbeb */
-    --gray-100: 54 37% 90%;    /* Bg light #efeddc */
-    --gray-200: 52 19% 84%;    /* Current Line #dedccf */
-    --gray-300: 51 13% 78%;    /* Bg dark #ceccc0 */
-    --gray-400: 49 18% 36%;    /* Comment #6c664b */
-    --gray-500: 49 14% 46%;    /* Comment lighter */
-    --gray-600: 0 0% 35%;      /* Fg muted */
-    --gray-700: 0 0% 22%;      /* Fg dimmed */
-    --gray-800: 0 0% 12%;      /* Foreground #1f1f1f */
-    --gray-900: 0 0% 12%;      /* Foreground #1f1f1f */
-  }
-
   html {
     @apply font-sans;
   }
@@ -383,8 +232,8 @@
   /* Staggered entry animation using CSS custom property */
   .animate-stagger-in {
     opacity: 0;
-    animation: staggerFadeSlideUp 0.4s ease-out forwards;
-    animation-delay: calc(var(--stagger-index, 0) * 60ms);
+    animation: staggerFadeSlideUp 0.25s ease-out forwards;
+    animation-delay: calc(var(--stagger-index, 0) * 40ms);
   }
 
   @keyframes staggerFadeSlideUp {
@@ -655,58 +504,44 @@
     box-shadow: 0 0 10px 2px hsl(var(--primary-500) / 0.25);
   }
 
-  /* Elevated card shadow — richer depth */
+  /* Elevated card shadow — subtle depth */
   .shadow-card {
     box-shadow:
-      0 1px 2px hsl(var(--primary-900) / 0.04),
-      0 4px 12px hsl(var(--primary-900) / 0.06);
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
   .dark .shadow-card {
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.2),
-      0 4px 12px rgba(0, 0, 0, 0.15);
+      0 1px 3px rgba(0, 0, 0, 0.15),
+      0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
-  /* Hero shadow — dramatic elevation for the main card */
+  /* Hero shadow — gentle elevation for the main card */
   .shadow-hero {
     box-shadow:
-      0 1px 3px hsl(var(--primary-900) / 0.06),
-      0 8px 24px hsl(var(--primary-900) / 0.08),
-      0 20px 48px hsl(var(--primary-900) / 0.04);
+      0 1px 3px rgba(0, 0, 0, 0.06),
+      0 4px 16px rgba(0, 0, 0, 0.04);
   }
 
   .dark .shadow-hero {
     box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.25),
-      0 8px 24px rgba(0, 0, 0, 0.2),
-      0 20px 48px rgba(0, 0, 0, 0.1);
+      0 1px 3px rgba(0, 0, 0, 0.2),
+      0 4px 16px rgba(0, 0, 0, 0.12);
   }
 
-  /* Hero gradient for key surfaces — richer, more confident */
+  /* Hero gradient for key surfaces — subtle tint */
   .bg-hero-gradient {
-    background: linear-gradient(
-      145deg,
-      hsl(var(--primary-50)) 0%,
-      hsl(var(--primary-100) / 0.6) 40%,
-      hsl(var(--net-50) / 0.4) 100%
-    );
+    background: hsl(var(--primary-50));
   }
 
   .dark .bg-hero-gradient {
-    background: linear-gradient(
-      145deg,
-      hsl(var(--primary-900) / 0.35) 0%,
-      hsl(var(--gray-800, 25 17% 18%)) 45%,
-      hsl(var(--net-900) / 0.25) 100%
-    );
+    background: hsl(var(--primary-900) / 0.15);
   }
 
   /* Accent border glow for focused/active cards */
   .ring-glow {
-    box-shadow:
-      0 0 0 2px hsl(var(--primary-500) / 0.2),
-      0 0 12px hsl(var(--primary-500) / 0.1);
+    box-shadow: 0 0 0 1px hsl(var(--primary-500) / 0.15);
   }
 
   /* Hide scrollbar utility */

@@ -268,11 +268,11 @@ export function SwipeableTransactionCard({
         }`}>
           <div className="flex justify-between items-start mb-2 gap-2">
             <div className="min-w-0">
-              <p className="font-semibold text-gray-900 dark:text-gray-50 truncate">{transaction.description}</p>
+              <p className="font-medium text-gray-900 dark:text-gray-50 truncate">{transaction.description}</p>
               <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(transaction.date)}</p>
             </div>
             <p
-              className={`text-lg sm:text-xl font-extrabold font-numbers shrink-0 ml-2 ${
+              className={`text-base sm:text-lg font-bold font-numbers shrink-0 ml-2 ${
                 transaction.is_transfer
                   ? 'text-net-600 dark:text-net-300'
                   : transaction.type === 'income'

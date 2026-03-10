@@ -9,6 +9,7 @@ import {
   PieChart,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
 } from 'lucide-react'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
 import { useGreeting } from '@/hooks/useGreeting'
@@ -59,6 +60,7 @@ export function Dashboard() {
   const { greeting, subtitle: greetingSubtitle, emoji } = useGreeting(profile?.display_name)
 
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [showDetails, setShowDetails] = useState(false)
 
   const { data: summary, isLoading: summaryLoading } = useQuery({
     queryKey: ['dashboard-summary'],
@@ -192,7 +194,7 @@ export function Dashboard() {
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-[0.12em]">
+            <h1 className="text-sm font-medium text-gray-500 dark:text-gray-400">
               {formatMonth(currentDate)}
             </h1>
             <button
@@ -204,7 +206,7 @@ export function Dashboard() {
             </button>
           </div>
           <div>
-            <h2 className="text-[1.875rem] sm:text-[2.25rem] font-extrabold text-gray-900 dark:text-white tracking-tight leading-tight">
+            <h2 className="text-[1.875rem] sm:text-[2.25rem] font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
               {emoji} {greeting}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
@@ -228,18 +230,17 @@ export function Dashboard() {
                 <Link
                   key={idx}
                   to={action.to}
-                  className="flex flex-col items-center gap-2 p-1 animate-stagger-in"
-                  style={{ '--stagger-index': idx } as React.CSSProperties}
+                  className="flex flex-col items-center gap-2 p-1"
                 >
                   <div className={cn(
-                    'w-14 h-14 rounded-2xl flex items-center justify-center shadow-md',
-                    'transition-all duration-150 ease-out hover:scale-[1.08] hover:shadow-lg active:scale-95 active:duration-[50ms]',
+                    'w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm',
+                    'transition-all duration-150 ease-out hover:scale-[1.04] active:scale-95 active:duration-[50ms]',
                     'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2',
                     action.color
                   )}>
                     <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
-                  <span className="text-[11px] font-bold text-gray-600 dark:text-gray-400">
+                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">
                     {action.label}
                   </span>
                 </Link>
@@ -270,75 +271,84 @@ export function Dashboard() {
         {/* 6. Monthly Summary — income/expenses + savings rate */}
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
-            <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
-              <QuickStatCard
-                label={t('dashboard.income', 'Income')}
-                value={currentMonth?.income || 0}
-                change={5.2}
-                isPositive
-                formatCurrency={formatCurrency}
-                className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
-              />
-            </div>
-            <div className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
-              <QuickStatCard
-                label={t('dashboard.expenses', 'Expenses')}
-                value={currentMonth?.expenses || 0}
-                change={-2.1}
-                isPositive={false}
-                formatCurrency={formatCurrency}
-                className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
-              />
-            </div>
+            <QuickStatCard
+              label={t('dashboard.income', 'Income')}
+              value={currentMonth?.income || 0}
+              change={5.2}
+              isPositive
+              formatCurrency={formatCurrency}
+              className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
+            />
+            <QuickStatCard
+              label={t('dashboard.expenses', 'Expenses')}
+              value={currentMonth?.expenses || 0}
+              change={-2.1}
+              isPositive={false}
+              formatCurrency={formatCurrency}
+              className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
+            />
           </div>
 
           <SavingsRateCard rate={savingsRate} />
         </div>
 
-        {/* 7. Net Worth Trend */}
-        <NetWorthTrendChart data={monthlyTrends} />
+        {/* Show details toggle */}
+        <button
+          onClick={() => setShowDetails(!showDetails)}
+          className="w-full py-3 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center gap-2 transition-colors"
+        >
+          {showDetails ? t('dashboard.showLess', 'Show less') : t('dashboard.showMore', 'Show details')}
+          <ChevronDown className={cn('w-4 h-4 transition-transform', showDetails && 'rotate-180')} />
+        </button>
 
-        {/* 8. Cashflow Forecast */}
-        <CashFlowForecastCard />
+        {showDetails && (
+          <div className="space-y-4 sm:space-y-5 animate-fade-in">
+            {/* Net Worth Trend */}
+            <NetWorthTrendChart data={monthlyTrends} />
 
-        {/* 9. Spending Velocity */}
-        <SpendingVelocityCard />
+            {/* Cashflow Forecast */}
+            <CashFlowForecastCard />
 
-        {/* 10. AI Insights */}
-        {liveInsights && liveInsights.insights.length > 0 && (
-          <InsightCards insights={liveInsights.insights} />
+            {/* Spending Velocity */}
+            <SpendingVelocityCard />
+
+            {/* AI Insights */}
+            {liveInsights && liveInsights.insights.length > 0 && (
+              <InsightCards insights={liveInsights.insights} />
+            )}
+
+            {/* Financial Health Score */}
+            {healthScore && <HealthScoreCard data={healthScore} />}
+
+            {/* Investment Holdings */}
+            <HoldingsWidget />
+
+            {/* Recent Transactions */}
+            <RecentTransactionsCard
+              transactions={recentTransactions}
+              formatCurrency={formatTransactionCurrency}
+            />
+
+            {/* Spending Calendar (lazy-loaded) */}
+            <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
+              <SpendingCalendar onDayClick={handleDayClick} />
+            </Suspense>
+
+            {/* Goals Progress */}
+            <DashboardGoalsSection
+              goalsProgress={goalsProgress}
+              goalsCount={goals?.length ?? 0}
+              formatCurrency={formatTransactionCurrency}
+            />
+
+            {/* Subscriptions Widget */}
+            <SubscriptionsWidget
+              recurringTxns={recurringTxns}
+              formatCurrency={formatCurrency}
+              rates={exchangeRates?.rates || {}}
+            />
+          </div>
         )}
-
-        {/* 11. Financial Health Score */}
-        {healthScore && <HealthScoreCard data={healthScore} />}
-
-        {/* 11.5. Investment Holdings */}
-        <HoldingsWidget />
-
-        {/* 12. Recent Transactions */}
-        <RecentTransactionsCard
-          transactions={recentTransactions}
-          formatCurrency={formatTransactionCurrency}
-        />
-
-        {/* 13. Spending Calendar (lazy-loaded) */}
-        <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
-          <SpendingCalendar onDayClick={handleDayClick} />
-        </Suspense>
-
-        {/* 14. Goals Progress */}
-        <DashboardGoalsSection
-          goalsProgress={goalsProgress}
-          goalsCount={goals?.length ?? 0}
-          formatCurrency={formatTransactionCurrency}
-        />
-
-        {/* 15. Subscriptions Widget */}
-        <SubscriptionsWidget
-          recurringTxns={recurringTxns}
-          formatCurrency={formatCurrency}
-          rates={exchangeRates?.rates || {}}
-        />
       </div>
 
       {/* Day Detail Modal */}

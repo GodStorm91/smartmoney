@@ -44,23 +44,30 @@ export const NAV_CONFIG: Record<string, NavItemConfig> = {
 
 const navItems: NavItemConfig[] = [
   NAV_CONFIG.home,
-  NAV_CONFIG.budget,
-  NAV_CONFIG.accounts,
   NAV_CONFIG.transactions,
 ]
 
-const primaryMenuItems: NavItemConfig[] = [
-  NAV_CONFIG.investments,
-  NAV_CONFIG.gamification,
-  NAV_CONFIG.analytics,
-  NAV_CONFIG.goals,
-  NAV_CONFIG.relocation,
-  NAV_CONFIG.proxy,
+// More sheet groups
+const quickAccessItems: NavItemConfig[] = [
+  NAV_CONFIG.budget,
+  NAV_CONFIG.accounts,
 ]
 
-const secondaryMenuItems: NavItemConfig[] = [
-  NAV_CONFIG.settings,
+const financeItems: NavItemConfig[] = [
+  NAV_CONFIG.investments,
+  NAV_CONFIG.analytics,
+  NAV_CONFIG.goals,
+]
+
+const toolsItems: NavItemConfig[] = [
+  NAV_CONFIG.proxy,
+  NAV_CONFIG.relocation,
   NAV_CONFIG.upload,
+]
+
+const otherItems: NavItemConfig[] = [
+  NAV_CONFIG.gamification,
+  NAV_CONFIG.settings,
 ]
 
 // Custom More icon (three dots)
@@ -92,93 +99,75 @@ export function BottomNavigation() {
     return location.pathname.startsWith(path)
   }
 
-  const isPrimaryActive = primaryMenuItems.some(item => isActive(item.path))
+  const allMoreItems = [...quickAccessItems, ...financeItems, ...toolsItems, ...otherItems]
+  const isMoreActive = allMoreItems.some(item => isActive(item.path))
+
+  const renderMenuGroup = (items: NavItemConfig[], label?: string) => (
+    <div>
+      {label && (
+        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 mb-2 px-2">
+          {label}
+        </h3>
+      )}
+      <div className="space-y-1">
+        {items.map((item) => {
+          const active = isActive(item.path)
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              onClick={() => setIsMoreOpen(false)}
+              className={cn(
+                'flex items-center gap-4 px-4 py-3 rounded-xl transition-all',
+                active
+                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
+                  : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
+              )}
+            >
+              <div className={cn(
+                'w-10 h-10 flex items-center justify-center rounded-lg',
+                active ? 'bg-primary-100 dark:bg-primary-900/50' : 'bg-gray-100 dark:bg-gray-800'
+              )}>
+                <item.icon className="w-5 h-5" strokeWidth={1.5} />
+              </div>
+              <span className="font-medium flex-1">{t(item.labelKey)}</span>
+              <ChevronRight className="w-4 h-4 text-gray-400" />
+            </Link>
+          )
+        })}
+      </div>
+    </div>
+  )
 
   return (
     <>
       {isMoreOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 bg-black/40 z-40 md:hidden animate-fade-in"
           onClick={() => setIsMoreOpen(false)}
         />
       )}
 
       {isMoreOpen && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50 md:hidden rounded-t-3xl shadow-2xl animate-slide-up max-h-[85vh] overflow-y-auto">
+        <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 z-50 md:hidden rounded-t-3xl shadow-lg animate-slide-up max-h-[85vh] overflow-y-auto">
           {/* Handle Bar */}
           <div className="flex justify-center pt-3 pb-2">
             <div className="w-10 h-1 bg-gray-300 dark:bg-gray-600 rounded-full" />
           </div>
 
           {/* Menu Items */}
-          <div className="p-4 space-y-6">
-            {/* Primary Menu */}
-            <div>
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-2">
-                {t('nav.explore', 'Explore')}
-              </h3>
-              <div className="space-y-1">
-                {primaryMenuItems.map((item) => {
-                  const active = isActive(item.path)
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={() => setIsMoreOpen(false)}
-                      className={cn(
-                        'flex items-center gap-4 px-4 py-3 rounded-xl transition-all',
-                        active
-                          ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      )}
-                    >
-                      <div className={cn(
-                        'w-10 h-10 flex items-center justify-center rounded-lg',
-                        active ? 'bg-primary-100 dark:bg-primary-900/50' : 'bg-gray-100 dark:bg-gray-800'
-                      )}>
-                        <item.icon className="w-5 h-5" strokeWidth={1.5} />
-                      </div>
-                      <span className="font-medium flex-1">{t(item.labelKey)}</span>
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
+          <div className="p-4 space-y-5">
+            {/* Quick Access — no header, promoted */}
+            {renderMenuGroup(quickAccessItems)}
 
-            {/* Secondary Menu */}
-            <div>
-              <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-2">
-                {t('nav.settings', 'Settings')}
-              </h3>
-              <div className="space-y-1">
-                {secondaryMenuItems.map((item) => {
-                  const active = isActive(item.path)
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={() => setIsMoreOpen(false)}
-                      className={cn(
-                        'flex items-center gap-4 px-4 py-3 rounded-xl transition-all',
-                        active
-                          ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'
-                      )}
-                    >
-                      <div className={cn(
-                        'w-10 h-10 flex items-center justify-center rounded-lg',
-                        active ? 'bg-primary-100 dark:bg-primary-900/50' : 'bg-gray-100 dark:bg-gray-800'
-                      )}>
-                        <item.icon className="w-5 h-5" strokeWidth={1.5} />
-                      </div>
-                      <span className="font-medium flex-1">{t(item.labelKey)}</span>
-                      <ChevronRight className="w-4 h-4 text-gray-400" />
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
+            {/* Finance */}
+            {renderMenuGroup(financeItems, t('nav.finance', 'Finance'))}
+
+            {/* Tools */}
+            {renderMenuGroup(toolsItems, t('nav.tools', 'Tools'))}
+
+            {/* Other */}
+            {renderMenuGroup(otherItems, t('nav.other', 'Other'))}
 
             {/* Logout */}
             <button
@@ -199,7 +188,7 @@ export function BottomNavigation() {
         </div>
       )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200/60 dark:border-gray-700/60 z-50 md:hidden safe-area-bottom shadow-[0_-4px_16px_-2px_rgba(0,0,0,0.12)]">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 supports-[backdrop-filter]:bg-white/95 supports-[backdrop-filter]:dark:bg-gray-800/95 backdrop-blur-lg border-t border-gray-200/60 dark:border-gray-700/60 z-50 md:hidden safe-area-bottom shadow-[0_-4px_16px_-2px_rgba(0,0,0,0.12)] transform-gpu">
         <div className="flex items-stretch justify-around h-[calc(4rem+env(safe-area-inset-bottom,0px))]">
           {navItems.map((item) => {
             const active = isActive(item.path)
@@ -234,7 +223,7 @@ export function BottomNavigation() {
             onClick={() => setIsMoreOpen(!isMoreOpen)}
             className={cn(
               'flex flex-col items-center justify-center flex-1 px-1 transition-all relative',
-              isPrimaryActive || isMoreOpen
+              isMoreActive || isMoreOpen
                 ? 'text-primary-600 dark:text-primary-400'
                 : 'text-gray-400 dark:text-gray-500'
             )}

@@ -27,7 +27,10 @@
     "collapse": "Thu gọn",
     "expand": "Mở rộng",
     "relocation": "Chuyển chỗ ở",
-    "benchmark": "Chuẩn"
+    "benchmark": "Chuẩn",
+    "finance": "Tài chính",
+    "tools": "Công cụ",
+    "other": "Khác"
   },
   "button": {
     "save": "Lưu",
@@ -219,6 +222,7 @@
     "unusualSpendingDesc": "Tăng {{change}}% so với tháng trước",
     "viewAll": "Xem tất cả",
     "showLess": "Thu gọn",
+    "showMore": "Xem chi tiết",
     "spendingSpike": "Chi tiêu tăng đột biến",
     "savingsWin": "Tiết kiệm thành công",
     "budgetPace": "Tiến độ ngân sách",

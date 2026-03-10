@@ -37,12 +37,9 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
       )}
       onClick={() => setExpanded(!expanded)}
     >
-      {/* Subtle accent stripe at top */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-400 via-primary-500 to-net-300 opacity-60" />
-
-      <div className="flex items-center gap-2 mb-1 pt-1">
+      <div className="flex items-center gap-2 mb-1">
         <Wallet className="w-4 h-4 text-primary-600 dark:text-primary-300" />
-        <span className="text-[11px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em]">
+        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {t('dashboard.netWorth', 'Net Worth')}
         </span>
       </div>
@@ -56,7 +53,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
 
       {monthlyNet !== 0 && (
         <div className={cn(
-          'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-bold animate-scale-in',
+          'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-medium',
           monthlyNet >= 0
             ? 'bg-income-100/80 text-income-600 dark:bg-income-900/20 dark:text-income-300'
             : 'bg-expense-100/80 text-expense-600 dark:bg-expense-900/20 dark:text-expense-300'
@@ -73,13 +70,13 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
         <div className="mt-5 pt-4 border-t border-gray-200/40 dark:border-gray-700/40 animate-fade-in">
           <div className="grid grid-cols-2 gap-3 sm:gap-6">
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-0.5">{t('dashboard.assets', 'Assets')}</p>
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-400 mb-0.5">{t('dashboard.assets', 'Assets')}</p>
               <p className="text-lg font-bold font-numbers text-income-600 dark:text-income-300">
                 {formatCurrency(assets)}
               </p>
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-400 uppercase tracking-wider mb-0.5">{t('dashboard.liabilities', 'Liabilities')}</p>
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-400 mb-0.5">{t('dashboard.liabilities', 'Liabilities')}</p>
               <p className="text-lg font-bold font-numbers text-expense-600 dark:text-expense-300">
                 {formatCurrency(liabilities)}
               </p>
