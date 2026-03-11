@@ -43,7 +43,7 @@ export function MetricCard({
         className
       )}
     >
-      <p className="text-[11px] font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
         {trend !== 'neutral' && (
           <span className={cn(
             'w-1.5 h-1.5 rounded-full flex-shrink-0',
@@ -53,7 +53,7 @@ export function MetricCard({
         {label}
       </p>
       <p className={cn(
-        'font-extrabold tracking-tight text-gray-900 dark:text-gray-100 font-numbers truncate',
+        'font-bold tracking-tight text-gray-900 dark:text-gray-100 font-numbers truncate',
         hero ? 'text-2xl sm:text-4xl tracking-tighter' : 'text-xl sm:text-2xl'
       )}>
         {value}

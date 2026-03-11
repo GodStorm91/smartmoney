@@ -143,7 +143,7 @@ function CardHeader({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
       <div className="p-2 rounded-xl bg-expense-100 dark:bg-expense-900/30">
         <LayoutGrid className="w-4 h-4 text-expense-600 dark:text-expense-400" />
       </div>
-      <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+      <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
         {t('heatmap.title')}
       </h3>
     </div>

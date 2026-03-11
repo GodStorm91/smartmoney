@@ -212,7 +212,7 @@ export function BottomNavigation() {
                 )}>
                   <item.icon className="w-6 h-6" strokeWidth={active ? 2.2 : 1.5} />
                 </div>
-                <span className="text-[10px] font-medium mt-1 truncate max-w-full px-0.5">
+                <span className="text-xs font-medium mt-0.5 truncate max-w-full px-0.5 leading-tight">
                   {t(item.labelKey)}
                 </span>
               </Link>
@@ -237,7 +237,7 @@ export function BottomNavigation() {
             )}>
               <MoreIcon className="w-6 h-6" />
             </div>
-            <span className="text-[10px] font-medium mt-1">
+            <span className="text-xs font-medium mt-0.5 leading-tight">
               {t('nav.more')}
             </span>
           </button>

@@ -104,7 +104,7 @@ export function BudgetPulseHero({
         </div>
 
         <p className={cn(
-          'text-3xl sm:text-4xl font-extrabold tracking-tight',
+          'text-3xl sm:text-4xl font-bold tracking-tight',
           availableToSpend < 0 ? 'text-expense-600 dark:text-expense-300' : health.color
         )}>
           {availableToSpend < 0 && '−'}{fmt(Math.abs(availableToSpend))}

@@ -76,7 +76,7 @@ export function YoYComparisonChart() {
           <div className="p-2 rounded-xl bg-net-100 dark:bg-net-900/30">
             <CalendarRange className="w-4 h-4 text-net-600 dark:text-net-400" />
           </div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('yoy.title')}
           </h3>
         </div>

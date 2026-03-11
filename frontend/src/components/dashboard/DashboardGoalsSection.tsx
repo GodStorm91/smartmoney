@@ -22,7 +22,7 @@ export function DashboardGoalsSection({ goalsProgress, goalsCount, formatCurrenc
             <div className="p-1.5 rounded-xl bg-pink-100 dark:bg-pink-900/30">
               <Target className="w-4 h-4 text-pink-600 dark:text-pink-400" />
             </div>
-            <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+            <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               {t('dashboard.goals', 'Goals')}
             </h3>
           </div>
@@ -38,8 +38,7 @@ export function DashboardGoalsSection({ goalsProgress, goalsCount, formatCurrenc
             progress.achievability && (
               <div
                 key={progress.goal_id}
-                className="animate-stagger-in"
-                style={{ '--stagger-index': idx } as React.CSSProperties}
+                className=""
               >
                 <MiniGoalCard
                   years={progress.years}
@@ -60,7 +59,7 @@ export function DashboardGoalsSection({ goalsProgress, goalsCount, formatCurrenc
       <Link to="/goals">
         <Card className="p-4 border-2 border-dashed border-pink-200 dark:border-pink-800/40 hover:border-pink-300 dark:hover:border-pink-700 hover:shadow-lg transition-all cursor-pointer group">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-pink-100 dark:bg-pink-900/30 rounded-xl group-hover:scale-110 transition-transform">
+            <div className="p-2.5 bg-pink-100 dark:bg-pink-900/30 rounded-xl group-hover:scale-105 transition-transform">
               <Target className="w-5 h-5 text-pink-600 dark:text-pink-400" />
             </div>
             <div>

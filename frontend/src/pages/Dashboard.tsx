@@ -240,7 +240,7 @@ export function Dashboard() {
                   )}>
                     <Icon className="w-6 h-6 text-white" strokeWidth={2} />
                   </div>
-                  <span className="text-[11px] font-medium text-gray-600 dark:text-gray-400">
+                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
                     {action.label}
                   </span>
                 </Link>

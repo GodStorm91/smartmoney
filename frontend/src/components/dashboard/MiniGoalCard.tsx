@@ -20,7 +20,7 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
   return (
     <div className="flex items-center gap-3 p-3.5 bg-gray-50/80 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700/50">
       <div className={cn(
-        'w-11 h-11 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0',
+        'w-11 h-11 rounded-xl flex items-center justify-center text-sm font-bold shrink-0',
         progressPct >= 100
           ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300 animate-success-pop'
           : isOnTrack
@@ -35,7 +35,7 @@ export function MiniGoalCard({ years, progress, formatCurrency }: MiniGoalCardPr
             {t('goals.yearGoal', { years })}
           </p>
           <span className={cn(
-            'text-[10px] font-medium px-1.5 py-0.5 rounded-full',
+            'text-xs font-medium px-1.5 py-0.5 rounded-full',
             isOnTrack
               ? 'bg-income-100 text-income-600 dark:bg-income-900/20 dark:text-income-300'
               : 'bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400'

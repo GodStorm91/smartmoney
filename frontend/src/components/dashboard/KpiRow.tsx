@@ -31,15 +31,15 @@ export function KpiRow({ summary, formatCurrency, accounts, exchangeRates = {} }
         <div
           key={kpi.label}
           className={cn(
-            'text-center p-3 rounded-xl border animate-stagger-in',
+            'text-center p-3 rounded-xl border',
             idx === 0 && 'bg-income-50/60 dark:bg-income-900/10 border-income-100/60 dark:border-income-900/20',
             idx === 1 && 'bg-expense-50/60 dark:bg-expense-900/10 border-expense-100/60 dark:border-expense-900/20',
             idx === 2 && 'bg-gray-50/80 dark:bg-gray-800/80 border-gray-100 dark:border-gray-700/50',
           )}
           style={{ '--stagger-index': idx } as React.CSSProperties}
         >
-          <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 mb-1.5 uppercase tracking-[0.12em]">{kpi.label}</p>
-          <p className={cn('text-lg font-extrabold font-numbers tracking-tight', kpi.color)}>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">{kpi.label}</p>
+          <p className={cn('text-lg font-bold font-numbers tracking-tight', kpi.color)}>
             {kpi.isCount ? (
               <CountUp end={kpi.value} duration={800} />
             ) : (

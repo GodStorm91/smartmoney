@@ -41,7 +41,7 @@ export function Login() {
 
       <Card className="w-full max-w-md p-8 relative animate-fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             SmartMoney
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">

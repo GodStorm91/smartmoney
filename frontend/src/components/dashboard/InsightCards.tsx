@@ -52,11 +52,11 @@ export function InsightCards({ insights }: InsightCardsProps) {
           <div className="p-1.5 rounded-xl bg-purple-100 dark:bg-purple-900/30">
             <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
           </div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('insights.title', 'Insights')}
           </h3>
         </div>
-        <span className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-[0.12em]">
+        <span className="text-xs font-medium text-gray-400 dark:text-gray-500">
           {insights.length} {t('insights.items', 'items')}
         </span>
       </div>

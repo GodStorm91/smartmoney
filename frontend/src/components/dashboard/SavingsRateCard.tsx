@@ -38,7 +38,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {t('dashboard.savingsRate', 'Savings Rate')}
         </span>
-        <span className={cn('text-[11px] font-medium px-2.5 py-1 rounded-full', status.bg, status.color)}>
+        <span className={cn('text-xs font-medium px-2.5 py-1 rounded-full', status.bg, status.color)}>
           {status.label}
         </span>
       </div>
@@ -59,7 +59,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
           style={{ width: `${Math.min(100, rate)}%` }}
         />
       </div>
-      <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-2.5 font-medium italic">
+      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2.5 font-medium italic">
         {status.tip}
       </p>
     </Card>

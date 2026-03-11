@@ -103,7 +103,7 @@ export function SubscriptionSummary() {
           <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">
             <CreditCard className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('subscriptions.title', 'Subscriptions')}
           </h3>
         </div>

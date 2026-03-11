@@ -22,7 +22,7 @@ export function RecentTransactionsCard({ transactions, formatCurrency }: RecentT
           <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
             <Receipt className="w-4 h-4 text-primary-600 dark:text-primary-400" />
           </div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('dashboard.recentTransactions', 'Recent')}
           </h3>
         </div>
@@ -38,8 +38,7 @@ export function RecentTransactionsCard({ transactions, formatCurrency }: RecentT
           {transactions.slice(0, 5).map((tx, idx) => (
             <div
               key={tx.id}
-              className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
-              style={{ '--stagger-index': idx } as React.CSSProperties}
+              className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0"
             >
               <div className="flex items-center gap-3">
                 <div className={cn(

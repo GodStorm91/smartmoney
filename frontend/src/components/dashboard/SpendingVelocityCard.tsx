@@ -63,7 +63,7 @@ export function SpendingVelocityCard() {
         <div className="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/30">
           <Zap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
-        <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
           {t('velocity.title')}
         </h3>
       </div>
@@ -76,7 +76,7 @@ export function SpendingVelocityCard() {
         <>
           {/* Daily burn rate — hero number */}
           <div className="flex items-baseline gap-1 mb-1">
-            <span className="text-[2rem] font-extrabold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none">
+            <span className="text-[2rem] font-bold font-numbers text-expense-600 dark:text-expense-300 tracking-tight leading-none">
               {fmt(daily_average)}
             </span>
             <span className="text-sm font-semibold text-gray-500 dark:text-gray-400">

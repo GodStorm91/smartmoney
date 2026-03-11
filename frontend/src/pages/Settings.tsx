@@ -267,7 +267,7 @@ export function Settings() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-2xl mx-auto px-4 py-4">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2.5 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2.5 tracking-tight">
             <SettingsIcon className="w-5 h-5 text-primary-600" />
             {t('settings.title')}
           </h1>

@@ -69,7 +69,7 @@ export function HoldingCard({ holding, onClick, index = 0 }: HoldingCardProps) {
             {holding.asset_name}
           </h4>
           <span className={cn(
-            'px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full shrink-0',
+            'px-2 py-0.5 text-xs font-medium rounded-full shrink-0',
             'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
           )}>
             {t(`holdings.${holding.asset_type}`, holding.asset_type)}

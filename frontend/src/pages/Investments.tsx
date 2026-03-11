@@ -99,10 +99,10 @@ export default function Investments() {
       {/* Portfolio Summary */}
       {!isLoading && holdings && holdings.length > 0 && summary && (
         <Card className="mb-6">
-          <p className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t('holdings.portfolioTotal', 'Portfolio Total')}
           </p>
-          <p className="text-2xl font-extrabold font-numbers tracking-tight text-gray-900 dark:text-white">
+          <p className="text-2xl font-bold font-numbers tracking-tight text-gray-900 dark:text-white">
             {fmtDisplay(summary.total_value)}
           </p>
           <div className="flex items-center gap-3 mt-2">

@@ -847,7 +847,7 @@ export function Transactions() {
                     <th
                       key={field}
                       className={cn(
-                        'px-6 py-3.5 text-[11px] font-bold uppercase tracking-[0.12em] cursor-pointer select-none transition-colors',
+                        'px-6 py-3.5 text-xs font-medium cursor-pointer select-none transition-colors',
                         sortField === field
                           ? 'text-primary-700 dark:text-primary-300 bg-primary-50/50 dark:bg-primary-900/20'
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600/30',
@@ -863,7 +863,7 @@ export function Transactions() {
                       </span>
                     </th>
                   ))}
-                  <th className="px-6 py-3.5 text-center text-[11px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-[0.12em] w-24">{t('transactions.actions')}</th>
+                  <th className="px-6 py-3.5 text-center text-xs font-medium text-gray-600 dark:text-gray-400 w-24">{t('transactions.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-600">

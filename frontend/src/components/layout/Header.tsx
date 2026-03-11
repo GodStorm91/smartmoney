@@ -68,7 +68,7 @@ export function Header() {
           <div className="hidden md:flex items-center gap-1 sm:gap-2">
             <button
               onClick={togglePrivacyMode}
-              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus-ring"
+              className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus-ring"
               aria-label={isPrivacyMode ? t('aria.showAmounts') : t('aria.hideAmounts')}
               title={isPrivacyMode ? t('aria.showAmounts') : t('aria.hideAmounts')}
             >
@@ -103,7 +103,7 @@ export function Header() {
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               aria-label="Menu"
             >
               <Menu className="w-5 h-5" />

@@ -65,7 +65,7 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
           <Lightbulb className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         </div>
         <div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('subscriptions.suggestionsTitle', 'We detected these recurring charges')}
           </h3>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">

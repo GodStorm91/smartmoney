@@ -59,7 +59,7 @@ export function NetWorthTrendChart({ data }: NetWorthTrendChartProps) {
         <div className="p-1.5 rounded-xl bg-primary-100 dark:bg-primary-900/30">
           <TrendingUp className="w-4 h-4 text-primary-600 dark:text-primary-400" />
         </div>
-        <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+        <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
           {t('dashboard.netWorthTrend', 'Net Worth Trend')}
         </h3>
       </div>

@@ -61,7 +61,7 @@ export function HoldingsWidget() {
           <div className="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/30">
             <BarChart3 className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <h3 className="text-base font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+          <h3 className="text-base font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {t('holdings.title', 'Investments')}
           </h3>
         </div>
@@ -77,10 +77,10 @@ export function HoldingsWidget() {
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 mb-3">
         {/* Total Value */}
         <div className="p-2.5 sm:p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
-          <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t('holdings.totalValue', 'Total Value')}
           </p>
-          <p className="text-xl sm:text-[1.65rem] font-extrabold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
+          <p className="text-xl sm:text-[1.65rem] font-bold font-numbers text-gray-900 dark:text-gray-100 tracking-tight leading-none">
             {fmt(summary?.total_value ?? 0)}
           </p>
         </div>
@@ -92,11 +92,11 @@ export function HoldingsWidget() {
             ? 'bg-income-50 dark:bg-income-900/20'
             : 'bg-expense-50 dark:bg-expense-900/20'
         )}>
-          <p className="text-[10px] font-bold text-gray-500 dark:text-gray-300 uppercase tracking-[0.12em] mb-1">
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
             {t('holdings.pnl', 'P&L')}
           </p>
           <p className={cn(
-            'text-xl sm:text-[1.65rem] font-extrabold font-numbers tracking-tight leading-none',
+            'text-xl sm:text-[1.65rem] font-bold font-numbers tracking-tight leading-none',
             isPositive
               ? 'text-income-600 dark:text-income-300'
               : 'text-expense-600 dark:text-expense-300'

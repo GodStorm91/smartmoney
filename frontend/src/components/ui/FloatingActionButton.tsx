@@ -85,7 +85,7 @@ export function FloatingActionButton({ onAddTransaction }: FloatingActionButtonP
       )}
 
       {/* FAB Container - only on mobile */}
-      <div className="fixed bottom-20 right-4 z-[102] md:hidden flex flex-col-reverse items-end gap-3">
+      <div className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom,0px))] right-4 z-[102] md:hidden flex flex-col-reverse items-end gap-3">
         {/* Action Buttons */}
         {isOpen && (
           <div className="flex flex-col-reverse gap-3 mb-2">
