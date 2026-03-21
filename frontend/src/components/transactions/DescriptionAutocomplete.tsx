@@ -217,15 +217,18 @@ export function DescriptionAutocomplete({
                 <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
                   {suggestion.description}
                 </div>
-                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                   <span className="truncate">{suggestion.category}</span>
-                  {suggestion.count > 0 && (
-                    <>
-                      <span className="text-gray-300 dark:text-gray-600">•</span>
-                      <span className="text-gray-400">
-                        {suggestion.count}x {t('autocomplete.used', 'used')}
-                      </span>
-                    </>
+                  {suggestion.count > 0 ? (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-400">
+                      <span className="w-1 h-1 rounded-full bg-income-500 shrink-0" />
+                      {suggestion.count}x
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-0.5 text-[10px] text-primary-500">
+                      <span className="w-1 h-1 rounded-full bg-primary-500 shrink-0" />
+                      {t('transaction.ruleBased', 'rule')}
+                    </span>
                   )}
                 </div>
               </div>

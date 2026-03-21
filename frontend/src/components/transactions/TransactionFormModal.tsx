@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { RefreshCw, ChevronDown, Sparkles, Loader2 } from 'lucide-react'
+import { RefreshCw, ChevronDown, Sparkles, Loader2, Check, Bookmark, Search, X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
@@ -54,7 +54,8 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
   const [showMoreOptions, setShowMoreOptions] = useState(false)
 
   // Auto-categorization state
-  const [autoSuggested, setAutoSuggested] = useState<'history' | 'rule' | 'ai' | null>(null)
+  const [autoSuggested, setAutoSuggested] = useState<'history' | 'rule' | 'fuzzy' | 'ai' | null>(null)
+  const [autoConfidence, setAutoConfidence] = useState<number>(0)
   const [isAiCategorizing, setIsAiCategorizing] = useState(false)
   const aiTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const manualPickRef = useRef(false)
@@ -145,16 +146,24 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
 
   // Handle autocomplete suggestion selection
   const handleSuggestionSelect = useCallback((suggestion: TransactionSuggestion) => {
-    const amountStr = suggestion.amount.toString()
-    setAmount(amountStr)
-    setDisplayAmount(formatWithCommas(amountStr))
+    // Only pre-fill amount if the user hasn't entered one yet
+    if (!amount) {
+      const amountStr = suggestion.amount.toString()
+      setAmount(amountStr)
+      setDisplayAmount(formatWithCommas(amountStr))
+    }
     // Set ref BEFORE changing isIncome so the useEffect skips category clear
     fromSuggestionRef.current = true
     setIsIncome(suggestion.is_income)
     if (suggestion.category) {
       setCategory(suggestion.category)
+      setParentCategory('')  // Let HierarchicalCategoryPicker resolve parent
     }
-  }, [])
+    setAutoSuggested('history')
+    setAutoConfidence(1)
+    hadAutoCategoryRef.current = true
+    manualPickRef.current = false  // Allow future auto-suggestions
+  }, [amount])
 
   // Handle auto-category from suggestions (Layer 1)
   const handleAutoCategory = useCallback((ac: AutoCategory) => {
@@ -164,6 +173,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
     setCategory(ac.category)
     setParentCategory(ac.parent_category || '')
     setAutoSuggested(ac.source)
+    setAutoConfidence(ac.confidence)
     hadAutoCategoryRef.current = true
   }, [])
 
@@ -192,6 +202,7 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
           setCategory(result.category)
           setParentCategory(result.parent_category || '')
           setAutoSuggested('ai')
+          setAutoConfidence(result.confidence)
           hadAutoCategoryRef.current = true
         }
       } finally {
@@ -397,13 +408,43 @@ export function TransactionFormModal({ isOpen, onClose, defaultAccountId }: Tran
               </div>
             )}
             {!isAiCategorizing && autoSuggested && category && (
-              <div className="mt-1.5 flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
-                {autoSuggested === 'ai' ? <Sparkles size={12} /> : <span>•</span>}
-                <span>
-                  {autoSuggested === 'ai'
-                    ? t('transaction.aiSuggested', 'AI-suggested')
-                    : t('transaction.autoSuggested', 'Auto-suggested')}
-                  {' • '}{category}
+              <div className="mt-1.5 animate-in fade-in slide-in-from-left-2 duration-200">
+                <span
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium',
+                    autoSuggested === 'history' && 'bg-income-50 text-income-700 dark:bg-income-900/30 dark:text-income-300',
+                    autoSuggested === 'rule' && 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+                    autoSuggested === 'fuzzy' && 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+                    autoSuggested === 'ai' && 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                  )}
+                >
+                  {autoSuggested === 'history' && <Check size={12} />}
+                  {autoSuggested === 'rule' && <Bookmark size={12} />}
+                  {autoSuggested === 'fuzzy' && <Search size={12} />}
+                  {autoSuggested === 'ai' && <Sparkles size={12} />}
+                  <span>
+                    {autoSuggested === 'history' && t('transaction.matchedFromHistory', 'Matched from history')}
+                    {autoSuggested === 'rule' && t('transaction.ruleBased', 'Rule-based')}
+                    {autoSuggested === 'fuzzy' && t('transaction.similarMerchant', 'Similar merchant')}
+                    {autoSuggested === 'ai' && t('transaction.aiSuggested', 'AI suggested')}
+                  </span>
+                  {autoConfidence > 0 && autoConfidence < 0.9 && (
+                    <span className="opacity-60" title={`${Math.round(autoConfidence * 100)}%`}>?</span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAutoSuggested(null)
+                      setCategory('')
+                      setParentCategory('')
+                      manualPickRef.current = false
+                      hadAutoCategoryRef.current = false
+                    }}
+                    className="ml-0.5 rounded-full p-0.5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                    aria-label={t('transaction.clearSuggestion', 'Clear suggestion')}
+                  >
+                    <X size={12} />
+                  </button>
                 </span>
               </div>
             )}

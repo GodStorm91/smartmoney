@@ -171,7 +171,7 @@ export interface AutoCategory {
   parent_category: string | null
   is_income: boolean
   confidence: number
-  source: 'history' | 'rule' | 'ai'
+  source: 'history' | 'rule' | 'fuzzy' | 'ai'
 }
 
 interface SuggestionResponse {

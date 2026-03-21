@@ -21,6 +21,7 @@ from ..schemas.transaction import (
 )
 from ..services.category_rule_service import CategoryRuleService
 from ..services.transaction_service import TransactionService
+from ..utils.merchant_normalizer import normalize_merchant
 from ..utils.transaction_hasher import generate_tx_hash
 
 logger = logging.getLogger(__name__)
@@ -239,7 +240,59 @@ async def get_transaction_suggestions(
                 "source": "rule",
             }
 
+    # 2.5 Fuzzy merchant match — if still no auto_category, try normalized merchant
+    if not auto_category:
+        try:
+            auto_category = _fuzzy_merchant_match(db, current_user.id, q)
+        except Exception:
+            logger.warning("fuzzy merchant match failed", exc_info=True)
+
     return {"suggestions": suggestions, "auto_category": auto_category}
+
+
+def _fuzzy_merchant_match(
+    db: Session, user_id: int, description: str
+) -> dict | None:
+    """Layer 2.5: Match by normalized merchant name against recent transactions."""
+    from datetime import timedelta
+
+    normalized_input = normalize_merchant(description)
+    if not normalized_input or len(normalized_input) < 2:
+        return None
+
+    cutoff = date.today() - timedelta(days=180)
+    recent_txs = (
+        db.query(Transaction.description, Transaction.category, Transaction.is_income)
+        .filter(
+            Transaction.user_id == user_id,
+            Transaction.is_transfer == False,
+            Transaction.category != "Other",
+            Transaction.date >= cutoff,
+        )
+        .limit(500)
+        .all()
+    )
+
+    # Group by category, count normalized matches
+    category_counts: dict[str, int] = {}
+    category_income: dict[str, bool] = {}
+    for tx in recent_txs:
+        if normalize_merchant(tx.description) == normalized_input:
+            category_counts[tx.category] = category_counts.get(tx.category, 0) + 1
+            category_income[tx.category] = tx.is_income
+
+    if not category_counts:
+        return None
+
+    best_cat = max(category_counts, key=category_counts.get)  # type: ignore[arg-type]
+    parent_name = _lookup_parent_category(db, user_id, best_cat)
+    return {
+        "category": best_cat,
+        "parent_category": parent_name,
+        "is_income": category_income[best_cat],
+        "confidence": 0.75,
+        "source": "fuzzy",
+    }
 
 
 def _lookup_parent_category(db: Session, user_id: int, category_name: str) -> str | None:

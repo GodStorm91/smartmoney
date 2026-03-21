@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from ..models.category_rule import CategoryRule
 from ..models.transaction import Transaction
+from ..utils.merchant_normalizer import normalize_merchant
 
 
 # Default rules for new users - common Japanese merchants/patterns
@@ -181,9 +182,35 @@ class CategoryRuleService:
             Transaction.category == "Other",
         ).all()
 
+        # Build normalized merchant -> category lookup from non-Other transactions
+        categorized_txs = db.query(
+            Transaction.description, Transaction.category
+        ).filter(
+            Transaction.user_id == user_id,
+            Transaction.category != "Other",
+        ).limit(500).all()
+
+        norm_category_map: dict[str, dict[str, int]] = {}
+        for ctx in categorized_txs:
+            norm = normalize_merchant(ctx.description)
+            if norm and len(norm) >= 2:
+                if norm not in norm_category_map:
+                    norm_category_map[norm] = {}
+                norm_category_map[norm][ctx.category] = (
+                    norm_category_map[norm].get(ctx.category, 0) + 1
+                )
+
         changes = []
         for tx in other_transactions:
             new_category = CategoryRuleService.categorize(tx.description, rules)
+
+            # Layer 2.5: fuzzy merchant fallback
+            if not new_category:
+                norm_desc = normalize_merchant(tx.description)
+                if norm_desc and norm_desc in norm_category_map:
+                    counts = norm_category_map[norm_desc]
+                    new_category = max(counts, key=counts.get)  # type: ignore[arg-type]
+
             if new_category:
                 changes.append({
                     "id": tx.id,

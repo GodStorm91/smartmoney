@@ -21,6 +21,7 @@ class UploadResponse(BaseModel):
     total_rows: int
     created: int
     skipped: int
+    auto_categorized_count: int = 0
     message: str
 
 
@@ -86,11 +87,20 @@ async def upload_csv(
             db, transactions_data
         )
 
+        # Auto-apply category rules to any remaining "Other" transactions
+        auto_categorized_count = 0
+        if created > 0:
+            result = CategoryRuleService.apply_rules_to_transactions(
+                db, current_user.id, dry_run=False
+            )
+            auto_categorized_count = result.get("affected_count", 0)
+
         return {
             "filename": file.filename,
             "total_rows": len(transactions_data),
             "created": created,
             "skipped": skipped,
+            "auto_categorized_count": auto_categorized_count,
             "message": f"Successfully imported {created} transactions, skipped {skipped} duplicates"
         }
 

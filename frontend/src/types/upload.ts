@@ -22,6 +22,7 @@ export interface BackendUploadResponse {
   total_rows: number
   created: number
   skipped: number
+  auto_categorized_count: number
   message: string
 }
 

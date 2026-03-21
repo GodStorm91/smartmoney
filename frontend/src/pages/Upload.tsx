@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { useXPGain } from '@/hooks/useXPGain'
 import { Card } from '@/components/ui/Card'
 import { UploadDropZone } from '@/components/upload/UploadDropZone'
@@ -129,6 +130,31 @@ export function Upload() {
       )
       invalidateAfterUpload()
       showReceiptUploadedXP()
+
+      // Show post-import toast with categorization summary
+      if (uploadMode === 'csv') {
+        const created = result.created
+        const autoCategorized = result.auto_categorized_count || 0
+        const needsReview = created - autoCategorized
+        toast.success(t('upload.toastImportComplete', 'Import Complete'), {
+          description: (
+            <div className="space-y-1 mt-1">
+              <p className="text-sm">{t('upload.toastImported', { count: created })}</p>
+              {autoCategorized > 0 && (
+                <p className="text-sm text-income-600 dark:text-income-300">
+                  ✓ {t('upload.toastAutoCategorized', { count: autoCategorized })}
+                </p>
+              )}
+              {needsReview > 0 && (
+                <p className="text-sm text-amber-600 dark:text-amber-400">
+                  {t('upload.toastNeedCategories', { count: needsReview })}
+                </p>
+              )}
+            </div>
+          ),
+          duration: 6000,
+        })
+      }
     } catch (error) {
       console.error('Upload failed:', error)
 
