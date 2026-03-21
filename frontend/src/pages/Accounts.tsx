@@ -343,8 +343,6 @@ export default function Accounts() {
                   {typeAccounts.map((account, idx) => (
                     <div
                       key={account.id}
-                      className="animate-stagger-in"
-                      style={{ '--stagger-index': Math.min(idx, 9) } as React.CSSProperties}
                     >
                       <AccountCard
                         account={account}

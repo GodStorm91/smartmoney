@@ -154,7 +154,7 @@ export function AddCategoryModal({ budget, onClose, onAdd }: AddCategoryModalPro
                           {child.name}
                         </span>
                         {isDisabled && (
-                          <span className="text-[10px] text-gray-400">{t('budget.alreadyAdded', 'Added')}</span>
+                          <span className="text-xs text-gray-400">{t('budget.alreadyAdded', 'Added')}</span>
                         )}
                       </button>
                     )
@@ -237,7 +237,7 @@ export function AddCategoryModal({ budget, onClose, onAdd }: AddCategoryModalPro
                         {parent.name}
                       </span>
                       {availableChildren.length > 0 && (
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-xs text-gray-400">
                           {availableChildren.length} {t('budget.available', 'available')}
                         </span>
                       )}

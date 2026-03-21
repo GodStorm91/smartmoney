@@ -81,10 +81,9 @@ export function SubscriptionSuggestions({ onCreateFromSuggestion }: Subscription
             <div
               key={s.hash}
               className={cn(
-                'p-3 rounded-lg border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 animate-stagger-in',
+                'p-3 rounded-lg border bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700',
                 dismissMutation.isPending && dismissMutation.variables === s.hash && 'opacity-50'
               )}
-              style={{ '--stagger-index': idx } as React.CSSProperties}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">

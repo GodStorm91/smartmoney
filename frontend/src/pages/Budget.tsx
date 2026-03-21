@@ -4,7 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, Download, Plus, Check, CalendarDays } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { PageShell } from '@/components/layout/PageShell'
+import { PageSkeleton } from '@/components/ui/PageSkeleton'
 import { BudgetCreationWizard } from '@/components/budget/budget-creation-wizard'
 import { BudgetFeedbackForm } from '@/components/budget/budget-feedback-form'
 import { AddCategoryModal } from '@/components/budget/add-category-modal'
@@ -194,91 +195,69 @@ export function BudgetPage() {
     URL.revokeObjectURL(url)
   }, [displayBudget, t])
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner />
+  const monthNav = (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => navigateMonth('prev')}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        </button>
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+          {formatMonth(selectedMonth)}
+        </span>
+        {healthColor && (
+          <span className={cn('w-2.5 h-2.5 rounded-full flex-shrink-0', healthColor)} title={t('budget.health.title')} />
+        )}
+        {!isCurrentMonth && (
+          <button
+            onClick={goToCurrentMonth}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-income-600 dark:text-income-300 transition-colors"
+            title={t('common.today')}
+          >
+            <CalendarDays className="w-5 h-5" />
+          </button>
+        )}
+        <button
+          onClick={() => navigateMonth('next')}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+          disabled={selectedMonth >= new Date().toISOString().slice(0, 7)}
+        >
+          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+        </button>
       </div>
-    )
-  }
+      {versions && versions.length > 1 && displayBudget && (
+        <BudgetVersionDropdown
+          versions={versions}
+          currentVersion={displayBudget.version || 1}
+          formatCurrency={formatCurrency}
+          onRestore={(id) => restoreMutation.mutate(id)}
+          isRestoring={restoreMutation.isPending}
+        />
+      )}
+      {displayBudget && (
+        <button
+          onClick={handleExportBudget}
+          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
+          title={t('export')}
+        >
+          <Download className="w-5 h-5" />
+        </button>
+      )}
+    </div>
+  )
 
   return (
-    <div className="min-h-screen pb-32">
-      {/* Sticky Header */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          {/* Month Navigation */}
-          <div className="flex items-center justify-between mb-3">
-            <button
-              onClick={() => navigateMonth('prev')}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            </button>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {formatMonth(selectedMonth)}
-              </h1>
-              {healthColor && (
-                <span className={cn('w-2.5 h-2.5 rounded-full flex-shrink-0', healthColor)} title={t('budget.health.title')} />
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              {!isCurrentMonth && (
-                <button
-                  onClick={goToCurrentMonth}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center text-income-600 dark:text-income-300 transition-colors"
-                  title={t('common.today')}
-                >
-                  <CalendarDays className="w-5 h-5" />
-                </button>
-              )}
-              <button
-                onClick={() => navigateMonth('next')}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
-                disabled={selectedMonth >= new Date().toISOString().slice(0, 7)}
-              >
-                <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-              </button>
-            </div>
-          </div>
-
-          {/* Title and Actions */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
-                {t('budget.title')}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('budget.subtitle')}
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {versions && versions.length > 1 && displayBudget && (
-                <BudgetVersionDropdown
-                  versions={versions}
-                  currentVersion={displayBudget.version || 1}
-                  formatCurrency={formatCurrency}
-                  onRestore={(id) => restoreMutation.mutate(id)}
-                  isRestoring={restoreMutation.isPending}
-                />
-              )}
-              {displayBudget && (
-                <button
-                  onClick={handleExportBudget}
-                  className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
-                  title={t('export')}
-                >
-                  <Download className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 py-4 space-y-4 animate-fade-in">
+    <PageShell
+      title={t('budget.title')}
+      subtitle={t('budget.subtitle')}
+      headerRight={monthNav}
+      maxWidth="4xl"
+      isLoading={isLoading}
+      skeleton={<PageSkeleton variant="cards" />}
+    >
+      <div className="space-y-4">
         {/* Empty State — Creation Wizard */}
         {!displayBudget && !error && (
           <BudgetCreationWizard
@@ -397,7 +376,7 @@ export function BudgetPage() {
         savingsTarget={displayBudget?.savings_target || 0}
         categoryCount={displayBudget?.allocations.length || 0}
       />
-    </div>
+    </PageShell>
   )
 }
 

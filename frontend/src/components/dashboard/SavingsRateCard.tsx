@@ -33,7 +33,7 @@ export function SavingsRateCard({ rate }: SavingsRateCardProps) {
   const status = getStatus()
 
   return (
-    <Card className="p-3 sm:p-4">
+    <Card temperature="cool">
       <div className="flex items-center justify-between mb-2.5 sm:mb-3">
         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {t('dashboard.savingsRate', 'Savings Rate')}

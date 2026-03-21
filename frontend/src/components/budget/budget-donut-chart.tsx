@@ -77,7 +77,7 @@ export function BudgetDonutChart({
       <g>
         <Sector cx={cx} cy={cy} innerRadius={innerRadius - 2} outerRadius={outerRadius + 4}
           startAngle={startAngle} endAngle={endAngle} fill={fill} />
-        <text x={cx} y={cy - 6} textAnchor="middle" className="fill-gray-500 dark:fill-gray-400 text-[10px]">
+        <text x={cx} y={cy - 6} textAnchor="middle" className="fill-gray-500 dark:fill-gray-400 text-xs">
           {payload.name}
         </text>
         <text x={cx} y={cy + 10} textAnchor="middle" className="fill-gray-900 dark:fill-gray-100 text-xs font-bold">

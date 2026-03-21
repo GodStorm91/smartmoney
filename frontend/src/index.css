@@ -229,23 +229,6 @@
     }
   }
 
-  /* Staggered entry animation using CSS custom property */
-  .animate-stagger-in {
-    opacity: 0;
-    animation: staggerFadeSlideUp 0.25s ease-out forwards;
-    animation-delay: calc(var(--stagger-index, 0) * 40ms);
-  }
-
-  @keyframes staggerFadeSlideUp {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 
   /* Progress bar fill animation on mount — GPU-composited via scaleX */
   .animate-progress-fill {

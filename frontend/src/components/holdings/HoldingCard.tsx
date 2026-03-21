@@ -58,9 +58,8 @@ export function HoldingCard({ holding, onClick, index = 0 }: HoldingCardProps) {
       hover
       onClick={onClick}
       className={cn(
-        'animate-stagger-in cursor-pointer hover:shadow-md transition-shadow'
+        'cursor-pointer hover:shadow-md transition-shadow'
       )}
-      style={{ '--stagger-index': index } as React.CSSProperties}
     >
       {/* Row 1: Name, type badge, units */}
       <div className="flex items-center justify-between gap-2">

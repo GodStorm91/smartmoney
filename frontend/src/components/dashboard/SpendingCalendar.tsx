@@ -273,7 +273,7 @@ export default function SpendingCalendar({ className, onDayClick }: SpendingCale
                       {getDate(day)}
                     </span>
                     {spendingData && spendingData.totalSpending > 0 && (
-                      <span className={cn('text-[10px] font-medium mt-0.5', level.text)}>
+                      <span className={cn('text-xs font-medium mt-0.5', level.text)}>
                         {formatCurrency(spendingData.totalSpending)}
                       </span>
                     )}

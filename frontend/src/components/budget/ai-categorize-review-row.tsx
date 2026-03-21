@@ -22,7 +22,7 @@ function ConfidenceBadge({ confidence }: { confidence: number }) {
   const pct = Math.round(confidence * 100)
   const variant = confidence >= 0.8 ? 'success' : confidence >= 0.6 ? 'warning' : 'error'
   return (
-    <Badge variant={variant} className="text-[10px] px-1.5 py-0.5">
+    <Badge variant={variant} className="text-xs px-1.5 py-0.5">
       {pct}% {t('ai.confidence')}
     </Badge>
   )
@@ -122,12 +122,12 @@ export function AiCategorizeReviewRow({
             )} />
           </div>
           {matchesBudget && (
-            <Badge variant="success" className="text-[10px] px-1.5 py-0.5">
+            <Badge variant="success" className="text-xs px-1.5 py-0.5">
               {t('budget.aiCategorize.budgetMatch', 'Budget')}
             </Badge>
           )}
           {suggestion.is_new_category && !matchesBudget && (
-            <Badge variant="info" className="text-[10px] px-1.5 py-0.5">
+            <Badge variant="info" className="text-xs px-1.5 py-0.5">
               {t('ai.newCategory')}
             </Badge>
           )}

@@ -132,7 +132,7 @@ export function BudgetPulseHero({
       <div className="px-3 sm:px-4 py-3 bg-black/5 dark:bg-white/5 grid grid-cols-3 gap-2 sm:gap-3">
         {/* Current pace */}
         <div className="min-w-0">
-          <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
+          <p className="text-xs font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.projection.currentPace')}
           </p>
           <p className={cn(
@@ -140,26 +140,26 @@ export function BudgetPulseHero({
             paceWarning ? 'text-amber-600 dark:text-amber-400' : ''
           )}>
             {fmtCompact(dailyRate)}
-            <span className="text-[10px] font-normal opacity-50">{t('budget.pulse.perDay')}</span>
+            <span className="text-xs font-normal opacity-50">{t('budget.pulse.perDay')}</span>
           </p>
         </div>
 
         {/* Safe pace */}
         <div className="min-w-0">
-          <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
+          <p className="text-xs font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.projection.safePace')}
           </p>
           <p className="text-base sm:text-lg font-bold leading-tight text-income-600 dark:text-income-300">
             {safeDaily > 0 ? fmtCompact(safeDaily) : '—'}
             {safeDaily > 0 && (
-              <span className="text-[10px] font-normal opacity-50">{t('budget.pulse.perDay')}</span>
+              <span className="text-xs font-normal opacity-50">{t('budget.pulse.perDay')}</span>
             )}
           </p>
         </div>
 
         {/* Days remaining */}
         <div className="min-w-0 text-right">
-          <p className="text-[10px] font-medium opacity-50 uppercase tracking-wider truncate">
+          <p className="text-xs font-medium opacity-50 uppercase tracking-wider truncate">
             {t('budget.daysLeft')}
           </p>
           <div className="flex items-center justify-end gap-1">

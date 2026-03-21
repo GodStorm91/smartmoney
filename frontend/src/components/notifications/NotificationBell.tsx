@@ -39,7 +39,7 @@ export function NotificationBell({ onViewAll, className }: NotificationBellProps
           <span className="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[18px] h-[18px] px-1">
             <Badge
               variant="error"
-              className="text-[10px] px-1 min-w-[18px] h-[18px] flex items-center justify-center"
+              className="text-xs px-1 min-w-[18px] h-[18px] flex items-center justify-center"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
             </Badge>

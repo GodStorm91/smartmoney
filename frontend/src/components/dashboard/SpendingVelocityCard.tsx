@@ -27,7 +27,7 @@ export function SpendingVelocityCard() {
 
   if (isLoading) {
     return (
-      <Card className="p-4">
+      <Card temperature="cool">
         <div className="flex items-center gap-2.5 mb-3">
           <Skeleton className="h-7 w-7 rounded-xl" />
           <Skeleton className="h-4 w-40" />
@@ -57,7 +57,7 @@ export function SpendingVelocityCard() {
   const noData = total_spent === 0
 
   return (
-    <Card className="p-4">
+    <Card temperature="cool">
       {/* Header */}
       <div className="flex items-center gap-2.5 mb-3">
         <div className="p-1.5 rounded-xl bg-amber-100 dark:bg-amber-900/30">

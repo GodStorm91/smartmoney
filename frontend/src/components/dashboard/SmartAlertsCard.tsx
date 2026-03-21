@@ -132,9 +132,8 @@ export function SmartAlertsCard({
         {alerts.map((alert, index) => (
           <div
             key={alert.id}
-            style={{ '--stagger-index': index } as React.CSSProperties}
             className={cn(
-              'flex items-start gap-3 p-3 rounded-lg animate-stagger-in',
+              'flex items-start gap-3 p-3 rounded-lg',
               alert.type === 'danger' && 'bg-expense-50 dark:bg-expense-900/20',
               alert.type === 'warning' && 'bg-amber-50 dark:bg-amber-900/20',
               alert.type === 'info' && 'bg-primary-50 dark:bg-primary-900/20'

@@ -52,7 +52,7 @@ export function BudgetCoverageIndicator({
             {coverage}%
           </span>
         </div>
-        <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
           {t('budget.coverage.label')}
         </p>
       </div>

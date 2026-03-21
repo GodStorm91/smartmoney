@@ -71,7 +71,7 @@ export function BudgetMoneyFlow({
       </div>
 
       {/* Legend chips */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-[10px] text-gray-500 dark:text-gray-400">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
         <span className="flex items-center gap-1">
           <span className="w-2 h-2 rounded-full bg-blue-500" />
           {Math.round(allocatedPct)}% {t('budget.flow.allocated').toLowerCase()}
@@ -94,7 +94,7 @@ export function BudgetMoneyFlow({
 function FlowNode({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="text-center min-w-0 flex-1">
-      <p className="text-[10px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">
+      <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate">
         {label}
       </p>
       <p className={cn('text-sm font-bold truncate', color)}>{value}</p>

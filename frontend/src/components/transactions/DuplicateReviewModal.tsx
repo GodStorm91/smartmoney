@@ -37,7 +37,7 @@ function TransactionColumn({ tx, highlighted, label }: TransactionColumnProps) {
           : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
       )}
     >
-      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 mb-1">
         {label}
       </p>
 
@@ -60,7 +60,7 @@ function TransactionColumn({ tx, highlighted, label }: TransactionColumnProps) {
         </p>
 
         <div className="flex items-center gap-1">
-          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300">
             {tx.category}
           </span>
         </div>

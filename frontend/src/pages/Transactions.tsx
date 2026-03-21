@@ -35,6 +35,7 @@ import { useOfflineCreate } from '@/hooks/use-offline-mutation'
 import type { Transaction, TransactionFilters } from '@/types'
 import type { ReceiptData } from '@/services/receipt-service'
 import { cn } from '@/utils/cn'
+import { PageShell } from '@/components/layout/PageShell'
 
 function getMonthDateRange(month: string): { start: string; end: string } {
   const [year, monthNum] = month.split('-').map(Number)
@@ -505,7 +506,11 @@ export function Transactions() {
   }, [displayedTransactions])
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 pb-28 animate-fade-in">
+    <PageShell
+      title={t('transactions.title')}
+      subtitle={t('transactions.subtitle')}
+      maxWidth="4xl"
+    >
       {fromAccounts && (
         <Button
           variant="ghost"
@@ -517,13 +522,6 @@ export function Transactions() {
           {t('backToAccounts')}
         </Button>
       )}
-
-      <div className="mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-50 mb-1 tracking-tight">
-          {t('transactions.title')}
-        </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('transactions.subtitle')}</p>
-      </div>
 
       <Card className="mb-4">
         <div className="space-y-3">
@@ -588,7 +586,7 @@ export function Transactions() {
               <Copy className="w-4 h-4" />
               <span className="hidden sm:inline">{t('duplicates.review')}</span>
               {duplicateCount > 0 && (
-                <span className="inline-flex items-center justify-center bg-warning-500 text-white text-[10px] font-black rounded-full w-4 h-4 leading-none">
+                <span className="inline-flex items-center justify-center bg-warning-500 text-white text-xs font-black rounded-full w-4 h-4 leading-none">
                   {duplicateCount}
                 </span>
               )}
@@ -682,7 +680,7 @@ export function Transactions() {
       {/* When filtering by account: amounts are in account's native currency */}
       {/* When viewing all: amounts are aggregated in JPY (base currency) */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
-        <div className="animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+        <div>
           <Card
             onClick={() => handleTypeFilter('income')}
             className={cn(
@@ -1062,6 +1060,6 @@ export function Transactions() {
 
       {/* FAB Button */}
       <AddTransactionFAB onClick={() => setIsAddModalOpen(true)} />
-    </div>
+    </PageShell>
   )
 }

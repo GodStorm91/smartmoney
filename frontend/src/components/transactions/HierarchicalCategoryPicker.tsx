@@ -95,9 +95,8 @@ export function HierarchicalCategoryPicker({
               key={child.id}
               type="button"
               onClick={() => handleChildClick(child)}
-              style={{ '--stagger-index': index } as React.CSSProperties}
               className={cn(
-                'flex flex-col items-center justify-center p-3 rounded-lg animate-stagger-in',
+                'flex flex-col items-center justify-center p-3 rounded-lg',
                 'min-h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500',
                 selected === child.name
                   ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'
@@ -172,9 +171,8 @@ export function HierarchicalCategoryPicker({
           key={parent.id}
           type="button"
           onClick={() => handleParentClick(parent)}
-          style={{ '--stagger-index': index } as React.CSSProperties}
           className={cn(
-            'flex flex-col items-center justify-center p-3 rounded-lg animate-stagger-in',
+            'flex flex-col items-center justify-center p-3 rounded-lg',
             'min-h-16 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500',
             findParentForChild(selected)?.id === parent.id
               ? 'bg-primary-100 border-2 border-primary-500 dark:bg-primary-900'

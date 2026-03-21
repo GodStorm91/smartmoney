@@ -119,7 +119,7 @@ export function AppearanceSettings() {
                   style={{ backgroundColor: color.preview }}
                 />
                 <span className={cn(
-                  'text-[10px] font-medium',
+                  'text-xs font-medium',
                   accentColor === color.id
                     ? 'text-gray-900 dark:text-gray-100'
                     : 'text-gray-500 dark:text-gray-500'

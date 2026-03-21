@@ -12,6 +12,8 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
+import { PageShell } from '@/components/layout/PageShell'
+import { PageSkeleton } from '@/components/ui/PageSkeleton'
 import { useGreeting } from '@/hooks/useGreeting'
 import { useProfile } from '@/services/rewards-service'
 const SpendingCalendar = lazy(() => import('@/components/dashboard/SpendingCalendar'))
@@ -182,10 +184,10 @@ export function Dashboard() {
   if (isLoading) return <DashboardSkeleton />
 
   return (
-    <div className="min-h-screen pb-32">
+    <PageShell>
       {/* Sticky Header — confident, content-driven */}
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50">
-        <div className="max-w-2xl mx-auto px-4 py-3.5">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50 -mx-4 -mt-4 sm:-mt-6 px-4">
+        <div className="py-3.5">
           <div className="flex items-center justify-between mb-2">
             <button
               onClick={() => { const d = new Date(currentDate); d.setMonth(d.getMonth() - 1); setCurrentDate(d) }}
@@ -206,7 +208,7 @@ export function Dashboard() {
             </button>
           </div>
           <div>
-            <h2 className="text-[1.875rem] sm:text-[2.25rem] font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
               {emoji} {greeting}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
@@ -217,7 +219,7 @@ export function Dashboard() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-5 space-y-4 sm:space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         {/* 1. Onboarding (auto-hides after completion) */}
         <OnboardingChecklist />
 
@@ -330,7 +332,7 @@ export function Dashboard() {
             />
 
             {/* Spending Calendar (lazy-loaded) */}
-            <Suspense fallback={<div className="h-64 rounded-xl bg-gray-100 dark:bg-gray-800 animate-pulse" />}>
+            <Suspense fallback={<PageSkeleton variant="chart" />}>
               <SpendingCalendar onDayClick={handleDayClick} />
             </Suspense>
 
@@ -360,6 +362,6 @@ export function Dashboard() {
           transactions={selectedDayTransactions}
         />
       )}
-    </div>
+    </PageShell>
   )
 }

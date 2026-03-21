@@ -180,14 +180,14 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                         key={token.id}
                         src={token.logo_url}
                         alt={token.symbol}
-                        className="w-10 h-10 rounded-full border-2 border-white/20 animate-stagger-in"
-                        style={{ zIndex: group.tokens.length - i, '--stagger-index': i } as React.CSSProperties}
+                        className="w-10 h-10 rounded-full border-2 border-white/20"
+                        style={{ zIndex: group.tokens.length - i } as React.CSSProperties}
                       />
                     ) : (
                       <div
                         key={token.id}
-                        className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm border-2 border-white/20 animate-stagger-in"
-                        style={{ zIndex: group.tokens.length - i, '--stagger-index': i } as React.CSSProperties}
+                        className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm border-2 border-white/20"
+                        style={{ zIndex: group.tokens.length - i } as React.CSSProperties}
                       >
                         {token.symbol.slice(0, 2)}
                       </div>
@@ -273,7 +273,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                     {performance && (() => {
                       const isPositive = Number(performance.total_return_pct) >= 0
                       return (
-                        <Card className="overflow-hidden animate-stagger-in" style={{ '--stagger-index': 0 } as React.CSSProperties}>
+                        <Card className="overflow-hidden">
                           <div className={cn(
                             'p-4 text-center relative overflow-hidden',
                             isPositive
@@ -342,7 +342,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
                     {/* Annualized Return */}
                     {performance && performance.annualized_return_pct !== null && (
-                      <Card className="animate-stagger-in" style={{ '--stagger-index': 1 } as React.CSSProperties}>
+                      <Card>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Percent className="w-4 h-4 text-indigo-500" />
@@ -360,7 +360,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
                     {/* APY */}
                     {performance && performance.current_apy != null && (
-                      <Card className="animate-stagger-in" style={{ '--stagger-index': 2 } as React.CSSProperties}>
+                      <Card>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <TrendingUp className="w-4 h-4 text-purple-500" />
@@ -375,7 +375,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
 
                     {/* Performance Chart */}
                     {combinedHistory && combinedHistory.snapshots.length > 0 && (
-                      <Card className="animate-stagger-in" style={{ '--stagger-index': 3 } as React.CSSProperties}>
+                      <Card>
                         <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
                           30-Day Performance
                         </h3>
@@ -388,8 +388,7 @@ export function PositionDetailModal({ group, onClose }: PositionDetailModalProps
                     {/* Close Position Button */}
                     <button
                       onClick={() => setShowCloseModal(true)}
-                      className="w-full py-3 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-medium rounded-lg transition-all duration-150 animate-stagger-in"
-                      style={{ '--stagger-index': 4 } as React.CSSProperties}
+                      className="w-full py-3 bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-medium rounded-lg transition-all duration-150"
                     >
                       Close Position
                     </button>

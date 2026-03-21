@@ -217,8 +217,6 @@ export function BillList({
           filteredAndSortedBills.map((bill, idx) => (
             <div
               key={bill.id}
-              className="animate-stagger-in"
-              style={{ '--stagger-index': Math.min(idx, 9) } as React.CSSProperties}
             >
               <BillCard
                 bill={bill}

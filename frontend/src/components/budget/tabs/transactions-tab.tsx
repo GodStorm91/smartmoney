@@ -164,7 +164,7 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-gray-900 dark:text-white truncate">{tx.description}</p>
                   {tx.exclude_from_budget && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 flex-shrink-0">
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 flex-shrink-0">
                       {t('transaction.budgetExcluded')}
                     </span>
                   )}
@@ -175,7 +175,7 @@ export function TransactionsTab({ allocations, month, onEditTransaction }: Trans
                 <span className="font-semibold text-gray-900 dark:text-white">{formatTxCurrency(tx.amount, tx.currency)}</span>
                 {!tx.exclude_from_budget && impactPercent > 10 && (
                   <p className={cn(
-                    'text-[10px] font-medium mt-0.5',
+                    'text-xs font-medium mt-0.5',
                     impactPercent > 30 ? 'text-red-500' : impactPercent > 20 ? 'text-amber-500' : 'text-gray-400'
                   )}>
                     {t('budget.budgetContext.impact', { percent: impactPercent })}

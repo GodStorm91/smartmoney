@@ -59,7 +59,7 @@ export function BudgetAdherenceTable({ data }: BudgetAdherenceTableProps) {
                   {cat.category}
                 </span>
                 <DeltaBadge value={cat.spending_change} invertColor className="ml-1" />
-                <Badge variant={statusToBadgeVariant(cat.status)} className="ml-1 text-[10px]">
+                <Badge variant={statusToBadgeVariant(cat.status)} className="ml-1 text-xs">
                   {statusLabel(cat.status, t)}
                 </Badge>
               </div>

@@ -60,7 +60,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
         )}>
           {monthlyNet >= 0 ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
           {monthlyNet >= 0 ? '+' : ''}{formatCurrency(monthlyNet)}
-          <span className="text-[10px] font-medium opacity-70 ml-0.5">
+          <span className="text-xs font-medium opacity-70 ml-0.5">
             {t('dashboard.thisMonth', 'this month')}
           </span>
         </div>

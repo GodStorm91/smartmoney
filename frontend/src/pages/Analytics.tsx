@@ -10,6 +10,8 @@ import { useState, useRef, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useSearch } from '@tanstack/react-router'
+import { PageShell } from '@/components/layout/PageShell'
+import { PageSkeleton } from '@/components/ui/PageSkeleton'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { HeroMetrics, InsightCarousel, MonthPicker, PeriodToggle } from '@/components/analytics'
 import type { PeriodType } from '@/components/analytics'
@@ -70,17 +72,13 @@ export function Analytics() {
     )
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 sm:py-8 animate-fade-in">
-      {/* Page header */}
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-          {t('analytics.title')}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          {t('analytics.subtitle')}
-        </p>
-      </div>
-
+    <PageShell
+      title={t('analytics.title')}
+      subtitle={t('analytics.subtitle')}
+      maxWidth="3xl"
+      isLoading={isLoading && activeTab === 'overview'}
+      skeleton={<PageSkeleton variant="chart" />}
+    >
       {/* Tab bar */}
       <div className="flex justify-center mb-6">
         <div className="bg-gray-100 dark:bg-gray-800 rounded-full p-1 inline-flex" role="tablist">
@@ -126,10 +124,8 @@ export function Analytics() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Hero metrics 2×2 grid */}
               {analytics && <HeroMetrics analytics={analytics} />}
 
-              {/* Insight carousel */}
               {insightsData?.insights && insightsData.insights.length > 0 && (
                 <InsightCarousel
                   insights={insightsData.insights}
@@ -137,25 +133,19 @@ export function Analytics() {
                 />
               )}
 
-              {/* Three main chart cards */}
               <AnalyticsChartSection
                 ref={chartSectionRef}
                 analytics={analytics}
                 monthlySavingsTarget={monthlySavingsTarget}
               />
 
-              {/* Spending heatmap */}
               <SpendingHeatmap startDate={dateRange.start} endDate={dateRange.end} />
-
-              {/* Year-over-year comparison */}
               <YoYComparisonChart />
-
-              {/* AI tools (collapsible) */}
               <AnalyticsAiToolsSection />
             </div>
           )}
         </>
       )}
-    </div>
+    </PageShell>
   )
 }

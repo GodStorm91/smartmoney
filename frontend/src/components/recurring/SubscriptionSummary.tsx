@@ -134,8 +134,7 @@ export function SubscriptionSummary() {
               {items.map((sub, idx) => (
                 <div
                   key={sub.id}
-                  className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0 animate-stagger-in"
-                  style={{ '--stagger-index': idx } as React.CSSProperties}
+                  className="flex items-center justify-between py-2.5 border-b border-gray-100 dark:border-gray-700 last:border-0"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
@@ -143,7 +142,7 @@ export function SubscriptionSummary() {
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className={cn(
-                        'px-1.5 py-0.5 text-[10px] font-medium rounded-full',
+                        'px-1.5 py-0.5 text-xs font-medium rounded-full',
                         'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                       )}>
                         {t(FREQ_KEYS[sub.frequency] || 'recurring.monthly', sub.frequency)}

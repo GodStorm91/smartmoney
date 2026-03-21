@@ -36,7 +36,7 @@ export function SubscriptionsWidget({ recurringTxns, formatCurrency, rates }: Su
   const monthlyTotal = subs.reduce((s, r) => s + toMonthlyConverted(r, rates), 0)
 
   return (
-    <Card className="p-3 sm:p-4">
+    <Card temperature="cool">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-xl bg-blue-100 dark:bg-blue-900/30">

@@ -42,7 +42,7 @@ function TokenRow({ token, isPrivacyMode }: { token: TokenBalance; isPrivacyMode
             }}
           />
         ) : (
-          <div className="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-[10px] font-medium">
+          <div className="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center text-xs font-medium">
             {token.symbol.slice(0, 2)}
           </div>
         )}

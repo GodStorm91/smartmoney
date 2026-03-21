@@ -76,7 +76,7 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
               : 0
             const over = isOverBudget(alert.alert_type)
             return (
-              <Link key={alert.id} to="/budget" className="block animate-stagger-in" style={{ '--stagger-index': idx } as React.CSSProperties}>
+              <Link key={alert.id} to="/budget" className="block">
                 <div className={cn(
                   'p-3 rounded-xl border transition-colors',
                   over
@@ -110,7 +110,7 @@ export function DashboardAlerts({ alerts, unreadAnomalyCount, budgetAlerts = [],
                     />
                   </div>
                   <p className={cn(
-                    'text-[10px] mt-1',
+                    'text-xs mt-1',
                     over ? 'text-expense-500 dark:text-expense-400' : 'text-amber-500 dark:text-amber-400'
                   )}>
                     {t('alerts.budgetRemaining', '{{amount}} remaining', { amount: formatCurrency(alert.amount_remaining, currency, exchangeRates?.rates || {}, false) })}
