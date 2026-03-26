@@ -2,7 +2,7 @@ import { apiClient } from './api-client'
 import type { PendingActionListResponse, ActionExecuteResponse } from '@/types/pending-action'
 
 export async function fetchPendingActions(surface?: string): Promise<PendingActionListResponse> {
-  const response = await apiClient.get<PendingActionListResponse>('/api/actions', {
+  const response = await apiClient.get<PendingActionListResponse>('/api/actions/pending', {
     params: surface ? { surface } : undefined,
   })
   return response.data

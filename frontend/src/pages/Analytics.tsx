@@ -30,6 +30,7 @@ type AnalyticsTab = 'overview' | 'report'
 export function Analytics() {
   const { t } = useTranslation('common')
   const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const openAiTools = searchParams?.tab === 'ai-tools'
   const [activeTab, setActiveTab] = useState<AnalyticsTab>(
     searchParams?.tab === 'report' ? 'report' : 'overview'
   )
@@ -141,7 +142,7 @@ export function Analytics() {
 
               <SpendingHeatmap startDate={dateRange.start} endDate={dateRange.end} />
               <YoYComparisonChart />
-              <AnalyticsAiToolsSection />
+              <AnalyticsAiToolsSection initialExpanded={openAiTools} />
             </div>
           )}
         </>

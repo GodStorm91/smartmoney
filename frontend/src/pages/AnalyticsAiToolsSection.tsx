@@ -9,9 +9,13 @@ import { SpendingInsights } from '@/components/analytics/SpendingInsights'
 import { AICategoryCleanup } from '@/components/analytics/AICategoryCleanup'
 import { cn } from '@/utils/cn'
 
-export function AnalyticsAiToolsSection() {
+interface AnalyticsAiToolsSectionProps {
+  initialExpanded?: boolean
+}
+
+export function AnalyticsAiToolsSection({ initialExpanded = false }: AnalyticsAiToolsSectionProps) {
   const { t } = useTranslation('common')
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(initialExpanded)
 
   return (
     <div className="border border-amber-200 dark:border-amber-800/40 rounded-xl overflow-hidden shadow-card">

@@ -130,7 +130,7 @@ def generate_adjust_budget_category(db: Session, user_id: int) -> bool:
         description=f"Spent {spent_abs:,} vs budgeted {alloc.amount:,}.",
         params={
             "category": alloc.category,
-            "current_spent": spent_abs,
+            "spent": spent_abs,
             "allocated": alloc.amount,
             "suggested_new": suggested,
             "allocation_id": alloc.id,
@@ -180,10 +180,10 @@ def generate_review_goal_catch_up(db: Session, user_id: int) -> bool:
         description=f"Need ~{monthly_needed:,}/mo to catch up.",
         params={
             "goal_id": goal.id,
-            "goal_name": f"{goal.years}-year goal",
+            "goalName": f"{goal.years}-year goal",
             "current_amount": int(goal.target_amount * (goal.last_milestone_pct or 0) / 100),
             "target": goal.target_amount,
-            "monthly_needed": monthly_needed,
+            "monthlyNeeded": monthly_needed,
         },
         priority=3,
     )
