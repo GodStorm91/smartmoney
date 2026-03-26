@@ -1,5 +1,5 @@
 export type ActionType = 'review_uncategorized' | 'copy_or_create_budget' | 'adjust_budget_category' | 'review_goal_catch_up'
-export type ActionSurface = 'dashboard' | 'budget_page'
+export type ActionSurface = 'dashboard' | 'budget_page' | 'goals_page' | 'report_page'
 export type ActionStatus = 'pending' | 'surfaced' | 'executed' | 'dismissed' | 'expired' | 'undone'
 
 export interface PendingAction {

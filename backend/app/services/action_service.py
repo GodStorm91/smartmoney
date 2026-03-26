@@ -7,6 +7,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..models.pending_action import PendingAction
+from ..models.settings import AppSettings
 from .action_generators import (
     generate_review_uncategorized,
     generate_copy_or_create_budget,
@@ -37,16 +38,21 @@ class ActionService:
         if is_auto_paused(db, user_id):
             return 0
 
+        # Read expansion settings
+        settings = db.query(AppSettings).filter(AppSettings.user_id == user_id).first()
+        expanded = settings.smart_actions_expanded if settings else False
+        auto_execute = settings.smart_actions_auto_execute if settings else False
+
+        goal_surface = "goals_page" if expanded else "dashboard"
         generators = [
-            generate_review_uncategorized,
-            generate_copy_or_create_budget,
-            generate_adjust_budget_category,
-            generate_review_goal_catch_up,
+            ("review_uncategorized", generate_review_uncategorized),
+            ("copy_or_create_budget", generate_copy_or_create_budget),
+            ("adjust_budget_category", generate_adjust_budget_category),
+            ("review_goal_catch_up", lambda d, u: generate_review_goal_catch_up(d, u, surface=goal_surface)),
         ]
         created = 0
-        for gen in generators:
+        for action_type, gen in generators:
             try:
-                action_type = gen.__name__.replace("generate_", "")
                 if has_active_action(db, user_id, action_type):
                     continue
                 if is_in_cooldown(db, user_id, action_type):
@@ -56,9 +62,25 @@ class ActionService:
             except Exception as e:
                 db.rollback()
                 logger.error(f"Action generator failed for user {user_id}: {e}")
+
+        # Auto-execute mutation actions if enabled (never navigation actions)
+        if auto_execute and created > 0:
+            auto_types = ["copy_or_create_budget", "adjust_budget_category"]
+            new_auto = db.query(PendingAction).filter(
+                PendingAction.user_id == user_id,
+                PendingAction.status == "pending",
+                PendingAction.type.in_(auto_types),
+            ).all()
+            for action in new_auto:
+                self.execute_action(db, user_id, action.id)
+                logger.info(f"Auto-executed action {action.id} ({action.type})")
+
         return created
 
-    # ── Surface / Execute / Dismiss / Undo ─────────────────
+    def _get_action(self, db: Session, user_id: int, action_id: int):
+        return db.query(PendingAction).filter(
+            PendingAction.id == action_id, PendingAction.user_id == user_id
+        ).first()
 
     def surface_actions(
         self, db: Session, user_id: int, surface: str | None = None, limit: int = 5
@@ -88,11 +110,7 @@ class ActionService:
 
     def execute_action(self, db: Session, user_id: int, action_id: int):
         """Execute an action. Returns (success, message, undo_available)."""
-        action = (
-            db.query(PendingAction)
-            .filter(PendingAction.id == action_id, PendingAction.user_id == user_id)
-            .first()
-        )
+        action = self._get_action(db, user_id, action_id)
         if not action:
             return False, "Action not found", False
         if action.status == "executed":
@@ -114,11 +132,7 @@ class ActionService:
 
     def dismiss_action(self, db: Session, user_id: int, action_id: int):
         """Dismiss an action. Returns (success, message)."""
-        action = (
-            db.query(PendingAction)
-            .filter(PendingAction.id == action_id, PendingAction.user_id == user_id)
-            .first()
-        )
+        action = self._get_action(db, user_id, action_id)
         if not action:
             return False, "Action not found"
         old_status = action.status
@@ -130,11 +144,7 @@ class ActionService:
 
     def undo_action(self, db: Session, user_id: int, action_id: int):
         """Undo an executed action within 24h window."""
-        action = (
-            db.query(PendingAction)
-            .filter(PendingAction.id == action_id, PendingAction.user_id == user_id)
-            .first()
-        )
+        action = self._get_action(db, user_id, action_id)
         if not action:
             return False, "Action not found", False
         if action.status != "executed":

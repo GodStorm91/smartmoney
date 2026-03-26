@@ -30,6 +30,10 @@ class AppSettings(Base):
     budget_carry_over: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     budget_email_alerts: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
+    # Smart actions expansion (Phase 2B)
+    smart_actions_expanded: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    smart_actions_auto_execute: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
     __table_args__ = (
         CheckConstraint("id = 1", name="singleton"),
         CheckConstraint("base_date >= 1 AND base_date <= 31", name="valid_base_date"),

@@ -19,6 +19,7 @@ import {
   Link2,
   Copy,
   CheckCircle,
+  Zap,
 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
@@ -37,6 +38,8 @@ import { NotificationPreferences } from '@/components/notifications/Notification
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
 import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileForm'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
+import { fetchActionSettings, updateActionSettings } from '@/services/pending-action-service'
+import type { ActionSettings } from '@/services/pending-action-service'
 import { getHouseholdProfile, updateHouseholdProfile } from '@/services/benchmark-service'
 import { toast } from 'sonner'
 import { exportForIOS, exportCsvFromServer, generateExportLink } from '@/services/export-service'
@@ -55,6 +58,7 @@ const SECTIONS = [
   { id: 'notifications', labelKey: 'settings.sections.notifications', icon: Bell },
   { id: 'crypto', labelKey: 'settings.sections.crypto', icon: Globe },
   { id: 'anomaly', labelKey: 'anomaly.title', icon: AlertTriangle },
+  { id: 'smartActions', labelKey: 'actions.smartActionsSettings', icon: Zap },
   { id: 'export', labelKey: 'settings.sections.export', icon: Smartphone },
 ] as const
 
@@ -79,6 +83,18 @@ export function Settings() {
   const { data: settings, isLoading } = useQuery({
     queryKey: ['settings'],
     queryFn: fetchSettings,
+  })
+
+  // Smart Actions settings
+  const { data: actionSettings } = useQuery({
+    queryKey: ['action-settings'],
+    queryFn: fetchActionSettings,
+  })
+  const updateActionSettingsMutation = useMutation({
+    mutationFn: updateActionSettings,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['action-settings'] })
+    },
   })
 
   // Household profile
@@ -404,6 +420,25 @@ export function Settings() {
         {/* Anomaly Detection */}
         <div className={cn('space-y-4', activeSection !== 'anomaly' && 'hidden')}>
           <AnomalyConfigPanel />
+        </div>
+
+        {/* Smart Actions */}
+        <div className={cn('space-y-4', activeSection !== 'smartActions' && 'hidden')}>
+          <SectionCard icon={Zap} title={t('actions.smartActionsSettings', 'Smart Actions')} description={t('actions.disclaimer')}>
+            <div className="space-y-4">
+              <ToggleSetting
+                label={t('actions.expandedSurfaces', 'Show actions on Goals & Report pages')}
+                checked={actionSettings?.expanded_surfaces ?? false}
+                onChange={(val) => updateActionSettingsMutation.mutate({ expanded_surfaces: val })}
+              />
+              <ToggleSetting
+                label={t('actions.autoExecute', 'Auto-apply budget actions')}
+                description={t('actions.autoExecuteDesc', 'Automatically create and adjust budgets without confirmation')}
+                checked={actionSettings?.auto_execute ?? false}
+                onChange={(val) => updateActionSettingsMutation.mutate({ auto_execute: val })}
+              />
+            </div>
+          </SectionCard>
         </div>
 
         {/* Export to iOS */}

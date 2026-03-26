@@ -1,10 +1,12 @@
 """Pending actions API endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
+from ..models.settings import AppSettings
 from ..models.user import User
 from ..schemas.pending_action import (
     ActionDismissResponse,
@@ -14,6 +16,18 @@ from ..schemas.pending_action import (
 )
 from ..models.pending_action import PendingAction
 from ..services.action_service import get_action_service
+
+
+class ActionSettingsResponse(BaseModel):
+    """Response for action-specific settings."""
+    expanded_surfaces: bool = False
+    auto_execute: bool = False
+
+
+class ActionSettingsUpdate(BaseModel):
+    """Update request for action-specific settings."""
+    expanded_surfaces: bool | None = None
+    auto_execute: bool | None = None
 
 router = APIRouter(prefix="/api/actions", tags=["actions"])
 
@@ -72,6 +86,42 @@ async def get_action_stats(
             "undo_rate": round(undone / executed, 2) if executed > 0 else 0,
         }
     }
+
+
+@router.get("/settings", response_model=ActionSettingsResponse)
+async def get_action_settings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ActionSettingsResponse:
+    """Get action-specific settings."""
+    settings = db.query(AppSettings).filter(AppSettings.user_id == current_user.id).first()
+    return ActionSettingsResponse(
+        expanded_surfaces=settings.smart_actions_expanded if settings else False,
+        auto_execute=settings.smart_actions_auto_execute if settings else False,
+    )
+
+
+@router.put("/settings", response_model=ActionSettingsResponse)
+async def update_action_settings(
+    request: ActionSettingsUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ActionSettingsResponse:
+    """Update action-specific settings."""
+    settings = db.query(AppSettings).filter(AppSettings.user_id == current_user.id).first()
+    if not settings:
+        settings = AppSettings(user_id=current_user.id)
+        db.add(settings)
+    if request.expanded_surfaces is not None:
+        settings.smart_actions_expanded = request.expanded_surfaces
+    if request.auto_execute is not None:
+        settings.smart_actions_auto_execute = request.auto_execute
+    db.commit()
+    db.refresh(settings)
+    return ActionSettingsResponse(
+        expanded_surfaces=settings.smart_actions_expanded,
+        auto_execute=settings.smart_actions_auto_execute,
+    )
 
 
 @router.get("/count")

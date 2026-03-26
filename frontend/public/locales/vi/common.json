@@ -2197,6 +2197,10 @@
     "adjustBudgetCategory": "Điều chỉnh ngân sách {{category}}",
     "adjustBudgetCategoryDesc": "Chi tiêu ¥{{spent}} vượt ngân sách ¥{{allocated}}",
     "reviewGoalCatchUp": "Mục tiêu cần chú ý",
-    "reviewGoalCatchUpDesc": "{{goalName}} đang chậm. Tiết kiệm ¥{{monthlyNeeded}}/tháng để bắt kịp"
+    "reviewGoalCatchUpDesc": "{{goalName}} đang chậm. Tiết kiệm ¥{{monthlyNeeded}}/tháng để bắt kịp",
+    "expandedSurfaces": "Hiển thị hành động trên trang Mục tiêu & Báo cáo",
+    "autoExecute": "Tự động áp dụng hành động ngân sách",
+    "autoExecuteDesc": "Tự động tạo và điều chỉnh ngân sách mà không cần xác nhận",
+    "smartActionsSettings": "Hành động thông minh"
   }
 }

@@ -2334,6 +2334,10 @@
     "adjustBudgetCategory": "Adjust {{category}} budget",
     "adjustBudgetCategoryDesc": "Spending ¥{{spent}} exceeds ¥{{allocated}} budget",
     "reviewGoalCatchUp": "Goal needs attention",
-    "reviewGoalCatchUpDesc": "{{goalName}} is behind. Save ¥{{monthlyNeeded}}/mo to catch up"
+    "reviewGoalCatchUpDesc": "{{goalName}} is behind. Save ¥{{monthlyNeeded}}/mo to catch up",
+    "expandedSurfaces": "Show actions on Goals & Report pages",
+    "autoExecute": "Auto-apply budget actions",
+    "autoExecuteDesc": "Automatically create and adjust budgets without confirmation",
+    "smartActionsSettings": "Smart Actions"
   }
 }

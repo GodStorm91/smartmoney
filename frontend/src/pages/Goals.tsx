@@ -4,12 +4,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useSearch, useNavigate } from '@tanstack/react-router'
 import { Plus, Target, TrendingUp, TrendingDown } from 'lucide-react'
+import { GoalsInlineAction } from '@/components/goals/GoalsInlineAction'
 import { PageShell } from '@/components/layout/PageShell'
 import { PageSkeleton } from '@/components/ui/PageSkeleton'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { GoalAchievabilityCard } from '@/components/goals/GoalAchievabilityCard'
 import { GoalCreateEmptyState } from '@/components/goals/GoalCreateEmptyState'
 import { GoalCreateModal } from '@/components/goals/GoalCreateModal'
+import { usePendingActions } from '@/hooks/use-pending-actions'
 import { fetchGoals, fetchGoalProgress, deleteGoal } from '@/services/goal-service'
 import { fetchCategoryBreakdown } from '@/services/analytics-service'
 import { useSettings } from '@/contexts/SettingsContext'
@@ -41,6 +43,7 @@ export function Goals() {
       }
     }
   }, [searchParams?.edit])
+  const { data: goalActions } = usePendingActions('goals_page')
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
   const { isPrivacyMode } = usePrivacy()
@@ -178,6 +181,15 @@ export function Goals() {
       isLoading={isLoading}
       skeleton={<PageSkeleton variant="cards" />}
     >
+      {/* Inline Action Suggestions */}
+      {goalActions?.actions?.length ? (
+        <div className="space-y-2 mb-4">
+          {goalActions.actions.map(a => (
+            <GoalsInlineAction key={a.id} action={a} />
+          ))}
+        </div>
+      ) : null}
+
       {/* Overall Progress Bar */}
       {overallStats && overallStats.totalCount > 0 && (
         <div className="flex items-center gap-3 mb-4">

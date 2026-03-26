@@ -141,7 +141,7 @@ def generate_adjust_budget_category(db: Session, user_id: int) -> bool:
     return _safe_add_action(db, action)
 
 
-def generate_review_goal_catch_up(db: Session, user_id: int) -> bool:
+def generate_review_goal_catch_up(db: Session, user_id: int, surface: str = "dashboard") -> bool:
     """Generate action for most-behind goal."""
     goals = db.query(Goal).filter(Goal.user_id == user_id).all()
     if not goals:
@@ -175,7 +175,7 @@ def generate_review_goal_catch_up(db: Session, user_id: int) -> bool:
     action = PendingAction(
         user_id=user_id,
         type="review_goal_catch_up",
-        surface="dashboard",
+        surface=surface,
         title=f"Goal '{goal.years}Y' is behind schedule",
         description=f"Need ~{monthly_needed:,}/mo to catch up.",
         params={

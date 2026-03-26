@@ -68,6 +68,8 @@ class SettingsService:
             "base_date": base_date,
             "budget_carry_over": settings.budget_carry_over,
             "budget_email_alerts": settings.budget_email_alerts,
+            "smart_actions_expanded": settings.smart_actions_expanded,
+            "smart_actions_auto_execute": settings.smart_actions_auto_execute,
             "categories": categories,
             "sources": sources,
         }
@@ -108,6 +110,10 @@ class SettingsService:
             settings.budget_carry_over = updates["budget_carry_over"]
         if "budget_email_alerts" in updates and updates["budget_email_alerts"] is not None:
             settings.budget_email_alerts = updates["budget_email_alerts"]
+        if "smart_actions_expanded" in updates and updates["smart_actions_expanded"] is not None:
+            settings.smart_actions_expanded = updates["smart_actions_expanded"]
+        if "smart_actions_auto_execute" in updates and updates["smart_actions_auto_execute"] is not None:
+            settings.smart_actions_auto_execute = updates["smart_actions_auto_execute"]
 
         db.commit()
         db.refresh(settings)

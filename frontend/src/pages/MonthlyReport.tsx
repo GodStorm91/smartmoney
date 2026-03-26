@@ -14,13 +14,16 @@ import { FocusAreas } from '@/components/report/FocusAreas'
 import { SmartSummaryCard } from '@/components/report/SmartSummaryCard'
 import { GoalProgressCard } from '@/components/report/GoalProgressCard'
 import { AccountSummaryCard } from '@/components/report/AccountSummaryCard'
+import { ReportInlineAction } from '@/components/report/ReportInlineAction'
 import { ReportInsights } from '@/components/report/ReportInsights'
+import { usePendingActions } from '@/hooks/use-pending-actions'
 import { formatCurrency } from '@/utils/formatCurrency'
 
 export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation('common')
   const [selectedMonth, setSelectedMonth] = useState(new Date())
   const [isDownloading, setIsDownloading] = useState(false)
+  const { data: reportActions } = usePendingActions('report_page')
 
   const year = selectedMonth.getFullYear()
   const month = selectedMonth.getMonth() + 1
@@ -54,6 +57,15 @@ export function MonthlyReport({ embedded = false }: { embedded?: boolean }) {
     <>
       <ReportHeader year={year} month={month} onDownloadPDF={handleDownloadPDF} isDownloading={isDownloading} />
       <MonthPicker selectedMonth={selectedMonth} onChange={setSelectedMonth} className="mb-6" />
+
+      {/* Inline Action Suggestions */}
+      {reportActions?.actions?.length ? (
+        <div className="space-y-2 mb-4">
+          {reportActions.actions.map(a => (
+            <ReportInlineAction key={a.id} action={a} />
+          ))}
+        </div>
+      ) : null}
 
       {isLoading && (
         <div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>

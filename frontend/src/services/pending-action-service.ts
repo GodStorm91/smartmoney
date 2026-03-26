@@ -29,3 +29,18 @@ export async function undoAction(actionId: number): Promise<ActionExecuteRespons
   const response = await apiClient.post<ActionExecuteResponse>(`/api/actions/${actionId}/undo`)
   return response.data
 }
+
+export interface ActionSettings {
+  expanded_surfaces: boolean
+  auto_execute: boolean
+}
+
+export async function fetchActionSettings(): Promise<ActionSettings> {
+  const response = await apiClient.get<ActionSettings>('/api/actions/settings')
+  return response.data
+}
+
+export async function updateActionSettings(data: Partial<ActionSettings>): Promise<ActionSettings> {
+  const response = await apiClient.put<ActionSettings>('/api/actions/settings', data)
+  return response.data
+}
