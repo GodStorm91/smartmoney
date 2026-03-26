@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { useSearch } from '@tanstack/react-router'
+import { useSearch, useNavigate } from '@tanstack/react-router'
 import { Plus, Target, TrendingUp, TrendingDown } from 'lucide-react'
 import { PageShell } from '@/components/layout/PageShell'
 import { PageSkeleton } from '@/components/ui/PageSkeleton'
@@ -25,6 +25,7 @@ export function Goals() {
   const { t } = useTranslation('common')
   const queryClient = useQueryClient()
   const searchParams = useSearch({ strict: false }) as Record<string, string>
+  const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedYears, setSelectedYears] = useState<number | undefined>()
   const [editingGoalId, setEditingGoalId] = useState<number | null>(null)
@@ -139,6 +140,10 @@ export function Goals() {
     setIsModalOpen(false)
     setSelectedYears(undefined)
     setEditingGoalId(null)
+    // Clear ?edit= param so refresh doesn't reopen modal
+    if (searchParams?.edit) {
+      navigate({ to: '/goals', search: {}, replace: true })
+    }
   }
 
   const headerRight = (
