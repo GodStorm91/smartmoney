@@ -2231,5 +2231,24 @@
     "lotDeleted": "取引を削除しました",
     "priceUpdated": "価格を更新しました",
     "noPriceSet": "価格未設定"
+  },
+  "actions": {
+    "nextBestAction": "おすすめアクション",
+    "notNow": "今はしない",
+    "apply": "適用",
+    "adjust": "調整",
+    "undo": "元に戻す",
+    "applied": "適用しました",
+    "undone": "元に戻しました",
+    "dismissed": "非表示にしました",
+    "disclaimer": "取引履歴に基づいています。金融アドバイスではありません。",
+    "reviewUncategorized": "未分類の取引を確認",
+    "reviewUncategorizedDesc": "今月{{count}}件の取引にカテゴリが必要です",
+    "copyOrCreateBudget": "今月の予算を作成",
+    "copyOrCreateBudgetDesc": "{{month}}の予算がまだありません。先月からコピーしますか？",
+    "adjustBudgetCategory": "{{category}}の予算を調整",
+    "adjustBudgetCategoryDesc": "支出¥{{spent}}が予算¥{{allocated}}を超えています",
+    "reviewGoalCatchUp": "目標の確認が必要",
+    "reviewGoalCatchUpDesc": "{{goalName}}が遅れています。月¥{{monthlyNeeded}}の貯蓄で追いつけます"
   }
 }

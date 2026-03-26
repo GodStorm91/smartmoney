@@ -2179,5 +2179,24 @@
     "lotDeleted": "Đã xóa giao dịch",
     "priceUpdated": "Đã cập nhật giá",
     "noPriceSet": "Chưa cập nhật giá"
+  },
+  "actions": {
+    "nextBestAction": "Hành động đề xuất",
+    "notNow": "Để sau",
+    "apply": "Áp dụng",
+    "adjust": "Điều chỉnh",
+    "undo": "Hoàn tác",
+    "applied": "Đã áp dụng",
+    "undone": "Đã hoàn tác",
+    "dismissed": "Đã ẩn",
+    "disclaimer": "Dựa trên lịch sử giao dịch. Không phải tư vấn tài chính.",
+    "reviewUncategorized": "Xem lại giao dịch chưa phân loại",
+    "reviewUncategorizedDesc": "{{count}} giao dịch cần phân loại tháng này",
+    "copyOrCreateBudget": "Tạo ngân sách tháng này",
+    "copyOrCreateBudgetDesc": "Chưa có ngân sách cho {{month}}. Sao chép từ tháng trước?",
+    "adjustBudgetCategory": "Điều chỉnh ngân sách {{category}}",
+    "adjustBudgetCategoryDesc": "Chi tiêu ¥{{spent}} vượt ngân sách ¥{{allocated}}",
+    "reviewGoalCatchUp": "Mục tiêu cần chú ý",
+    "reviewGoalCatchUpDesc": "{{goalName}} đang chậm. Tiết kiệm ¥{{monthlyNeeded}}/tháng để bắt kịp"
   }
 }
