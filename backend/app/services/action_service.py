@@ -53,6 +53,7 @@ class ActionService:
                 if gen(db, user_id):
                     created += 1
             except Exception as e:
+                db.rollback()
                 logger.error(f"Action generator failed for user {user_id}: {e}")
         return created
 

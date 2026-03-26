@@ -44,9 +44,15 @@ def upgrade() -> None:
     op.create_index('ix_pending_action_expires', 'pending_actions', ['expires_at'], unique=False)
     op.create_index('ix_pending_action_user_status', 'pending_actions', ['user_id', 'status'], unique=False)
     op.create_index('ix_pending_action_user_type_status', 'pending_actions', ['user_id', 'type', 'status'], unique=False)
+    # Partial unique index: only 1 active (pending/surfaced) action per user+type
+    op.execute(
+        "CREATE UNIQUE INDEX uq_pending_action_active ON pending_actions (user_id, type) "
+        "WHERE status IN ('pending', 'surfaced')"
+    )
 
 
 def downgrade() -> None:
+    op.execute("DROP INDEX IF EXISTS uq_pending_action_active")
     op.drop_index('ix_pending_action_user_type_status', table_name='pending_actions')
     op.drop_index('ix_pending_action_user_status', table_name='pending_actions')
     op.drop_index('ix_pending_action_expires', table_name='pending_actions')

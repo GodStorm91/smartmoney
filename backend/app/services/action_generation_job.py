@@ -34,6 +34,7 @@ class ActionGenerationJob:
                 if created:
                     logger.info(f"User {user.id}: created {created} action(s)")
             except Exception as e:
+                db.rollback()
                 errors += 1
                 logger.error(f"Action generation failed for user {user.id}: {e}")
 

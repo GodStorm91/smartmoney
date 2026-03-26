@@ -1,10 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from '@tanstack/react-router'
 import { Lightbulb, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePendingActions } from '@/hooks/use-pending-actions'
 import { cn } from '@/utils/cn'
-import type { PendingAction } from '@/types/pending-action'
+import type { PendingAction, ActionType } from '@/types/pending-action'
+
+const NAVIGATION_ACTIONS: Partial<Record<ActionType, (params: Record<string, unknown>) => string>> = {
+  review_uncategorized: () => '/analytics?tab=ai-tools',
+  review_goal_catch_up: (params) => `/goals?edit=${params.goal_id || ''}`,
+}
 
 interface BudgetInlineActionProps {
   action: PendingAction
@@ -12,12 +18,34 @@ interface BudgetInlineActionProps {
 
 export function BudgetInlineAction({ action }: BudgetInlineActionProps) {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
   const { executeMutation, dismissMutation, undoMutation } = usePendingActions('budget_page')
   const [hidden, setHidden] = useState(false)
 
+  // Localized copy from i18n keys + action params
+  const titleKeyMap: Record<ActionType, string> = {
+    review_uncategorized: 'actions.reviewUncategorized',
+    copy_or_create_budget: 'actions.copyOrCreateBudget',
+    adjust_budget_category: 'actions.adjustBudgetCategory',
+    review_goal_catch_up: 'actions.reviewGoalCatchUp',
+  }
+  const descKeyMap: Record<ActionType, string> = {
+    review_uncategorized: 'actions.reviewUncategorizedDesc',
+    copy_or_create_budget: 'actions.copyOrCreateBudgetDesc',
+    adjust_budget_category: 'actions.adjustBudgetCategoryDesc',
+    review_goal_catch_up: 'actions.reviewGoalCatchUpDesc',
+  }
+  const localTitle = t(titleKeyMap[action.type], action.title, action.params as Record<string, string>)
+  const localDesc = t(descKeyMap[action.type], action.description || '', action.params as Record<string, string>)
+
   const handleExecute = () => {
+    const navAction = NAVIGATION_ACTIONS[action.type]
     executeMutation.mutate(action.id, {
       onSuccess: (result) => {
+        if (navAction) {
+          navigate({ to: navAction(action.params) })
+          return
+        }
         toast.success(t('actions.applied', 'Action applied'), {
           duration: 10000,
           action: result.undo_available
@@ -50,11 +78,11 @@ export function BudgetInlineAction({ action }: BudgetInlineActionProps) {
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900 dark:text-white leading-snug">
-          {action.title}
+          {localTitle}
         </p>
-        {action.description && (
+        {localDesc && (
           <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">
-            {action.description}
+            {localDesc}
           </p>
         )}
         <button

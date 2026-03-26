@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from '@tanstack/react-router'
 import { ListChecks, Wallet, TrendingUp, Target } from 'lucide-react'
 import { toast } from 'sonner'
 import { Card } from '@/components/ui/Card'
@@ -25,17 +26,47 @@ interface DashboardActionCardProps {
   action: PendingAction
 }
 
+// Navigation-only action types that should route the user instead of just marking executed
+const NAVIGATION_ACTIONS: Partial<Record<ActionType, (params: Record<string, unknown>) => string>> = {
+  review_uncategorized: () => '/analytics?tab=ai-tools',
+  review_goal_catch_up: (params) => `/goals?edit=${params.goal_id || ''}`,
+}
+
 export function DashboardActionCard({ action }: DashboardActionCardProps) {
   const { t } = useTranslation('common')
+  const navigate = useNavigate()
   const { executeMutation, dismissMutation, undoMutation } = usePendingActions('dashboard')
   const [dismissed, setDismissed] = useState(false)
 
   const Icon = iconMap[action.type] || ListChecks
   const ctaKey = ctaLabelMap[action.type] || 'actions.apply'
 
+  // Localized title/description from i18n keys + action params (Finding 5 fix)
+  const titleKeyMap: Record<ActionType, string> = {
+    review_uncategorized: 'actions.reviewUncategorized',
+    copy_or_create_budget: 'actions.copyOrCreateBudget',
+    adjust_budget_category: 'actions.adjustBudgetCategory',
+    review_goal_catch_up: 'actions.reviewGoalCatchUp',
+  }
+  const descKeyMap: Record<ActionType, string> = {
+    review_uncategorized: 'actions.reviewUncategorizedDesc',
+    copy_or_create_budget: 'actions.copyOrCreateBudgetDesc',
+    adjust_budget_category: 'actions.adjustBudgetCategoryDesc',
+    review_goal_catch_up: 'actions.reviewGoalCatchUpDesc',
+  }
+  const localTitle = t(titleKeyMap[action.type], action.title, action.params as Record<string, string>)
+  const localDesc = t(descKeyMap[action.type], action.description || '', action.params as Record<string, string>)
+
   const handleExecute = () => {
+    const navAction = NAVIGATION_ACTIONS[action.type]
     executeMutation.mutate(action.id, {
       onSuccess: (result) => {
+        // Navigation actions: route user to the relevant flow after marking executed
+        if (navAction) {
+          const path = navAction(action.params)
+          navigate({ to: path })
+          return
+        }
         toast.success(t('actions.applied', 'Action applied'), {
           duration: 10000,
           action: result.undo_available
@@ -64,11 +95,11 @@ export function DashboardActionCard({ action }: DashboardActionCardProps) {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-gray-900 dark:text-white leading-snug">
-            {action.title}
+            {localTitle}
           </p>
-          {action.description && (
+          {localDesc && (
             <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 leading-relaxed">
-              {action.description}
+              {localDesc}
             </p>
           )}
         </div>

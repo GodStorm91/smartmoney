@@ -4,6 +4,7 @@ import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..models.budget import Budget
@@ -12,6 +13,18 @@ from ..models.pending_action import PendingAction
 from ..models.transaction import Transaction
 
 logger = logging.getLogger(__name__)
+
+
+def _safe_add_action(db: Session, action: PendingAction) -> bool:
+    """Add action with IntegrityError handling for dedup constraint."""
+    try:
+        db.add(action)
+        db.commit()
+        return True
+    except IntegrityError:
+        db.rollback()
+        logger.debug(f"Duplicate action skipped: {action.type} for user {action.user_id}")
+        return False
 
 
 def generate_review_uncategorized(db: Session, user_id: int) -> bool:
@@ -39,9 +52,7 @@ def generate_review_uncategorized(db: Session, user_id: int) -> bool:
         params={"count": count, "month": current_month},
         priority=3,
     )
-    db.add(action)
-    db.commit()
-    return True
+    return _safe_add_action(db, action)
 
 
 def generate_copy_or_create_budget(db: Session, user_id: int) -> bool:
@@ -68,9 +79,7 @@ def generate_copy_or_create_budget(db: Session, user_id: int) -> bool:
         params={"month": current_month, "suggested_source": "previous"},
         priority=2,
     )
-    db.add(action)
-    db.commit()
-    return True
+    return _safe_add_action(db, action)
 
 
 def generate_adjust_budget_category(db: Session, user_id: int) -> bool:
@@ -129,9 +138,7 @@ def generate_adjust_budget_category(db: Session, user_id: int) -> bool:
         },
         priority=2,
     )
-    db.add(action)
-    db.commit()
-    return True
+    return _safe_add_action(db, action)
 
 
 def generate_review_goal_catch_up(db: Session, user_id: int) -> bool:
@@ -180,6 +187,4 @@ def generate_review_goal_catch_up(db: Session, user_id: int) -> bool:
         },
         priority=3,
     )
-    db.add(action)
-    db.commit()
-    return True
+    return _safe_add_action(db, action)
