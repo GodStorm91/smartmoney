@@ -2249,6 +2249,10 @@
     "adjustBudgetCategory": "{{category}}の予算を調整",
     "adjustBudgetCategoryDesc": "支出¥{{spent}}が予算¥{{allocated}}を超えています",
     "reviewGoalCatchUp": "目標の確認が必要",
-    "reviewGoalCatchUpDesc": "{{goalName}}が遅れています。月¥{{monthlyNeeded}}の貯蓄で追いつけます"
+    "reviewGoalCatchUpDesc": "{{goalName}}が遅れています。月¥{{monthlyNeeded}}の貯蓄で追いつけます",
+    "expandedSurfaces": "目標・レポートページにアクションを表示",
+    "autoExecute": "予算アクションを自動適用",
+    "autoExecuteDesc": "確認なしで予算の作成・調整を自動実行",
+    "smartActionsSettings": "スマートアクション"
   }
 }
