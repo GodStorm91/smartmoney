@@ -15,6 +15,7 @@ from fastapi.exceptions import RequestValidationError
 from .config import settings as app_settings
 from .database import SessionLocal, init_db
 from .routes.accounts import router as accounts_router
+from .routes.actions import router as actions_router
 from .routes.ai_categorization import router as ai_categorization_router
 from .routes.analytics import router as analytics_router
 from .routes.anomalies import router as anomalies_router
@@ -346,6 +347,21 @@ def scheduled_insight_generation():
         db.close()
 
 
+def scheduled_action_generation():
+    """Background job to generate pending actions daily."""
+    from .services.action_generation_job import ActionGenerationJob
+
+    db = SessionLocal()
+    try:
+        job = ActionGenerationJob()
+        result = job.run(db)
+        logger.info(f"Action generation: {result}")
+    except Exception as e:
+        logger.error(f"Scheduled action generation failed: {e}")
+    finally:
+        db.close()
+
+
 def scheduled_export_cleanup():
     """Clean up expired export files (older than 10 minutes)."""
     import time
@@ -478,6 +494,17 @@ async def startup_event():
     )
     logger.info("Insight generation scheduled (daily at 7 AM UTC)")
 
+    # Schedule daily action generation at 2:30 AM UTC
+    scheduler.add_job(
+        scheduled_action_generation,
+        trigger="cron",
+        hour=2,
+        minute=30,
+        id="action_generation",
+        replace_existing=True,
+    )
+    logger.info("Action generation scheduled (daily at 2:30 AM UTC)")
+
     # Ensure exports directory exists
     exports_dir = os.path.join(uploads_dir, "exports")
     os.makedirs(exports_dir, exist_ok=True)
@@ -536,6 +563,7 @@ app.include_router(theme_router)
 app.include_router(export_router)
 app.include_router(health_score_router)
 app.include_router(holdings_router)
+app.include_router(actions_router)
 
 
 # Root endpoints

@@ -12,6 +12,7 @@ import { AddCategoryModal } from '@/components/budget/add-category-modal'
 import { BudgetConfirmDialog } from '@/components/budget/budget-confirm-dialog'
 import { BudgetTabsContainer } from '@/components/budget/budget-tabs-container'
 import { BudgetVersionDropdown } from '@/components/budget/budget-version-dropdown'
+import { BudgetInlineAction } from '@/components/budget/BudgetInlineAction'
 import { OverviewTab } from '@/components/budget/tabs/overview-tab'
 import { CategoriesTab } from '@/components/budget/tabs/categories-tab'
 import { TransactionsTab } from '@/components/budget/tabs/transactions-tab'
@@ -26,6 +27,7 @@ import { useSettings } from '@/contexts/SettingsContext'
 import { usePrivacy } from '@/contexts/PrivacyContext'
 import { useExchangeRates } from '@/hooks/useExchangeRates'
 import { useXPGain } from '@/hooks/useXPGain'
+import { usePendingActions } from '@/hooks/use-pending-actions'
 import { useBudgetTabState } from '@/hooks/useBudgetTabState'
 import { cn } from '@/utils/cn'
 import { toast } from 'sonner'
@@ -60,6 +62,7 @@ export function BudgetPage() {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   const { activeTab, setActiveTab } = useBudgetTabState('overview')
+  const { data: budgetActions } = usePendingActions('budget_page')
   const { showBudgetCreatedXP } = useXPGain()
 
   const formatCurrency = (amount: number) =>
@@ -258,6 +261,11 @@ export function BudgetPage() {
       skeleton={<PageSkeleton variant="cards" />}
     >
       <div className="space-y-4">
+        {/* Inline Actions */}
+        {budgetActions?.actions?.map(a => (
+          <BudgetInlineAction key={a.id} action={a} />
+        ))}
+
         {/* Empty State — Creation Wizard */}
         {!displayBudget && !error && (
           <BudgetCreationWizard

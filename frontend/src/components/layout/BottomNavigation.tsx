@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/contexts/AuthContext'
+import { useActionCount } from '@/hooks/use-pending-actions'
 
 // Consistent icon configuration using Lucide icons
 interface NavItemConfig {
@@ -93,6 +94,8 @@ export function BottomNavigation() {
   const location = useLocation()
   const { logout } = useAuth()
   const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const { data: actionCountData } = useActionCount()
+  const actionCount = actionCountData?.count ?? 0
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/'
@@ -207,10 +210,15 @@ export function BottomNavigation() {
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-1 bg-primary-600 dark:bg-primary-400 rounded-full animate-nav-indicator" />
                 )}
                 <div className={cn(
-                  'p-2 rounded-xl transition-colors',
+                  'p-2 rounded-xl transition-colors relative',
                   active && 'bg-primary-100/80 dark:bg-primary-900/30'
                 )}>
                   <item.icon className="w-6 h-6" strokeWidth={active ? 2.2 : 1.5} />
+                  {item.path === '/' && actionCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary-500 text-white text-[10px] font-bold flex items-center justify-center">
+                      {actionCount > 9 ? '9+' : actionCount}
+                    </span>
+                  )}
                 </div>
                 <span className="text-xs font-medium mt-0.5 truncate max-w-full px-0.5 leading-tight">
                   {t(item.labelKey)}

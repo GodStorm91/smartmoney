@@ -50,6 +50,8 @@ import { useAccounts } from '@/hooks/useAccounts'
 import { formatCurrencyPrivacy } from '@/utils/formatCurrency'
 import { cn } from '@/utils/cn'
 import { useTierLimits } from '@/hooks/useTierLimits'
+import { DashboardActionCard } from '@/components/dashboard/DashboardActionCard'
+import { usePendingActions } from '@/hooks/use-pending-actions'
 import type { Transaction } from '@/types'
 
 export function Dashboard() {
@@ -132,6 +134,8 @@ export function Dashboard() {
     queryFn: fetchHealthScore,
     staleTime: 60 * 60 * 1000,
   })
+
+  const { data: pendingActions } = usePendingActions('dashboard')
 
   const [selectedDayTransactions, setSelectedDayTransactions] = useState<Transaction[] | null>(null)
   const [selectedDayDate, setSelectedDayDate] = useState<string | null>(null)
@@ -220,6 +224,11 @@ export function Dashboard() {
 
       {/* Content */}
       <div className="space-y-4 sm:space-y-5">
+        {/* 0. Pending Action (top priority) */}
+        {pendingActions?.actions?.[0] && (
+          <DashboardActionCard action={pendingActions.actions[0]} />
+        )}
+
         {/* 1. Onboarding (auto-hides after completion) */}
         <OnboardingChecklist />
 

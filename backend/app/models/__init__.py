@@ -26,6 +26,7 @@ from .goal import Goal
 from .goal_type import GoalType
 from .holding import Holding, HoldingLot
 from .insight import InsightCard, SavingsRecommendation
+from .pending_action import PendingAction
 from .notification import (
     NotificationPreference,
     PushSubscription,
@@ -158,4 +159,5 @@ __all__ = [
     "RegionalRent",
     "RegionalCostIndex",
     "PrefectureInsuranceRate",
+    "PendingAction",
 ]

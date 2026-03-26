@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from .crypto_wallet import CryptoWallet, RewardContract, RewardClaim
     from .notification import InAppNotification, BurnRateAlert
     from .insight import InsightCard, SavingsRecommendation
+    from .pending_action import PendingAction
     from .anomaly import AnomalyAlert, AnomalyConfig
     from .user_credit import UserCredit
     from .credit_purchase import CreditPurchase
@@ -109,4 +110,9 @@ class User(Base):
     )
     burn_rate_alerts: Mapped[list["BurnRateAlert"]] = relationship(
         "BurnRateAlert", back_populates="user", cascade="all, delete-orphan"
+    )
+
+    # Action queue relationships
+    pending_actions: Mapped[list["PendingAction"]] = relationship(
+        "PendingAction", back_populates="user", cascade="all, delete-orphan"
     )
