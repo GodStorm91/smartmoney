@@ -54,8 +54,14 @@ export function DashboardActionCard({ action }: DashboardActionCardProps) {
     adjust_budget_category: 'actions.adjustBudgetCategoryDesc',
     review_goal_catch_up: 'actions.reviewGoalCatchUpDesc',
   }
-  const localTitle = t(titleKeyMap[action.type], action.title, action.params as Record<string, string>)
-  const localDesc = t(descKeyMap[action.type], action.description || '', action.params as Record<string, string>)
+  // Normalize params: map legacy snake_case keys to camelCase for i18n compatibility
+  const normalizedParams = { ...action.params } as Record<string, string>
+  if (normalizedParams.current_spent && !normalizedParams.spent) normalizedParams.spent = String(normalizedParams.current_spent)
+  if (normalizedParams.goal_name && !normalizedParams.goalName) normalizedParams.goalName = String(normalizedParams.goal_name)
+  if (normalizedParams.monthly_needed && !normalizedParams.monthlyNeeded) normalizedParams.monthlyNeeded = String(normalizedParams.monthly_needed)
+
+  const localTitle = t(titleKeyMap[action.type], action.title, normalizedParams)
+  const localDesc = t(descKeyMap[action.type], action.description || '', normalizedParams)
 
   const handleExecute = () => {
     const navAction = NAVIGATION_ACTIONS[action.type]

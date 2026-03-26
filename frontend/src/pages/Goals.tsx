@@ -32,7 +32,13 @@ export function Goals() {
   // Open goal edit modal from action card navigation (?edit=<goalId>)
   useEffect(() => {
     const editId = searchParams?.edit
-    if (editId) setEditingGoalId(Number(editId))
+    if (editId) {
+      const id = Number(editId)
+      if (!isNaN(id) && id > 0) {
+        setEditingGoalId(id)
+        setIsModalOpen(true)
+      }
+    }
   }, [searchParams?.edit])
   const { currency } = useSettings()
   const { data: exchangeRates } = useExchangeRates()
