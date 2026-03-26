@@ -13,6 +13,7 @@ from .action_generators import (
     generate_adjust_budget_category,
     generate_review_goal_catch_up,
 )
+from .action_guard_checks import has_active_action, is_in_cooldown, is_auto_paused
 from .action_mutations import execute_mutation, revert_mutation
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class ActionService:
 
     def generate_actions(self, db: Session, user_id: int) -> int:
         """Run all generators, return count of new actions created."""
-        if self._is_auto_paused(db, user_id):
+        if is_auto_paused(db, user_id):
             return 0
 
         generators = [
@@ -46,9 +47,9 @@ class ActionService:
         for gen in generators:
             try:
                 action_type = gen.__name__.replace("generate_", "")
-                if self._has_active_action(db, user_id, action_type):
+                if has_active_action(db, user_id, action_type):
                     continue
-                if self._is_in_cooldown(db, user_id, action_type):
+                if is_in_cooldown(db, user_id, action_type):
                     continue
                 if gen(db, user_id):
                     created += 1
@@ -77,9 +78,11 @@ class ActionService:
         )
 
         if actions and actions[0].status == "pending":
+            old_status = actions[0].status
             actions[0].surfaced_at = datetime.utcnow()
             actions[0].status = "surfaced"
             db.commit()
+            logger.info(f"Action {actions[0].id} ({actions[0].type}): {old_status} -> surfaced")
 
         return actions
 
@@ -96,11 +99,13 @@ class ActionService:
             return True, "Already executed", action.undo_snapshot is not None
 
         try:
+            old_status = action.status
             undo = execute_mutation(db, action)
             action.undo_snapshot = undo
             action.status = "executed"
             action.executed_at = datetime.utcnow()
             db.commit()
+            logger.info(f"Action {action.id} ({action.type}): {old_status} -> executed")
             return True, "Action executed", undo is not None
         except Exception as e:
             db.rollback()
@@ -116,9 +121,11 @@ class ActionService:
         )
         if not action:
             return False, "Action not found"
+        old_status = action.status
         action.status = "dismissed"
         action.dismissed_at = datetime.utcnow()
         db.commit()
+        logger.info(f"Action {action.id} ({action.type}): {old_status} -> dismissed")
         return True, "Action dismissed"
 
     def undo_action(self, db: Session, user_id: int, action_id: int):
@@ -142,6 +149,7 @@ class ActionService:
             action.status = "undone"
             action.undone_at = datetime.utcnow()
             db.commit()
+            logger.info(f"Action {action.id} ({action.type}): executed -> undone")
             return True, "Action undone", False
         except Exception as e:
             db.rollback()
@@ -160,6 +168,8 @@ class ActionService:
             .update({"status": "expired"}, synchronize_session="fetch")
         )
         db.commit()
+        if count:
+            logger.info(f"Expired {count} stale actions: pending/surfaced -> expired")
         return count
 
     def get_pending_count(self, db: Session, user_id: int) -> int:
@@ -173,41 +183,3 @@ class ActionService:
             .scalar()
         ) or 0
 
-    # ── Dedup / cooldown / pause checks ─────────────────────
-
-    def _has_active_action(self, db: Session, user_id: int, action_type: str) -> bool:
-        return (
-            db.query(PendingAction)
-            .filter(
-                PendingAction.user_id == user_id,
-                PendingAction.type == action_type,
-                PendingAction.status.in_(["pending", "surfaced"]),
-            )
-            .first()
-        ) is not None
-
-    def _is_in_cooldown(self, db: Session, user_id: int, action_type: str) -> bool:
-        cutoff = datetime.utcnow() - timedelta(days=30)
-        return (
-            db.query(PendingAction)
-            .filter(
-                PendingAction.user_id == user_id,
-                PendingAction.type == action_type,
-                PendingAction.status == "dismissed",
-                PendingAction.dismissed_at >= cutoff,
-            )
-            .first()
-        ) is not None
-
-    def _is_auto_paused(self, db: Session, user_id: int) -> bool:
-        cutoff = datetime.utcnow() - timedelta(days=30)
-        dismissed_count = (
-            db.query(func.count(PendingAction.id))
-            .filter(
-                PendingAction.user_id == user_id,
-                PendingAction.status == "dismissed",
-                PendingAction.dismissed_at >= cutoff,
-            )
-            .scalar()
-        ) or 0
-        return dismissed_count >= 3

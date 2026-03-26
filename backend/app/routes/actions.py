@@ -12,6 +12,7 @@ from ..schemas.pending_action import (
     PendingActionListResponse,
     PendingActionResponse,
 )
+from ..models.pending_action import PendingAction
 from ..services.action_service import get_action_service
 
 router = APIRouter(prefix="/api/actions", tags=["actions"])
@@ -31,6 +32,46 @@ async def get_pending_actions(
         actions=[PendingActionResponse.model_validate(a) for a in actions],
         count=len(actions),
     )
+
+
+@router.get("/stats")
+async def get_action_stats(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Action metrics for Phase 2B measurement review."""
+    from sqlalchemy import func, case
+
+    results = db.query(
+        PendingAction.status,
+        func.count(PendingAction.id)
+    ).filter(
+        PendingAction.user_id == current_user.id
+    ).group_by(PendingAction.status).all()
+
+    by_status = {status: count for status, count in results}
+
+    total_surfaced = db.query(func.count(PendingAction.id)).filter(
+        PendingAction.user_id == current_user.id,
+        PendingAction.surfaced_at.isnot(None)
+    ).scalar() or 0
+
+    executed = by_status.get("executed", 0)
+    dismissed = by_status.get("dismissed", 0)
+    undone = by_status.get("undone", 0)
+
+    return {
+        "by_status": by_status,
+        "metrics": {
+            "total_surfaced": total_surfaced,
+            "total_executed": executed,
+            "total_dismissed": dismissed,
+            "total_undone": undone,
+            "tap_through_rate": round(executed / total_surfaced, 2) if total_surfaced > 0 else 0,
+            "execution_rate": round(executed / (executed + dismissed), 2) if (executed + dismissed) > 0 else 0,
+            "undo_rate": round(undone / executed, 2) if executed > 0 else 0,
+        }
+    }
 
 
 @router.get("/count")

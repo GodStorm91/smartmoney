@@ -1,7 +1,7 @@
 # Insight-to-Action Layer - Implementation Plan
 
 **Date:** 2026-03-26 | **ADR:** `docs/decisions/260326-ai-smart-actions-strategy.md`
-**Effort:** ~40h total (Phase 0: 2h, Phase 1A: 14h, Phase 1B: 12h, Phase 1C: 12h)
+**Effort:** ~69h total (Phase 1: ~40h done, Phase 2A: 13h, Phase 2B: 16h if validated)
 
 ---
 
@@ -9,12 +9,16 @@
 
 | # | Phase | Status | Est. | Plan |
 |---|-------|--------|------|------|
-| 0 | Data Accuracy Gate | DEFERRED (run post-deploy) | 2h | [phase-00-data-accuracy-gate.md](./phase-00-data-accuracy-gate.md) |
+| 0 | Data Accuracy Gate | DEFERRED (folded into 2A) | 2h | [phase-00-data-accuracy-gate.md](./phase-00-data-accuracy-gate.md) |
 | 1A | Backend: Action Queue | DONE | 14h | [phase-01a-backend-action-queue.md](./phase-01a-backend-action-queue.md) |
 | 1B | Frontend: Action UI | DONE | 12h | [phase-01b-frontend-action-ui.md](./phase-01b-frontend-action-ui.md) |
-| 1C | Integration + Tests | PARTIAL (undo toast + badge done, tests deferred) | 12h | [phase-01c-integration-tests.md](./phase-01c-integration-tests.md) |
+| 1C | Integration + Tests | DONE (undo toast + badge + nav) | 12h | [phase-01c-integration-tests.md](./phase-01c-integration-tests.md) |
+| **2A** | **Instrumentation + Tests** | **NOT STARTED** | **13h** | [phase-02a-instrumentation-tests.md](./phase-02a-instrumentation-tests.md) |
+| **2B** | **Measurement + Expansion** | **BLOCKED by 2A + calendar** | **16h** | [phase-02b-measurement-expansion.md](./phase-02b-measurement-expansion.md) |
 
-**Gate rule:** Phase 0 must pass (>=85% categorization, >=98% budget consistency) before any Phase 1 work begins.
+**Phase 2A gate:** Ship instrumentation before measurement clock starts.
+**Phase 2B trigger:** 20 surfaced actions OR 60 days after 2A ships (whichever first).
+**Phase 2B decision gate:** Quant + Qual must both pass to expand. See ADR 7.4.
 
 ## Architecture Summary
 
