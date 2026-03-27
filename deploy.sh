@@ -93,6 +93,13 @@ if [ "$RESTART_ONLY" = false ]; then
             --exclude='.pyc' \
             --exclude='*.pyo' \
             --exclude='node_modules' \
+            --exclude='.venv' \
+            --exclude='venv' \
+            --exclude='.pytest_cache' \
+            --exclude='.ruff_cache' \
+            --exclude='*.db' \
+            --exclude='.coverage' \
+            --exclude='test_*.log' \
             "$LOCAL_DIR/backend/" \
             "$SERVER:$REMOTE_DIR/backend/"
     else
@@ -125,6 +132,14 @@ ssh "$SERVER" "
 
     # Sync app directory
     docker cp $REMOTE_DIR/backend/app/. $CONTAINER_NAME:/app/app/
+
+    # Sync alembic migrations
+    docker cp $REMOTE_DIR/backend/alembic/. $CONTAINER_NAME:/app/alembic/
+
+    # Run pending migrations
+    docker start $CONTAINER_NAME 2>/dev/null || true
+    docker exec $CONTAINER_NAME alembic upgrade head 2>/dev/null || true
+    docker stop $CONTAINER_NAME 2>/dev/null || true
 
     # If frontend changed, sync that too
     if [ -d '$REMOTE_DIR/frontend' ]; then
