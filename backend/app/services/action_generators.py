@@ -1,30 +1,30 @@
-"""Action generators for the insight-to-action layer."""
+"""Action generators for the insight-to-action layer.
+
+Budget generators are in action_generators_budget.py.
+"""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from ..models.budget import Budget
 from ..models.goal import Goal
 from ..models.pending_action import PendingAction
 from ..models.transaction import Transaction
+from .action_copy_service import generate_action_copy
+from .action_generators_common import safe_add_action
+
+# Re-export budget generators so existing imports keep working
+from .action_generators_budget import (  # noqa: F401
+    generate_copy_or_create_budget,
+    generate_adjust_budget_category,
+)
 
 logger = logging.getLogger(__name__)
 
-
-def _safe_add_action(db: Session, action: PendingAction) -> bool:
-    """Add action with IntegrityError handling for dedup constraint."""
-    try:
-        db.add(action)
-        db.commit()
-        return True
-    except IntegrityError:
-        db.rollback()
-        logger.debug(f"Duplicate action skipped: {action.type} for user {action.user_id}")
-        return False
+# Keep backward-compatible alias
+_safe_add_action = safe_add_action
 
 
 def generate_review_uncategorized(db: Session, user_id: int) -> bool:
@@ -43,105 +43,24 @@ def generate_review_uncategorized(db: Session, user_id: int) -> bool:
     if count <= 5:
         return False
 
+    params = {"count": count, "month": current_month}
+    title, description = generate_action_copy("review_uncategorized", params)
+
     action = PendingAction(
         user_id=user_id,
         type="review_uncategorized",
         surface="dashboard",
-        title=f"{count} uncategorized transactions this month",
-        description="Review and categorize transactions for better insights.",
-        params={"count": count, "month": current_month},
+        title=title,
+        description=description,
+        params=params,
         priority=3,
     )
-    return _safe_add_action(db, action)
+    return safe_add_action(db, action)
 
 
-def generate_copy_or_create_budget(db: Session, user_id: int) -> bool:
-    """Generate action if current month has no active budget."""
-    current_month = datetime.utcnow().strftime("%Y-%m")
-    has_budget = (
-        db.query(Budget)
-        .filter(
-            Budget.user_id == user_id,
-            Budget.month == current_month,
-            Budget.is_active == True,
-        )
-        .first()
-    )
-    if has_budget:
-        return False
-
-    action = PendingAction(
-        user_id=user_id,
-        type="copy_or_create_budget",
-        surface="budget_page",
-        title=f"No budget for {current_month}",
-        description="Create a budget from last month or start fresh.",
-        params={"month": current_month, "suggested_source": "previous"},
-        priority=2,
-    )
-    return _safe_add_action(db, action)
-
-
-def generate_adjust_budget_category(db: Session, user_id: int) -> bool:
-    """Generate action for worst over-budget category."""
-    current_month = datetime.utcnow().strftime("%Y-%m")
-    budget = (
-        db.query(Budget)
-        .filter(
-            Budget.user_id == user_id,
-            Budget.month == current_month,
-            Budget.is_active == True,
-        )
-        .first()
-    )
-    if not budget:
-        return False
-
-    worst = None
-    worst_overspend = 0
-    for alloc in budget.allocations:
-        spent = (
-            db.query(func.coalesce(func.sum(Transaction.amount), 0))
-            .filter(
-                Transaction.user_id == user_id,
-                Transaction.category == alloc.category,
-                func.to_char(Transaction.date, "YYYY-MM") == current_month,
-                Transaction.amount < 0,
-            )
-            .scalar()
-        )
-        spent_abs = abs(int(spent or 0))
-        overspend = spent_abs - alloc.amount
-        if overspend > worst_overspend:
-            worst_overspend = overspend
-            worst = (alloc, spent_abs)
-
-    if worst is None:
-        return False
-
-    alloc, spent_abs = worst
-    suggested = int(spent_abs * 1.1)
-
-    action = PendingAction(
-        user_id=user_id,
-        type="adjust_budget_category",
-        surface="budget_page",
-        title=f"{alloc.category} over budget by {worst_overspend:,}",
-        description=f"Spent {spent_abs:,} vs budgeted {alloc.amount:,}.",
-        params={
-            "category": alloc.category,
-            "spent": spent_abs,
-            "allocated": alloc.amount,
-            "suggested_new": suggested,
-            "allocation_id": alloc.id,
-            "budget_id": alloc.budget_id,
-        },
-        priority=2,
-    )
-    return _safe_add_action(db, action)
-
-
-def generate_review_goal_catch_up(db: Session, user_id: int, surface: str = "dashboard") -> bool:
+def generate_review_goal_catch_up(
+    db: Session, user_id: int, surface: str = "dashboard"
+) -> bool:
     """Generate action for most-behind goal."""
     goals = db.query(Goal).filter(Goal.user_id == user_id).all()
     if not goals:
@@ -172,19 +91,22 @@ def generate_review_goal_catch_up(db: Session, user_id: int, surface: str = "das
         return False
 
     goal, monthly_needed = most_behind
+    params = {
+        "goal_id": goal.id,
+        "goalName": f"{goal.years}-year goal",
+        "current_amount": int(goal.target_amount * (goal.last_milestone_pct or 0) / 100),
+        "target": goal.target_amount,
+        "monthlyNeeded": monthly_needed,
+    }
+    title, description = generate_action_copy("review_goal_catch_up", params)
+
     action = PendingAction(
         user_id=user_id,
         type="review_goal_catch_up",
         surface=surface,
-        title=f"Goal '{goal.years}Y' is behind schedule",
-        description=f"Need ~{monthly_needed:,}/mo to catch up.",
-        params={
-            "goal_id": goal.id,
-            "goalName": f"{goal.years}-year goal",
-            "current_amount": int(goal.target_amount * (goal.last_milestone_pct or 0) / 100),
-            "target": goal.target_amount,
-            "monthlyNeeded": monthly_needed,
-        },
+        title=title,
+        description=description,
+        params=params,
         priority=3,
     )
-    return _safe_add_action(db, action)
+    return safe_add_action(db, action)
