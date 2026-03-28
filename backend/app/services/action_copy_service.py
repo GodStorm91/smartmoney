@@ -66,6 +66,10 @@ def _build_prompt(action_type: str, params: dict, language: str) -> str:
             f"{params.get('goalName', 'A goal')} is behind. "
             f"Need {params.get('monthlyNeeded', 0):,}/month to catch up."
         ),
+        "monthly_report_nudge": (
+            f"{params.get('monthName', 'Your latest')} report is ready. "
+            "Prompt the user to review their monthly report."
+        ),
     }
 
     return f"""Generate a short, friendly action suggestion for a personal finance app.
@@ -98,6 +102,10 @@ def _get_templates(action_type: str, params: dict) -> tuple[str, str]:
         "review_goal_catch_up": (
             f"Goal '{params.get('goalName', '')}' is behind schedule",
             f"Need ~{params.get('monthlyNeeded', 0):,}/mo to catch up.",
+        ),
+        "monthly_report_nudge": (
+            f"{params.get('monthName', 'Monthly')} report is ready",
+            params.get("summary") or "Review your spending patterns and savings progress.",
         ),
     }
     return templates.get(action_type, ("Action needed", ""))

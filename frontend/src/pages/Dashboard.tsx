@@ -33,7 +33,6 @@ import { SubscriptionsWidget } from '@/components/dashboard/SubscriptionsWidget'
 import { HoldingsWidget } from '@/components/dashboard/HoldingsWidget'
 import { OnboardingChecklist } from '@/components/onboarding/OnboardingChecklist'
 import { ProxyReceivablesWidget } from '@/components/proxy/ProxyReceivablesWidget'
-import { ReportBanner } from '@/components/dashboard/ReportBanner'
 import { formatMonth } from '@/utils/formatDate'
 import { fetchHealthScore } from '@/services/health-score-service'
 import { fetchDashboardSummary, fetchMonthlyTrends } from '@/services/analytics-service'
@@ -272,9 +271,6 @@ export function Dashboard() {
           budgetAlerts={budgetAlerts?.alerts || []}
           onDismissBudgetAlert={(id) => markAlertReadMutation.mutate(id)}
         />
-
-        {/* 4.5 Report Banner (first 7 days of month) */}
-        <ReportBanner />
 
         {/* 5. Proxy Receivables (self-handles empty state) */}
         <ProxyReceivablesWidget />

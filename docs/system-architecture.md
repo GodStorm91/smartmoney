@@ -1,7 +1,7 @@
 # SmartMoney System Architecture
-**Version:** 1.0
-**Last Updated:** 2025-11-17
-**Status:** MVP Complete
+**Version:** 1.2
+**Last Updated:** 2026-03-28
+**Status:** Production Deployed
 
 ---
 
@@ -26,8 +26,8 @@ SmartMoney uses a **three-tier monolithic architecture**:
                      │
 ┌────────────────────▼────────────────────────────────────┐
 │                    Data Tier                            │
-│         SQLite (MVP) / PostgreSQL (Production)         │
-│                  (smartmoney.db)                        │
+│              PostgreSQL (primary production DB)         │
+│            Docker volume + Alembic migrations           │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -35,7 +35,7 @@ SmartMoney uses a **three-tier monolithic architecture**:
 - **Monolithic:** Simplicity over microservices (KISS principle)
 - **Three-tier:** Clear separation of concerns
 - **RESTful API:** Standard, well-understood pattern
-- **SQLite → PostgreSQL:** Start simple, scale when needed
+- **PostgreSQL-backed:** Production now runs on containerized PostgreSQL
 
 ---
 
@@ -52,20 +52,18 @@ SmartMoney uses a **three-tier monolithic architecture**:
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │              Pages (6 components)               │   │
-│  │  Dashboard | Upload | Transactions | Analytics │   │
-│  │          Goals | Settings                       │   │
+│  │            Pages (20+ route screens)            │   │
+│  │  Dashboard | Budget | Goals | Reports | More   │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │           UI Components (24 files)              │   │
-│  │  Charts | Dashboard | Financial | Layout | UI  │   │
+│  │          UI Components (290+ files)             │   │
+│  │ Charts | Dashboard | Budget | Goals | Report   │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │           Services (API Clients)                │   │
-│  │  transaction-service | analytics-service       │   │
-│  │  goal-service | upload-service                 │   │
+│  │        Services / Hooks / Contexts              │   │
+│  │  API clients | React Query hooks | settings    │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
@@ -82,9 +80,9 @@ SmartMoney uses a **three-tier monolithic architecture**:
 │                      FastAPI App                        │
 ├─────────────────────────────────────────────────────────┤
 │  ┌─────────────────────────────────────────────────┐   │
-│  │                Routes (4 files)                 │   │
-│  │  /api/transactions | /api/analytics            │   │
-│  │  /api/goals | /api/upload                      │   │
+│  │             Routes (40+ feature files)          │   │
+│  │  transactions | analytics | budgets | goals    │   │
+│  │  reports | actions | holdings | rewards        │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
@@ -93,20 +91,20 @@ SmartMoney uses a **three-tier monolithic architecture**:
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │             Services (3 files)                  │   │
-│  │  TransactionService | AnalyticsService         │   │
-│  │  GoalService                                    │   │
+│  │             Services (80+ feature files)        │   │
+│  │  finance | reports | categorization | actions  │   │
+│  │  rewards | crypto | schedulers                  │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │            Utils (6 files)                      │   │
-│  │  csv_parser | encoding_detector                │   │
-│  │  category_mapper | transaction_hasher          │   │
+│  │            Utils / helpers / auth              │   │
+│  │  parsing | hashing | DB types | dependencies   │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
-│  │          SQLAlchemy ORM (Models)                │   │
-│  │  Transaction | Goal | AppSettings              │   │
+│  │          SQLAlchemy ORM (36 models)             │   │
+│  │  Transaction | Budget | Goal | PendingAction   │   │
+│  │  ReportAISummary | Holding | Rewards           │   │
 │  └──────────────────────┬──────────────────────────┘   │
 │                         │                               │
 │  ┌──────────────────────▼──────────────────────────┐   │
@@ -119,6 +117,35 @@ SmartMoney uses a **three-tier monolithic architecture**:
 ---
 
 ## Database Schema
+
+### Insight-to-Action Layer
+
+The most important post-MVP addition is the action pipeline:
+
+```text
+Insight / Report / Budget / Goal Signal
+        ↓
+Action Generator
+        ↓
+Guard Checks (dedup, cooldown, auto-pause)
+        ↓
+pending_actions table
+        ↓
+/api/actions/pending
+        ↓
+Dashboard / Budget / Goals / Report surfaces
+        ↓
+Execute / Dismiss / Undo / Stats
+```
+
+Key files:
+
+- `backend/app/models/pending_action.py`
+- `backend/app/services/action_service.py`
+- `backend/app/services/action_lifecycle_ops.py`
+- `backend/app/routes/actions.py`
+- `frontend/src/hooks/use-pending-actions.ts`
+- `frontend/src/components/dashboard/DashboardActionCard.tsx`
 
 ### Entity Relationship Diagram
 

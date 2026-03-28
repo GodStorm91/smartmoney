@@ -427,13 +427,14 @@ export function Settings() {
           <SectionCard icon={Zap} title={t('actions.smartActionsSettings', 'Smart Actions')} description={t('actions.disclaimer')}>
             <div className="space-y-4">
               <ToggleSetting
-                label={t('actions.expandedSurfaces', 'Show actions on Goals & Report pages')}
+                label={t('actions.expandedSurfaces', 'Show suggestions on Goals & Report pages')}
+                description={t('actions.expandedSurfacesDesc', 'Display actionable tips alongside your goals and monthly reports')}
                 checked={actionSettings?.expanded_surfaces ?? false}
                 onChange={(val) => updateActionSettingsMutation.mutate({ expanded_surfaces: val })}
               />
               <ToggleSetting
-                label={t('actions.autoExecute', 'Auto-apply budget actions')}
-                description={t('actions.autoExecuteDesc', 'Automatically create and adjust budgets without confirmation')}
+                label={t('actions.autoExecute', 'Automatically apply budget suggestions')}
+                description={t('actions.autoExecuteDesc', 'Create and adjust budgets without asking for confirmation each time')}
                 checked={actionSettings?.auto_execute ?? false}
                 onChange={(val) => updateActionSettingsMutation.mutate({ auto_execute: val })}
               />

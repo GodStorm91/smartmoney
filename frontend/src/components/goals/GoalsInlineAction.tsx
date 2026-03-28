@@ -10,6 +10,7 @@ import type { PendingAction, ActionType } from '@/types/pending-action'
 const NAVIGATION_ACTIONS: Partial<Record<ActionType, (params: Record<string, unknown>) => string>> = {
   review_uncategorized: () => '/analytics?tab=ai-tools',
   review_goal_catch_up: (params) => `/goals?edit=${params.goal_id || ''}`,
+  monthly_report_nudge: () => '/analytics?tab=report',
 }
 
 interface GoalsInlineActionProps {
@@ -17,7 +18,7 @@ interface GoalsInlineActionProps {
 }
 
 export function GoalsInlineAction({ action }: GoalsInlineActionProps) {
-  const { t } = useTranslation('common')
+  const { t, i18n } = useTranslation('common')
   const navigate = useNavigate()
   const { executeMutation, dismissMutation, undoMutation } = usePendingActions('goals_page')
   const [hidden, setHidden] = useState(false)
@@ -28,18 +29,34 @@ export function GoalsInlineAction({ action }: GoalsInlineActionProps) {
     copy_or_create_budget: 'actions.copyOrCreateBudget',
     adjust_budget_category: 'actions.adjustBudgetCategory',
     review_goal_catch_up: 'actions.reviewGoalCatchUp',
+    monthly_report_nudge: 'actions.monthlyReportNudge',
   }
   const descKeyMap: Record<ActionType, string> = {
     review_uncategorized: 'actions.reviewUncategorizedDesc',
     copy_or_create_budget: 'actions.copyOrCreateBudgetDesc',
     adjust_budget_category: 'actions.adjustBudgetCategoryDesc',
     review_goal_catch_up: 'actions.reviewGoalCatchUpDesc',
+    monthly_report_nudge: 'actions.monthlyReportNudgeDesc',
   }
   // Normalize params: map legacy snake_case keys to camelCase for i18n compatibility
   const normalizedParams = { ...action.params } as Record<string, string>
   if (normalizedParams.current_spent && !normalizedParams.spent) normalizedParams.spent = String(normalizedParams.current_spent)
   if (normalizedParams.goal_name && !normalizedParams.goalName) normalizedParams.goalName = String(normalizedParams.goal_name)
   if (normalizedParams.monthly_needed && !normalizedParams.monthlyNeeded) normalizedParams.monthlyNeeded = String(normalizedParams.monthly_needed)
+  const reportYear = Number(action.params.reportYear)
+  const reportMonth = Number(action.params.reportMonth)
+  if (
+    action.type === 'monthly_report_nudge' &&
+    Number.isInteger(reportYear) &&
+    Number.isInteger(reportMonth) &&
+    reportMonth >= 1 &&
+    reportMonth <= 12
+  ) {
+    normalizedParams.monthName = new Date(reportYear, reportMonth - 1, 1).toLocaleDateString(
+      i18n.language,
+      { month: 'long', year: 'numeric' },
+    )
+  }
 
   const localTitle = t(titleKeyMap[action.type], action.title, normalizedParams)
   const localDesc = t(descKeyMap[action.type], action.description || '', normalizedParams)

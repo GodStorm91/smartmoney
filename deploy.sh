@@ -121,6 +121,26 @@ if [ "$RESTART_ONLY" = false ]; then
             scp -r "$LOCAL_DIR/frontend/"* "$SERVER:$REMOTE_DIR/frontend/"
         fi
     fi
+
+    # Sync deploy scripts and config
+    if [ -d "$LOCAL_DIR/deploy" ]; then
+        log_info "Syncing deploy scripts..."
+        if command -v rsync &> /dev/null; then
+            rsync -avz \
+                "$LOCAL_DIR/deploy/" \
+                "$SERVER:$REMOTE_DIR/deploy/"
+        else
+            scp -r "$LOCAL_DIR/deploy/"* "$SERVER:$REMOTE_DIR/deploy/"
+        fi
+    fi
+fi
+
+# Step 2.5: Create a pre-deploy backup
+if [ "$RESTART_ONLY" = false ]; then
+    log_info "Creating pre-deploy backup on server..."
+    if ! ssh "$SERVER" "cd $REMOTE_DIR && bash deploy/scripts/backup.sh"; then
+        log_warn "Pre-deploy backup failed, continuing deploy"
+    fi
 fi
 
 # Step 3: Copy files to Docker container

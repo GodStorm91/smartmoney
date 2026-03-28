@@ -4,13 +4,14 @@ Budget generators are in action_generators_budget.py.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from ..models.goal import Goal
 from ..models.pending_action import PendingAction
+from ..models.report_ai_summary import ReportAISummary
 from ..models.transaction import Transaction
 from .action_copy_service import generate_action_copy
 from .action_generators_common import safe_add_action
@@ -108,5 +109,47 @@ def generate_review_goal_catch_up(
         description=description,
         params=params,
         priority=3,
+    )
+    return safe_add_action(db, action)
+
+
+def generate_monthly_report_nudge(db: Session, user_id: int) -> bool:
+    """Generate a dashboard nudge to review the previous month's report."""
+    now = datetime.utcnow()
+    if now.day > 3:
+        return False
+
+    report_date = now.replace(day=1) - timedelta(days=1)
+    month_name = report_date.strftime("%B %Y")
+    params = {
+        "month": report_date.strftime("%Y-%m"),
+        "monthName": month_name,
+        "reportYear": report_date.year,
+        "reportMonth": report_date.month,
+    }
+
+    summary = (
+        db.query(ReportAISummary)
+        .filter(
+            ReportAISummary.user_id == user_id,
+            ReportAISummary.year == report_date.year,
+            ReportAISummary.month == report_date.month,
+        )
+        .order_by(ReportAISummary.created_at.desc())
+        .first()
+    )
+    if summary:
+        params["summary"] = summary.win
+
+    title, description = generate_action_copy("monthly_report_nudge", params)
+
+    action = PendingAction(
+        user_id=user_id,
+        type="monthly_report_nudge",
+        surface="dashboard",
+        title=title,
+        description=description,
+        params=params,
+        priority=4,
     )
     return safe_add_action(db, action)

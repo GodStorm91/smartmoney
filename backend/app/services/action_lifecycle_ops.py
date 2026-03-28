@@ -23,7 +23,7 @@ class ActionLifecycleOps:
     def surface_actions(
         self, db: Session, user_id: int, surface: str | None = None, limit: int = 5
     ):
-        """Return highest-priority pending actions. Mark first as surfaced."""
+        """Return currently surfaced actions or surface one new action per week."""
         query = db.query(PendingAction).filter(
             PendingAction.user_id == user_id,
             PendingAction.status.in_(["pending", "surfaced"]),
@@ -37,14 +37,33 @@ class ActionLifecycleOps:
             .all()
         )
 
-        if actions and actions[0].status == "pending":
-            old_status = actions[0].status
-            actions[0].surfaced_at = datetime.utcnow()
-            actions[0].status = "surfaced"
-            db.commit()
-            logger.info(f"Action {actions[0].id} ({actions[0].type}): {old_status} -> surfaced")
+        if not actions:
+            return []
 
-        return actions
+        surfaced_actions = [action for action in actions if action.status == "surfaced"]
+        if surfaced_actions:
+            return surfaced_actions
+
+        recent_cutoff = datetime.utcnow() - timedelta(days=7)
+        recent_surfaced = (
+            db.query(PendingAction.id)
+            .filter(
+                PendingAction.user_id == user_id,
+                PendingAction.surfaced_at.isnot(None),
+                PendingAction.surfaced_at >= recent_cutoff,
+            )
+            .first()
+        )
+        if recent_surfaced:
+            return []
+
+        old_status = actions[0].status
+        actions[0].surfaced_at = datetime.utcnow()
+        actions[0].status = "surfaced"
+        db.commit()
+        logger.info(f"Action {actions[0].id} ({actions[0].type}): {old_status} -> surfaced")
+
+        return [actions[0]]
 
     def execute_action(self, db: Session, user_id: int, action_id: int):
         """Execute an action. Returns (success, message, undo_available)."""
@@ -52,7 +71,15 @@ class ActionLifecycleOps:
         if not action:
             return False, "Action not found", False
         if action.status == "executed":
+            if not action.tapped_at:
+                action.tapped_at = action.executed_at or datetime.utcnow()
+                db.commit()
             return True, "Already executed", action.undo_snapshot is not None
+
+        if not action.tapped_at:
+            action.tapped_at = datetime.utcnow()
+            db.commit()
+            db.refresh(action)
 
         try:
             old_status = action.status

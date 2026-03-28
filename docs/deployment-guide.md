@@ -446,57 +446,65 @@ sudo systemctl start smartmoney-backend
 
 ### PostgreSQL Backup
 
+**Production backup paths:**
+- App directory: `/var/www/smartmoney`
+- Backup script: `/var/www/smartmoney/deploy/scripts/backup.sh`
+- Restore script: `/var/www/smartmoney/deploy/scripts/restore.sh`
+- Backup directory: `/root/smartmoney/backups`
+- Backup log: `/var/log/smartmoney-backup.log`
+- Cron wrapper file in repo: `deploy/cron/smartmoney-backup`
+
 **Manual backup:**
 ```bash
-pg_dump -U smartmoney_user smartmoney > smartmoney-backup-$(date +%Y%m%d).sql
+ssh root@money.khanh.page
+cd /var/www/smartmoney
+bash deploy/scripts/backup.sh
+ls -lh /root/smartmoney/backups | tail
 ```
 
-**Automated backup:**
+**Automated backup schedule:**
+- Daily at `02:00 UTC`
+- Runs before the `02:30 UTC` action-generation job
+- Script keeps a 7-day rolling window and writes files with `0600` permissions
+
+**Install cron job on production:**
 ```bash
-#!/bin/bash
-# /home/smartmoney/scripts/backup.sh
-
-BACKUP_DIR="/home/smartmoney/backups"
-DATE=$(date +%Y%m%d)
-FILENAME="smartmoney-$DATE.sql"
-
-# Dump database
-pg_dump -U smartmoney_user smartmoney > "$BACKUP_DIR/$FILENAME"
-
-# Compress
-gzip "$BACKUP_DIR/$FILENAME"
-
-# Delete backups older than 30 days
-find "$BACKUP_DIR" -name "smartmoney-*.sql.gz" -mtime +30 -delete
-
-# Optional: Upload to remote storage
-# rclone copy "$BACKUP_DIR/$FILENAME.gz" remote:backups/
+ssh root@money.khanh.page
+crontab -l > /tmp/current-crontab 2>/dev/null || true
+grep -v 'deploy/scripts/backup.sh' /tmp/current-crontab > /tmp/smartmoney-crontab || true
+cat /var/www/smartmoney/deploy/cron/smartmoney-backup >> /tmp/smartmoney-crontab
+crontab /tmp/smartmoney-crontab
+crontab -l
 ```
 
-**Cron job:**
+**Restore drill to a test database:**
 ```bash
-0 2 * * * /home/smartmoney/scripts/backup.sh
+ssh root@money.khanh.page
+cd /var/www/smartmoney
+bash deploy/scripts/backup.sh
+LATEST_BACKUP=$(ls -1 /root/smartmoney/backups/smartmoney_*.sql.gz | tail -1)
+bash deploy/scripts/restore.sh "$LATEST_BACKUP" smartmoney_restore_test
+docker exec smartmoney-db psql -U smartmoney -d smartmoney_restore_test -c "SELECT COUNT(*) FROM users;"
+docker exec smartmoney-db psql -U smartmoney -d smartmoney_restore_test -c "SELECT COUNT(*) FROM transactions;"
+docker exec smartmoney-db psql -U smartmoney -d postgres -c "DROP DATABASE IF EXISTS smartmoney_restore_test;"
 ```
 
-**Restore:**
+**Live restore procedure:**
 ```bash
-# Stop backend
-sudo systemctl stop smartmoney-backend
-
-# Drop and recreate database
-sudo -u postgres psql
-DROP DATABASE smartmoney;
-CREATE DATABASE smartmoney;
-GRANT ALL PRIVILEGES ON DATABASE smartmoney TO smartmoney_user;
-\q
-
-# Restore backup
-gunzip smartmoney-20251117.sql.gz
-psql -U smartmoney_user smartmoney < smartmoney-20251117.sql
-
-# Start backend
-sudo systemctl start smartmoney-backend
+ssh root@money.khanh.page
+cd /var/www/smartmoney
+bash deploy/scripts/restore.sh smartmoney_YYYYMMDD_HHMMSS.sql.gz
 ```
+
+**Pre-deploy safety net:**
+- `./deploy.sh` now triggers `deploy/scripts/backup.sh` before copying code into the running container.
+- Backup failure is non-blocking, but the warning should be investigated before repeating the deploy.
+
+**Recovery notes:**
+- Expected recovery time: about 10-20 minutes for backup selection, restore, validation, and application checks.
+- Backed up: PostgreSQL application data.
+- Not backed up by this script: uploaded files under `uploads/`, container images, TLS material, or off-site copies.
+- Follow-up hardening still recommended: encrypted off-site sync and a periodic restore-drill calendar reminder.
 
 ---
 

@@ -43,6 +43,7 @@ class PendingAction(Base):
         DateTime, server_default=func.now(), nullable=False
     )
     surfaced_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    tapped_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(
         DateTime, default=lambda: datetime.utcnow() + timedelta(days=7)
     )

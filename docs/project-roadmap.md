@@ -1,8 +1,8 @@
 # SmartMoney Cashflow Tracker - Project Roadmap
 
-**Version:** 1.3
-**Last Updated:** 2026-03-01
-**Current Release:** v0.5.0 (Production Deployed)
+**Version:** 1.4
+**Last Updated:** 2026-03-28
+**Current Release:** v0.7.0 (Production Deployed)
 **Status:** ✅ Live at https://money.khanh.page
 
 ---
@@ -12,7 +12,7 @@
 1. [Executive Summary](#executive-summary)
 2. [Version History](#version-history)
 3. [Short-Term Roadmap (v0.2.0 - v0.5.0)](#short-term-roadmap-v020---v050)
-4. [Mid-Term Roadmap (v0.6.0 - v1.0.0)](#mid-term-roadmap-v060---v100)
+4. [Mid-Term Roadmap (v0.8.0 - v1.0.0)](#mid-term-roadmap-v080---v100)
 5. [Long-Term Vision (v2.0+)](#long-term-vision-v20)
 6. [Technical Debt & Improvements](#technical-debt--improvements)
 7. [Milestones & Timeline](#milestones--timeline)
@@ -26,15 +26,15 @@
 
 SmartMoney Cashflow Tracker is a privacy-first personal finance webapp designed for Japanese users to track cashflow, analyze spending patterns, and monitor progress toward long-term financial goals through CSV imports from popular finance apps (MoneyForward, Zaim).
 
-**Current State (v0.1.0):**
-- 89/89 tests passing (95%+ coverage)
-- Code quality: 92/100
-- Dashboard loads <500ms with 1000 transactions
-- Full Japanese support (Shift-JIS/UTF-8)
-- 102 files, 57,579 tokens
+**Current State (v0.7.0):**
+- Production app deployed on Docker Compose + PostgreSQL + Nginx
+- Multi-user auth, budgets, goals, recurring transactions, monthly reports, and AI summaries live
+- Auto-categorization pipeline shipped: history, rules, fuzzy normalization, and AI fallback
+- Insight-to-action layer shipped: pending actions, dashboard card, stats endpoint, undo/cooldown logic
+- 3 locales supported across the app: English, Japanese, Vietnamese
 
 **Next Phase Focus:**
-Production readiness, deployment automation, and enhanced user experience features.
+Production hardening: backup operationalization, trustworthy action metrics, banner-to-action consolidation, and documentation refresh.
 
 ---
 
@@ -537,84 +537,52 @@ The following planned v0.5.0 items were already shipped in earlier versions:
 
 ---
 
-## Mid-Term Roadmap (v0.6.0 - v1.0.0)
+### v0.6.0 - Design Refresh + Auto-Categorization (2026-03) ✅
 
-### v0.6.0 - Multi-Source Support
+**Release Window:** March 2026
+**Status:** Complete - Production Deployed
 
-**Timeline:** Q2 2025 (6-8 weeks)
-**Priority:** Medium
-**Dependencies:** v0.5.0 (requires flexible CSV parser)
+#### Features Shipped
 
-#### Features
+**Design refresh + UX consistency:**
+- ✅ Landing page redesign aimed at digital nomads across all 3 locales
+- ✅ Typography polish pass and hierarchy cleanup
+- ✅ Safe-area and touch-target fixes for mobile navigation and floating actions
+- ✅ PageShell/PageSkeleton alignment across major pages
+- ✅ Visual consistency pass for Settings, cards, and navigation surfaces
 
-**Additional CSV Format Support:**
-- [ ] Credit card statements (Visa, Mastercard, Amex)
-- [ ] Bank statements (MUFG, Mizuho, Sumitomo)
-- [ ] E-wallet exports (PayPay, LINE Pay, Rakuten Pay)
-- [ ] Format auto-detection (heuristic analysis)
-
-**API Integrations (if available):**
-- [ ] MoneyForward API integration
-- [ ] Zaim API integration
-- [ ] Bank API connections (plaid.com equivalent)
-- [ ] OAuth authentication for third-party services
-
-**Manual Transaction Entry Improvements:**
-- [ ] Quick entry form (minimal fields)
-- [ ] Transaction templates (recurring expenses)
-- [ ] Recently used categories (autocomplete)
-- [ ] Voice input (mobile)
-
-**Receipt Scanning (OCR):**
-- [ ] Upload receipt image
-- [ ] Extract amount, merchant, date (Tesseract OCR)
-- [ ] Suggest category based on merchant
-- [ ] Attach receipt image to transaction
-
-#### Success Criteria
-
-- [ ] Support 10+ CSV formats
-- [ ] OCR accuracy >85% (amount/date/merchant)
-- [ ] Manual entry <10s per transaction
-- [ ] Receipt image storage <1MB per file
+**Auto-categorization system:**
+- ✅ 4-layer categorization pipeline: history → rules → fuzzy → AI
+- ✅ Merchant normalization including Japanese suffixes and branch cleanup
+- ✅ Post-import auto-categorization with richer feedback toasts
+- ✅ Suggestion chips improved with source-aware styling
 
 ---
 
-### v0.7.0 - Advanced Goals
+### v0.7.0 - Insight-to-Action Layer (2026-03) ✅
 
-**Timeline:** Q2-Q3 2025 (6-8 weeks)
-**Priority:** Low
-**Dependencies:** v0.6.0
+**Release Window:** March 2026
+**Status:** Complete - Production Deployed
 
-#### Features
+#### Features Shipped
 
-**Variable Savings Goals:**
-- [ ] Milestone-based goals (e.g., 25%, 50%, 75%, 100%)
-- [ ] Non-linear goal curves (exponential, logarithmic)
-- [ ] Seasonal adjustments (higher spending in December)
+**Smart action pipeline:**
+- ✅ `pending_actions` queue with status lifecycle, dedup, cooldown, and undo support
+- ✅ Dashboard "Next Best Action" card
+- ✅ Budget and goals inline action surfaces behind settings
+- ✅ Auto-execute option for budget mutation actions
+- ✅ Stats endpoint, transition logging, and validation scripts
 
-**Milestone Tracking:**
-- [ ] Define milestones (e.g., "Save ¥1M for emergency fund")
-- [ ] Notification when milestone reached
-- [ ] Milestone celebration animations
+**Action generation + copy:**
+- ✅ Action types for uncategorized review, budget creation/copy, budget adjustment, and goal catch-up
+- ✅ AI-assisted copy via Claude Haiku with deterministic template fallback
+- ✅ Payday-aware prioritization and 3-month rolling average support for budget actions
 
-**Goal Templates:**
-- [ ] Predefined goals (emergency fund, house down payment, retirement)
-- [ ] Community-shared goal templates
-- [ ] Import/export goals (JSON)
+---
 
-**Scenario Modeling:**
-- [ ] "What if" calculator
-  - "What if I save ¥10,000 more per month?"
-  - "What if expenses increase by 10%?"
-- [ ] Goal achievement probability (Monte Carlo simulation)
-- [ ] Risk analysis (volatility in savings rate)
+## Mid-Term Roadmap (v0.8.0 - v1.0.0)
 
-#### Success Criteria
-
-- [ ] Non-linear goal projection accuracy >90%
-- [ ] Milestone notifications <1s delay
-- [ ] Scenario simulation runs <2s
+**Note:** v0.6.0 and v0.7.0 were shipped in March 2026 and moved into Version History above.
 
 ---
 
@@ -1384,9 +1352,29 @@ The following planned v0.5.0 items were already shipped in earlier versions:
 
 ---
 
+### v0.6.0 - Design Refresh + Auto-Categorization (2026-03) ✅
+
+**Added:**
+- Landing page redesign and multi-locale marketing polish
+- Mobile-safe interaction fixes, typography cleanup, and component consistency passes
+- 4-layer auto-categorization pipeline with merchant normalization and AI fallback
+- Post-import auto-categorization feedback and source-aware suggestion chips
+
+---
+
+### v0.7.0 - Insight-to-Action Layer (2026-03) ✅
+
+**Added:**
+- `pending_actions` queue, lifecycle tracking, cooldown/undo support, and per-surface delivery
+- Dashboard action card plus inline actions on expanded surfaces
+- AI/template action copy generation and payday-aware budget prioritization
+- Stats endpoint and backend test coverage for the action system
+
+---
+
 ### Future Versions
 
-See [Short-Term Roadmap](#short-term-roadmap-v020---v050) and [Mid-Term Roadmap](#mid-term-roadmap-v060---v100) sections for planned features.
+See [Mid-Term Roadmap](#mid-term-roadmap-v080---v100) and later sections for planned features.
 
 Changelog entries will be added upon release of each version.
 

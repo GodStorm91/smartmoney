@@ -1,7 +1,7 @@
 """Tests for action routes — verifies endpoint wiring via DB queries."""
 from datetime import datetime, timedelta
 
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from app.models.pending_action import PendingAction
 from app.models.user import User
@@ -27,7 +27,7 @@ def create_test_action(db, user_id, type="review_uncategorized", status="pending
         priority=kw.get("priority", 5),
         expires_at=kw.get("expires_at", datetime.utcnow() + timedelta(days=7)),
     )
-    for field in ("surfaced_at", "executed_at", "dismissed_at", "undo_snapshot"):
+    for field in ("surfaced_at", "tapped_at", "executed_at", "dismissed_at", "undo_snapshot"):
         if kw.get(field) is not None:
             setattr(action, field, kw[field])
     db.add(action)
@@ -38,15 +38,19 @@ def create_test_action(db, user_id, type="review_uncategorized", status="pending
 
 class TestActionRoutes:
     def test_stats_computation(self, db_session):
-        """Stats endpoint computes metrics correctly."""
+        """Stats endpoint computes honest counts and rates."""
         user = create_test_user(db_session)
         for i in range(3):
             create_test_action(db_session, user.id, type=f"type_{i}", status="executed",
                                surfaced_at=datetime.utcnow(),
+                               tapped_at=datetime.utcnow(),
                                executed_at=datetime.utcnow())
         create_test_action(db_session, user.id, type="type_d", status="dismissed",
                            surfaced_at=datetime.utcnow(),
                            dismissed_at=datetime.utcnow())
+        create_test_action(db_session, user.id, type="type_s", status="surfaced",
+                           surfaced_at=datetime.utcnow(),
+                           tapped_at=datetime.utcnow())
         create_test_action(db_session, user.id, type="type_p", status="pending")
 
         results = db_session.query(
@@ -59,14 +63,25 @@ class TestActionRoutes:
         assert by_status.get("executed", 0) == 3
         assert by_status.get("dismissed", 0) == 1
         assert by_status.get("pending", 0) == 1
+        assert by_status.get("surfaced", 0) == 1
 
         surfaced = db_session.query(PendingAction).filter(
             PendingAction.user_id == user.id,
             PendingAction.surfaced_at.isnot(None),
         ).count()
-        assert surfaced == 4
-        tap_through = by_status.get("executed", 0) / surfaced
-        assert round(tap_through, 2) == 0.75
+        tapped = db_session.query(PendingAction).filter(
+            PendingAction.user_id == user.id,
+            or_(PendingAction.tapped_at.isnot(None), PendingAction.executed_at.isnot(None)),
+        ).count()
+        total = db_session.query(PendingAction).filter(PendingAction.user_id == user.id).count()
+
+        assert total == 6
+        assert surfaced == 5
+        assert tapped == 4
+        assert round(surfaced / total, 2) == 0.83
+        assert round(tapped / surfaced, 2) == 0.8
+        assert round(by_status.get("executed", 0) / tapped, 2) == 0.75
+        assert round(by_status.get("dismissed", 0) / surfaced, 2) == 0.2
 
     def test_count_endpoint_logic(self, db_session):
         """Count logic matches service get_pending_count."""

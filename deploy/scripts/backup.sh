@@ -3,6 +3,7 @@
 # Runs daily via cron, keeps 7 days of backups
 
 set -e
+umask 077
 
 # Configuration
 BACKUP_DIR="/root/smartmoney/backups"
@@ -25,6 +26,7 @@ log "Starting backup..."
 
 # Run pg_dump inside the container and compress
 if docker exec "$CONTAINER" pg_dump -U smartmoney smartmoney | gzip > "$BACKUP_DIR/$BACKUP_FILE"; then
+    chmod 600 "$BACKUP_DIR/$BACKUP_FILE"
     FILESIZE=$(du -h "$BACKUP_DIR/$BACKUP_FILE" | cut -f1)
     log "Backup successful: $BACKUP_FILE ($FILESIZE)"
 else

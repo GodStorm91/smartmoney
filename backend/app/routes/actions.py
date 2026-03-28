@@ -54,7 +54,7 @@ async def get_action_stats(
     current_user: User = Depends(get_current_user),
 ):
     """Action metrics for Phase 2B measurement review."""
-    from sqlalchemy import func, case
+    from sqlalchemy import func, or_
 
     results = db.query(
         PendingAction.status,
@@ -63,26 +63,49 @@ async def get_action_stats(
         PendingAction.user_id == current_user.id
     ).group_by(PendingAction.status).all()
 
-    by_status = {status: count for status, count in results}
+    by_status = {
+        "pending": 0,
+        "surfaced": 0,
+        "executed": 0,
+        "dismissed": 0,
+        "expired": 0,
+        "undone": 0,
+    }
+    by_status.update({status: count for status, count in results})
+
+    total_generated = sum(by_status.values())
 
     total_surfaced = db.query(func.count(PendingAction.id)).filter(
         PendingAction.user_id == current_user.id,
         PendingAction.surfaced_at.isnot(None)
     ).scalar() or 0
 
-    executed = by_status.get("executed", 0)
-    dismissed = by_status.get("dismissed", 0)
-    undone = by_status.get("undone", 0)
+    total_tapped = db.query(func.count(PendingAction.id)).filter(
+        PendingAction.user_id == current_user.id,
+        or_(PendingAction.tapped_at.isnot(None), PendingAction.executed_at.isnot(None))
+    ).scalar() or 0
+
+    executed = by_status["executed"]
+    dismissed = by_status["dismissed"]
+    undone = by_status["undone"]
+    expired = by_status["expired"]
 
     return {
         "by_status": by_status,
-        "metrics": {
+        "counts": {
+            "total_generated": total_generated,
             "total_surfaced": total_surfaced,
+            "total_tapped": total_tapped,
             "total_executed": executed,
             "total_dismissed": dismissed,
+            "total_expired": expired,
             "total_undone": undone,
-            "tap_through_rate": round(executed / total_surfaced, 2) if total_surfaced > 0 else 0,
-            "execution_rate": round(executed / (executed + dismissed), 2) if (executed + dismissed) > 0 else 0,
+        },
+        "rates": {
+            "surfacing_rate": round(total_surfaced / total_generated, 2) if total_generated > 0 else 0,
+            "tap_through_rate": round(total_tapped / total_surfaced, 2) if total_surfaced > 0 else 0,
+            "execution_rate": round(executed / total_tapped, 2) if total_tapped > 0 else 0,
+            "dismiss_rate": round(dismissed / total_surfaced, 2) if total_surfaced > 0 else 0,
             "undo_rate": round(undone / executed, 2) if executed > 0 else 0,
         }
     }

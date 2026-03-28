@@ -20,6 +20,7 @@ class PendingActionResponse(BaseModel):
     priority: int
     created_at: datetime
     surfaced_at: datetime | None
+    tapped_at: datetime | None
     expires_at: datetime | None
     executed_at: datetime | None
     dismissed_at: datetime | None

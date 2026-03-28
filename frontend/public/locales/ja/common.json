@@ -109,12 +109,12 @@
     "categoryBreakdown": "カテゴリー別支出",
     "goalAchievability": "目標達成可能性",
     "viewAllCategories": "すべてのカテゴリーを表示 →",
-    "noData": "データがありません",
+    "noData": "取引を追加して財務概要を確認しましょう",
     "noCategories": "支出データがありません",
-    "noCategoriesDescription": "取引を追加して支出内訳を確認しましょう",
+    "noCategoriesDescription": "CSVをインポートするか取引を追加して、お金の流れを確認しましょう",
     "addTransaction": "取引を追加",
     "noGoals": "目標がありません",
-    "noGoalsDescription": "目標を設定して進捗を追跡しましょう",
+    "noGoalsDescription": "1年、3年、5年の目標を設定して進捗を追跡しましょう",
     "createGoal": "目標を作成",
     "yearGoal": "{{years}}年目標",
     "quickActions": "クイックアクション",
@@ -407,7 +407,7 @@
     "incomeVsExpense": "収入 vs 支出",
     "categoryBreakdown": "カテゴリー別内訳",
     "monthlyCashFlow": "月次キャッシュフロー",
-    "noData": "データがありません",
+    "noData": "1ヶ月以上の取引を追加するとチャートが表示されます",
     "comingSoon": "月次詳細チャート (実装予定)",
     "spendingInsights": "支出インサイト",
     "noInsights": "注目すべき支出パターンは検出されませんでした",
@@ -448,11 +448,11 @@
       "change": "前年比{{percent}}%",
       "increase": "増加",
       "decrease": "減少",
-      "noData": "比較に十分なデータがありません"
+      "noData": "2年目のデータを追加するとトレンド比較ができます"
     },
     "heatmap": {
       "title": "支出ヒートマップ",
-      "noData": "この期間の支出データがありません",
+      "noData": "数週間の支出を記録するとヒートマップが表示されます",
       "dailyAvg": "曜日別平均",
       "less": "少",
       "more": "多",
@@ -560,7 +560,7 @@
   },
   "common": {
     "loading": "読み込み中...",
-    "noData": "データがありません",
+    "noData": "まだ表示するものがありません — 追跡を続けてまた確認しましょう",
     "saving": "保存中...",
     "assigning": "割り当て中...",
     "save": "保存",
@@ -719,7 +719,7 @@
     "avgMonthlySavings": "月平均貯蓄額",
     "perMonth": "月あたり",
     "warningNegative": "{{months}}ヶ月後に残高がマイナスになる可能性があります",
-    "noData": "予測に必要なデータがありません",
+    "noData": "数ヶ月のデータを追加するとキャッシュフロー予測が利用できます",
     "error": "予測を読み込めませんでした"
   },
   "dateRange": {
@@ -1393,7 +1393,7 @@
   "report": {
     "title": "月次レポート",
     "loadError": "レポートデータの読み込みに失敗しました。もう一度お試しください。",
-    "noData": "この月のデータはありません。",
+    "noData": "この月の取引がまだありません。インポートまたは追加してレポートを確認しましょう。",
     "savingsRate": "貯蓄率",
     "savingsRateDesc": "収入に対する貯蓄の割合",
     "budgetAdherence": "予算達成状況",
@@ -1901,7 +1901,7 @@
     },
     "upcoming": {
       "title": "今後の請求",
-      "empty": "今後の請求はありません",
+      "empty": "直近の請求はありません — 順調です",
       "total_due": "合計支払い額"
     },
     "detail": {
@@ -2182,7 +2182,7 @@
     "projected": "今月の予測合計",
     "dayProgress": "{{current}}日目/{{total}}日",
     "vsLastMonth": "先月比",
-    "noData": "今月の支出データがありません"
+    "noData": "支出を記録すると日々のペースが表示されます"
   },
   "holdings": {
     "title": "投資",
@@ -2253,9 +2253,10 @@
     "reviewGoalCatchUpDesc": "{{goalName}}が遅れています。月¥{{monthlyNeeded}}の貯蓄で追いつけます",
     "monthlyReportNudge": "{{monthName}}のレポートができました",
     "monthlyReportNudgeDesc": "{{monthName}}の支出と貯蓄を確認しましょう",
-    "expandedSurfaces": "目標・レポートページにアクションを表示",
-    "autoExecute": "予算アクションを自動適用",
-    "autoExecuteDesc": "確認なしで予算の作成・調整を自動実行",
+    "expandedSurfaces": "目標・レポートページに提案を表示",
+    "expandedSurfacesDesc": "目標や月次レポートと一緒にアドバイスを表示します",
+    "autoExecute": "予算の提案を自動的に適用",
+    "autoExecuteDesc": "毎回確認せずに予算の作成・調整を自動実行します",
     "smartActionsSettings": "スマートアクション"
   }
 }

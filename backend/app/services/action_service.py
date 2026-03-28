@@ -13,6 +13,7 @@ from .action_generators import (
     generate_review_uncategorized,
     generate_copy_or_create_budget,
     generate_adjust_budget_category,
+    generate_monthly_report_nudge,
     generate_review_goal_catch_up,
 )
 from .action_guard_checks import has_active_action, is_in_cooldown, is_auto_paused
@@ -50,6 +51,7 @@ class ActionService(ActionLifecycleOps):
             ("copy_or_create_budget", generate_copy_or_create_budget),
             ("adjust_budget_category", generate_adjust_budget_category),
             ("review_goal_catch_up", lambda d, u: generate_review_goal_catch_up(d, u, surface=goal_surface)),
+            ("monthly_report_nudge", generate_monthly_report_nudge),
         ]
         created = 0
         for action_type, gen in generators:

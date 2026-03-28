@@ -6,6 +6,7 @@ import { X, FileText, ArrowRight } from 'lucide-react'
 import { fetchAISummary } from '@/services/report-service'
 import { cn } from '@/utils/cn'
 
+// Deprecated: monthly report reminders now flow through the pending action pipeline.
 interface ReportBannerProps {
   className?: string
 }
