@@ -131,17 +131,28 @@ export function GoalAchievabilityCard({
           <div className="relative w-full h-2.5">
             <div className="w-full h-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
-                className={cn('h-full rounded-full transition-[width] duration-500', progressColor)}
+                className={cn(
+                  'h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none',
+                  progressColor,
+                  isCompleted && 'shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                )}
                 style={{ width: `${Math.min(100, progressPercentage)}%` }}
               />
             </div>
-            {[25, 50, 75].map((pct) => (
-              <div
-                key={pct}
-                className="absolute top-0 w-0.5 h-full bg-gray-400/50 dark:bg-gray-500/50"
-                style={{ left: `${pct}%` }}
-              />
-            ))}
+            {[25, 50, 75].map((pct) => {
+              const reached = progressPercentage >= pct
+              return (
+                <div
+                  key={pct}
+                  className={cn(
+                    'absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border-2 border-white dark:border-gray-800 transition-all duration-300 motion-reduce:transition-none',
+                    reached ? progressColor : 'bg-gray-300 dark:bg-gray-600',
+                    reached && 'scale-110'
+                  )}
+                  style={{ left: `calc(${pct}% - 4px)` }}
+                />
+              )
+            })}
           </div>
           {!isOnPace && !isCompleted && (
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-1.5">

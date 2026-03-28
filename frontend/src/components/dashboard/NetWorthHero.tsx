@@ -51,6 +51,14 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
         {formatCurrency(netWorth)}
       </p>
 
+      {/* Trend delight — subtle "trending up" when net worth positive and growing */}
+      {netWorth > 0 && monthlyNet > 0 && (
+        <span className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-income-500 dark:text-income-400 animate-in fade-in slide-in-from-left-2 duration-300 motion-reduce:animate-none">
+          <span className="w-1.5 h-1.5 rounded-full bg-income-500 dark:bg-income-400 animate-pulse motion-reduce:animate-none" />
+          {t('dashboard.trending', 'Trending up')}
+        </span>
+      )}
+
       {monthlyNet !== 0 && (
         <div className={cn(
           'inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-full text-xs font-medium',
