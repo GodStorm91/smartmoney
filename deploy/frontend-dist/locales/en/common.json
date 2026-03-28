@@ -112,12 +112,12 @@
     "categoryBreakdown": "Spending by Category",
     "goalAchievability": "Goal Achievability",
     "viewAllCategories": "View all categories →",
-    "noData": "No data available",
+    "noData": "Add transactions to see your financial overview",
     "noCategories": "No spending data yet",
-    "noCategoriesDescription": "Add transactions to see your spending breakdown",
+    "noCategoriesDescription": "Import a CSV or add a transaction to see where your money goes",
     "addTransaction": "Add transaction",
     "noGoals": "No goals yet",
-    "noGoalsDescription": "Set financial goals to track your progress",
+    "noGoalsDescription": "Pick a 1, 3, or 5-year horizon and start tracking progress",
     "createGoal": "Create a goal",
     "yearGoal": "{{years}}-year goal",
     "quickActions": "Quick Actions",
@@ -128,6 +128,7 @@
     "assets": "Assets",
     "liabilities": "Liabilities",
     "thisMonth": "This month",
+    "trending": "Trending up",
     "income": "Income",
     "expenses": "Expenses",
     "savingsRate": "Savings Rate",
@@ -336,7 +337,7 @@
   "report": {
     "title": "Monthly Report",
     "loadError": "Failed to load report data. Please try again.",
-    "noData": "No data available for this month.",
+    "noData": "No transactions recorded for this month. Import or add some to see your report.",
     "savingsRate": "Savings Rate",
     "savingsRateDesc": "% of income saved",
     "budgetAdherence": "Budget Adherence",
@@ -478,7 +479,7 @@
     "incomeVsExpense": "Income vs Expense",
     "categoryBreakdown": "Category Breakdown",
     "monthlyCashFlow": "Monthly Cash Flow",
-    "noData": "No data available",
+    "noData": "Add at least one month of transactions to see charts",
     "comingSoon": "Monthly detail chart (coming soon)",
     "spendingInsights": "Spending Insights",
     "noInsights": "No notable spending patterns detected",
@@ -519,11 +520,11 @@
       "change": "{{percent}}% vs last year",
       "increase": "increase",
       "decrease": "decrease",
-      "noData": "Not enough data for comparison"
+      "noData": "Add a second year of data to compare trends"
     },
     "heatmap": {
       "title": "Spending Heatmap",
-      "noData": "No spending data for this period",
+      "noData": "Track spending for a few weeks to see your heatmap",
       "dailyAvg": "Daily Average",
       "less": "Less",
       "more": "More",
@@ -631,7 +632,7 @@
   },
   "common": {
     "loading": "Loading...",
-    "noData": "No data available",
+    "noData": "Nothing to show yet — keep tracking and check back soon",
     "saving": "Saving...",
     "assigning": "Assigning...",
     "save": "Save",
@@ -837,7 +838,7 @@
     "avgMonthlySavings": "Avg monthly savings",
     "perMonth": "per month",
     "warningNegative": "Balance may go negative in {{months}} months",
-    "noData": "No data available for forecast",
+    "noData": "Add a few months of data to unlock cash-flow forecasts",
     "error": "Unable to load forecast"
   },
   "dateRange": {
@@ -1953,7 +1954,7 @@
     },
     "upcoming": {
       "title": "Upcoming Bills",
-      "empty": "No upcoming bills",
+      "empty": "No bills due soon — you're ahead of schedule",
       "total_due": "Total Due"
     },
     "detail": {
@@ -2029,7 +2030,7 @@
     "all": "All",
     "unread": "Unread",
     "noUnread": "No unread notifications",
-    "empty": "No notifications yet",
+    "empty": "You're all caught up — notifications will appear here",
     "loadMore": "Load more",
     "viewAll": "View all notifications",
     "markAllRead": "Mark all read",
@@ -2266,7 +2267,7 @@
     "projected": "Projected this month",
     "dayProgress": "Day {{current}}/{{total}}",
     "vsLastMonth": "vs last month",
-    "noData": "No spending data this month"
+    "noData": "Start tracking spending to see your daily pace"
   },
   "holdings": {
     "title": "Investments",
@@ -2335,9 +2336,12 @@
     "adjustBudgetCategoryDesc": "Spending ¥{{spent}} exceeds ¥{{allocated}} budget",
     "reviewGoalCatchUp": "Goal needs attention",
     "reviewGoalCatchUpDesc": "{{goalName}} is behind. Save ¥{{monthlyNeeded}}/mo to catch up",
-    "expandedSurfaces": "Show actions on Goals & Report pages",
-    "autoExecute": "Auto-apply budget actions",
-    "autoExecuteDesc": "Automatically create and adjust budgets without confirmation",
+    "monthlyReportNudge": "{{monthName}} report is ready",
+    "monthlyReportNudgeDesc": "Review your {{monthName}} spending and savings",
+    "expandedSurfaces": "Show suggestions on Goals & Report pages",
+    "expandedSurfacesDesc": "Display actionable tips alongside your goals and monthly reports",
+    "autoExecute": "Automatically apply budget suggestions",
+    "autoExecuteDesc": "Create and adjust budgets without asking for confirmation each time",
     "smartActionsSettings": "Smart Actions"
   }
 }

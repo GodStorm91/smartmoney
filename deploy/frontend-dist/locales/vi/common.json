@@ -109,12 +109,12 @@
     "categoryBreakdown": "Chi tiêu theo danh mục",
     "goalAchievability": "Khả năng đạt mục tiêu",
     "viewAllCategories": "Xem tất cả danh mục →",
-    "noData": "Không có dữ liệu",
+    "noData": "Thêm giao dịch để xem tổng quan tài chính",
     "noCategories": "Chưa có dữ liệu chi tiêu",
-    "noCategoriesDescription": "Thêm giao dịch để xem phân tích chi tiêu",
+    "noCategoriesDescription": "Nhập CSV hoặc thêm giao dịch để xem tiền đi đâu",
     "addTransaction": "Thêm giao dịch",
     "noGoals": "Chưa có mục tiêu",
-    "noGoalsDescription": "Đặt mục tiêu tài chính để theo dõi tiến độ",
+    "noGoalsDescription": "Chọn mốc 1, 3 hoặc 5 năm và bắt đầu theo dõi tiến độ",
     "createGoal": "Tạo mục tiêu",
     "yearGoal": "Mục tiêu {{years}} năm",
     "quickActions": "Hành động nhanh",
@@ -125,6 +125,7 @@
     "assets": "Tài sản",
     "liabilities": "Nợ phải trả",
     "thisMonth": "Tháng này",
+    "trending": "Đang tăng",
     "income": "Thu nhập",
     "expenses": "Chi tiêu",
     "savingsRate": "Tỷ lệ tiết kiệm",
@@ -360,7 +361,7 @@
     "incomeVsExpense": "Thu nhập vs Chi tiêu",
     "categoryBreakdown": "Phân tích theo danh mục",
     "monthlyCashFlow": "Dòng tiền hàng tháng",
-    "noData": "Không có dữ liệu",
+    "noData": "Thêm ít nhất một tháng giao dịch để xem biểu đồ",
     "comingSoon": "Biểu đồ chi tiết hàng tháng (sắp ra mắt)",
     "spendingInsights": "Thông tin chi tiêu",
     "noInsights": "Không phát hiện mẫu chi tiêu đáng chú ý",
@@ -401,11 +402,11 @@
       "change": "{{percent}}% so với năm ngoái",
       "increase": "tăng",
       "decrease": "giảm",
-      "noData": "Không đủ dữ liệu để so sánh"
+      "noData": "Thêm dữ liệu năm thứ hai để so sánh xu hướng"
     },
     "heatmap": {
       "title": "Bản đồ nhiệt chi tiêu",
-      "noData": "Không có dữ liệu chi tiêu trong khoảng thời gian này",
+      "noData": "Theo dõi chi tiêu vài tuần để xem bản đồ nhiệt",
       "dailyAvg": "Trung bình theo ngày",
       "less": "Ít",
       "more": "Nhiều",
@@ -513,7 +514,7 @@
   },
   "common": {
     "loading": "Đang tải...",
-    "noData": "Không có dữ liệu",
+    "noData": "Chưa có gì để hiển thị — tiếp tục theo dõi và quay lại sau",
     "saving": "Đang lưu...",
     "assigning": "Đang gán...",
     "save": "Lưu",
@@ -712,7 +713,7 @@
     "avgMonthlySavings": "Tiết kiệm trung bình",
     "perMonth": "mỗi tháng",
     "warningNegative": "Số dư có thể âm trong {{months}} tháng",
-    "noData": "Không có dữ liệu để dự báo",
+    "noData": "Thêm vài tháng dữ liệu để mở khóa dự báo dòng tiền",
     "error": "Không thể tải dự báo"
   },
   "dateRange": {
@@ -1385,7 +1386,7 @@
   "report": {
     "title": "Báo cáo tháng",
     "loadError": "Không thể tải dữ liệu báo cáo. Vui lòng thử lại.",
-    "noData": "Không có dữ liệu cho tháng này.",
+    "noData": "Chưa có giao dịch trong tháng này. Nhập hoặc thêm để xem báo cáo.",
     "savingsRate": "Tỷ lệ tiết kiệm",
     "savingsRateDesc": "% thu nhập tiết kiệm được",
     "budgetAdherence": "Tuân thủ ngân sách",
@@ -1807,7 +1808,7 @@
     },
     "upcoming": {
       "title": "Hóa đơn sắp tới",
-      "empty": "Không có hóa đơn sắp tới",
+      "empty": "Không có hóa đơn đến hạn — bạn đi trước lịch rồi",
       "total_due": "Tổng tiền đến hạn"
     },
     "detail": {
@@ -2129,7 +2130,7 @@
     "projected": "Dự kiến tháng này",
     "dayProgress": "Ngày {{current}}/{{total}}",
     "vsLastMonth": "so với tháng trước",
-    "noData": "Không có dữ liệu chi tiêu tháng này"
+    "noData": "Bắt đầu ghi nhận chi tiêu để xem nhịp độ hàng ngày"
   },
   "holdings": {
     "title": "Đầu tư",
@@ -2198,9 +2199,12 @@
     "adjustBudgetCategoryDesc": "Chi tiêu ¥{{spent}} vượt ngân sách ¥{{allocated}}",
     "reviewGoalCatchUp": "Mục tiêu cần chú ý",
     "reviewGoalCatchUpDesc": "{{goalName}} đang chậm. Tiết kiệm ¥{{monthlyNeeded}}/tháng để bắt kịp",
-    "expandedSurfaces": "Hiển thị hành động trên trang Mục tiêu & Báo cáo",
-    "autoExecute": "Tự động áp dụng hành động ngân sách",
-    "autoExecuteDesc": "Tự động tạo và điều chỉnh ngân sách mà không cần xác nhận",
+    "monthlyReportNudge": "Báo cáo {{monthName}} đã sẵn sàng",
+    "monthlyReportNudgeDesc": "Xem lại chi tiêu và tiết kiệm của {{monthName}}",
+    "expandedSurfaces": "Hiển thị gợi ý trên trang Mục tiêu & Báo cáo",
+    "expandedSurfacesDesc": "Hiển thị lời khuyên cùng với mục tiêu và báo cáo hàng tháng",
+    "autoExecute": "Tự động áp dụng gợi ý ngân sách",
+    "autoExecuteDesc": "Tạo và điều chỉnh ngân sách mà không cần xác nhận mỗi lần",
     "smartActionsSettings": "Hành động thông minh"
   }
 }
