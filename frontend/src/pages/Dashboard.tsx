@@ -232,6 +232,7 @@ export function Dashboard() {
         <OnboardingChecklist />
 
         {/* 2. Quick Actions — primary interaction point */}
+        <div className="bg-gray-50/80 dark:bg-gray-800/30 rounded-xl p-3 -mx-1">
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
           <div className="flex gap-3 pb-2 min-w-max">
             {quickActions.map((action, idx) => {
@@ -257,6 +258,7 @@ export function Dashboard() {
               )
             })}
           </div>
+        </div>
         </div>
 
         {/* 3. Net Worth Hero — THE focal point */}
@@ -284,7 +286,7 @@ export function Dashboard() {
               change={5.2}
               isPositive
               formatCurrency={formatCurrency}
-              className="bg-income-50/50 dark:bg-income-900/10 border-income-100 dark:border-income-900/20"
+              className="bg-income-50/80 dark:bg-income-900/15 border-income-200 dark:border-income-800/30"
             />
             <QuickStatCard
               label={t('dashboard.expenses', 'Expenses')}
@@ -292,7 +294,7 @@ export function Dashboard() {
               change={-2.1}
               isPositive={false}
               formatCurrency={formatCurrency}
-              className="bg-expense-50/50 dark:bg-expense-900/10 border-expense-100 dark:border-expense-900/20"
+              className="bg-expense-50/80 dark:bg-expense-900/15 border-expense-200 dark:border-expense-800/30"
             />
           </div>
 

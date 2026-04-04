@@ -202,7 +202,7 @@ export function Goals() {
                 {formatCurrencyCompactPrivacy(overallStats.totalTarget, currency, exchangeRates?.rates || {}, true, isPrivacyMode)}
               </span>
             </div>
-            <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-gray-200/80 dark:bg-gray-700/50 rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full rounded-full transition-[width] duration-500',

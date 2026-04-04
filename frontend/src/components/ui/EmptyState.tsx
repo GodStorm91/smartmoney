@@ -19,11 +19,11 @@ export function EmptyState({ icon, title, description, action, className, compac
     )}>
       {icon ? (
         <div className={cn(
-          'flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800',
+          'flex items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-900/20',
           compact ? 'w-12 h-12 mb-3' : 'w-16 h-16 mb-4'
         )}>
           <div className={cn(
-            'text-gray-400 dark:text-gray-500',
+            'text-primary-400 dark:text-primary-500',
             compact ? '[&>svg]:w-6 [&>svg]:h-6' : '[&>svg]:w-8 [&>svg]:h-8'
           )}>
             {icon}
@@ -31,11 +31,11 @@ export function EmptyState({ icon, title, description, action, className, compac
         </div>
       ) : (
         <div className={cn(
-          'flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-gray-800',
+          'flex items-center justify-center rounded-2xl bg-primary-50 dark:bg-primary-900/20',
           compact ? 'w-12 h-12 mb-3' : 'w-16 h-16 mb-4'
         )}>
           <Sparkles className={cn(
-            'text-gray-400 dark:text-gray-500',
+            'text-primary-400 dark:text-primary-500',
             compact ? 'w-6 h-6' : 'w-8 h-8'
           )} />
         </div>

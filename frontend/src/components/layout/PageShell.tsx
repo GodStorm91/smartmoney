@@ -35,6 +35,7 @@ export function PageShell({
     <div className={cn('pb-[calc(6rem+env(safe-area-inset-bottom,0px))] md:pb-6', className)}>
       {title && (
         <div className="sticky top-0 z-10 bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-700/50">
+          <div className="h-0.5 bg-primary-500/20 dark:bg-primary-400/10" />
           <div className={cn(MAX_WIDTH_MAP[maxWidth], 'mx-auto px-4 py-4')}>
             <div className="flex items-center justify-between">
               <div className="min-w-0">

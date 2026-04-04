@@ -649,12 +649,31 @@ interface SectionCardProps {
   className?: string
 }
 
+// Domain-specific icon colors for section cards
+const SECTION_ICON_COLORS: Record<string, { bg: string; text: string }> = {
+  Palette: { bg: 'bg-violet-100 dark:bg-violet-900/30', text: 'text-violet-600 dark:text-violet-400' },
+  Wallet: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400' },
+  Bell: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' },
+  Tag: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
+  Smartphone: { bg: 'bg-sky-100 dark:bg-sky-900/30', text: 'text-sky-600 dark:text-sky-400' },
+  Users: { bg: 'bg-pink-100 dark:bg-pink-900/30', text: 'text-pink-600 dark:text-pink-400' },
+  Globe: { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-600 dark:text-teal-400' },
+  AlertTriangle: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-600 dark:text-orange-400' },
+  Zap: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-600 dark:text-yellow-400' },
+}
+
+function getIconColors(icon: React.ComponentType<{ className?: string }>) {
+  const name = icon.displayName || icon.name || ''
+  return SECTION_ICON_COLORS[name] || { bg: 'bg-primary-100 dark:bg-primary-900/30', text: 'text-primary-600 dark:text-primary-400' }
+}
+
 function SectionCard({ icon: Icon, title, description, children, className }: SectionCardProps) {
+  const colors = getIconColors(Icon)
   return (
     <Card className={cn('shadow-card', className)}>
       <div className="flex items-start gap-3 mb-4">
-        <div className="p-2 rounded-xl bg-primary-100 dark:bg-primary-900/30">
-          <Icon className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+        <div className={cn('p-2 rounded-xl', colors.bg)}>
+          <Icon className={cn('w-5 h-5', colors.text)} />
         </div>
         <div className="flex-1">
           <h3 className="font-bold text-gray-900 dark:text-gray-100">{title}</h3>
