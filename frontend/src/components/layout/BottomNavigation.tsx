@@ -230,7 +230,7 @@ export function BottomNavigation() {
           <button
             onClick={() => setIsMoreOpen(!isMoreOpen)}
             className={cn(
-              'flex flex-col items-center justify-center flex-1 px-1 transition-all relative',
+              'flex flex-col items-center justify-center flex-1 px-1.5 min-w-[48px] transition-all relative',
               isMoreActive || isMoreOpen
                 ? 'text-primary-600 dark:text-primary-400'
                 : 'text-gray-400 dark:text-gray-500'

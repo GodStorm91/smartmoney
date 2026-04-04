@@ -26,7 +26,7 @@ export function KpiRow({ summary, formatCurrency, accounts, exchangeRates = {} }
   ]
 
   return (
-    <div className="grid grid-cols-3 gap-2.5">
+    <div className="grid grid-cols-3 gap-3">
       {kpis.map((kpi, idx) => (
         <div
           key={kpi.label}

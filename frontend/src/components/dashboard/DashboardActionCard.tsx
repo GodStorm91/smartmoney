@@ -132,7 +132,7 @@ export function DashboardActionCard({ action }: DashboardActionCardProps) {
   return (
     <Card className={cn(
       'transition-all duration-300 motion-reduce:transition-none',
-      resolved && 'bg-income-50/50 dark:bg-income-900/10 scale-[0.98] opacity-80',
+      resolved && 'bg-income-50/50 dark:bg-income-900/10 scale-[0.99] opacity-90',
       dismissed && 'opacity-0 -translate-y-2 h-0 p-0 overflow-hidden'
     )}>
       <div className="flex items-start gap-3">

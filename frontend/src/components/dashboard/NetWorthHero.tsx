@@ -37,7 +37,7 @@ export function NetWorthHero({ summary, accounts }: NetWorthHeroProps) {
       )}
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="flex items-center gap-2 mb-1">
+      <div className="flex items-center gap-2 mb-2.5 sm:mb-3">
         <Wallet className="w-4 h-4 text-primary-600 dark:text-primary-300" />
         <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
           {t('dashboard.netWorth', 'Net Worth')}

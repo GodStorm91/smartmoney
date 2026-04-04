@@ -199,7 +199,7 @@ export function Dashboard() {
             >
               <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="text-sm font-medium text-gray-500 dark:text-gray-400">
+            <h1 className="text-xs font-medium text-gray-500 dark:text-gray-400">
               {formatMonth(currentDate)}
             </h1>
             <button
@@ -214,7 +214,7 @@ export function Dashboard() {
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight">
               {emoji} {greeting}
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 font-medium">
+            <p className="text-sm text-gray-500 dark:text-gray-300 mt-0.5 font-medium">
               {greetingSubtitle}
             </p>
           </div>
@@ -302,7 +302,7 @@ export function Dashboard() {
         {/* Show details toggle */}
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="w-full py-3 text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center gap-2 transition-colors"
+          className="w-full py-3 min-h-[44px] text-sm font-medium text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center justify-center gap-2 transition-colors"
         >
           {showDetails ? t('dashboard.showLess', 'Show less') : t('dashboard.showMore', 'Show details')}
           <ChevronDown className={cn('w-4 h-4 transition-transform', showDetails && 'rotate-180')} />
