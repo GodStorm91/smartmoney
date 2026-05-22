@@ -35,6 +35,20 @@ services:
     expose:
       - "8000"
 
+  mcp-server:
+    build: ../mcp-server
+    container_name: smartmoney-mcp
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:8000
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 3000
+      MCP_PATH: /mcp
+    depends_on:
+      - backend
+    expose:
+      - "3000"
+
   nginx:
     image: nginx:alpine
     container_name: smartmoney-nginx
@@ -49,6 +63,7 @@ services:
       - ./certbot/www:/var/www/certbot:ro
     depends_on:
       - backend
+      - mcp-server
 
   certbot:
     image: certbot/certbot

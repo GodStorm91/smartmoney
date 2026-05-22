@@ -33,6 +33,22 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
+def create_mcp_token(data: dict, jti: str, expires_days: int = 365) -> str:
+    """Create a long-lived JWT for MCP (OpenClaw) access.
+
+    Carries type="mcp" and a jti so it can be revoked by rotating/clearing the
+    user's stored jti. Read-only enforcement (safe HTTP methods only) lives in
+    get_current_user.
+    """
+    to_encode = data.copy()
+    # Ensure sub is a string (JWT spec requirement)
+    if "sub" in to_encode:
+        to_encode["sub"] = str(to_encode["sub"])
+    expire = datetime.now(timezone.utc) + timedelta(days=expires_days)
+    to_encode.update({"exp": expire, "type": "mcp", "jti": jti})
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+
+
 def create_refresh_token(data: dict) -> str:
     """Create a JWT refresh token."""
     to_encode = data.copy()

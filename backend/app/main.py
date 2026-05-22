@@ -54,6 +54,7 @@ from .routes.upload import router as upload_router
 from .routes.exchange_rates import router as exchange_rates_router
 from .routes.export import router as export_router
 from .routes.health_score import router as health_score_router
+from .routes.mcp_token import router as mcp_token_router
 from .routes.user_categories import router as user_categories_router
 from .services.exchange_rate_service import ExchangeRateService
 from .services.recurring_service import RecurringTransactionService
@@ -524,6 +525,7 @@ async def shutdown_event():
 
 # Include routers
 app.include_router(auth_router)
+app.include_router(mcp_token_router)
 app.include_router(benchmarks_router)
 app.include_router(accounts_router)
 app.include_router(anomalies_router)

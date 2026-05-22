@@ -133,6 +133,22 @@ if [ "$RESTART_ONLY" = false ]; then
             scp -r "$LOCAL_DIR/deploy/"* "$SERVER:$REMOTE_DIR/deploy/"
         fi
     fi
+
+    # Sync MCP server source (build context for the mcp-server compose service)
+    if [ -d "$LOCAL_DIR/mcp-server" ]; then
+        log_info "Syncing MCP server code..."
+        if command -v rsync &> /dev/null; then
+            rsync -avz --delete \
+                --exclude='.venv' \
+                --exclude='__pycache__' \
+                --exclude='*.pyc' \
+                --exclude='.env' \
+                "$LOCAL_DIR/mcp-server/" \
+                "$SERVER:$REMOTE_DIR/mcp-server/"
+        else
+            scp -r "$LOCAL_DIR/mcp-server/"* "$SERVER:$REMOTE_DIR/mcp-server/"
+        fi
+    fi
 fi
 
 # Step 2.5: Create a pre-deploy backup
@@ -191,6 +207,18 @@ ssh "$SERVER" "
         exit 1
     fi
 "
+
+# Step 4.5: Build/restart the MCP server + reload nginx (new /mcp route)
+if [ "$RESTART_ONLY" = false ]; then
+    log_info "Building and (re)starting MCP server..."
+    ssh "$SERVER" "
+        cd $REMOTE_DIR/deploy
+        docker compose up -d --build mcp-server
+        # nginx.conf is mounted read-only; reload to pick up the /mcp location
+        docker exec smartmoney-nginx nginx -t && docker exec smartmoney-nginx nginx -s reload || \
+            docker compose restart nginx
+    "
+fi
 
 # Step 5: Verify deployment
 log_info "Verifying deployment..."

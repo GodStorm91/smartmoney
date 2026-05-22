@@ -36,6 +36,7 @@ import { CryptoWalletSettings } from '@/components/settings/CryptoWalletSettings
 import { AnomalyConfigPanel } from '@/components/anomalies/AnomalyConfigPanel'
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences'
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
+import { McpTokenSection } from '@/components/settings/McpTokenSection'
 import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileForm'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 import { fetchActionSettings, updateActionSettings } from '@/services/pending-action-service'
@@ -59,6 +60,7 @@ const SECTIONS = [
   { id: 'crypto', labelKey: 'settings.sections.crypto', icon: Globe },
   { id: 'anomaly', labelKey: 'anomaly.title', icon: AlertTriangle },
   { id: 'smartActions', labelKey: 'actions.smartActionsSettings', icon: Zap },
+  { id: 'mcp', labelKey: 'mcp.sectionTitle', icon: Link2 },
   { id: 'export', labelKey: 'settings.sections.export', icon: Smartphone },
 ] as const
 
@@ -442,6 +444,13 @@ export function Settings() {
           </SectionCard>
         </div>
 
+        {/* MCP Access Token */}
+        <div className={cn('space-y-4', activeSection !== 'mcp' && 'hidden')}>
+          <SectionCard icon={Link2} title={t('mcp.sectionTitle', 'AI Access (MCP)')} description={t('mcp.sectionDescription', 'Connect AI assistants to your finance data')}>
+            <McpTokenSection />
+          </SectionCard>
+        </div>
+
         {/* Export to iOS */}
         <div className={cn('space-y-4', activeSection !== 'export' && 'hidden')}>
           <SectionCard icon={Smartphone} title={t('settings.export.title')} description={t('settings.export.description')}>
@@ -660,6 +669,7 @@ const SECTION_ICON_COLORS: Record<string, { bg: string; text: string }> = {
   Globe: { bg: 'bg-teal-100 dark:bg-teal-900/30', text: 'text-teal-600 dark:text-teal-400' },
   AlertTriangle: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-600 dark:text-orange-400' },
   Zap: { bg: 'bg-yellow-100 dark:bg-yellow-900/30', text: 'text-yellow-600 dark:text-yellow-400' },
+  Link2: { bg: 'bg-indigo-100 dark:bg-indigo-900/30', text: 'text-indigo-600 dark:text-indigo-400' },
 }
 
 function getIconColors(icon: React.ComponentType<{ className?: string }>) {

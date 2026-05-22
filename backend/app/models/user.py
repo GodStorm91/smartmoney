@@ -36,6 +36,10 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     theme_settings: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     household_profile: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # MCP (OpenClaw) access token: single active token per user; jti enables
+    # rotate-to-revoke. Null = no active MCP token.
+    mcp_token_jti: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    mcp_token_created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
