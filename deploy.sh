@@ -224,6 +224,22 @@ if [ "$RESTART_ONLY" = false ]; then
     "
 fi
 
+# Step 4.6: Re-cp backend code in case compose recreated the backend container.
+# Background: docker compose up -d --build mcp-server can re-evaluate every
+# service in the project. If .env or docker-compose.yml has changed since the
+# backend was last started, compose recreates backend from the prebuilt image,
+# blowing away the docker-cp'd code from Step 3. Re-cp here as a safety net.
+# Long-term: switch backend to image-baked deploys or bind-mount the app dir.
+if [ "$RESTART_ONLY" = false ]; then
+    log_info "Re-syncing backend code post-compose (safety net)..."
+    ssh "$SERVER" "
+        docker cp $REMOTE_DIR/backend/app/. $CONTAINER_NAME:/app/app/
+        docker cp $REMOTE_DIR/backend/alembic/. $CONTAINER_NAME:/app/alembic/
+        docker restart $CONTAINER_NAME >/dev/null
+        echo '[INFO] backend code re-cp + restart complete'
+    "
+fi
+
 # Step 5: Verify deployment
 log_info "Verifying deployment..."
 HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" https://money.khanh.page/api/health 2>/dev/null || echo "000")
