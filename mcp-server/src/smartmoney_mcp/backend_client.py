@@ -69,7 +69,7 @@ async def backend_post_json(
                 "This is a read-only MCP token. "
                 "Generate a Write token in Settings → MCP Write Token section."
             )
-        if resp.status_code in (400, 402, 422):
+        if resp.status_code in (400, 402, 404, 422):
             try:
                 detail = resp.json().get("detail", resp.text)
             except Exception:

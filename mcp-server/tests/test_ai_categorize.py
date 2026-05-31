@@ -117,6 +117,20 @@ async def test_suggest_403_distinguishes_read_token(fake_request, mock_backend):
     assert "Settings" in msg
 
 
+async def test_suggest_404_surfaces_backend_detail(fake_request, mock_backend):
+    """404 from /budget-suggestions ('No active budget...') must reach the agent.
+
+    Without 404 in the detail-surfacing list, the agent gets a generic
+    "SmartMoney returned an error (404)" and can't tell the user what's wrong.
+    """
+    mock_backend["status"] = 404
+    mock_backend["json"] = {"detail": "No active budget found for 2026-05."}
+
+    fake_request(query="token=write-jwt")
+    with pytest.raises(RuntimeError, match="No active budget found"):
+        await ai_categorize_suggest(scope="budget", month="2026-05")
+
+
 # --- apply --------------------------------------------------------------------
 
 async def test_apply_happy_path(fake_request, mock_backend):

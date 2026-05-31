@@ -194,15 +194,19 @@ ssh "$SERVER" "
         echo '--- Container logs ---'
         docker logs --tail 30 $CONTAINER_NAME 2>&1 | tail -30
 
-        # Check for startup errors
-        if docker logs $CONTAINER_NAME 2>&1 | grep -qi 'error\|exception\|failed'; then
-            log_error 'Container started with errors. Check logs above.'
+        # Positive-proof health: uvicorn prints 'Application startup complete'
+        # once it's ready. Heuristic error-grep was false-positive on sqlalchemy
+        # debug logs (column names like 'error_message'). Note: log_info /
+        # log_error are parent-shell functions, not available inside ssh heredoc
+        # — use inline echo here so we don't bash-fail on 'command not found'.
+        if ! docker logs $CONTAINER_NAME 2>&1 | grep -q 'Application startup complete'; then
+            echo '[ERROR] Backend did not reach Application startup complete state.'
             exit 1
         fi
 
-        log_info 'Container started successfully!'
+        echo '[INFO] Container started successfully!'
     else
-        log_error 'Container failed to start!'
+        echo '[ERROR] Container failed to start!'
         docker logs --tail 50 $CONTAINER_NAME
         exit 1
     fi
