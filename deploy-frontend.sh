@@ -1,4 +1,7 @@
 #!/bin/bash
+# Canonical prod tree: /var/www/smartmoney/  (/root/smartmoney is a symlink to it).
+# Always reference /var/www/smartmoney/ in this script — /root/smartmoney/ is
+# preserved only so existing cron entries keep resolving.
 set -e
 
 RED='\033[0;31m'
@@ -36,12 +39,12 @@ echo -e "${GREEN}Deploying to server...${NC}"
 tar -czf /tmp/frontend-deploy.tar.gz -C deploy/frontend-dist .
 scp /tmp/frontend-deploy.tar.gz root@$SERVER:/tmp/
 
-# Extract on server
+# Extract on server (canonical path: /var/www/smartmoney/)
 ssh root@$SERVER "
-  rm -rf /root/smartmoney/deploy/frontend-dist/*
-  tar -xzf /tmp/frontend-deploy.tar.gz -C /root/smartmoney/deploy/frontend-dist/
-  chmod -R 755 /root/smartmoney/deploy/frontend-dist/
-  find /root/smartmoney/deploy/frontend-dist/locales -type f -exec chmod 644 {} \;
+  rm -rf /var/www/smartmoney/deploy/frontend-dist/*
+  tar -xzf /tmp/frontend-deploy.tar.gz -C /var/www/smartmoney/deploy/frontend-dist/
+  chmod -R 755 /var/www/smartmoney/deploy/frontend-dist/
+  find /var/www/smartmoney/deploy/frontend-dist/locales -type f -exec chmod 644 {} \;
   docker restart smartmoney-nginx
 "
 

@@ -1,6 +1,9 @@
 #!/bin/bash
 # SmartMoney Deployment Script
 # Usage: ./deploy.sh [--skip-tests] [--restart-only]
+#
+# Canonical prod tree: /var/www/smartmoney/  (/root/smartmoney is a symlink to it).
+# REMOTE_DIR below is the only path to reference — never hard-code /root/smartmoney/.
 
 set -e
 
@@ -100,6 +103,8 @@ if [ "$RESTART_ONLY" = false ]; then
             --exclude='*.db' \
             --exclude='.coverage' \
             --exclude='test_*.log' \
+            --exclude='.env' \
+            --exclude='uploads' \
             "$LOCAL_DIR/backend/" \
             "$SERVER:$REMOTE_DIR/backend/"
     else
@@ -122,11 +127,18 @@ if [ "$RESTART_ONLY" = false ]; then
         fi
     fi
 
-    # Sync deploy scripts and config
+    # Sync deploy scripts and config.
+    # CRITICAL: --exclude='.env' — prod's .env holds real secrets
+    # (ANTHROPIC_API_KEY etc.); local copy is just a placeholder template.
+    # Same exclude on backend/.env (rsync above already excludes other state).
     if [ -d "$LOCAL_DIR/deploy" ]; then
         log_info "Syncing deploy scripts..."
         if command -v rsync &> /dev/null; then
             rsync -avz \
+                --exclude='.env' \
+                --exclude='.env.production' \
+                --exclude='frontend-dist' \
+                --exclude='certbot' \
                 "$LOCAL_DIR/deploy/" \
                 "$SERVER:$REMOTE_DIR/deploy/"
         else
