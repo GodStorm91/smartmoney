@@ -15,7 +15,12 @@ _SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 
 # Endpoints where mcp_write tokens are accepted. Fail-closed: unknown endpoints
 # get 403, never 200. Extend here when adding new write-capable MCP tools.
-WRITE_TOKEN_ALLOWLIST: frozenset[str] = frozenset({"/api/upload/csv"})
+WRITE_TOKEN_ALLOWLIST: frozenset[str] = frozenset({
+    "/api/upload/csv",
+    "/api/ai/categorize/suggestions",
+    "/api/ai/categorize/budget-suggestions",
+    "/api/ai/categorize/apply",
+})
 
 
 async def get_current_user(

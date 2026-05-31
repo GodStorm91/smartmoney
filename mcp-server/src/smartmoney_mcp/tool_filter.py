@@ -21,7 +21,7 @@ from fastmcp.tools.base import Tool
 
 logger = logging.getLogger(__name__)
 
-_WRITE_TOOL_NAMES = {"import_csv"}
+_WRITE_TOOL_NAMES = {"import_csv", "ai_categorize_suggest", "ai_categorize_apply"}
 
 
 def _decode_token_type(token: str | None) -> str | None:

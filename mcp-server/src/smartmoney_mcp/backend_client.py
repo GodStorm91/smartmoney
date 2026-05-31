@@ -42,6 +42,46 @@ def _clean(params: dict | None) -> dict | None:
     return cleaned or None
 
 
+async def backend_post_json(
+    path: str,
+    json_body: dict,
+    params: dict | None = None,
+) -> dict:
+    """POST application/json to a SmartMoney backend endpoint.
+
+    Used for write tools that submit structured payloads (e.g. AI categorization
+    suggest/apply). 402 PAYMENT_REQUIRED is surfaced with backend detail since
+    "insufficient credits" is actionable info for the user.
+    """
+    token = _extract_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    async with httpx.AsyncClient(base_url=BACKEND_URL, timeout=BACKEND_TIMEOUT) as client:
+        resp = await client.post(
+            path, params=_clean(params), json=json_body, headers=headers
+        )
+        if resp.status_code == 401:
+            raise AuthError(
+                "Write MCP token revoked or expired. "
+                "Generate a new Write token in Settings."
+            )
+        if resp.status_code == 403:
+            raise AuthError(
+                "This is a read-only MCP token. "
+                "Generate a Write token in Settings → MCP Write Token section."
+            )
+        if resp.status_code in (400, 402, 422):
+            try:
+                detail = resp.json().get("detail", resp.text)
+            except Exception:
+                detail = resp.text
+            raise RuntimeError(f"SmartMoney rejected the request: {detail}")
+        if resp.status_code >= 400:
+            raise RuntimeError(
+                f"SmartMoney returned an error ({resp.status_code})."
+            )
+        return resp.json()
+
+
 async def backend_post_multipart(
     path: str,
     files: dict,

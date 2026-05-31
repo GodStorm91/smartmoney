@@ -7,7 +7,7 @@ import base64
 
 from fastmcp import FastMCP
 
-from ..backend_client import backend_post_multipart
+from ..backend_client import backend_post_json, backend_post_multipart
 
 
 async def import_csv(
@@ -36,6 +36,73 @@ async def import_csv(
     )
 
 
+async def ai_categorize_suggest(
+    limit: int = 50,
+    language: str = "ja",
+    scope: str = "all",
+    month: str | None = None,
+) -> dict:
+    """Get AI-powered category suggestions for transactions currently labeled "Other".
+
+    Requires a Write MCP token. **Costs credits** (~0.5 credits per ~50-row batch);
+    surfaces a clear "insufficient credits" error if the account lacks balance.
+
+    Pair this tool with `ai_categorize_apply`: review suggestions with the user,
+    then call apply with the approved subset.
+
+    limit: max transactions to analyze (1-100; default 50)
+    language: "ja" or "en" — language for the suggestion reasoning text
+    scope: "all" (default) for every "Other" transaction; "budget" to limit to
+      transactions in a given month whose categories aren't covered by any
+      active budget allocation
+    month: required when scope == "budget"; format YYYY-MM
+
+    Returns {suggestions: [{transaction_id, description, amount, current_category,
+      suggested_category, confidence, reason, is_new_category}, ...],
+      total_other_count, credits_used, new_categories_suggested}.
+    """
+    if scope == "budget":
+        if not month:
+            raise ValueError("month is required when scope='budget' (format YYYY-MM)")
+        return await backend_post_json(
+            "/api/ai/categorize/budget-suggestions",
+            {"month": month, "limit": limit, "language": language},
+        )
+    if scope != "all":
+        raise ValueError(f"scope must be 'all' or 'budget', got: {scope!r}")
+    return await backend_post_json(
+        "/api/ai/categorize/suggestions",
+        {"limit": limit, "language": language},
+    )
+
+
+async def ai_categorize_apply(
+    approved: list[dict],
+    create_rules: bool = True,
+) -> dict:
+    """Apply AI-suggested categories to a set of approved transactions.
+
+    Requires a Write MCP token. Modifies transactions in-place; optionally
+    creates keyword rules so future imports match the same description→category.
+
+    Typically called after `ai_categorize_suggest` once the user has approved
+    which suggestions to keep.
+
+    approved: list of {"transaction_id": <int>, "category": <str>} dicts. Use
+      the transaction_id values from a prior `ai_categorize_suggest` result.
+    create_rules: if True (default), auto-creates a keyword rule per unique
+      description so the same description gets the same category next time.
+
+    Returns {updated_count, rules_created, failed_ids}.
+    """
+    return await backend_post_json(
+        "/api/ai/categorize/apply",
+        {"approved": approved, "create_rules": create_rules},
+    )
+
+
 def register_write_tools(mcp: FastMCP) -> None:
     """Attach all write tools to the given FastMCP instance."""
     mcp.tool()(import_csv)
+    mcp.tool()(ai_categorize_suggest)
+    mcp.tool()(ai_categorize_apply)

@@ -1,8 +1,8 @@
 """Tests for token-type-based tools/list filtering.
 
 Verifies that filter_tools_by_token_type correctly narrows the tool surface:
-  - read token (type="mcp")       → strips import_csv, keeps 9 read tools
-  - write token (type="mcp_write") → keeps ONLY import_csv
+  - read token (type="mcp")       → strips all write tools, keeps 9 read tools
+  - write token (type="mcp_write") → keeps ONLY write tools (import_csv + ai_categorize_*)
   - missing/invalid token          → returns unchanged list (fail-open)
 """
 import base64
@@ -45,24 +45,26 @@ READ_TOOL_NAMES = [
     "get_cashflow_forecast",
 ]
 
-ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, "import_csv")  # 10 total
+WRITE_TOOL_NAMES = ["import_csv", "ai_categorize_suggest", "ai_categorize_apply"]
+ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 12 total
 
 
-def test_read_token_strips_import_csv():
+def test_read_token_strips_all_write_tools():
     token = _make_jwt({"type": "mcp", "sub": "user-1"})
     result = filter_tools_by_token_type(ALL_TOOLS, token)
     names = [t.name for t in result]
-    assert "import_csv" not in names
+    for write_name in WRITE_TOOL_NAMES:
+        assert write_name not in names
     assert len(names) == 9
     for read_name in READ_TOOL_NAMES:
         assert read_name in names
 
 
-def test_write_token_keeps_only_import_csv():
+def test_write_token_keeps_only_write_tools():
     token = _make_jwt({"type": "mcp_write", "sub": "user-1"})
     result = filter_tools_by_token_type(ALL_TOOLS, token)
-    names = [t.name for t in result]
-    assert names == ["import_csv"]
+    names = sorted(t.name for t in result)
+    assert names == sorted(WRITE_TOOL_NAMES)
 
 
 def test_missing_or_invalid_token_returns_unchanged_list():
