@@ -12,13 +12,14 @@ SmartMoney is now well beyond the original cashflow-tracker MVP. The codebase su
 
 Current repo counts at a glance:
 
-- `backend/app`: 216 Python files
+- `backend/app`: 217 Python files (+paypay_csv_parser.py)
 - `backend/app/models`: 36 files
 - `backend/app/routes`: 42 files
 - `backend/app/services`: 80 files
-- `backend/tests`: 20 pytest modules
-- `frontend/src`: 482 TypeScript/TSX files
-- `frontend/src/components`: 293 component files
+- `backend/tests`: 22 pytest modules (+test_mcp_write_token.py, +test_paypay_csv_parser.py)
+- `mcp-server`: 1 new write tools module (write_tools.py) + test_import_csv.py
+- `frontend/src`: 483 TypeScript/TSX files (+McpWriteTokenSection.tsx)
+- `frontend/src/components`: 294 component files
 - `frontend/src/pages`: 22 page files
 - `frontend/src/services`: 37 API/service modules
 - Locales: English, Japanese, Vietnamese
@@ -31,6 +32,7 @@ The main product domains currently implemented are:
 
 - Auth and per-user data isolation
 - Transactions, transfers, tags, receipts, and CSV import
+- **MCP (Model Context Protocol)** integration — read/write token tiers, OpenClaw tools, PayPay CSV parser
 - Analytics, dashboard summaries, anomaly detection, and health scoring
 - Budgets, budget alerts, revisions, and tracking
 - Goals and achievability modeling

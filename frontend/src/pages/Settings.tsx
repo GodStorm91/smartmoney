@@ -37,6 +37,7 @@ import { AnomalyConfigPanel } from '@/components/anomalies/AnomalyConfigPanel'
 import { NotificationPreferences } from '@/components/notifications/NotificationPreferences'
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings'
 import { McpTokenSection } from '@/components/settings/McpTokenSection'
+import { McpWriteTokenSection } from '@/components/settings/McpWriteTokenSection'
 import { HouseholdProfileForm } from '@/components/benchmark/HouseholdProfileForm'
 import { fetchSettings, updateSettings } from '@/services/settings-service'
 import { fetchActionSettings, updateActionSettings } from '@/services/pending-action-service'
@@ -448,6 +449,9 @@ export function Settings() {
         <div className={cn('space-y-4', activeSection !== 'mcp' && 'hidden')}>
           <SectionCard icon={Link2} title={t('mcp.sectionTitle', 'AI Access (MCP)')} description={t('mcp.sectionDescription', 'Connect AI assistants to your finance data')}>
             <McpTokenSection />
+          </SectionCard>
+          <SectionCard icon={Link2} title={t('mcpWrite.sectionTitle', 'MCP Write Token')} description={t('mcpWrite.sectionDescription', 'Allow AI assistants to import transactions via CSV upload')}>
+            <McpWriteTokenSection />
           </SectionCard>
         </div>
 

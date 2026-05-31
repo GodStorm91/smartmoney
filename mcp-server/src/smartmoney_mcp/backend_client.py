@@ -42,6 +42,45 @@ def _clean(params: dict | None) -> dict | None:
     return cleaned or None
 
 
+async def backend_post_multipart(
+    path: str,
+    files: dict,
+    params: dict | None = None,
+) -> dict:
+    """POST multipart/form-data to a SmartMoney backend endpoint.
+
+    Used exclusively for write operations (CSV import etc.) that require a
+    Write MCP token. Read tokens will get a clear 403 explaining the fix.
+    """
+    token = _extract_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    async with httpx.AsyncClient(base_url=BACKEND_URL, timeout=BACKEND_TIMEOUT) as client:
+        resp = await client.post(
+            path, params=_clean(params), files=files, headers=headers
+        )
+        if resp.status_code == 401:
+            raise AuthError(
+                "Write MCP token revoked or expired. "
+                "Generate a new Write token in Settings."
+            )
+        if resp.status_code == 403:
+            raise AuthError(
+                "This is a read-only MCP token. "
+                "Generate a Write token in Settings → MCP Write Token section."
+            )
+        if resp.status_code in (400, 422):
+            try:
+                detail = resp.json().get("detail", resp.text)
+            except Exception:
+                detail = resp.text
+            raise RuntimeError(f"CSV rejected by SmartMoney: {detail}")
+        if resp.status_code >= 400:
+            raise RuntimeError(
+                f"SmartMoney returned an error ({resp.status_code}) during upload."
+            )
+        return resp.json()
+
+
 async def backend_get(path: str, params: dict | None = None):
     """GET an endpoint on the SmartMoney backend with the caller's token.
 

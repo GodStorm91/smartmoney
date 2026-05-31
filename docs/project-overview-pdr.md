@@ -137,6 +137,21 @@ SmartMoney is a personal finance webapp that enables Japanese users to track cas
 - ✅ Japanese currency formatting (¥1,234,567)
 - ✅ Status badges (green=ahead, yellow=on_track, red=behind)
 
+### 4.6 MCP Integration (OpenClaw)
+**Status:** ✅ Complete (v0.8.0+)
+
+**Functionality:**
+- **Read-only MCP:** 365-day token expiry; 9 read tools (query transactions, analytics, goals, reports)
+- **Write-capable MCP:** 30-day opt-in token; `import_csv` tool routes PayPay/MoneyForward/Zaim CSVs to backend
+- **Per-endpoint allowlist:** Write tokens gated to `/api/upload/csv` only
+- **PayPay parser:** English headers, UTF-8 BOM handling, outgoing/incoming amount columns, Transaction ID dedup
+
+**Acceptance Criteria:**
+- ✅ Two-tier token system deployed and tested
+- ✅ MCP server filters tools by token type (read: 9 tools; write: 1 tool)
+- ✅ `import_csv(source, csv_base64)` tool with source dispatch (paypay, moneyforward, zaim)
+- ✅ Write token management in frontend Settings UI
+
 ---
 
 ## 5. Success Criteria

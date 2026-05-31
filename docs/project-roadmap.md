@@ -598,6 +598,7 @@ The following planned v0.5.0 items were already shipped in earlier versions:
 - [x] Anomaly detection → `/api/anomalies` endpoint (live)
 - [x] Budget recommendations → Claude AI budget generation (live)
 - [x] Category spending trends → Analytics page (live)
+- [x] MCP write features → Two-tier auth (read 365d / write 30d), `import_csv` tool, PayPay parser (2026-05-31)
 
 #### Remaining Features
 

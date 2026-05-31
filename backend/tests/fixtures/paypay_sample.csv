@@ -1,0 +1,6 @@
+﻿Date & Time,Amount Outgoing (Yen),Amount Incoming (Yen),Amount Outgoing Overseas,Currency,Exchange Rate (Yen),Country Paid In,Transaction Type,Business Name,Method,Payment Option,User,Transaction ID
+2026/04/30 17:14:13,"1,732",-,-,-,-,-,Payment,Test Merchant 1,PayPay Card Gold Mastercard,One-time Payment,,TEST_PAYPAY_001
+2026/04/30 15:44:51,-,1,-,-,-,-,"Points, Balance Earned",Test Merchant 2,PayPay Point,-,,TEST_PAYPAY_002
+2026/04/30 15:43:04,-,"2,556",-,-,-,-,"Points, Balance Earned",Test Merchant 3,PayPay Point,-,,TEST_PAYPAY_003
+2026/04/30 14:08:35,"3,000",-,-,-,-,-,Payment,Test Merchant 4,Credit Mastercard,One-time Payment,,TEST_PAYPAY_004
+2026/04/30 12:47:42,-,-,-,-,-,-,Payment,Test Merchant 5,PayPay Point,-,,TEST_PAYPAY_005

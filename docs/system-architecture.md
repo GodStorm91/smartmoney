@@ -232,7 +232,8 @@ User Browser
 └───────────┬─────────────────┘
             │
             │ 2. uploadCSV(file)
-            │    POST /api/upload/csv
+            │    POST /api/upload/csv?source=moneyforward|zaim|paypay
+            │    (source param routes to specific parser)
             ▼
 ┌─────────────────────────────┐
 │  upload.py (Route)          │
@@ -650,6 +651,38 @@ Client Request
 │       Content Security Policy       │
 │  - Helmet.js equivalent             │
 │  - XSS protection                   │
+└─────────────────────────────────────┘
+```
+
+### MCP Authentication Tiers (Added v0.8.0+)
+
+```
+┌─────────────────────────────────────┐
+│     MCP Read Token (365 days)       │
+│  - Created via /api/auth/mcp-token  │
+│  - Long-lived, read-only scope      │
+│  - Tools: 9 read operations (query  │
+│    transactions, analytics, goals)  │
+└─────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────┐
+│  MCP Write Token (30 days, opt-in)  │
+│  - Created via /api/auth/           │
+│    mcp-write-token                  │
+│  - Short-lived, scoped to writes    │
+│  - Tools: import_csv (CSV → DB)     │
+│  - Backed by WRITE_TOKEN_ALLOWLIST  │
+│    (currently: /api/upload/csv)     │
+└─────────────────────────────────────┘
+              │
+              ▼
+┌─────────────────────────────────────┐
+│      MCP Server Tool Filtering      │
+│  - Inbound token type determines    │
+│    which tools are visible          │
+│  - Read: 9 tools | Write: 1 tool    │
+│  - Per-endpoint allowlist enforced  │
 └─────────────────────────────────────┘
 ```
 

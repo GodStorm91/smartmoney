@@ -825,9 +825,19 @@ cd /home/godstorm91/project/smartmoney
 1. Runs linting checks (ruff, ESLint, TypeScript)
 2. Syncs backend code to server using rsync/scp
 3. Syncs frontend code if changed
-4. Copies files to Docker container
-5. Restarts the backend container
-6. Verifies API health
+4. Runs pre-deploy backup via `deploy/scripts/backup.sh`
+4.5 ⚠️ **Known Issue:** `log_error` function undefined in SSH heredoc (non-critical; workaround below)
+5. Copies files to Docker container
+6. Restarts the backend container
+7. Verifies API health
+
+**Deploy.sh Step 4.5 Workaround:**
+If deploy fails with `log_error: command not found`, manually trigger Alembic migration on the server:
+```bash
+ssh root@money.khanh.page
+docker exec smartmoney-backend /bin/bash -c "cd /app && alembic upgrade head"
+```
+This is non-blocking; the issue is a script heredoc substitution bug, not a migration failure.
 
 **Manual Docker deployment (if deploy.sh fails):**
 

@@ -1,5 +1,5 @@
 """CSV upload API route."""
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -9,9 +9,17 @@ from ..models.user import User
 from ..services.category_rule_service import CategoryRuleService
 from ..services.transaction_service import TransactionService
 from ..utils.csv_parser import CSVParseError, parse_csv
+from ..utils.paypay_csv_parser import parse_paypay_csv
 from ..utils.transaction_hasher import generate_tx_hash
 
 router = APIRouter(prefix="/api/upload", tags=["upload"])
+
+# Registry of source-specific parsers. Each callable has signature:
+#   (file_bytes: bytes, user_id: int) -> list[dict]
+# Add new sources here (e.g. "rakuten", "linepay") without touching endpoint logic.
+SOURCE_PARSERS = {
+    "paypay": parse_paypay_csv,
+}
 
 
 class UploadResponse(BaseModel):
@@ -28,17 +36,31 @@ class UploadResponse(BaseModel):
 @router.post("/csv", response_model=UploadResponse)
 async def upload_csv(
     file: UploadFile = File(..., description="CSV file to upload"),
+    source: str | None = Query(
+        None,
+        description="Optional parser source (e.g. 'paypay'). "
+                    "When omitted, the generic Japanese-format parser is used.",
+    ),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
     """Upload CSV file and import transactions.
 
-    Expected CSV format:
+    Expected CSV format (no source param):
     - Japanese columns: 日付, 内容, 金額（円）, 大項目, 保有金融機関
     - Or English columns: date, description, amount, category, source
 
+    With ?source=paypay — PayPay CSV export format (English headers, BOM, split amounts).
+
     Returns summary of imported transactions.
     """
+    # Validate source before touching the file (fail fast).
+    if source is not None and source not in SOURCE_PARSERS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown source: '{source}'. Supported values: {sorted(SOURCE_PARSERS)}",
+        )
+
     # Validate file extension
     if not file.filename.endswith(".csv"):
         raise HTTPException(
@@ -59,30 +81,45 @@ async def upload_csv(
     await file.seek(0)
 
     try:
-        # Parse CSV
-        transactions_data = parse_csv(file.file, file.filename)
+        if source is not None:
+            # --- Source-specific parser path ---
+            # Parser returns fully-formed dicts (user_id + tx_hash already set).
+            transactions_data = SOURCE_PARSERS[source](file_content, current_user.id)
 
-        # Apply keyword rules for transactions categorized as "Other"
-        rules = CategoryRuleService.list_rules(db, current_user.id, active_only=True)
+            # Apply keyword rules for transactions categorized as "Other".
+            rules = CategoryRuleService.list_rules(db, current_user.id, active_only=True)
+            if rules:
+                for tx_data in transactions_data:
+                    if tx_data.get("category") == "Other":
+                        matched = CategoryRuleService.categorize(tx_data["description"], rules)
+                        if matched:
+                            tx_data["category"] = matched
 
-        # Add user_id and regenerate tx_hash with user scope
-        for tx_data in transactions_data:
-            tx_data["user_id"] = current_user.id
-            tx_data["tx_hash"] = generate_tx_hash(
-                str(tx_data["date"]),
-                tx_data["amount"],
-                tx_data["description"],
-                tx_data["source"],
-                current_user.id,
-            )
+        else:
+            # --- Generic parser path (unchanged) ---
+            transactions_data = parse_csv(file.file, file.filename)
 
-            # If static mapper returned "Other", try keyword rules
-            if tx_data.get("category") == "Other" and rules:
-                matched = CategoryRuleService.categorize(tx_data["description"], rules)
-                if matched:
-                    tx_data["category"] = matched
+            # Apply keyword rules for transactions categorized as "Other"
+            rules = CategoryRuleService.list_rules(db, current_user.id, active_only=True)
 
-        # Bulk create transactions
+            # Add user_id and regenerate tx_hash with user scope
+            for tx_data in transactions_data:
+                tx_data["user_id"] = current_user.id
+                tx_data["tx_hash"] = generate_tx_hash(
+                    str(tx_data["date"]),
+                    tx_data["amount"],
+                    tx_data["description"],
+                    tx_data["source"],
+                    current_user.id,
+                )
+
+                # If static mapper returned "Other", try keyword rules
+                if tx_data.get("category") == "Other" and rules:
+                    matched = CategoryRuleService.categorize(tx_data["description"], rules)
+                    if matched:
+                        tx_data["category"] = matched
+
+        # Bulk create transactions (shared path for both parsers)
         created, skipped = TransactionService.bulk_create_transactions(
             db, transactions_data
         )
@@ -105,6 +142,8 @@ async def upload_csv(
         }
 
     except CSVParseError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(

@@ -13,6 +13,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 # MCP tokens are read-only: only these HTTP methods are permitted for them.
 _SAFE_METHODS = {"GET", "HEAD", "OPTIONS"}
 
+# Endpoints where mcp_write tokens are accepted. Fail-closed: unknown endpoints
+# get 403, never 200. Extend here when adding new write-capable MCP tools.
+WRITE_TOKEN_ALLOWLIST: frozenset[str] = frozenset({"/api/upload/csv"})
+
 
 async def get_current_user(
     request: Request,
@@ -21,10 +25,12 @@ async def get_current_user(
 ) -> User:
     """Get the current authenticated user from a JWT token.
 
-    Accepts two token types:
+    Accepts three token types:
       - "access": normal web session token, any HTTP method.
       - "mcp": long-lived OpenClaw token. Revocable via the user's stored jti
         and restricted to safe (read-only) HTTP methods.
+      - "mcp_write": short-lived (30d) write token. Revocable via
+        mcp_write_token_jti; accepted only on endpoints in WRITE_TOKEN_ALLOWLIST.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -35,7 +41,7 @@ async def get_current_user(
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         user_id_str = payload.get("sub")
         token_type: str = payload.get("type")
-        if user_id_str is None or token_type not in ("access", "mcp"):
+        if user_id_str is None or token_type not in ("access", "mcp", "mcp_write"):
             raise credentials_exception
         user_id = int(user_id_str)
     except (JWTError, ValueError):
@@ -54,6 +60,17 @@ async def get_current_user(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="MCP tokens are read-only",
+            )
+
+    # MCP write token gates: revocation + endpoint allowlist.
+    if token_type == "mcp_write":
+        jti = payload.get("jti")
+        if not jti or jti != user.mcp_write_token_jti:
+            raise credentials_exception
+        if request.url.path not in WRITE_TOKEN_ALLOWLIST:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Write token not allowed for this endpoint",
             )
 
     return user

@@ -2,10 +2,13 @@
 from fastmcp import FastMCP
 
 from .config import MCP_HOST, MCP_PATH, MCP_PORT
-from .tools import register_read_tools
+from .tool_filter import TokenTypeToolFilter
+from .tools import register_read_tools, register_write_tools
 
 mcp = FastMCP("smartmoney")
 register_read_tools(mcp)
+register_write_tools(mcp)
+mcp.add_middleware(TokenTypeToolFilter())
 
 
 def main() -> None:

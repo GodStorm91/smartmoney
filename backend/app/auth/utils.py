@@ -49,6 +49,21 @@ def create_mcp_token(data: dict, jti: str, expires_days: int = 365) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
+def create_mcp_write_token(data: dict, jti: str, expires_days: int = 30) -> str:
+    """Create a short-lived JWT for MCP write access.
+
+    Carries type="mcp_write" and a jti for revocation. Accepted only on
+    endpoints listed in WRITE_TOKEN_ALLOWLIST in get_current_user.
+    """
+    to_encode = data.copy()
+    # Ensure sub is a string (JWT spec requirement)
+    if "sub" in to_encode:
+        to_encode["sub"] = str(to_encode["sub"])
+    expire = datetime.now(timezone.utc) + timedelta(days=expires_days)
+    to_encode.update({"exp": expire, "type": "mcp_write", "jti": jti})
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
+
+
 def create_refresh_token(data: dict) -> str:
     """Create a JWT refresh token."""
     to_encode = data.copy()

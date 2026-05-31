@@ -33,3 +33,30 @@ export async function generateMcpToken(): Promise<McpTokenResult> {
 export async function revokeMcpToken(): Promise<void> {
   await apiClient.delete('/api/auth/mcp-token')
 }
+
+// ---------------------------------------------------------------------------
+// MCP Write Token (30-day expiry, accepted only on /api/upload/csv)
+// ---------------------------------------------------------------------------
+
+/**
+ * Fetch MCP write token status (never returns the token itself)
+ */
+export async function fetchMcpWriteTokenStatus(): Promise<McpTokenStatus> {
+  const response = await apiClient.get<McpTokenStatus>('/api/auth/mcp-write-token')
+  return response.data
+}
+
+/**
+ * Generate (or rotate) the MCP write token. Returns the token ONCE.
+ */
+export async function generateMcpWriteToken(): Promise<McpTokenResult> {
+  const response = await apiClient.post<McpTokenResult>('/api/auth/mcp-write-token')
+  return response.data
+}
+
+/**
+ * Revoke the active MCP write token
+ */
+export async function revokeMcpWriteToken(): Promise<void> {
+  await apiClient.delete('/api/auth/mcp-write-token')
+}

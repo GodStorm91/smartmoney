@@ -40,6 +40,10 @@ class User(Base):
     # rotate-to-revoke. Null = no active MCP token.
     mcp_token_jti: Mapped[str | None] = mapped_column(String(64), nullable=True)
     mcp_token_created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    # MCP write token: separate short-lived (30d) token for write operations.
+    # Accepted only on endpoints in WRITE_TOKEN_ALLOWLIST in dependencies.py.
+    mcp_write_token_jti: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    mcp_write_token_created_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), onupdate=func.now()
