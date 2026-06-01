@@ -3,8 +3,8 @@
 Decodes the JWT `type` claim (NO signature verification — backend is sole auth
 authority) to tailor the tools/list surface per token type:
 
-  type == "mcp"       → read-only surface: strip import_csv
-  type == "mcp_write" → write-only surface: keep ONLY import_csv
+  type == "mcp"       → read-only surface: strip write tools
+  type == "mcp_write" → write-only surface: keep ONLY write tools
   missing / malformed → return unchanged (fail-open; backend still gates calls)
 
 This is a UX hint only. Any mismatch between token type and tool call is caught
@@ -27,6 +27,8 @@ _WRITE_TOOL_NAMES = {
     "ai_categorize_apply",
     "scan_receipt",
     "apply_receipt_scan",
+    "set_budget_allocations",
+    "ai_suggest_budget",
 }
 
 
@@ -62,8 +64,8 @@ def _get_request_token() -> str | None:
 def filter_tools_by_token_type(tools: Sequence[Tool], token: str | None) -> list[Tool]:
     """Return a filtered tool list based on the JWT `type` claim.
 
-    - type == "mcp"       → strip import_csv (read-only surface, 9 read tools)
-    - type == "mcp_write" → keep ONLY import_csv (write-only surface)
+    - type == "mcp"       → strip write tools
+    - type == "mcp_write" → keep ONLY write tools
     - anything else       → return unchanged
     """
     token_type = _decode_token_type(token)

@@ -53,11 +53,34 @@ async def backend_post_json(
     suggest/apply). 402 PAYMENT_REQUIRED is surfaced with backend detail since
     "insufficient credits" is actionable info for the user.
     """
+    return await _backend_json_request("POST", path, json_body, params)
+
+
+async def backend_patch_json(
+    path: str,
+    json_body: dict,
+    params: dict | None = None,
+) -> dict:
+    """PATCH application/json to a SmartMoney backend endpoint."""
+    return await _backend_json_request("PATCH", path, json_body, params)
+
+
+async def _backend_json_request(
+    method: str,
+    path: str,
+    json_body: dict,
+    params: dict | None = None,
+) -> dict:
+    """Send a JSON write request with consistent MCP auth error handling."""
     token = _extract_token()
     headers = {"Authorization": f"Bearer {token}"}
     async with httpx.AsyncClient(base_url=BACKEND_URL, timeout=BACKEND_TIMEOUT) as client:
-        resp = await client.post(
-            path, params=_clean(params), json=json_body, headers=headers
+        resp = await client.request(
+            method,
+            path,
+            params=_clean(params),
+            json=_clean(json_body) or {},
+            headers=headers,
         )
         if resp.status_code == 401:
             raise AuthError(

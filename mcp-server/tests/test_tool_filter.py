@@ -1,8 +1,8 @@
 """Tests for token-type-based tools/list filtering.
 
 Verifies that filter_tools_by_token_type correctly narrows the tool surface:
-  - read token (type="mcp")       → strips all write tools, keeps 9 read tools
-  - write token (type="mcp_write") → keeps ONLY write tools (import_csv + ai_categorize_*)
+  - read token (type="mcp")       → strips all write tools, keeps read tools
+  - write token (type="mcp_write") → keeps ONLY write tools
   - missing/invalid token          → returns unchanged list (fail-open)
 """
 import base64
@@ -43,6 +43,8 @@ READ_TOOL_NAMES = [
     "get_health_score",
     "get_spending_by_category",
     "get_cashflow_forecast",
+    "evaluate_purchase",
+    "get_budget_suggestions",
 ]
 
 WRITE_TOOL_NAMES = [
@@ -51,8 +53,10 @@ WRITE_TOOL_NAMES = [
     "ai_categorize_apply",
     "scan_receipt",
     "apply_receipt_scan",
+    "set_budget_allocations",
+    "ai_suggest_budget",
 ]
-ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 14 total
+ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 17 total
 
 
 def test_read_token_strips_all_write_tools():
@@ -61,7 +65,7 @@ def test_read_token_strips_all_write_tools():
     names = [t.name for t in result]
     for write_name in WRITE_TOOL_NAMES:
         assert write_name not in names
-    assert len(names) == 9
+    assert len(names) == 11
     for read_name in READ_TOOL_NAMES:
         assert read_name in names
 

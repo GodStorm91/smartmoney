@@ -22,6 +22,8 @@ WRITE_TOKEN_ALLOWLIST: frozenset[str] = frozenset({
     "/api/ai/categorize/apply",
     "/api/receipts/scan",        # costs Vision API — gate via write token
     "/api/receipts/apply-scan",  # stateless; creates Transaction with source="Receipt"
+    "/api/budgets/generate-preview",
+    "/api/budgets/current/allocations",
 })
 
 

@@ -4,15 +4,21 @@ from decimal import Decimal
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
 from ..database import get_db
 from ..models.budget import Budget, BudgetAllocation
+from ..models.category import Category
 from ..models.user import User
+from ..models.user_category import UserCategory
 from ..schemas.budget import (
+    BulkAllocationUpdateRequest,
+    BudgetAllocationBulkUpdateResponse,
     BudgetGenerateRequest,
     BudgetRegenerateRequest,
+    BudgetPreviewResponse,
     BudgetResponse,
     BudgetTrackingResponse,
     CategoryHistoryResponse,
@@ -28,6 +34,43 @@ from ..services.budget_tracking_service import BudgetTrackingService
 from ..services.credit_service import CreditService, InsufficientCreditsError
 
 router = APIRouter(prefix="/api/budgets", tags=["budgets"])
+
+
+def _calculate_budget_credit_cost(usage: dict[str, int]) -> Decimal:
+    """Calculate budget-generation credit cost from Claude token usage."""
+    input_cost = Decimal(usage["input_tokens"]) * Decimal("0.080") / Decimal("1000")
+    output_cost = Decimal(usage["output_tokens"]) * Decimal("0.400") / Decimal("1000")
+    return input_cost + output_cost
+
+
+def _valid_budget_categories(db: Session, user_id: int) -> set[str]:
+    """Return exact category names allowed for budget allocations."""
+    category_rows = db.query(Category.name).filter(
+        Category.parent_id.is_(None),
+        or_(Category.is_system == True, Category.user_id == user_id),
+    )
+    legacy_rows = db.query(UserCategory.name).filter(UserCategory.user_id == user_id)
+    return {row[0] for row in category_rows.union(legacy_rows).all()}
+
+
+def _build_bulk_budget_response(
+    budget: Budget,
+    was_created: bool,
+) -> dict:
+    """Serialize a Budget with the extra auto-created flag."""
+    return {
+        "id": budget.id,
+        "month": budget.month,
+        "monthly_income": budget.monthly_income,
+        "savings_target": budget.savings_target,
+        "advice": budget.advice,
+        "allocations": budget.allocations,
+        "created_at": budget.created_at,
+        "version": budget.version,
+        "is_active": budget.is_active,
+        "copied_from_id": budget.copied_from_id,
+        "was_created": was_created,
+    }
 
 
 @router.post("/generate", response_model=BudgetResponse, status_code=status.HTTP_201_CREATED)
@@ -73,9 +116,7 @@ def generate_budget(
 
         # Calculate credit cost based on token usage
         # Pricing: $0.80/1M input, $4/1M output (with 100x markup)
-        input_cost = Decimal(usage["input_tokens"]) * Decimal("0.080") / Decimal("1000")
-        output_cost = Decimal(usage["output_tokens"]) * Decimal("0.400") / Decimal("1000")
-        total_credits = input_cost + output_cost
+        total_credits = _calculate_budget_credit_cost(usage)
 
         # Deduct credits (atomic transaction)
         try:
@@ -119,6 +160,71 @@ def generate_budget(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate budget: {str(e)}"
+        )
+
+
+@router.post("/generate-preview", response_model=BudgetPreviewResponse)
+def generate_budget_preview(
+    request: BudgetGenerateRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Generate an AI budget proposal and deduct credits without saving a budget."""
+    try:
+        ai_service = ClaudeAIService()
+        credit_service = CreditService(db)
+
+        account = credit_service.get_account(current_user.id)
+        if account.balance < Decimal("0.36"):
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail="Insufficient credits. Please purchase more credits to generate a budget."
+            )
+
+        budget_data, usage = ai_service.generate_budget_with_tracking(
+            db=db,
+            user_id=current_user.id,
+            monthly_income=request.monthly_income,
+            feedback=request.feedback,
+            language=request.language
+        )
+
+        total_credits = _calculate_budget_credit_cost(usage)
+
+        try:
+            credit_service.deduct_credits(
+                user_id=current_user.id,
+                amount=total_credits,
+                transaction_type="usage",
+                description=f"AI budget preview ({usage['input_tokens']} input + {usage['output_tokens']} output tokens)",
+                extra_data={
+                    "input_tokens": usage["input_tokens"],
+                    "output_tokens": usage["output_tokens"],
+                    "monthly_income": request.monthly_income
+                }
+            )
+            db.commit()
+        except InsufficientCreditsError as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail=str(e)
+            )
+
+        return {
+            "allocations": budget_data["allocations"],
+            "reasoning": budget_data.get("advice") or budget_data.get("reasoning"),
+            "credits_used": float(total_credits),
+            "monthly_income": request.monthly_income,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate budget preview: {str(e)}"
         )
 
 
@@ -341,6 +447,65 @@ def get_current_budget_tracking(
         )
 
     return tracking
+
+
+@router.patch("/current/allocations", response_model=BudgetAllocationBulkUpdateResponse)
+def update_current_budget_allocations(
+    request: BulkAllocationUpdateRequest,
+    db: Annotated[Session, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)]
+):
+    """Merge allocation updates into the current-month budget, creating it if needed."""
+    requested_names = [item.category for item in request.allocations]
+    valid_names = _valid_budget_categories(db, current_user.id)
+    unknown_names = sorted({name for name in requested_names if name not in valid_names})
+    if unknown_names:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail={"unknown_categories": unknown_names},
+        )
+
+    current_month = date.today().strftime("%Y-%m")
+    budget = BudgetService.get_current_budget(db, current_user.id)
+    was_created = budget is None
+
+    try:
+        if budget is None:
+            latest = BudgetService.get_latest_budget(db, current_user.id)
+            max_version = db.query(func.max(Budget.version)).filter(
+                Budget.user_id == current_user.id,
+                Budget.month == current_month,
+            ).scalar() or 0
+            budget = Budget(
+                user_id=current_user.id,
+                month=current_month,
+                monthly_income=latest.monthly_income if latest else 0,
+                version=max_version + 1,
+                is_active=True,
+            )
+            db.add(budget)
+            db.flush()
+
+        allocations_by_category = {alloc.category: alloc for alloc in budget.allocations}
+        for item in request.allocations:
+            allocation = allocations_by_category.get(item.category)
+            if allocation:
+                allocation.amount = item.amount
+            else:
+                allocation = BudgetAllocation(
+                    budget_id=budget.id,
+                    category=item.category,
+                    amount=item.amount,
+                )
+                db.add(allocation)
+                allocations_by_category[item.category] = allocation
+
+        db.commit()
+        db.refresh(budget)
+        return _build_bulk_budget_response(budget, was_created)
+    except Exception:
+        db.rollback()
+        raise
 
 
 @router.patch("/{budget_id}/allocations/{category}", response_model=BudgetResponse)

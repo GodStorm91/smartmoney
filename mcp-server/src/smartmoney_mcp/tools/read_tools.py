@@ -1,4 +1,4 @@
-"""The 9 read-only SmartMoney tools exposed to OpenClaw.
+"""The read-only SmartMoney tools exposed to OpenClaw.
 
 Each tool is a thin pass-through to an existing backend endpoint — NO financial
 computation happens here (all currency conversion, budget math, achievability,
@@ -9,6 +9,16 @@ the account's currency; the backend's base currency is JPY.
 from fastmcp import FastMCP
 
 from ..backend_client import backend_get
+
+
+async def get_budget_suggestions() -> dict:
+    """Get last month's budget shape as guidance for setting this month's budget.
+
+    Useful when the user asks to set or adjust a budget. Returns previous
+    allocations, monthly income, and carry-over context, or a no-prior-budget
+    indicator when the user has never had a budget.
+    """
+    return await backend_get("/api/budgets/suggestions")
 
 
 def register_read_tools(mcp: FastMCP) -> None:
@@ -154,3 +164,5 @@ def register_read_tools(mcp: FastMCP) -> None:
             "/api/budgets/evaluate-purchase",
             {"price": price, "category": category, "item_name": item_name},
         )
+
+    mcp.tool()(get_budget_suggestions)

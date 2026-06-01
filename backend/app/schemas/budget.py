@@ -28,6 +28,25 @@ class AllocationUpdateRequest(BaseModel):
     amount: int = Field(..., ge=0, description="New allocation amount (JPY)")
 
 
+class BulkAllocationItem(BaseModel):
+    """Single allocation update for bulk current-month budget edits."""
+    category: str = Field(..., min_length=1, description="Budget category name")
+    amount: int = Field(..., ge=0, description="Allocated amount (JPY)")
+
+
+class BulkAllocationUpdateRequest(BaseModel):
+    """Request to merge allocation updates into the current-month budget."""
+    allocations: list[BulkAllocationItem] = Field(..., min_length=1)
+
+
+class BudgetPreviewResponse(BaseModel):
+    """AI-generated budget proposal that has not been persisted."""
+    allocations: list[BudgetAllocationSchema]
+    reasoning: str | None = None
+    credits_used: float
+    monthly_income: int
+
+
 class BudgetResponse(BaseModel):
     """Budget response."""
     id: int
@@ -43,6 +62,11 @@ class BudgetResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BudgetAllocationBulkUpdateResponse(BudgetResponse):
+    """Updated current-month budget plus whether it was auto-created."""
+    was_created: bool
 
 
 class BudgetCopyRequest(BaseModel):

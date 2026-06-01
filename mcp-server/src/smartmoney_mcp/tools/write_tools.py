@@ -7,7 +7,7 @@ import base64
 
 from fastmcp import FastMCP
 
-from ..backend_client import backend_post_json, backend_post_multipart
+from ..backend_client import backend_patch_json, backend_post_json, backend_post_multipart
 
 
 async def import_csv(
@@ -174,6 +174,49 @@ async def apply_receipt_scan(
     )
 
 
+async def set_budget_allocations(
+    allocations: list[dict],
+) -> dict:
+    """Set or update budget allocations for the current month.
+
+    Requires a Write MCP token. Free (no AI cost).
+    Auto-creates a current-month budget if none exists yet.
+
+    allocations: list of {"category": str, "amount": int} dicts. Each entry
+      sets or overwrites that category's allocation for the current month.
+      Categories NOT in the list are LEFT UNTOUCHED. Use amount=0 to explicitly
+      clear a category.
+
+    Returns the updated budget and was_created=True when a new current-month
+    budget was created.
+    """
+    return await backend_patch_json(
+        "/api/budgets/current/allocations",
+        {"allocations": allocations},
+    )
+
+
+async def ai_suggest_budget(
+    monthly_income: int,
+    feedback: str | None = None,
+) -> dict:
+    """Get an AI-proposed budget WITHOUT saving it.
+
+    Requires a Write MCP token. Costs credits per call.
+    Two-step pattern: call this to get a proposal, show the user, then call
+    `set_budget_allocations` with the approved allocations to persist.
+
+    monthly_income: expected monthly income in yen.
+    feedback: optional natural-language guidance.
+
+    Returns {allocations, reasoning, credits_used, monthly_income}.
+    """
+    return await backend_post_json(
+        "/api/budgets/generate-preview",
+        {"monthly_income": monthly_income, "feedback": feedback},
+    )
+
+
 def register_write_tools(mcp: FastMCP) -> None:
     """Attach all write tools to the given FastMCP instance."""
     mcp.tool()(import_csv)
@@ -181,3 +224,5 @@ def register_write_tools(mcp: FastMCP) -> None:
     mcp.tool()(ai_categorize_apply)
     mcp.tool()(scan_receipt)
     mcp.tool()(apply_receipt_scan)
+    mcp.tool()(set_budget_allocations)
+    mcp.tool()(ai_suggest_budget)
