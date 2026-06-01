@@ -101,8 +101,83 @@ async def ai_categorize_apply(
     )
 
 
+async def scan_receipt(
+    image_base64: str,
+    mime_type: str = "image/jpeg",
+) -> dict:
+    """Scan a receipt photo and extract structured transaction data via Claude Vision.
+
+    Requires a Write MCP token (generate in Settings → MCP Write Token).
+    Costs ~$0.005-0.02 per scan (Claude Haiku Vision API).
+
+    Typically paired with `apply_receipt_scan`: call this first to parse the receipt,
+    show the result (including warnings) to the user for confirmation/edits, then
+    call `apply_receipt_scan` with the approved fields.
+
+    image_base64: base64-encoded image bytes. Accepts plain base64 or data URL
+      format (data:image/jpeg;base64,...). Practical size limit: ~7MB base64
+      (Telegram compresses photos, so real-world images are well under this).
+    mime_type: MIME type of the image (default "image/jpeg"). Also accepted:
+      "image/png". Ignored if image_base64 is a data URL (type inferred from prefix).
+
+    Returns {success: bool, data: {amount: int, date: str, merchant: str,
+      category: str, confidence: {amount: float, date: float, merchant: float},
+      warnings: [str, ...]}}. IMPORTANT: always surface `data.warnings` to the user
+      — they explain low-confidence parses (e.g. "Amount unclear — blurry digit").
+      Low-confidence fields should trigger a user confirmation step before applying.
+    """
+    return await backend_post_json(
+        "/api/receipts/scan",
+        {"image": image_base64, "media_type": mime_type},
+    )
+
+
+async def apply_receipt_scan(
+    amount: int,
+    date: str,
+    merchant: str,
+    category: str = "Other",
+    is_income: bool = False,
+    currency: str = "JPY",
+) -> dict:
+    """Create a SmartMoney transaction from confirmed receipt scan fields.
+
+    Requires a Write MCP token. Stateless — does NOT require a Receipt DB row.
+    Typically called after `scan_receipt` once the user has approved the parsed fields.
+
+    If the same receipt data is submitted twice, the duplicate-detection hash
+    (based on date + amount + merchant) will skip creation silently.
+
+    amount: transaction amount in the smallest currency unit (e.g. yen, not sen).
+      Use the value from `scan_receipt` data.amount, adjusted by the user if needed.
+    date: transaction date in YYYY-MM-DD format (or ISO). Falls back to today on
+      invalid input, so prefer passing the exact string from `scan_receipt` data.date.
+    merchant: merchant/description name from the receipt (shown in transaction list).
+    category: spending category (default "Other"). Use the suggestion from
+      `scan_receipt` data.category or let the user pick.
+    is_income: set True only if the receipt represents income (rare; default False).
+    currency: ISO currency code (default "JPY"; override for foreign receipts).
+
+    Returns {transaction_id, description, amount, date, category, source, is_income}.
+    source will always be "Receipt".
+    """
+    return await backend_post_json(
+        "/api/receipts/apply-scan",
+        {
+            "amount": amount,
+            "date": date,
+            "merchant": merchant,
+            "category": category,
+            "is_income": is_income,
+            "currency": currency,
+        },
+    )
+
+
 def register_write_tools(mcp: FastMCP) -> None:
     """Attach all write tools to the given FastMCP instance."""
     mcp.tool()(import_csv)
     mcp.tool()(ai_categorize_suggest)
     mcp.tool()(ai_categorize_apply)
+    mcp.tool()(scan_receipt)
+    mcp.tool()(apply_receipt_scan)

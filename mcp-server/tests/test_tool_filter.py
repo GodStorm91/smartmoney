@@ -45,8 +45,14 @@ READ_TOOL_NAMES = [
     "get_cashflow_forecast",
 ]
 
-WRITE_TOOL_NAMES = ["import_csv", "ai_categorize_suggest", "ai_categorize_apply"]
-ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 12 total
+WRITE_TOOL_NAMES = [
+    "import_csv",
+    "ai_categorize_suggest",
+    "ai_categorize_apply",
+    "scan_receipt",
+    "apply_receipt_scan",
+]
+ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 14 total
 
 
 def test_read_token_strips_all_write_tools():

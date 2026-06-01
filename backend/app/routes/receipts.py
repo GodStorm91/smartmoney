@@ -357,3 +357,111 @@ async def delete_receipt(
     db.commit()
 
     return None
+
+
+# ============== Stateless apply-scan endpoint ==============
+
+class ApplyScanRequest(BaseModel):
+    """Request model for applying parsed receipt scan data to create a transaction."""
+    amount: int
+    date: str  # YYYY-MM-DD or ISO format; falls back to today on bad input
+    merchant: str
+    category: str = "Other"
+    is_income: bool = False
+    currency: str = "JPY"
+
+
+class ApplyScanResponse(BaseModel):
+    """Response model for apply-scan."""
+    transaction_id: int
+    description: str
+    amount: int
+    date: str
+    category: str
+    source: str
+    is_income: bool
+
+
+@router.post("/apply-scan", response_model=ApplyScanResponse)
+async def apply_receipt_scan(
+    request: ApplyScanRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Create a transaction from pre-parsed receipt scan fields (stateless).
+
+    This endpoint is stateless — it does NOT require a Receipt DB row.
+    Typically called after /scan once the user has confirmed the parsed fields.
+
+    Args:
+        request: ApplyScanRequest with parsed receipt fields
+        current_user: Authenticated user
+
+    Returns:
+        ApplyScanResponse with created transaction details
+
+    Raises:
+        HTTPException: If transaction creation fails
+    """
+    try:
+        # Parse date, fall back to today on bad input
+        tx_date = datetime.now().date()
+        if request.date:
+            try:
+                tx_date = datetime.fromisoformat(request.date).date()
+            except ValueError:
+                pass  # fall back to today
+
+        description = request.merchant
+        category = request.category or "Other"
+        amount = request.amount
+        is_income = request.is_income
+        month_key = tx_date.strftime("%Y-%m")
+
+        # Generate transaction hash for duplicate detection
+        tx_hash = generate_tx_hash(
+            str(tx_date),
+            amount if is_income else -amount,
+            description,
+            "receipt_scan",
+            current_user.id,
+        )
+
+        # Create transaction (no receipt_url — Transaction model has no such column;
+        # the Receipt relationship is via the Receipt table, not a URL column)
+        transaction = Transaction(
+            user_id=current_user.id,
+            date=tx_date,
+            description=description,
+            amount=amount if is_income else -amount,
+            currency=request.currency,
+            category=category,
+            source="Receipt",
+            is_income=is_income,
+            is_transfer=False,
+            is_adjustment=False,
+            month_key=month_key,
+            tx_hash=tx_hash,
+        )
+
+        db.add(transaction)
+        db.commit()
+        db.refresh(transaction)
+
+        return ApplyScanResponse(
+            transaction_id=transaction.id,
+            description=transaction.description,
+            amount=abs(transaction.amount),
+            date=transaction.date.isoformat(),
+            category=transaction.category,
+            source=transaction.source,
+            is_income=transaction.is_income,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to create transaction from scan: {str(e)}"
+        )
