@@ -1,4 +1,5 @@
 """Budget tracking service for monitoring spending vs budget."""
+import calendar
 import statistics
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
@@ -14,6 +15,14 @@ from ..utils.currency_utils import convert_to_jpy
 
 
 class BudgetTrackingService:
+    # --- v1 tuneable constants for evaluate_purchase heuristic ---
+    # Window for the 3-month rolling average (days).
+    PURCHASE_AVG_WINDOW_DAYS: int = 90
+    # Coefficient for the "tight" threshold: remaining_after must be >=
+    # (avg_daily_pace * days_until_month_end * TIGHT_THRESHOLD) to get "go".
+    # 0.5 = 50% of expected spend remaining — conservative v1 default; revisit
+    # after real use (issue: plan/260601-1640-mcp-evaluate-purchase/plan.md §Risks).
+    PURCHASE_TIGHT_THRESHOLD: float = 0.5
     """Service for tracking budget spending and sending alerts."""
 
     @staticmethod
@@ -499,4 +508,139 @@ class BudgetTrackingService:
             'monthly_totals': monthly_totals,
             'overall_avg_daily': round(overall_avg_daily, 2),
             'std_deviation': round(std_deviation, 2)
+        }
+
+    @staticmethod
+    def evaluate_purchase(
+        db: Session,
+        user_id: int,
+        price: int,
+        category: str,
+        item_name: str | None = None,
+    ) -> dict:
+        """Deterministic purchase-against-budget verdict.
+
+        Returns a structured dict with verdict (go/tight/stop/unknown) and all
+        numeric context (allocated, spent_so_far, remaining, 3-month avg, days
+        until month-end, reasoning string). No LLM involved — all math is here.
+
+        Args:
+            db: Database session
+            user_id: User ID
+            price: Planned purchase amount (minor units, assumed JPY)
+            category: Budget category name to check against
+            item_name: Optional description of the item (echoed in response only)
+
+        Returns:
+            Dict matching the plan's response shape.
+        """
+        today = date.today()
+        current_month = today.strftime("%Y-%m")
+
+        # Days until month-end (inclusive of today)
+        year, month_num = today.year, today.month
+        last_day = calendar.monthrange(year, month_num)[1]
+        month_end = date(year, month_num, last_day)
+        days_until_month_end = (month_end - today).days + 1
+
+        # --- Get current-month budget tracking ---
+        tracking = BudgetTrackingService.get_budget_tracking(db, user_id, current_month)
+
+        allocated = 0
+        spent_so_far = 0
+        allocation_found = False
+
+        if tracking and tracking.get("categories"):
+            # Try to find matching category (case-insensitive, hierarchy-aware)
+            hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)
+            resolved_input = BudgetTrackingService._resolve_allocation_to_hierarchy(
+                category, hierarchy
+            )
+            for cat_item in tracking["categories"]:
+                resolved_alloc = BudgetTrackingService._resolve_allocation_to_hierarchy(
+                    cat_item["category"], hierarchy
+                )
+                if (
+                    cat_item["category"].lower() == category.lower()
+                    or resolved_alloc == resolved_input
+                ):
+                    allocated = int(cat_item["budgeted"])
+                    spent_so_far = int(cat_item["spent"])
+                    allocation_found = True
+                    break
+
+        remaining_before = allocated - spent_so_far
+        remaining_after = remaining_before - price
+
+        # --- 3-month rolling average for this category (raw transactions, no currency) ---
+        three_months_ago = today - timedelta(days=BudgetTrackingService.PURCHASE_AVG_WINDOW_DAYS)
+
+        # Build category list to query (parent + children) using hierarchy
+        hierarchy = BudgetTrackingService._build_category_hierarchy(db, user_id)
+        resolved_key = BudgetTrackingService._resolve_allocation_to_hierarchy(
+            category, hierarchy
+        )
+        categories_to_query = list(hierarchy.get(resolved_key, [category]))
+        # Also query by the raw category name in case it's not in hierarchy
+        if category not in categories_to_query:
+            categories_to_query.append(category)
+
+        raw_sum = (
+            db.query(func.sum(Transaction.amount))
+            .filter(
+                Transaction.user_id == user_id,
+                Transaction.category.in_(categories_to_query),
+                Transaction.date >= three_months_ago,
+                Transaction.is_income == False,  # noqa: E712
+                Transaction.is_transfer == False,  # noqa: E712
+                Transaction.is_adjustment == False,  # noqa: E712
+            )
+            .scalar()
+        ) or 0
+
+        three_month_avg = int(abs(raw_sum) // 3)
+
+        # --- Verdict heuristic ---
+        daily_avg_pace = three_month_avg / 30.0
+        tight_threshold = daily_avg_pace * days_until_month_end * BudgetTrackingService.PURCHASE_TIGHT_THRESHOLD
+
+        if not allocation_found:
+            verdict = "unknown"
+        elif remaining_after < 0:
+            verdict = "stop"
+        elif remaining_after >= tight_threshold:
+            verdict = "go"
+        else:
+            verdict = "tight"
+
+        # --- Reasoning string ---
+        if verdict == "go":
+            reasoning = (
+                f"Within budget. ¥{remaining_after:,} left for {days_until_month_end} days; pace healthy."
+            )
+        elif verdict == "tight":
+            reasoning = (
+                f"After this you'll have ¥{remaining_after:,} for {days_until_month_end} days"
+                f" — below half your usual daily pace."
+            )
+        elif verdict == "stop":
+            reasoning = f"Over budget by ¥{-remaining_after:,}."
+        else:  # unknown
+            reasoning = (
+                f"No budget set for '{category}'. "
+                f"3-month average for this category is ¥{three_month_avg:,}/month."
+            )
+
+        return {
+            "category": category,
+            "item_name": item_name,
+            "price": price,
+            "allocated": allocated,
+            "spent_so_far": spent_so_far,
+            "remaining_before": remaining_before,
+            "remaining_after": remaining_after,
+            "days_until_month_end": days_until_month_end,
+            "three_month_avg_in_category": three_month_avg,
+            "verdict": verdict,
+            "reasoning": reasoning,
         }

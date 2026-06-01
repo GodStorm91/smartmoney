@@ -127,3 +127,30 @@ def register_read_tools(mcp: FastMCP) -> None:
     async def get_cashflow_forecast(months: int = 6) -> dict:
         """Projected income/expense/balance for the next N months (1-24)."""
         return await backend_get("/api/analytics/forecast", {"months": months})
+
+    @mcp.tool()
+    async def evaluate_purchase(
+        price: int,
+        category: str,
+        item_name: str | None = None,
+    ) -> dict:
+        """Decide if a planned purchase fits the user's current budget for that category.
+
+        Returns deterministic verdict (go/tight/stop/unknown) + numeric context:
+        allocated, spent_so_far, remaining_before/after, 3-month avg, days until month-end,
+        and a 1-line reasoning string.
+
+        price: planned purchase amount (yen).
+        category: budget category to check against (e.g. "Food", "Shopping").
+          If the category has no budget allocation, verdict will be "unknown" but the
+          3-month average is still returned as guidance.
+        item_name: optional — what you're buying (for user-visible context, not used in
+          verdict math).
+
+        Use this BEFORE confirming a purchase decision so the user has structured data
+        instead of LLM-guessed budget math.
+        """
+        return await backend_get(
+            "/api/budgets/evaluate-purchase",
+            {"price": price, "category": category, "item_name": item_name},
+        )

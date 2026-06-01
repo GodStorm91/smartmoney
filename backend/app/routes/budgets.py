@@ -616,6 +616,35 @@ def preview_budget_copy(
     )
 
 
+@router.get("/evaluate-purchase")
+def evaluate_purchase(
+    price: Annotated[int, Query(gt=0, description="Purchase price in JPY (must be > 0)")],
+    category: Annotated[str, Query(description="Budget category to evaluate against")],
+    item_name: str | None = Query(default=None, description="Optional item description (echoed only)"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Evaluate whether a planned purchase fits the user's current budget.
+
+    Returns a deterministic verdict (go/tight/stop/unknown) with numeric context:
+    allocated, spent_so_far, remaining before/after, 3-month average, days until
+    month-end, and a 1-line reasoning string.
+
+    Verdict logic:
+    - stop: purchase would put remaining < 0
+    - go: remaining_after >= 50% of expected spend for rest of month
+    - tight: positive but below the pace threshold
+    - unknown: no active budget allocation for this category
+    """
+    return BudgetTrackingService.evaluate_purchase(
+        db=db,
+        user_id=current_user.id,
+        price=price,
+        category=category,
+        item_name=item_name,
+    )
+
+
 @router.get("/{month}", response_model=BudgetResponse)
 def get_budget_by_month(
     month: str,
