@@ -167,6 +167,36 @@ async def get_closed_positions(wallet_id: int | None = None, limit: int = 50) ->
     return await backend_get("/api/crypto/closed-positions", params)
 
 
+async def get_lp_real_pnl(
+    wallet_id: int | None = None,
+    chain: str = "base",
+    include_closed: bool = True,
+    limit: int = 50,
+) -> dict:
+    """Known real LP P&L using SmartMoney cost basis, rewards, and LP value.
+
+    Formula for full rows: current/exit LP value + recorded position rewards
+    - cost basis. This is the right tool for "real profit check" on Base LPs.
+
+    wallet_id: optional. Pass from get_wallets() when user asks about a wallet.
+    chain: defaults to "base".
+    include_closed: include closed-position records in the same answer.
+    limit: max rows to return (1-200; default 50, most recent first).
+
+    IMPORTANT: If data_completeness is "partial", do NOT quote real_pnl_usd as
+    true profit. Tell the user which missing fields block exact P&L. This tool
+    does not reconstruct missing Algebra/Uniswap NFT tx history from chain logs.
+    """
+    params = {
+        "chain": chain,
+        "include_closed": include_closed,
+        "limit": limit,
+    }
+    if wallet_id is not None:
+        params["wallet_id"] = wallet_id
+    return await backend_get("/api/crypto/lp-real-pnl", params)
+
+
 def register_read_tools(mcp: FastMCP) -> None:
     """Attach all read tools to the given FastMCP instance."""
 
@@ -323,3 +353,4 @@ def register_read_tools(mcp: FastMCP) -> None:
     mcp.tool()(get_position_insights)
     mcp.tool()(get_il_scenarios)
     mcp.tool()(get_closed_positions)
+    mcp.tool()(get_lp_real_pnl)

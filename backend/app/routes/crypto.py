@@ -43,12 +43,14 @@ from ..schemas.position_closure import (
     PositionClosureResponse,
     ClosedPositionsSummary,
 )
+from ..schemas.lp_pnl import LpRealPnlResponse
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
 from ..services.defillama_service import DeFiLlamaService
 from ..services.il_calculator_service import ILCalculatorService
 from ..services.defi_insights_service import DefiInsightsService
 from ..services.merkl_service import MerklService
+from ..services.lp_pnl_service import LpPnlService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -311,6 +313,29 @@ async def get_closed_positions_pnl(
 
     closures = query.order_by(PositionClosure.exit_date.desc()).limit(limit).all()
     return [_closed_position_pnl_response(closure) for closure in closures]
+
+
+@router.get("/lp-real-pnl", response_model=LpRealPnlResponse)
+async def get_lp_real_pnl(
+    wallet_id: int | None = Query(None),
+    chain: str = Query("base", description="Chain key, e.g. base or polygon"),
+    include_closed: bool = Query(True),
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get known LP real P&L with explicit missing-data flags."""
+    result = LpPnlService.get_real_pnl(
+        db=db,
+        user_id=current_user.id,
+        wallet_id=wallet_id,
+        chain=chain,
+        include_closed=include_closed,
+        limit=limit,
+    )
+    if result is None:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    return result
 
 
 # ==================== DeFi Position Snapshot Endpoints ====================
