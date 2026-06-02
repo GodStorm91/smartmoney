@@ -95,6 +95,78 @@ async def get_merkl_rewards(wallet_id: int, chain: str = "base") -> dict:
     )
 
 
+async def get_wallet_performance(wallet_id: int) -> dict:
+    """Wallet-level aggregated DeFi position performance.
+
+    Returns {total_value_usd, total_change_7d_usd, total_change_30d_usd,
+    positions, snapshot_count, first_snapshot_date}.
+
+    IMPORTANT: change values are 30-DAY DELTAS, not since-deposit P&L.
+    Cost basis for open positions is NOT tracked yet. When the user asks
+    "how much did I make total?" on an open position, tell them this is a
+    rolling 30-day window. For TRUE realized P&L on EXITED positions, use
+    get_closed_positions instead.
+    """
+    return await backend_get(f"/api/crypto/wallets/{wallet_id}/performance")
+
+
+async def get_position_performance(position_id: str) -> dict:
+    """Per-position open-state performance metrics.
+
+    position_id: opaque identifier from get_defi_positions().
+
+    Same caveat as get_wallet_performance: returns rolling 30-day P&L, NOT
+    since-deposit. For closed positions' realized P&L, use get_closed_positions.
+    """
+    return await backend_get(f"/api/crypto/positions/{position_id}/performance")
+
+
+async def get_position_insights(position_id: str) -> dict:
+    """Per-position insights including HODL counterfactual.
+
+    Returns LP-vs-HODL comparison, APY analysis, and recommendations.
+    Useful for "was this LP a good investment?" questions.
+
+    Caveat: cost-basis P&L is not tracked for open positions. HODL comparison
+    is anchored on snapshot data, typically a 30-day window, not since-deposit.
+    """
+    return await backend_get(f"/api/crypto/positions/{position_id}/insights")
+
+
+async def get_il_scenarios() -> list:
+    """Impermanent loss scenarios for various price-change scenarios.
+
+    Returns IL curves such as "if ETH +50%, IL = X%". Educational tool, likely
+    generic curves rather than per-user-position data.
+
+    Use when the user asks about IL concepts or "what's my IL risk if X happens".
+    """
+    return await backend_get("/api/crypto/il/scenarios")
+
+
+async def get_closed_positions(wallet_id: int | None = None, limit: int = 50) -> list:
+    """Realized P&L on positions you've CLOSED: the cleanest real-earnings answer.
+
+    Each closure has cost_basis_usd, exit_value_usd, total_rewards_usd, and
+    realized_pnl_usd (= exit + rewards - cost_basis).
+
+    wallet_id: optional, filter to a single wallet (omit = all user's wallets).
+    limit: max closures to return (1-200; default 50, most recent first).
+
+    Returns list of {position_id, protocol, symbol, chain_id, exit_date,
+    cost_basis_usd, exit_value_usd, total_rewards_usd, realized_pnl_usd,
+    exit_tx_hash, note, data_completeness}.
+
+    data_completeness "full" means cost_basis was recorded and realized_pnl is
+    accurate. "partial" means cost_basis is null; tell the user realized P&L is
+    unavailable for that closure before quoting it.
+    """
+    params = {"limit": limit}
+    if wallet_id is not None:
+        params["wallet_id"] = wallet_id
+    return await backend_get("/api/crypto/closed-positions", params)
+
+
 def register_read_tools(mcp: FastMCP) -> None:
     """Attach all read tools to the given FastMCP instance."""
 
@@ -246,3 +318,8 @@ def register_read_tools(mcp: FastMCP) -> None:
     mcp.tool()(get_unclaimed_rewards)
     mcp.tool()(get_position_history)
     mcp.tool()(get_merkl_rewards)
+    mcp.tool()(get_wallet_performance)
+    mcp.tool()(get_position_performance)
+    mcp.tool()(get_position_insights)
+    mcp.tool()(get_il_scenarios)
+    mcp.tool()(get_closed_positions)

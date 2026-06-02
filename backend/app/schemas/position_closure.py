@@ -1,7 +1,7 @@
 """Position closure schemas for API validation."""
 from datetime import datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -49,6 +49,23 @@ class PositionClosureResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ClosedPositionPnlResponse(BaseModel):
+    """MCP-friendly realized P&L response for a closed position."""
+
+    position_id: str
+    protocol: str
+    symbol: str
+    chain_id: str
+    exit_date: datetime
+    cost_basis_usd: Optional[Decimal] = None
+    exit_value_usd: Decimal
+    total_rewards_usd: Optional[Decimal] = None
+    realized_pnl_usd: Optional[Decimal] = None
+    exit_tx_hash: Optional[str] = None
+    note: Optional[str] = None
+    data_completeness: Literal["full", "partial"]
 
 
 class ClosedPositionsSummary(BaseModel):

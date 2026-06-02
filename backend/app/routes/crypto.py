@@ -39,6 +39,7 @@ from ..schemas.crypto_wallet import (
 )
 from ..schemas.position_closure import (
     ClosePositionRequest,
+    ClosedPositionPnlResponse,
     PositionClosureResponse,
     ClosedPositionsSummary,
 )
@@ -50,6 +51,24 @@ from ..services.defi_insights_service import DefiInsightsService
 from ..services.merkl_service import MerklService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
+
+
+def _closed_position_pnl_response(closure) -> dict:
+    """Serialize a closed position with explicit P&L data completeness."""
+    return {
+        "position_id": closure.position_id,
+        "protocol": closure.protocol,
+        "symbol": closure.symbol,
+        "chain_id": closure.chain_id,
+        "exit_date": closure.exit_date,
+        "cost_basis_usd": closure.cost_basis_usd,
+        "exit_value_usd": closure.exit_value_usd,
+        "total_rewards_usd": closure.total_rewards_usd,
+        "realized_pnl_usd": closure.realized_pnl_usd,
+        "exit_tx_hash": closure.exit_tx_hash,
+        "note": closure.note,
+        "data_completeness": "partial" if closure.cost_basis_usd is None else "full",
+    }
 
 
 # ==================== Crypto Wallet Endpoints ====================
@@ -270,6 +289,28 @@ async def detect_claims(
         return {"detected": len(new_claims), "claims": new_claims}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Detection failed: {str(e)}")
+
+
+@router.get("/closed-positions", response_model=list[ClosedPositionPnlResponse])
+async def get_closed_positions_pnl(
+    wallet_id: int | None = Query(None),
+    limit: int = Query(50, ge=1, le=200),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get realized P&L rows for closed positions, optionally filtered by wallet."""
+    from ..models.position_closure import PositionClosure
+
+    query = db.query(PositionClosure).filter(PositionClosure.user_id == current_user.id)
+
+    if wallet_id is not None:
+        wallet = CryptoWalletService.get_wallet(db, current_user.id, wallet_id)
+        if not wallet:
+            raise HTTPException(status_code=404, detail="Wallet not found")
+        query = query.filter(PositionClosure.wallet_address == wallet.wallet_address)
+
+    closures = query.order_by(PositionClosure.exit_date.desc()).limit(limit).all()
+    return [_closed_position_pnl_response(closure) for closure in closures]
 
 
 # ==================== DeFi Position Snapshot Endpoints ====================
