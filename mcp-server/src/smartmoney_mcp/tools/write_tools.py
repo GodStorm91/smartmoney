@@ -7,7 +7,12 @@ import base64
 
 from fastmcp import FastMCP
 
-from ..backend_client import backend_patch_json, backend_post_json, backend_post_multipart
+from ..backend_client import (
+    backend_patch_json,
+    backend_post_json,
+    backend_post_multipart,
+    backend_put_json,
+)
 
 
 async def import_csv(
@@ -217,6 +222,37 @@ async def ai_suggest_budget(
     )
 
 
+async def set_position_cost_basis(
+    position_id: str,
+    amount_usd: float | None,
+    note: str | None = None,
+) -> dict:
+    """Set or clear the manual USD cost basis for one DeFi LP position.
+
+    Requires a Write MCP token. Use this when SmartMoney's snapshot-derived
+    basis is approximate or missing and the user/agent has reconciled a better
+    tx-by-tx basis.
+
+    position_id: exact LP position id from `get_lp_real_pnl` or DeFi position
+      tools.
+    amount_usd: manual cost basis in USD. Pass null to clear the manual override
+      and fall back to the oldest-snapshot derived basis.
+    note: optional audit note, e.g. source transaction hash or reconciliation
+      summary.
+
+    Returns {position_id, manual_basis_usd, derived_basis_usd,
+      effective_basis_usd, basis_source, note, updated_at}.
+    """
+    return await backend_put_json(
+        "/api/crypto/positions/cost-basis",
+        {
+            "position_id": position_id,
+            "manual_basis_usd": amount_usd,
+            "note": note,
+        },
+    )
+
+
 def register_write_tools(mcp: FastMCP) -> None:
     """Attach all write tools to the given FastMCP instance."""
     mcp.tool()(import_csv)
@@ -226,3 +262,4 @@ def register_write_tools(mcp: FastMCP) -> None:
     mcp.tool()(apply_receipt_scan)
     mcp.tool()(set_budget_allocations)
     mcp.tool()(ai_suggest_budget)
+    mcp.tool()(set_position_cost_basis)

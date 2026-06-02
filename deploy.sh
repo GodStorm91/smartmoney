@@ -248,6 +248,8 @@ if [ "$RESTART_ONLY" = false ]; then
         docker cp $REMOTE_DIR/backend/app/. $CONTAINER_NAME:/app/app/
         docker cp $REMOTE_DIR/backend/alembic/. $CONTAINER_NAME:/app/alembic/
         docker restart $CONTAINER_NAME >/dev/null
+        docker exec $CONTAINER_NAME python -m app.scripts.backfill_position_cost_basis || \
+            echo '[WARN] position cost-basis backfill failed'
         echo '[INFO] backend code re-cp + restart complete'
     "
 fi

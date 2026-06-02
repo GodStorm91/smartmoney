@@ -44,6 +44,10 @@ from ..schemas.position_closure import (
     ClosedPositionsSummary,
 )
 from ..schemas.lp_pnl import LpRealPnlResponse
+from ..schemas.position_cost_basis import (
+    PositionCostBasisResponse as EffectiveCostBasisResponse,
+    SetCostBasisRequest,
+)
 from ..services.crypto_wallet_service import CryptoWalletService
 from ..services.defi_snapshot_service import DefiSnapshotService
 from ..services.defillama_service import DeFiLlamaService
@@ -51,6 +55,7 @@ from ..services.il_calculator_service import ILCalculatorService
 from ..services.defi_insights_service import DefiInsightsService
 from ..services.merkl_service import MerklService
 from ..services.lp_pnl_service import LpPnlService
+from ..services.position_cost_basis_service import PositionCostBasisService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -908,6 +913,25 @@ async def get_position_cost_basis(
     if not cost_basis:
         raise HTTPException(status_code=404, detail="Cost basis not found")
     return cost_basis
+
+
+@router.put("/positions/cost-basis", response_model=EffectiveCostBasisResponse)
+async def set_position_cost_basis(
+    body: SetCostBasisRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Set or clear manual cost basis for a snapshotted position."""
+    try:
+        return PositionCostBasisService.set_manual_basis(
+            db=db,
+            user_id=current_user.id,
+            position_id=body.position_id,
+            manual_basis_usd=body.manual_basis_usd,
+            note=body.note,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
 
 
 # ==================== HODL Scenarios Endpoints ====================

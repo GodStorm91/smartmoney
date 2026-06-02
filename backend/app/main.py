@@ -510,10 +510,13 @@ async def startup_event():
     exports_dir = os.path.join(uploads_dir, "exports")
     os.makedirs(exports_dir, exist_ok=True)
 
-    scheduler.start()
-    logger.info(
-        "Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)"
-    )
+    if scheduler.running:
+        logger.info("Schedulers already running; refreshed job definitions")
+    else:
+        scheduler.start()
+        logger.info(
+            "Schedulers started (rates: 4 AM UTC, recurring: 00:05 JST, defi: 00:30 UTC, cleanup: Sun 3 AM UTC)"
+        )
 
 
 @app.on_event("shutdown")

@@ -17,6 +17,7 @@ from ..schemas.crypto_wallet import (
 )
 from .zerion_api_service import ZerionApiService
 from .defillama_service import DeFiLlamaService
+from .position_cost_basis_service import PositionCostBasisService
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +114,7 @@ class DefiSnapshotService:
                 db.rollback()
 
         stats["users"] = len(user_ids)
+        stats["basis_backfill"] = DefiSnapshotService._backfill_cost_basis(db)
         logger.info(f"Snapshot capture complete: {stats}")
         return stats
 
@@ -188,6 +190,7 @@ class DefiSnapshotService:
                 stats["positions"] += 1
 
             db.commit()
+            stats["basis_backfill"] = DefiSnapshotService._backfill_cost_basis(db, user_id)
 
         except Exception as e:
             logger.error(f"Backfill failed for wallet {wallet.wallet_address}: {e}")
@@ -195,6 +198,15 @@ class DefiSnapshotService:
             return {"error": str(e)}
 
         return stats
+
+    @staticmethod
+    def _backfill_cost_basis(db: Session, user_id: Optional[int] = None) -> dict:
+        try:
+            return PositionCostBasisService.backfill_derived_basis(db, user_id)
+        except Exception as e:
+            logger.error(f"Cost-basis derivation failed after snapshot capture: {e}")
+            db.rollback()
+            return {"positions_updated": 0, "positions_skipped": 0, "errors": 1}
 
     @staticmethod
     def get_position_history(

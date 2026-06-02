@@ -65,21 +65,34 @@ async def backend_patch_json(
     return await _backend_json_request("PATCH", path, json_body, params)
 
 
+async def backend_put_json(
+    path: str,
+    json_body: dict,
+    params: dict | None = None,
+) -> dict:
+    """PUT application/json to a SmartMoney backend endpoint."""
+    return await _backend_json_request(
+        "PUT", path, json_body, params, clean_json=False
+    )
+
+
 async def _backend_json_request(
     method: str,
     path: str,
     json_body: dict,
     params: dict | None = None,
+    clean_json: bool = True,
 ) -> dict:
     """Send a JSON write request with consistent MCP auth error handling."""
     token = _extract_token()
     headers = {"Authorization": f"Bearer {token}"}
+    body = _clean(json_body) if clean_json else json_body
     async with httpx.AsyncClient(base_url=BACKEND_URL, timeout=BACKEND_TIMEOUT) as client:
         resp = await client.request(
             method,
             path,
             params=_clean(params),
-            json=_clean(json_body) or {},
+            json=body or {},
             headers=headers,
         )
         if resp.status_code == 401:

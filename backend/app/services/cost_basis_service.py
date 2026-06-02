@@ -43,6 +43,7 @@ class CostBasisService:
             token_b_symbol=token_b_symbol,
             token_b_amount=token_b_amount,
             total_usd=total_usd,
+            manual_basis_usd=total_usd,
             deposited_at=deposited_at,
             tx_hash=tx_hash,
             block_number=block_number,
@@ -84,6 +85,7 @@ class CostBasisService:
 
         if total_usd is not None:
             cost_basis.total_usd = total_usd
+            cost_basis.manual_basis_usd = total_usd
         if deposited_at is not None:
             cost_basis.deposited_at = deposited_at
 

@@ -67,8 +67,9 @@ WRITE_TOOL_NAMES = [
     "apply_receipt_scan",
     "set_budget_allocations",
     "ai_suggest_budget",
+    "set_position_cost_basis",
 ]
-ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 30 total
+ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 31 total
 
 
 def test_read_token_strips_all_write_tools():

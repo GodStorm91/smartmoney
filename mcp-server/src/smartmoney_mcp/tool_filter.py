@@ -29,6 +29,7 @@ _WRITE_TOOL_NAMES = {
     "apply_receipt_scan",
     "set_budget_allocations",
     "ai_suggest_budget",
+    "set_position_cost_basis",
 }
 
 

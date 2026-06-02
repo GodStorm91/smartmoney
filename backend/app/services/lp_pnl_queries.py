@@ -8,7 +8,6 @@ from sqlalchemy.orm import Session
 from ..models.crypto_wallet import (
     CryptoWallet,
     DefiPositionSnapshot,
-    PositionCostBasis,
     PositionReward,
 )
 from ..models.position_closure import PositionClosure
@@ -86,27 +85,6 @@ def closed_positions(
     if wallet_addresses:
         query = query.filter(PositionClosure.wallet_address.in_(wallet_addresses))
     return query.order_by(PositionClosure.exit_date.desc()).all()
-
-
-def cost_basis_totals(
-    db: Session,
-    user_id: int,
-    chain: str,
-    wallet_addresses: Optional[list[str]],
-) -> dict[PositionKey, Decimal]:
-    """Aggregate cost-basis rows per position key."""
-    query = db.query(PositionCostBasis).filter(
-        PositionCostBasis.user_id == user_id,
-        PositionCostBasis.chain_id == chain,
-    )
-    if wallet_addresses:
-        query = query.filter(PositionCostBasis.wallet_address.in_(wallet_addresses))
-
-    totals: dict[PositionKey, Decimal] = {}
-    for row in query.all():
-        key = position_key(row.position_id, row.wallet_address, row.chain_id)
-        totals[key] = totals.get(key, ZERO) + Decimal(str(row.total_usd))
-    return totals
 
 
 def reward_totals(

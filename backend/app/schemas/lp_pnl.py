@@ -19,6 +19,7 @@ class LpRealPnlPositionResponse(BaseModel):
     current_value_usd: Optional[Decimal] = None
     exit_value_usd: Optional[Decimal] = None
     cost_basis_usd: Optional[Decimal] = None
+    basis_source: Optional[Literal["manual", "derived"]] = None
     total_rewards_usd: Decimal = Decimal("0")
     real_pnl_usd: Optional[Decimal] = None
     real_pnl_pct: Optional[float] = None

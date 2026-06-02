@@ -10,12 +10,12 @@ from ..schemas.lp_pnl import LpRealPnlPositionResponse, LpRealPnlResponse
 from .lp_pnl_queries import (
     PositionKey,
     closed_positions,
-    cost_basis_totals,
     get_wallet,
     latest_snapshots,
     position_key,
     reward_totals,
 )
+from .position_cost_basis_service import BasisValue, PositionCostBasisService
 
 ZERO = Decimal("0")
 METHOD = "cost_basis_plus_rewards_plus_current_or_exit_value"
@@ -56,7 +56,9 @@ class LpPnlService:
             if position_key(snap.position_id, snap.wallet_address, snap.chain_id) not in closed_keys
         ]
 
-        cost_basis = cost_basis_totals(db, user_id, chain_key, wallet_addresses)
+        cost_basis = PositionCostBasisService.get_effective_basis_map(
+            db, user_id, chain_key, wallet_addresses
+        )
         rewards = reward_totals(db, user_id, chain_key, wallet_addresses)
 
         positions = [
@@ -84,11 +86,12 @@ class LpPnlService:
     @staticmethod
     def _open_position(
         snapshot: DefiPositionSnapshot,
-        cost_basis: dict[PositionKey, Decimal],
+        cost_basis: dict[PositionKey, BasisValue],
         rewards: dict[PositionKey, Decimal],
     ) -> LpRealPnlPositionResponse:
         key = position_key(snapshot.position_id, snapshot.wallet_address, snapshot.chain_id)
-        basis = cost_basis.get(key)
+        basis_value = cost_basis.get(key)
+        basis = basis_value.amount if basis_value else None
         reward_total = rewards.get(key, ZERO)
         current_value = Decimal(str(snapshot.balance_usd))
         pnl = current_value + reward_total - basis if basis is not None else None
@@ -103,6 +106,7 @@ class LpPnlService:
             current_value_usd=current_value,
             exit_value_usd=None,
             cost_basis_usd=basis,
+            basis_source=basis_value.source if basis_value else None,
             total_rewards_usd=reward_total,
             pnl=pnl,
             missing=[] if basis is not None else ["cost_basis_usd"],
@@ -111,11 +115,15 @@ class LpPnlService:
     @staticmethod
     def _closed_position(
         closure: PositionClosure,
-        cost_basis: dict[PositionKey, Decimal],
+        cost_basis: dict[PositionKey, BasisValue],
         rewards: dict[PositionKey, Decimal],
     ) -> LpRealPnlPositionResponse:
         key = position_key(closure.position_id, closure.wallet_address, closure.chain_id)
-        basis = closure.cost_basis_usd or cost_basis.get(key)
+        basis_value = cost_basis.get(key)
+        basis = closure.cost_basis_usd or (basis_value.amount if basis_value else None)
+        basis_source = None if closure.cost_basis_usd is not None else (
+            basis_value.source if basis_value else None
+        )
         reward_total = closure.total_rewards_usd if closure.total_rewards_usd is not None else rewards.get(key, ZERO)
         pnl = closure.realized_pnl_usd
         if pnl is None and basis is not None:
@@ -132,6 +140,7 @@ class LpPnlService:
             current_value_usd=None,
             exit_value_usd=Decimal(str(closure.exit_value_usd)),
             cost_basis_usd=Decimal(str(basis)) if basis is not None else None,
+            basis_source=basis_source,
             total_rewards_usd=Decimal(str(reward_total or ZERO)),
             pnl=Decimal(str(pnl)) if pnl is not None else None,
             missing=[] if basis is not None else ["cost_basis_usd"],
@@ -150,6 +159,7 @@ class LpPnlService:
         current_value_usd: Optional[Decimal],
         exit_value_usd: Optional[Decimal],
         cost_basis_usd: Optional[Decimal],
+        basis_source: Optional[str],
         total_rewards_usd: Decimal,
         pnl: Optional[Decimal],
         missing: list[str],
@@ -166,6 +176,7 @@ class LpPnlService:
             current_value_usd=current_value_usd,
             exit_value_usd=exit_value_usd,
             cost_basis_usd=cost_basis_usd,
+            basis_source=basis_source,
             total_rewards_usd=total_rewards_usd,
             real_pnl_usd=pnl,
             real_pnl_pct=pnl_pct,

@@ -263,6 +263,10 @@ class PositionCostBasis(Base):
     token_b_symbol: Mapped[str | None] = mapped_column(String(20), nullable=True)
     token_b_amount: Mapped[Decimal | None] = mapped_column(Numeric(30, 18), nullable=True)
     total_usd: Mapped[Decimal] = mapped_column(Numeric(18, 2), nullable=False)
+    derived_basis_usd: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    manual_basis_usd: Mapped[Decimal | None] = mapped_column(Numeric(18, 2), nullable=True)
+    note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    derived_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     # Transaction info
     deposited_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
@@ -271,6 +275,9 @@ class PositionCostBasis(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime, server_default=func.now(), onupdate=func.now(), nullable=True
     )
 
     user: Mapped["User"] = relationship("User", lazy="select")
