@@ -44,60 +44,68 @@ class MerklService:
             raise
 
     @staticmethod
-    def _parse_rewards_response(data: dict) -> dict:
-        """Parse Merkl rewards response.
+    def _parse_rewards_response(data) -> dict:
+        """Parse Merkl v4 /users/{address}/rewards response.
 
-        Expected structure:
-        {
-            "chain_id": {
-                "token_address": {
-                    "accumulated": "...",
-                    "claimed": "...",
-                    "pending": "...",
-                    "symbol": "...",
-                    "decimals": 18,
-                    "breakdowns": {
-                        "campaign_id": {
-                            "accumulated": "...",
-                            "reason": "pool_address or campaign_name"
-                        }
+        v4 shape (list of chain-grouped entries):
+        [
+            {
+                "chain": {"id": 8453, "name": "Base", ...},
+                "rewards": [
+                    {
+                        "amount": "987545203765856080208",
+                        "claimed": "974690593785791153037",
+                        "pending": "12213602735890860638",
+                        "token": {"chainId": 8453, "address": "0x...", "decimals": 18, "symbol": "AIX", "price": 0.023},
+                        "breakdowns": [
+                            {"reason": "QUICKSWAP_ALGEBRA_12_0x...", "amount": "...", "claimed": "...", "pending": "...", "campaignId": "0x..."}
+                        ]
                     }
-                }
+                ]
             }
-        }
+        ]
+
+        Returns FastAPI-serializable floats (NOT Decimal) so the route can JSON-encode without a custom encoder.
         """
         result = {"tokens": []}
 
-        for chain_id, tokens in data.items():
-            if not isinstance(tokens, dict):
-                continue
+        if not isinstance(data, list):
+            return result  # defensive: unexpected v3-style or error shape
 
-            for token_address, token_data in tokens.items():
-                if not isinstance(token_data, dict):
+        for chain_entry in data:
+            if not isinstance(chain_entry, dict):
+                continue
+            chain = chain_entry.get("chain") or {}
+            chain_id = chain.get("id")
+
+            for reward in chain_entry.get("rewards") or []:
+                if not isinstance(reward, dict):
                     continue
 
-                decimals = token_data.get("decimals", 18)
+                token = reward.get("token") or {}
+                decimals = token.get("decimals", 18)
                 divisor = Decimal(10) ** decimals
 
                 token_info = {
                     "chain_id": chain_id,
-                    "token_address": token_address.lower(),
-                    "symbol": token_data.get("symbol", ""),
+                    "token_address": (token.get("address") or "").lower(),
+                    "symbol": token.get("symbol", ""),
                     "decimals": decimals,
-                    "claimed": Decimal(str(token_data.get("claimed", 0))) / divisor,
-                    "pending": Decimal(str(token_data.get("pending", 0))) / divisor,
-                    "accumulated": Decimal(str(token_data.get("accumulated", 0))) / divisor,
+                    "price_usd": token.get("price"),  # USD price per token (Merkl-enriched)
+                    "claimed": float(Decimal(str(reward.get("claimed", 0))) / divisor),
+                    "pending": float(Decimal(str(reward.get("pending", 0))) / divisor),
+                    "accumulated": float(Decimal(str(reward.get("amount", 0))) / divisor),
                     "breakdowns": [],
                 }
 
-                # Parse campaign breakdowns for attribution
-                breakdowns = token_data.get("breakdowns", {})
-                for campaign_id, breakdown in breakdowns.items():
+                for breakdown in reward.get("breakdowns") or []:
                     if isinstance(breakdown, dict):
                         token_info["breakdowns"].append({
-                            "campaign_id": campaign_id,
-                            "accumulated": Decimal(str(breakdown.get("accumulated", 0))) / divisor,
+                            "campaign_id": breakdown.get("campaignId", ""),
                             "reason": breakdown.get("reason", ""),
+                            "accumulated": float(Decimal(str(breakdown.get("amount", 0))) / divisor),
+                            "claimed": float(Decimal(str(breakdown.get("claimed", 0))) / divisor),
+                            "pending": float(Decimal(str(breakdown.get("pending", 0))) / divisor),
                         })
 
                 result["tokens"].append(token_info)
