@@ -1,6 +1,6 @@
 # SmartMoney MCP Server (OpenClaw, read + scoped write)
 
-Exposes 11 **read** tools and 7 **scoped write** SmartMoney finance tools to
+Exposes 17 **read** tools and 7 **scoped write** SmartMoney finance tools to
 [OpenClaw](https://openclaw.ai) over MCP `streamable-http`. OpenClaw runs on your
 laptop; this server runs on the VPS (`money.khanh.page`) next to the backend and
 is reached over HTTPS.
@@ -30,6 +30,12 @@ server never validates tokens and performs no financial computation.
 | `get_cashflow_forecast` | `/api/analytics/forecast` |
 | `evaluate_purchase` | `/api/budgets/evaluate-purchase` |
 | `get_budget_suggestions` | `/api/budgets/suggestions` |
+| `get_wallets` | `/api/crypto/wallets` |
+| `get_wallet_portfolio` | `/api/crypto/wallets/{id}/portfolio` |
+| `get_defi_positions` | `/api/crypto/wallets/{id}/defi-positions` |
+| `get_unclaimed_rewards` | `/api/crypto/claims` |
+| `get_position_history` | `/api/crypto/positions/{position_id}/history` |
+| `get_merkl_rewards` | `/api/crypto/wallets/{id}/merkl-rewards` |
 
 ## Write Tools
 

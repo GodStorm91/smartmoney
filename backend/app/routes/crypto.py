@@ -1,5 +1,5 @@
 """Crypto wallet API routes."""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_user
@@ -47,6 +47,7 @@ from ..services.defi_snapshot_service import DefiSnapshotService
 from ..services.defillama_service import DeFiLlamaService
 from ..services.il_calculator_service import ILCalculatorService
 from ..services.defi_insights_service import DefiInsightsService
+from ..services.merkl_service import MerklService
 
 router = APIRouter(prefix="/api/crypto", tags=["crypto"])
 
@@ -163,6 +164,34 @@ async def get_defi_positions(
         return positions
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch DeFi positions: {str(e)}")
+
+
+@router.get("/wallets/{wallet_id}/merkl-rewards")
+async def get_merkl_rewards(
+    wallet_id: int,
+    chain: str = Query("base", description="Chain key in MerklService.CHAIN_IDS"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get Merkl reward incentives for a user's wallet on a supported chain."""
+    wallet = CryptoWalletService.get_wallet(db, current_user.id, wallet_id)
+    if not wallet:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    chain_key = chain.lower()
+    valid_chains = sorted(MerklService.CHAIN_IDS)
+    if chain_key not in MerklService.CHAIN_IDS:
+        raise HTTPException(
+            status_code=400,
+            detail={"invalid_chain": chain, "valid_chains": valid_chains},
+        )
+
+    rewards = await MerklService.get_user_rewards(wallet.wallet_address, chain=chain_key)
+    return {
+        **rewards,
+        "chain": chain_key,
+        "wallet_address": wallet.wallet_address,
+    }
 
 
 # ==================== Reward Contract Endpoints ====================

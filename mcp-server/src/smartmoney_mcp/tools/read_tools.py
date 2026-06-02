@@ -21,6 +21,80 @@ async def get_budget_suggestions() -> dict:
     return await backend_get("/api/budgets/suggestions")
 
 
+async def get_wallets() -> list:
+    """List the user's tracked crypto wallets (id, address, label, chain).
+
+    Use this FIRST when the user asks about DeFi/LPs/portfolio so you know
+    which wallet IDs to query. Empty list = user hasn't added any wallets yet
+    (direct them to the web UI Settings -> Wallets to add one).
+    """
+    return await backend_get("/api/crypto/wallets")
+
+
+async def get_wallet_portfolio(wallet_id: int) -> dict:
+    """Full portfolio summary for a single wallet (tokens + total value).
+
+    wallet_id: from get_wallets().
+    Returns native + ERC20 token balances with USD values, totals, chain breakdown.
+    """
+    return await backend_get(f"/api/crypto/wallets/{wallet_id}/portfolio")
+
+
+async def get_defi_positions(wallet_id: int) -> dict:
+    """DeFi positions (LPs, lending, staking, etc.) for a single wallet.
+
+    Protocol-agnostic. Backend uses Zerion API which identifies positions by
+    contract regardless of which DEX/protocol they belong to.
+
+    wallet_id: from get_wallets(). Returns positions with type, protocol, chain,
+    underlying tokens, USD value, position_id (use for get_position_history).
+    """
+    return await backend_get(f"/api/crypto/wallets/{wallet_id}/defi-positions")
+
+
+async def get_unclaimed_rewards() -> list:
+    """All unclaimed reward claims across the user's wallets, in one call.
+
+    Single aggregated read. No wallet_id needed. Returns claims with source
+    contract, reward token, amount, USD value, claim URL/instructions.
+    """
+    return await backend_get("/api/crypto/claims")
+
+
+async def get_position_history(position_id: str, days: int = 30) -> dict:
+    """Historical value of a single DeFi position over the last N days.
+
+    position_id: opaque identifier from get_defi_positions() output. May change
+      after a re-sync; re-fetch positions first if the ID is stale.
+    days: lookback window. Backend supports a fixed enum: 7, 30, 90, or 365.
+      Any other value silently coerces to 30 — pass one of those four to be sure.
+
+    Returns time-series of position value (USD) so the agent can describe trends.
+    """
+    return await backend_get(
+        f"/api/crypto/positions/{position_id}/history",
+        {"days": days},
+    )
+
+
+async def get_merkl_rewards(wallet_id: int, chain: str = "base") -> dict:
+    """Merkl LP incentive rewards for a wallet on a given chain.
+
+    Merkl distributes LP incentives such as AERO on Aerodrome or extra rewards
+    on Uniswap V3 pools. This is separate from `get_unclaimed_rewards`, which
+    aggregates other reward sources.
+
+    wallet_id: from get_wallets().
+    chain: "base" (default) or "polygon". Other chains not yet supported.
+
+    Returns {tokens, chain, wallet_address} with breakdown per reward token.
+    """
+    return await backend_get(
+        f"/api/crypto/wallets/{wallet_id}/merkl-rewards",
+        {"chain": chain},
+    )
+
+
 def register_read_tools(mcp: FastMCP) -> None:
     """Attach all read tools to the given FastMCP instance."""
 
@@ -166,3 +240,9 @@ def register_read_tools(mcp: FastMCP) -> None:
         )
 
     mcp.tool()(get_budget_suggestions)
+    mcp.tool()(get_wallets)
+    mcp.tool()(get_wallet_portfolio)
+    mcp.tool()(get_defi_positions)
+    mcp.tool()(get_unclaimed_rewards)
+    mcp.tool()(get_position_history)
+    mcp.tool()(get_merkl_rewards)

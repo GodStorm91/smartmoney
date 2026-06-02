@@ -12,7 +12,10 @@ class MerklService:
     """Service for interacting with Merkl API."""
 
     BASE_URL = "https://api.merkl.xyz/v4"
-    CHAIN_IDS = {"polygon": 137}
+    CHAIN_IDS = {
+        "polygon": 137,
+        "base": 8453,
+    }
 
     @staticmethod
     async def get_user_rewards(wallet_address: str, chain: str = "polygon") -> dict:

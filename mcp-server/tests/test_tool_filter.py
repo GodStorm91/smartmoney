@@ -45,6 +45,12 @@ READ_TOOL_NAMES = [
     "get_cashflow_forecast",
     "evaluate_purchase",
     "get_budget_suggestions",
+    "get_wallets",
+    "get_wallet_portfolio",
+    "get_defi_positions",
+    "get_unclaimed_rewards",
+    "get_position_history",
+    "get_merkl_rewards",
 ]
 
 WRITE_TOOL_NAMES = [
@@ -56,7 +62,7 @@ WRITE_TOOL_NAMES = [
     "set_budget_allocations",
     "ai_suggest_budget",
 ]
-ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 17 total
+ALL_TOOLS = _make_tools(*READ_TOOL_NAMES, *WRITE_TOOL_NAMES)  # 24 total
 
 
 def test_read_token_strips_all_write_tools():
@@ -65,7 +71,7 @@ def test_read_token_strips_all_write_tools():
     names = [t.name for t in result]
     for write_name in WRITE_TOOL_NAMES:
         assert write_name not in names
-    assert len(names) == 11
+    assert len(names) == 17
     for read_name in READ_TOOL_NAMES:
         assert read_name in names
 
