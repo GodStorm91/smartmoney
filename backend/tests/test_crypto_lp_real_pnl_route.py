@@ -102,6 +102,8 @@ def _snapshot(session, user_id: int, wallet_address: str, position_id: str, valu
 
 
 def _cost_basis(session, user_id: int, wallet_address: str, position_id: str, value: str):
+    # Set derived_basis_usd alongside total_usd to match post-migration state.
+    # Pre-fix code attributed legacy total_usd as manual; new attribution is derived.
     session.add(
         PositionCostBasis(
             user_id=user_id,
@@ -110,6 +112,8 @@ def _cost_basis(session, user_id: int, wallet_address: str, position_id: str, va
             chain_id="base",
             vault_address="0x9999999999999999999999999999999999999999",
             total_usd=Decimal(value),
+            derived_basis_usd=Decimal(value),
+            derived_at=datetime(2026, 5, 25, 9, 0, 0),
             deposited_at=datetime(2026, 5, 25, 9, 0, 0),
             tx_hash="0x" + position_id[-64:].rjust(64, "0"),
         )
