@@ -187,9 +187,11 @@ class PositionCostBasisService:
         manual = [Decimal(str(row.manual_basis_usd)) for row in rows if row.manual_basis_usd is not None]
         if manual:
             return BasisValue(sum(manual, Decimal("0")), "manual")
-        derived = next((row.derived_basis_usd for row in rows if row.derived_basis_usd is not None), None)
-        if derived is not None:
-            return BasisValue(Decimal(str(derived)), "derived")
+        derived = [Decimal(str(row.derived_basis_usd)) for row in rows if row.derived_basis_usd is not None]
+        if derived:
+            # Sum derived rows for consistency with manual + legacy semantics
+            # (the migrated state may legitimately have multiple rows per position).
+            return BasisValue(sum(derived, Decimal("0")), "derived")
         # No manual + no derived → no basis. The prior implementation summed
         # `total_usd` into a phantom "manual" basis here, which mis-attributed
         # unattributed/legacy data as user-asserted truth. Caveat doctrine wins.
