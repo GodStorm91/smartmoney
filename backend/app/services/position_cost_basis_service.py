@@ -95,6 +95,14 @@ class PositionCostBasisService:
             raise ValueError(f"unknown position_id: {position_id}")
 
         rows = PositionCostBasisService._rows(db, user_id, position_id)
+        # Refuse to update when duplicate rows exist — the prior implementation
+        # silently nulled the manual_basis on extras, destroying data.
+        # If you ever see this, the legacy-table dedupe migration needs to run first.
+        if len(rows) > 1:
+            raise ValueError(
+                f"position_id {position_id} has {len(rows)} cost-basis rows; "
+                f"ambiguous state. Resolve duplicate rows before setting manual basis."
+            )
         row = rows[0] if rows else PositionCostBasisService._new_row(snapshot)
         if not rows:
             db.add(row)
@@ -107,10 +115,6 @@ class PositionCostBasisService:
         row.total_usd = manual_basis_usd if manual_basis_usd is not None else derived
         row.updated_at = datetime.utcnow()
 
-        for duplicate in rows[1:]:
-            duplicate.manual_basis_usd = None
-            duplicate.updated_at = datetime.utcnow()
-
         db.commit()
         db.refresh(row)
         return PositionCostBasisService._response(row)
@@ -122,8 +126,12 @@ class PositionCostBasisService:
         if any(row.manual_basis_usd is not None for row in rows):
             return False
         if legacy_manual:
-            rows[0].manual_basis_usd = sum((Decimal(str(row.total_usd)) for row in rows), Decimal("0"))
-            rows[0].note = rows[0].note or "Migrated from legacy manual cost basis"
+            # Legacy `total_usd` came from on-chain reconstruction (CostBasisService),
+            # NOT user manual entry — attribute it to derived, not manual. Doing the
+            # opposite would falsely tell the LLM the user asserted this number.
+            rows[0].derived_basis_usd = sum((Decimal(str(row.total_usd)) for row in rows), Decimal("0"))
+            rows[0].derived_at = rows[0].derived_at or datetime.utcnow()
+            rows[0].note = rows[0].note or "Migrated from legacy auto-computed cost basis"
             rows[0].updated_at = datetime.utcnow()
             return True
 
@@ -182,8 +190,10 @@ class PositionCostBasisService:
         derived = next((row.derived_basis_usd for row in rows if row.derived_basis_usd is not None), None)
         if derived is not None:
             return BasisValue(Decimal(str(derived)), "derived")
-        legacy = [Decimal(str(row.total_usd)) for row in rows]
-        return BasisValue(sum(legacy, Decimal("0")), "manual") if legacy else None
+        # No manual + no derived → no basis. The prior implementation summed
+        # `total_usd` into a phantom "manual" basis here, which mis-attributed
+        # unattributed/legacy data as user-asserted truth. Caveat doctrine wins.
+        return None
 
     @staticmethod
     def _response(row: PositionCostBasis) -> PositionCostBasisResponse:

@@ -110,7 +110,11 @@ def test_manual_basis_wins_over_backfill(session):
     assert basis[("lp-manual", WALLET, "base")].source == "manual"
 
 
-def test_legacy_total_usd_rows_are_treated_as_manual_basis(session):
+def test_legacy_total_usd_rows_are_treated_as_derived_basis(session):
+    """Legacy total_usd (from on-chain reconstruction) attributes to DERIVED,
+    not manual. Calling unattributed numbers "user-asserted manual entry" would
+    violate the caveat doctrine — the LLM would tell the user they confirmed
+    a basis they never set."""
     user = _user(session)
     _snapshot(session, user.id, "lp-legacy", "100.00", 1)
     _basis_row(session, user.id, "lp-legacy", "70.00")
@@ -122,4 +126,4 @@ def test_legacy_total_usd_rows_are_treated_as_manual_basis(session):
     assert stats == {"positions_updated": 1, "positions_skipped": 0, "errors": 0}
     basis = PositionCostBasisService.get_effective_basis_map(session, user.id, "base")
     assert basis[("lp-legacy", WALLET, "base")].amount == Decimal("100.00")
-    assert basis[("lp-legacy", WALLET, "base")].source == "manual"
+    assert basis[("lp-legacy", WALLET, "base")].source == "derived"
